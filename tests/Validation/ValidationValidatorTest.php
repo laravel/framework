@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Validation;
 
-use JMac\Testing\Double;
 use Countable;
 use DateTime;
 use DateTimeImmutable;
@@ -32,6 +31,7 @@ use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
+use JMac\Testing\Double;
 use Mockery;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;

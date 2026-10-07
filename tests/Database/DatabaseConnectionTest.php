@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use DateTime;
 use ErrorException;
 use Exception;
@@ -20,7 +19,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PDOException;
 use PDOStatement;

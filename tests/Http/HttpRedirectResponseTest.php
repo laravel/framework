@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Http;
 
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Http\RedirectResponse;
@@ -11,7 +10,7 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 

@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Console;
 
-use JMac\Testing\Double;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class CacheCommandMutexTest extends TestCase

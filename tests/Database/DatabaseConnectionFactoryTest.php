@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\SqlServerConnection;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

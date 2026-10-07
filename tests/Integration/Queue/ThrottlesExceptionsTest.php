@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use JMac\Testing\Matching\Argument;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
@@ -13,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 

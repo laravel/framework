@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Bus;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
@@ -14,7 +12,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;

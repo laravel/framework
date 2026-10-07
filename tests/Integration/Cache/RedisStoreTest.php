@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use JMac\Testing\Double;
 use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;

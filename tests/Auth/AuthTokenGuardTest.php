@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Auth;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\TokenGuard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class AuthTokenGuardTest extends TestCase

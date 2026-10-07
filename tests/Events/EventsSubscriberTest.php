@@ -2,9 +2,8 @@
 
 namespace Illuminate\Tests\Events;
 
-use JMac\Testing\Double;
 use Illuminate\Events\Dispatcher;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class EventsSubscriberTest extends TestCase

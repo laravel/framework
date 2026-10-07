@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
@@ -16,7 +15,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Support\Facades\Event;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 
 class CallQueuedHandlerTest extends TestCase

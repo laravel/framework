@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Events\Dispatcher;
@@ -11,7 +9,8 @@ use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\QueueFailedOver;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class FailoverQueueTest extends TestCase

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\DoubleInterface;
 use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use SortDirection;
 
@@ -77,7 +77,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $value = 'pivot_value';
         $column = new Expression("CONCAT(foo, '_', bar)");
         $relation = $this->getRelation();
-        /** @var Builder|Mockery\MockInterface $builder */
+        /** @var Builder|DoubleInterface $builder */
         $builder = $relation->getQuery();
 
         $builder->expects('where')->with($column, '=', $value, 'and')->times(2)->returns($builder);

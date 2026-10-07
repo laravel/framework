@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithQueueTest extends TestCase

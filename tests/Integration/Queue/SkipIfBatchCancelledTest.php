@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
@@ -10,7 +9,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\SkipIfBatchCancelled;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 
 class SkipIfBatchCancelledTest extends TestCase

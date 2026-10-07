@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Closure;
 use DateInterval;
@@ -38,7 +36,8 @@ use Illuminate\Tests\Database\Fixtures\Enums\IntegerStatus;
 use Illuminate\Tests\Database\Fixtures\Enums\NonBackedStatus;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Mockery\MockInterface;
 use PDO;
 use PHPUnit\Framework\TestCase;

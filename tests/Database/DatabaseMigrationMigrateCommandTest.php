@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -12,7 +11,7 @@ use Illuminate\Database\Schema\SchemaState;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;

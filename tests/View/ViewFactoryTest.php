@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\View;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Closure;
 use ErrorException;
 use Illuminate\Container\Container;
@@ -23,7 +21,8 @@ use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Illuminate\View\ViewFinderInterface;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use ReflectionFunction;
 

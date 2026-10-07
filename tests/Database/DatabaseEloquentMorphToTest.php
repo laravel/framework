@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +14,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\TestEnum;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

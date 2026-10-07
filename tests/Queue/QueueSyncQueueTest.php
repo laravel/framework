@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -15,8 +14,8 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
+use JMac\Testing\Double;
 use LogicException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase

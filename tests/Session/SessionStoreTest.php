@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Session;
 
-use JMac\Testing\Double;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;

@@ -2,19 +2,18 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use JMac\Testing\Double;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
-use PHPUnit\Framework\TestCase;
-
 use function Orchestra\Testbench\package_path;
+
+use PHPUnit\Framework\TestCase;
 
 class LazilyRefreshDatabaseTest extends TestCase
 {

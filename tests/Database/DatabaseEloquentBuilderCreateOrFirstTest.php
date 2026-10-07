@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
@@ -11,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -58,12 +57,12 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -84,12 +83,12 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -140,12 +139,12 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -166,15 +165,15 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-                ['baz', '2023-01-01 00:00:00', 123])->returns(1);
+            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -225,15 +224,15 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-                ['baz', '2023-01-01 00:00:00', 123])->returns(1);
+            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -254,17 +253,17 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'count' => 1,
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('raw')->with('"count" + 1')->returns('2');
 
         $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
-                ['2', '2023-01-01 00:00:00', 123])->returns(1);
+            ['2', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], 'count');
         $this->assertFalse($result->wasRecentlyCreated);
@@ -308,18 +307,18 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'count' => 1,
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'count' => 1,
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('raw')->with('"count" + 2')->returns('3');
 
         $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "val" = ?, "updated_at" = ? where "id" = ?',
-                ['3', 'baz', '2023-01-01 00:00:00', 123])->returns(1);
+            ['3', 'baz', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -372,17 +371,17 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'count' => 1,
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('raw')->with('"count" + 1')->returns('2');
 
         $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
-                ['2', '2023-01-01 00:00:00', 123])->returns(1);
+            ['2', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -427,15 +426,15 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-                ['baz', '2023-01-01 00:00:00', 123])->returns(1);
+            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -472,15 +471,15 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-                ['baz', '2023-01-01 00:00:00', 123])->returns(1);
+            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
 
         $callCount = 0;
         $model->newQuery()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
@@ -516,12 +515,12 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-                'id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $callCount = 0;
         $result = $model->newQuery()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {

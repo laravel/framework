@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console;
 
-use JMac\Testing\Double;
 use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
@@ -15,8 +14,8 @@ use Illuminate\Console\View\Components\Factory;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Concerns\CreatesAnsweredOutputStyles;
+use JMac\Testing\Double;
 use Laravel\Prompts\Prompt;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;

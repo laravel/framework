@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Http;
 
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -15,8 +14,8 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use JMac\Testing\Double;
 use JsonSerializable;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;

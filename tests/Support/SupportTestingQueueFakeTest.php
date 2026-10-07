@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +12,8 @@ use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 

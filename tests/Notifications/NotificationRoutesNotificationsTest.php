@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

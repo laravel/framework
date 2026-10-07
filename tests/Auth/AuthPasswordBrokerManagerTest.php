@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerManagerTest extends TestCase

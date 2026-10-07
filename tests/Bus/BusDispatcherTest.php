@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Bus;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Config\Repository as Config;
@@ -16,7 +14,8 @@ use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Double;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
-
 use function Illuminate\Support\php_binary;
+use JMac\Testing\Double;
+use PHPUnit\Framework\TestCase;
+
+use Symfony\Component\Process\Process;
 
 class SupportComposerTest extends TestCase
 {

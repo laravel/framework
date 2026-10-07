@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use JMac\Testing\Double;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class NotificationDatabaseChannelTest extends TestCase

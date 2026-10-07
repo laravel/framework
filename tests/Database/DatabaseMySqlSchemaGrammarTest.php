@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Expression;
@@ -11,7 +10,7 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase

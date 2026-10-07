@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;

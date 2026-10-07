@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\EloquentUserProvider;
@@ -13,7 +12,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

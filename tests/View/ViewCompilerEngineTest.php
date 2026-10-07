@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View;
 
-use JMac\Testing\Double;
 use ErrorException;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -10,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\ViewException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -89,8 +88,8 @@ class ViewCompilerEngineTest extends TestCase
         $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
 
         $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-                "File does not exist at path {$path}."
-            ));
+            "File does not exist at path {$path}."
+        ));
 
         $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
 
@@ -118,8 +117,8 @@ class ViewCompilerEngineTest extends TestCase
         $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
 
         $files->expects('getRequire')->with($compiled, [])->throws(new ErrorException(
-                "require({$path}): Failed to open stream: No such file or directory",
-            ));
+            "require({$path}): Failed to open stream: No such file or directory",
+        ));
 
         $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
 
@@ -147,12 +146,12 @@ class ViewCompilerEngineTest extends TestCase
         $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
 
         $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-                "File does not exist at path {$path}."
-            ));
+            "File does not exist at path {$path}."
+        ));
 
         $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-                "File does not exist at path {$path}."
-            ));
+            "File does not exist at path {$path}."
+        ));
 
         $engine->getCompiler()->expects('getCompiledPath')->times(3)->with($path)->returns($compiled);
 
@@ -178,8 +177,8 @@ class ViewCompilerEngineTest extends TestCase
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')->with($compiled, [])->throws(new Exception(
-                'Just an regular error...'
-            ));
+            'Just an regular error...'
+        ));
 
         $engine->getCompiler()->expects('isExpired')->returns(false);
 
@@ -200,8 +199,8 @@ class ViewCompilerEngineTest extends TestCase
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-                "File does not exist at path {$path}."
-            ));
+            "File does not exist at path {$path}."
+        ));
 
         $engine->getCompiler()->expects('isExpired')->returns(true);
 

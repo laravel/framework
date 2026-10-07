@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
-use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Support\Collection;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class ChannelListCommandTest extends TestCase

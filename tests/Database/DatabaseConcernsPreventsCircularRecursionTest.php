@@ -2,9 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Concerns\PreventsCircularRecursion;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__.'/DatabaseEloquentStrictMorphsTest.php';

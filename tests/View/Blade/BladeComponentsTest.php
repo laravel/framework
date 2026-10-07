@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use JMac\Testing\Double;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use Mockery;
+use JMac\Testing\Double;
 
 class BladeComponentsTest extends AbstractBladeTestCase
 {

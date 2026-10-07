@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
@@ -26,7 +25,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase

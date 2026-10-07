@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 

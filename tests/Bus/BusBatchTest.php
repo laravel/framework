@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Bus;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
@@ -35,7 +33,8 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

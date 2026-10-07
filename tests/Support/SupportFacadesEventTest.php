@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Double;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
@@ -19,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase

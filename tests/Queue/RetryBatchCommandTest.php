@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use JMac\Testing\Double;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\RetryBatchCommand;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;

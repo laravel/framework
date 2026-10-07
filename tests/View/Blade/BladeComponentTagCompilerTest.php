@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -13,7 +12,7 @@ use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 {

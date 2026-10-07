@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -22,7 +21,7 @@ use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;

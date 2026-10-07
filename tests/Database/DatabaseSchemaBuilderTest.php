@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBuilderTest extends TestCase

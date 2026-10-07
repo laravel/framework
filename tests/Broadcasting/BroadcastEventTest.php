@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 

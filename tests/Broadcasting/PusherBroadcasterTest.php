@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\Request;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -142,9 +141,9 @@ class PusherBroadcasterTest extends TestCase
     public function testUserAuthenticationForPusher()
     {
         $this->pusher->expects('getSettings')->returns([
-                'auth_key' => '278d425bdf160c739803',
-                'secret' => '7ad3773142a6692b25b8',
-            ]);
+            'auth_key' => '278d425bdf160c739803',
+            'secret' => '7ad3773142a6692b25b8',
+        ]);
 
         $this->broadcaster = new PusherBroadcaster($this->pusher);
 

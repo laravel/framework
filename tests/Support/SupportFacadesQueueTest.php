@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesQueueTest extends TestCase

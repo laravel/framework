@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use ArrayIterator;
 use BadMethodCallException;
 use DateInterval;
@@ -24,7 +22,8 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;

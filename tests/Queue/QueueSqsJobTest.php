@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
+use JMac\Testing\Double;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;

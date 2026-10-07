@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Cache\ArrayStore;
@@ -31,7 +29,8 @@ use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -383,10 +382,10 @@ class FoundationExceptionsHandlerTest extends TestCase
             $redirector->expects('to')->returns($responder);
 
             $responder->expects('withInput')->with(Argument::satisfies(function ($argument) use (&$argumentActual) {
-                    $argumentActual = $argument;
+                $argumentActual = $argument;
 
-                    return true;
-                }))->returns($responder);
+                return true;
+            }))->returns($responder);
 
             $responder->expects('withErrors')->returns($responder);
 

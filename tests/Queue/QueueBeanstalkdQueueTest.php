@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\DoubleInterface;
+use JMac\Testing\Matching\Argument;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
@@ -29,7 +29,7 @@ class QueueBeanstalkdQueueTest extends TestCase
     private $queue;
 
     /**
-     * @var \Illuminate\Container\Container|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+     * @var \Illuminate\Container\Container|DoubleInterface|\Mockery\MockInterface
      */
     private $container;
 

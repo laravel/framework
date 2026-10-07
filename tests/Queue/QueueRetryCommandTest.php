@@ -2,9 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Foundation\Application;
@@ -16,7 +13,9 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
-use Mockery as m;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;

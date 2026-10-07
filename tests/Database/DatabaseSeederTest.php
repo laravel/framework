@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
-use Mockery;
+use JMac\Testing\Double;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;

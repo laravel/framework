@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -11,7 +10,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class FoundationAuthenticationTest extends TestCase

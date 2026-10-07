@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Double;
 use ArrayAccess;
 use ArrayIterator;
 use ArrayObject;
@@ -26,8 +25,8 @@ use Illuminate\Tests\Support\Fixtures\TestJsonSerializeWithScalarValueObject;
 use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestTraversableAndJsonSerializableObject;
 use InvalidArgumentException;
+use JMac\Testing\Double;
 use JsonSerializable;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;

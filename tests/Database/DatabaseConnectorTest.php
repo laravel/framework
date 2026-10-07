@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Connectors\Connector;
 use Illuminate\Database\Connectors\MySqlConnector;
 use Illuminate\Database\Connectors\PostgresConnector;
 use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
@@ -12,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -62,13 +61,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $result = $model->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -162,13 +161,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01T00:00:00.000000Z',
-                'updated_at' => '2023-01-01T00:00:00.000000Z',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ]]);
 
         $result = $model->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -198,13 +197,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $result = $model->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -252,13 +251,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01T00:00:00.000000Z',
-                'updated_at' => '2023-01-01T00:00:00.000000Z',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "child_table" set "val" = ?, "updated_at" = ? where "id" = ?',
             ['baz', '2023-01-01 00:00:00', 456])->returns(1);
@@ -291,13 +290,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "child_table" set "val" = ?, "updated_at" = ? where "id" = ?',
             ['baz', '2023-01-01 00:00:00', 456])->returns(1);
@@ -342,13 +341,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01T00:00:00.000000Z',
-                'updated_at' => '2023-01-01T00:00:00.000000Z',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ]]);
 
         $model->getConnection()->expects('update')->with('update "child_table" set "val" = ?, "updated_at" = ? where "id" = ?',
             ['baz', '2023-01-01 00:00:00', 456])->returns(1);
@@ -367,13 +366,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
-                'id' => 456,
-                'parent_id' => 123,
-                'attr' => 'foo',
-                'val' => 'bar',
-                'created_at' => '2023-01-01 00:00:00',
-                'updated_at' => '2023-01-01 00:00:00',
-            ]]);
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]]);
 
         $callCount = 0;
         $result = $model->children()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {

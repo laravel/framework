@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Session;
 
-use JMac\Testing\Double;
 use Illuminate\Filesystem\Filesystem;
+use function Illuminate\Filesystem\join_paths;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Support\Carbon;
-use Mockery;
-use PHPUnit\Framework\TestCase;
+use JMac\Testing\Double;
 
-use function Illuminate\Filesystem\join_paths;
+use PHPUnit\Framework\TestCase;
 
 class FileSessionHandlerTest extends TestCase
 {

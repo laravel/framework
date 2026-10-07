@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Aws\Result;
 use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
@@ -29,6 +27,8 @@ use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDelayAttribute;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithMessageGroup;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery;
 use PHPUnit\Framework\TestCase;

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -11,7 +9,8 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;

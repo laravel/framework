@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
@@ -13,7 +12,7 @@ use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\Events\QueuesPaused;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

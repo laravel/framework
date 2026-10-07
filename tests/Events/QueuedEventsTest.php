@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Events;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Cache\ArrayStore;
@@ -27,9 +25,10 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class QueuedEventsTest extends TestCase

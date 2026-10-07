@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use JMac\Testing\Double;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -17,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
+use JMac\Testing\Double;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -24,7 +24,6 @@ use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;

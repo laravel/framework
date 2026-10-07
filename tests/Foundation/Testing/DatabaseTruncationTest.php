@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -10,7 +9,7 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseTruncationTest extends TestCase
@@ -195,14 +194,14 @@ class DatabaseTruncationTest extends TestCase
             $callback($connection);
         });
         $connection->allows('table')->resolves(function (string $tableName) use (&$actual) {
-                $actual[] = $tableName;
+            $actual[] = $tableName;
 
-                $table = Double::for(QueryBuilder::class);
-                $table->expects('exists')->returns(true);
-                $table->expects('truncate');
+            $table = Double::for(QueryBuilder::class);
+            $table->expects('exists')->returns(true);
+            $table->expects('truncate');
 
-                return $table;
-            });
+            return $table;
+        });
 
         return $connection;
     }

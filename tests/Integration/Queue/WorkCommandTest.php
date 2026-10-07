@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 

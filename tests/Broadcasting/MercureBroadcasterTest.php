@@ -2,21 +2,20 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Http\Request;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A256GCM;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\Dir;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\Serializer\CompactSerializer;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;

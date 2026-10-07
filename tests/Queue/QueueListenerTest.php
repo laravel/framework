@@ -2,15 +2,14 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
-
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
+use JMac\Testing\Double;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase
 {

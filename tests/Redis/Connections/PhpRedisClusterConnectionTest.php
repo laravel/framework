@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Redis\Connections;
 
-use JMac\Testing\Double;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -109,15 +108,15 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Double::for(\RedisCluster::class);
         $client->allows('_masters')->returns($masters);
         $client->expects('scan')->with(0, $masters[0], '*', 10)->resolves(function (&$cursor) {
-                $cursor = 42;
+            $cursor = 42;
 
-                return ['first'];
-            });
+            return ['first'];
+        });
         $client->expects('scan')->with(42, $masters[0], '*', 10)->resolves(function (&$cursor) {
-                $cursor = 0;
+            $cursor = 0;
 
-                return ['last'];
-            });
+            return ['last'];
+        });
 
         $connection = new PhpRedisClusterConnection($client);
 
@@ -149,15 +148,15 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Double::for(\RedisCluster::class);
         $client->allows('_masters')->returns([$master]);
         $client->expects('scan')->with(null, $master, '*', 10)->resolves(function (&$cursor) use ($largeCursor) {
-                $cursor = $largeCursor;
+            $cursor = $largeCursor;
 
-                return ['first'];
-            });
+            return ['first'];
+        });
         $client->expects('scan')->with($largeCursor, $master, '*', 10)->resolves(function (&$cursor) {
-                $cursor = '0';
+            $cursor = '0';
 
-                return ['last'];
-            });
+            return ['last'];
+        });
 
         $connection = new PhpRedisClusterConnection($client);
 
@@ -189,10 +188,10 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Double::for(\RedisCluster::class);
         $client->expects('_masters')->times(2)->returns($masters, [$masters[1]]);
         $client->expects('scan')->with(0, $masters[0], '*', 10)->resolves(function (&$cursor) {
-                $cursor = 42;
+            $cursor = 42;
 
-                return ['a'];
-            });
+            return ['a'];
+        });
         $client->expects('scan')->with(0, $masters[1], '*', 10)->returns(['b']);
 
         $connection = new PhpRedisClusterConnection($client);

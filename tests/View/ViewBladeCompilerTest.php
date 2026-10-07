@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\View;
 
-use JMac\Testing\Double;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Session\Middleware;
 
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -10,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Store;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class AuthenticateSessionTest extends TestCase

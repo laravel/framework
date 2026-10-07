@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\ArrayStore;
@@ -17,7 +16,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase

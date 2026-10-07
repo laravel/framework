@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\Attributes\Delay;
@@ -14,7 +12,8 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Cache\DatabaseLock;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
@@ -11,7 +9,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -158,11 +157,11 @@ class DatabaseLockTest extends DatabaseTestCase
 
         $deleteBuilder->expects('where')->with('expiration', '<=', Argument::any())->returns($deleteBuilder);
         $deleteBuilder->expects('delete')->throws(new QueryException(
-                'mysql',
-                'delete from cache_locks where expiration <= ?',
-                [],
-                new PDOException($message, $code)
-            ));
+            'mysql',
+            'delete from cache_locks where expiration <= ?',
+            [],
+            new PDOException($message, $code)
+        ));
 
         $connection->allows('transactionLevel')->returns(0);
         $connection->expects('table')->times(2)->with('cache_locks')->returns($insertBuilder, $deleteBuilder);
@@ -186,11 +185,11 @@ class DatabaseLockTest extends DatabaseTestCase
         $updateBuilder = Double::for(Builder::class);
 
         $insertBuilder->expects('insert')->throws(new QueryException(
-                'mysql',
-                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
-                [],
-                new PDOException('Deadlock found when trying to get lock', 1213)
-            ));
+            'mysql',
+            'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+            [],
+            new PDOException('Deadlock found when trying to get lock', 1213)
+        ));
 
         $updateBuilder->allows('where')->returns($updateBuilder);
         $updateBuilder->allows('update')->returns(1);
@@ -221,11 +220,11 @@ class DatabaseLockTest extends DatabaseTestCase
         $deleteBuilder->expects('where')->with('key', 'foo')->returns($deleteBuilder);
         $deleteBuilder->expects('where')->with('owner', $owner)->returns($deleteBuilder);
         $deleteBuilder->expects('delete')->throws(new QueryException(
-                'mysql',
-                'delete from cache_locks where key = ? and owner = ?',
-                ['foo', $owner],
-                new PDOException($message, $code)
-            ));
+            'mysql',
+            'delete from cache_locks where key = ? and owner = ?',
+            ['foo', $owner],
+            new PDOException($message, $code)
+        ));
 
         $connection->allows('transactionLevel')->returns(0);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
@@ -248,11 +247,11 @@ class DatabaseLockTest extends DatabaseTestCase
 
         $deleteBuilder->expects('where')->with('expiration', '<=', Argument::any())->returns($deleteBuilder);
         $deleteBuilder->expects('delete')->throws(new QueryException(
-                'mysql',
-                'delete from cache_locks where expiration <= ?',
-                [],
-                new PDOException('Deadlock found when trying to get lock', 1213)
-            ));
+            'mysql',
+            'delete from cache_locks where expiration <= ?',
+            [],
+            new PDOException('Deadlock found when trying to get lock', 1213)
+        ));
 
         $connection->allows('transactionLevel')->returns(1);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
@@ -274,11 +273,11 @@ class DatabaseLockTest extends DatabaseTestCase
         $deleteBuilder->expects('where')->with('key', 'foo')->returns($deleteBuilder);
         $deleteBuilder->expects('where')->with('owner', $owner)->returns($deleteBuilder);
         $deleteBuilder->expects('delete')->throws(new QueryException(
-                'mysql',
-                'delete from cache_locks where key = ? and owner = ?',
-                ['foo', $owner],
-                new PDOException('Serialization failure: 1213 Deadlock', 40001)
-            ));
+            'mysql',
+            'delete from cache_locks where key = ? and owner = ?',
+            ['foo', $owner],
+            new PDOException('Serialization failure: 1213 Deadlock', 40001)
+        ));
 
         $connection->allows('transactionLevel')->returns(1);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View;
 
-use JMac\Testing\Double;
 use Closure;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -15,7 +14,7 @@ use Illuminate\View\Component;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class ComponentTest extends TestCase

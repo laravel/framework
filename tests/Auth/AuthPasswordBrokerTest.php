@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -10,6 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Arr;
+use JMac\Testing\Double;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;

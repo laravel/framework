@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +18,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;

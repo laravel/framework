@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use JMac\Testing\Double;
 use Carbon\CarbonInterval as Duration;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
@@ -10,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase

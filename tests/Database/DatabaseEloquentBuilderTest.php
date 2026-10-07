@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
@@ -25,7 +23,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -2725,9 +2724,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
 
         $query->expects('upsert')->with([
-                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
-                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
-            ], ['email'], ['email', 'name', 'updated_at'])->returns(2);
+            ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+            ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+        ], ['email'], ['email', 'name', 'updated_at'])->returns(2);
 
         $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
 

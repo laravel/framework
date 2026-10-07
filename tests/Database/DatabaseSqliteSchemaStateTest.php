@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use JMac\Testing\Double;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\GenericUser;
@@ -11,6 +10,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
+use JMac\Testing\Double;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 

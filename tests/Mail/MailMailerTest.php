@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Mail;
 
-use JMac\Testing\Double;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Events\Dispatcher;
@@ -14,7 +13,7 @@ use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

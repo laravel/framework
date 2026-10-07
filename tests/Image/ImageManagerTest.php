@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Image;
 
-use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
@@ -18,7 +17,7 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class ImageManagerTest extends TestCase

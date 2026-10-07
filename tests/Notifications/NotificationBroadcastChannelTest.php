@@ -2,15 +2,14 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

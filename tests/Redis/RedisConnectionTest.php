@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Redis;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application;
@@ -11,7 +9,8 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\RedisManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
 use Redis;

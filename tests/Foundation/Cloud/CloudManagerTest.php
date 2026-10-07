@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Foundation\Cloud;
 
-use JMac\Testing\Double;
 use Illuminate\Foundation\Cloud\CloudManager;
 use Illuminate\Foundation\Cloud\Queue as CloudQueue;
 use Illuminate\Support\Facades\Cloud;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;

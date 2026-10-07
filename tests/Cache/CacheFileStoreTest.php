@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Cache;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Cache\FileStore;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\BeforeClass;

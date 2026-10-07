@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractCursorPaginator;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class CursorPaginatorLoadMorphTest extends TestCase

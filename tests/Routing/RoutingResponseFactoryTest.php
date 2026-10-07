@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Routing;
 
-use JMac\Testing\Double;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class RoutingResponseFactoryTest extends TestCase

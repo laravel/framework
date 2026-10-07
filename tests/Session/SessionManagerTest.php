@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Session;
 
-use JMac\Testing\Double;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Session\SessionManager;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class SessionManagerTest extends TestCase

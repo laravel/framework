@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Console;
 
-use JMac\Testing\Double;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleScheduledEventTest extends TestCase

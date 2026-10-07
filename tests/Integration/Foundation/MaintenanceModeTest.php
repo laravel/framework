@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use JMac\Testing\Double;
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
@@ -17,7 +16,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;

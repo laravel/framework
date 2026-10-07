@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
-use JMac\Testing\Double;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\ParallelTesting as ParallelTestingFacade;
 use Illuminate\Testing\Concerns\TestViews;
 use Illuminate\Testing\ParallelTesting;
 use Illuminate\View\Compilers\BladeCompiler;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;

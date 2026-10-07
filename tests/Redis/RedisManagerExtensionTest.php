@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Redis;
 
-use JMac\Testing\Double;
 use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class RedisManagerExtensionTest extends TestCase

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JMac\Testing\Double;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use JMac\Testing\Double;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;

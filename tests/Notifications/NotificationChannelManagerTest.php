@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Bus\Queueable;
@@ -25,8 +24,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
+use JMac\Testing\Double;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

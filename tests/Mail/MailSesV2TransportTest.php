@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Mail;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Aws\Command;
 use Aws\Exception\AwsException;
 use Aws\Result;
@@ -13,7 +11,8 @@ use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\View\Factory;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -64,12 +63,12 @@ class MailSesV2TransportTest extends TestCase
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
-                return $arg['Source'] === 'myself@example.com' &&
-                    $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
-                    $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
-                    $arg['EmailTags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
-                    str_contains($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
-            }))->returns($sesResult);
+            return $arg['Source'] === 'myself@example.com' &&
+                $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
+                $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
+                $arg['EmailTags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
+                str_contains($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
+        }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
@@ -86,8 +85,8 @@ class MailSesV2TransportTest extends TestCase
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
-                return $arg['TenantName'] === 'my-tenant';
-            }))->returns($sesResult);
+            return $arg['TenantName'] === 'my-tenant';
+        }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
@@ -103,8 +102,8 @@ class MailSesV2TransportTest extends TestCase
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
-                return ! array_key_exists('TenantName', $arg);
-            }))->returns($sesResult);
+            return ! array_key_exists('TenantName', $arg);
+        }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }

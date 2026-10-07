@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Events;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\PendingBroadcast;
 use Illuminate\Container\Container;
@@ -11,7 +9,8 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Tests\Events\Fixtures\ExampleEvent;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class BroadcastedEventsTest extends TestCase
@@ -174,12 +173,12 @@ class BroadcastedEventsTest extends TestCase
             $pendingBroadcast = Double::for(PendingBroadcast::class);
 
             $broadcast->expects('event')->with(Argument::satisfies(function ($event) {
-                    $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
-                    $this->assertSame('first-value', $event->first);
-                    $this->assertSame('second-value', $event->second);
+                $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
+                $this->assertSame('first-value', $event->first);
+                $this->assertSame('second-value', $event->second);
 
-                    return true;
-                }))->returns($pendingBroadcast);
+                return true;
+            }))->returns($pendingBroadcast);
 
             $this->assertSame(
                 $pendingBroadcast,

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -10,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase

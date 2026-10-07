@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Mail;
 
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\ResendTransport;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Resend\Contracts\Client;
 use Resend\Email as ResendEmail;
@@ -56,11 +55,11 @@ class MailResendTransportTest extends TestCase
         $client->emails = $emailService;
 
         $emailService->expects('send')->returns(ResendEmail::from([
-                'id' => 'resend_id_test',
-                'from' => 'myself@example.com',
-                'to' => 'me@example.com',
-                'created_at' => '2023-04-08T00:00:00.000Z',
-            ]));
+            'id' => 'resend_id_test',
+            'from' => 'myself@example.com',
+            'to' => 'me@example.com',
+            'created_at' => '2023-04-08T00:00:00.000Z',
+        ]));
 
         $transport = new ResendTransport($client);
         $sentMessage = $transport->send($email);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
@@ -14,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -63,9 +62,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([[
+            [123, 'foo'],
+            true,
+            [])->returns([[
                 'id' => 789,
                 'pivot_id' => 456,
                 'laravel_through_key' => 123,
@@ -98,9 +97,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([]);
+            [123, 'foo'],
+            true,
+            [])->returns([]);
 
         $parent->getConnection()->expects('insert')->with('insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
@@ -126,9 +125,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([[
+            [123, 'foo'],
+            true,
+            [])->returns([[
                 'id' => 789,
                 'pivot_id' => 456,
                 'laravel_through_key' => 123,
@@ -161,9 +160,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([]);
+            [123, 'foo'],
+            true,
+            [])->returns([]);
 
         $sql = 'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
         $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
@@ -171,9 +170,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ? and "val" = ?) limit 1',
-                [123, 'foo', 'bar'],
-                true,
-                [])->returns([[
+            [123, 'foo', 'bar'],
+            true,
+            [])->returns([[
                 'id' => 789,
                 'pivot_id' => 456,
                 'laravel_through_key' => 123,
@@ -206,12 +205,12 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([]);
+            [123, 'foo'],
+            true,
+            [])->returns([]);
 
         $parent->getConnection()->expects('insert')->with('insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-                ['foo', 'baz', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
+            ['foo', 'baz', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
 
         $result = $parent->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertTrue($result->wasRecentlyCreated);
@@ -234,9 +233,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([[
+            [123, 'foo'],
+            true,
+            [])->returns([[
                 'id' => 789,
                 'pivot_id' => 456,
                 'laravel_through_key' => 123,
@@ -247,7 +246,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             ]]);
 
         $parent->getConnection()->expects('update')->with('update "child" set "val" = ?, "updated_at" = ? where "id" = ?',
-                ['baz', '2023-01-01 00:00:00', 789])->returns(1);
+            ['baz', '2023-01-01 00:00:00', 789])->returns(1);
 
         $result = $parent->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
@@ -272,9 +271,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
-                [123, 'foo'],
-                true,
-                [])->returns([]);
+            [123, 'foo'],
+            true,
+            [])->returns([]);
 
         $sql = 'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
         $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
@@ -282,9 +281,9 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ? and "val" = ?) limit 1',
-                [123, 'foo', 'bar'],
-                true,
-                [])->returns([[
+            [123, 'foo', 'bar'],
+            true,
+            [])->returns([[
                 'id' => 789,
                 'pivot_id' => 456,
                 'laravel_through_key' => 123,

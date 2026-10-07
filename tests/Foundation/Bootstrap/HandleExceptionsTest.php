@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
-use JMac\Testing\Double;
 use Error;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
-use Mockery;
+use JMac\Testing\Double;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;

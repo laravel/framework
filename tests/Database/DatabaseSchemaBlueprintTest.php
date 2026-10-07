@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
@@ -10,7 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Tests\Database\Fixtures\Models\User;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintTest extends TestCase

@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Redis;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Events\CommandFailed;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use Redis;
 

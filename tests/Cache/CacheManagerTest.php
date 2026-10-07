@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use JMac\Testing\Double;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\NullStore;
@@ -14,7 +13,7 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Events\Dispatcher as Event;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

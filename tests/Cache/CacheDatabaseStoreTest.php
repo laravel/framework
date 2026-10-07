@@ -2,15 +2,14 @@
 
 namespace Illuminate\Tests\Cache;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Closure;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\SQLiteConnection;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use stdClass;

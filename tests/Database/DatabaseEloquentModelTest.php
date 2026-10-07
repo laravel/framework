@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Double;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -63,6 +62,7 @@ use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
 use InvalidArgumentException;
+use JMac\Testing\Double;
 use LogicException;
 use Mockery;
 use PDO;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use JMac\Testing\Double;
 use Exception;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
@@ -34,7 +33,7 @@ use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

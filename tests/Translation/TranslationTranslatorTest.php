@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Translation;
 
-use JMac\Testing\Double;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -12,7 +11,7 @@ use Illuminate\Tests\Translation\Fixtures\Enums\Foo;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
@@ -354,10 +353,10 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->expects('load')->with('en', '*', '*')->returns([
-                'string_backed_enum' => 'Laravel 12 was released in :month 2025',
-                'int_backed_enum' => 'Stay tuned for Laravel v:version',
-                'unit_enum' => ':person gets excited about every new Laravel release',
-            ]);
+            'string_backed_enum' => 'Laravel 12 was released in :month 2025',
+            'int_backed_enum' => 'Stay tuned for Laravel v:version',
+            'unit_enum' => ':person gets excited about every new Laravel release',
+        ]);
 
         $this->assertSame(
             'Laravel 12 was released in February 2025',

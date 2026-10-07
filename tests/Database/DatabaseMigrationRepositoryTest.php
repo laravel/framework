@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use JMac\Testing\Matching\Argument;
-use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
@@ -11,7 +9,8 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationRepositoryTest extends TestCase
