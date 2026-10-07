@@ -36,7 +36,7 @@
         "guzzlehttp/promises": "^2.0.3 || ^3.0",
         "guzzlehttp/psr7": "^2.9 || ^3.0",
         "guzzlehttp/uri-template": "^1.0 || ^2.0",
-        "laravel/prompts": "^0.3.11",
+        "laravel/prompts": "^0.3.25",
         "laravel/serializable-closure": "^2.0.10",
         "league/commonmark": "^2.8.1",
         "league/flysystem": "^3.25.1",
