@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
@@ -184,24 +183,13 @@ class SupportLazyCollectionTest extends TestCase
     {
         $timeout = Carbon::now();
 
-        $mock = Mockery::mock(LazyCollection::class.'[now]');
-
         $timedOutWith = [];
 
-        $results = $mock
-            ->times(10)
-            ->tap(function ($collection) use ($mock, $timeout) {
-                tap($collection)
-                    ->mockery_init($mock->mockery_getContainer())
-                    ->shouldAllowMockingProtectedMethods()
-                    ->expects('now')
-                    ->times(3)
-                    ->andReturn(
-                        (clone $timeout)->sub(2, 'minute')->getTimestamp(),
-                        (clone $timeout)->sub(1, 'minute')->getTimestamp(),
-                        $timeout->getTimestamp()
-                    );
-            })
+        Carbon::setTestNow((clone $timeout)->sub(2, 'minute'));
+
+        // The clock moves forward one minute for each item, reaching the timeout on the second.
+        $results = LazyCollection::times(10)
+            ->tapEach(fn ($number) => Carbon::setTestNow((clone $timeout)->sub(2 - $number, 'minute')))
             ->takeUntilTimeout($timeout, function ($value, $key) use (&$timedOutWith) {
                 $timedOutWith = [$value, $key];
             })

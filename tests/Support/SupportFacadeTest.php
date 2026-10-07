@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use Illuminate\Support\Facades\Facade;
-use JMac\Testing\Double;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -84,8 +83,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeResolvesAgainAfterClearingSpecific()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Double::for(FacadeTestService::class)]);
-        $mock->expects('bar')->times(3)->returns('baz');
+        $app->setAttributes(['foo' => $service = new FacadeTestService]);
 
         // Resolve for the first time
         FacadeStub::setFacadeApplication($app);
@@ -98,13 +96,14 @@ class SupportFacadeTest extends TestCase
         // Clear resolved instance through parent and resolve the third time
         Facade::clearResolvedInstance('foo');
         $this->assertSame('baz', FacadeStub::bar());
+
+        $this->assertSame(3, $service->calls);
     }
 
     public function testFacadeResolvesAgainAfterClearingAll()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Double::for(FacadeTestService::class)]);
-        $mock->expects('bar')->times(2)->returns('baz');
+        $app->setAttributes(['foo' => $service = new FacadeTestService]);
 
         // Resolve for the first time
         FacadeStub::setFacadeApplication($app);
@@ -113,6 +112,8 @@ class SupportFacadeTest extends TestCase
         // Clear all resolved instances and resolve a second time
         Facade::clearResolvedInstances();
         $this->assertSame('baz', FacadeStub::bar());
+
+        $this->assertSame(2, $service->calls);
     }
 }
 
@@ -161,8 +162,12 @@ class ApplicationStub implements ArrayAccess
 
 class FacadeTestService
 {
+    public int $calls = 0;
+
     public function bar()
     {
-        //
+        $this->calls++;
+
+        return 'baz';
     }
 }

@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Bus;
 
 use Illuminate\Foundation\Bus\PendingDispatch;
-use JMac\Testing\Double;
+use Illuminate\Foundation\Queue\Queueable;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -27,63 +27,73 @@ class BusPendingDispatchTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->job = Double::for(PendingDispatchTestJob::class);
+        $this->job = new PendingDispatchTestJob;
         $this->pendingDispatch = new PendingDispatchWithoutDestructor($this->job);
     }
 
     public function testOnConnection()
     {
-        $this->job->expects('onConnection')->with('test-connection');
         $this->pendingDispatch->onConnection('test-connection');
+
+        $this->assertSame('test-connection', $this->job->connection);
     }
 
     public function testOnQueue()
     {
-        $this->job->expects('onQueue')->with('test-queue');
         $this->pendingDispatch->onQueue('test-queue');
+
+        $this->assertSame('test-queue', $this->job->queue);
     }
 
     public function testAllOnConnection()
     {
-        $this->job->expects('allOnConnection')->with('test-connection');
         $this->pendingDispatch->allOnConnection('test-connection');
+
+        $this->assertSame('test-connection', $this->job->connection);
+        $this->assertSame('test-connection', $this->job->chainConnection);
     }
 
     public function testAllOnQueue()
     {
-        $this->job->expects('allOnQueue')->with('test-queue');
         $this->pendingDispatch->allOnQueue('test-queue');
+
+        $this->assertSame('test-queue', $this->job->queue);
+        $this->assertSame('test-queue', $this->job->chainQueue);
     }
 
     public function testDelay()
     {
-        $this->job->expects('delay')->with(60);
         $this->pendingDispatch->delay(60);
+
+        $this->assertSame(60, $this->job->delay);
     }
 
     public function testWithoutDelay()
     {
-        $this->job->expects('withoutDelay');
-        $this->pendingDispatch->withoutDelay();
+        $this->pendingDispatch->delay(60)->withoutDelay();
+
+        $this->assertSame(0, $this->job->delay);
     }
 
     public function testAfterCommit()
     {
-        $this->job->expects('afterCommit');
         $this->pendingDispatch->afterCommit();
+
+        $this->assertTrue($this->job->afterCommit);
     }
 
     public function testBeforeCommit()
     {
-        $this->job->expects('beforeCommit');
         $this->pendingDispatch->beforeCommit();
+
+        $this->assertFalse($this->job->afterCommit);
     }
 
     public function testChain()
     {
-        $chain = [new stdClass];
-        $this->job->expects('chain')->with($chain);
-        $this->pendingDispatch->chain($chain);
+        $this->pendingDispatch->chain([new stdClass]);
+
+        $this->assertSame([serialize(new stdClass)], $this->job->chained);
     }
 
     public function testAfterResponse()
@@ -101,89 +111,41 @@ class BusPendingDispatchTest extends TestCase
 
     public function testDynamicallyProxyMethods()
     {
-        $newJob = new stdClass;
-        $this->job->expects('appendToChain')->with($newJob);
-        $this->pendingDispatch->appendToChain($newJob);
+        $this->pendingDispatch->appendToChain(new stdClass);
+
+        $this->assertSame([serialize(new stdClass)], $this->job->chained);
     }
 
     public function testWhenMethodOfConditionableTraitWithTrue()
     {
-        $this->job->expects('delay')->with(300);
-
         $this->pendingDispatch->when(true, fn ($pendingDispatch) => $pendingDispatch->delay(300));
+
+        $this->assertSame(300, $this->job->delay);
     }
 
     public function testWhenMethodOfConditionableTraitWithFalse()
     {
-        $this->job->expects('delay')->never();
-
         $this->pendingDispatch->when(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
+
+        $this->assertNull($this->job->delay);
     }
 
     public function testUnlessMethodOfConditionableTraitWithTrue()
     {
-        $this->job->expects('delay')->never();
-
         $this->pendingDispatch->unless(true, fn ($pendingDispatch) => $pendingDispatch->delay(300));
+
+        $this->assertNull($this->job->delay);
     }
 
     public function testUnlessMethodOfConditionableTraitWithFalse()
     {
-        $this->job->expects('delay')->with(300);
-
         $this->pendingDispatch->unless(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
+
+        $this->assertSame(300, $this->job->delay);
     }
 }
 
 class PendingDispatchTestJob
 {
-    public function onConnection(...$arguments)
-    {
-        //
-    }
-
-    public function onQueue(...$arguments)
-    {
-        //
-    }
-
-    public function allOnConnection(...$arguments)
-    {
-        //
-    }
-
-    public function allOnQueue(...$arguments)
-    {
-        //
-    }
-
-    public function delay(...$arguments)
-    {
-        //
-    }
-
-    public function withoutDelay(...$arguments)
-    {
-        //
-    }
-
-    public function afterCommit(...$arguments)
-    {
-        //
-    }
-
-    public function beforeCommit(...$arguments)
-    {
-        //
-    }
-
-    public function chain(...$arguments)
-    {
-        //
-    }
-
-    public function appendToChain(...$arguments)
-    {
-        //
-    }
+    use Queueable;
 }

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
-use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
 class JsonResourceTest extends TestCase
@@ -51,8 +50,9 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $resource = Double::for(JsonResource::class)->passthru();
-        $resource->expects('jsonSerialize')->times(3)->returns(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
+        Container::getInstance()->instance('request', Request::create('/'));
+
+        $resource = new JsonResource(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
 
         $results = $resource->toPrettyJson();
         $expected = $resource->toJson(JSON_PRETTY_PRINT);
@@ -66,5 +66,7 @@ class JsonResourceTest extends TestCase
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
         $this->assertStringContainsString('"number": 123', $results);
+
+        Container::getInstance()->forgetInstance('request');
     }
 }
