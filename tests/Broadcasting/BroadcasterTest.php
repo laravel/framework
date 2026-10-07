@@ -190,14 +190,25 @@ class BroadcasterTest extends TestCase
         );
     }
 
+    protected function requestResolvingUsers(array $users, array &$guards = []): Request
+    {
+        $request = new Request;
+        $request->setUserResolver(function ($guard = null) use ($users, &$guards) {
+            $guards[] = $guard;
+
+            return $users[$guard] ?? null;
+        });
+
+        return $request;
+    }
+
     public function testRetrieveUserWithoutGuard()
     {
         $this->broadcaster->channel('somechannel', function () {
             //
         });
 
-        $request = Double::for(Request::class);
-        $request->expects('user')->with(Argument::none())->returns(new DummyUser);
+        $request = $this->requestResolvingUsers([null => new DummyUser]);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -211,8 +222,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = Double::for(Request::class);
-        $request->expects('user')->with('myguard')->returns(new DummyUser);
+        $request = $this->requestResolvingUsers(['myguard' => new DummyUser]);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -229,13 +239,8 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = Double::for(Request::class);
-        $request->expects('user')->with('myguard1')->returns(null);
-        $request->expects('user')
-            ->times(2)
-            ->with('myguard2')
-            ->andReturn(new DummyUser)
-            ->ordered('user');
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard1' => null, 'myguard2' => new DummyUser], $guards);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -246,6 +251,8 @@ class BroadcasterTest extends TestCase
             DummyUser::class,
             $this->broadcaster->retrieveUser($request, 'someotherchannel')
         );
+
+        $this->assertSame(['myguard1', 'myguard2', 'myguard2'], $guards);
     }
 
     public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
@@ -254,11 +261,12 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = Double::for(Request::class);
-        $request->expects('user')->with('myguard')->returns(null);
-        $request->expects('user')->with(Argument::none())->never();
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard' => null], $guards);
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
+
+        $this->assertSame(['myguard'], $guards);
     }
 
     public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
@@ -267,12 +275,12 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = Double::for(Request::class);
-        $request->expects('user')->with('myguard1')->returns(null);
-        $request->expects('user')->with('myguard2')->returns(null);
-        $request->expects('user')->with(Argument::none())->never();
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard1' => null, 'myguard2' => null], $guards);
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
+
+        $this->assertSame(['myguard1', 'myguard2'], $guards);
     }
 
     public function testUserAuthenticationWithValidUser()

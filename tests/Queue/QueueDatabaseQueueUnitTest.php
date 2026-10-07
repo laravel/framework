@@ -40,8 +40,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database = Double::for(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->method('currentTime')->willReturn('time');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('insertGetId')->resolves(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
@@ -92,8 +92,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
             ->setConstructorArgs([$database, 'table', 'default'])
             ->getMock();
         $queue->method('currentTime')->willReturn('time');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('insertGetId')->resolves(function ($array) use ($uuid, $time) {
@@ -125,8 +125,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database = Double::for(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->method('currentTime')->willReturn('time');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('insertGetId')->resolves(function ($array) {
@@ -145,8 +145,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Double::for(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('insertGetId')->resolves(function ($array) {
@@ -169,8 +169,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Double::for(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('insertGetId')->resolves(function ($array) {

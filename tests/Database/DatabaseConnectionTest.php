@@ -433,7 +433,7 @@ class DatabaseConnectionTest extends TestCase
         $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
         $pdo = Double::for(PDO::class);
-        $pdo->expects('beginTransaction');
+        $pdo->expects('beginTransaction')->returns(true);
         $statement = Double::for(PDOStatement::class);
         $pdo->expects('prepare')->returns($statement);
         $statement->expects('execute')->throws(new PDOException('server has gone away'));
@@ -476,7 +476,7 @@ class DatabaseConnectionTest extends TestCase
     protected function getFailingPdo()
     {
         $statement = Double::for(PDOStatement::class);
-        $statement->expects('bindValue');
+        $statement->expects('bindValue')->returns(true);
         $statement->expects('execute')->throws(new PDOException('SQLSTATE[42S02]: Base table or view not found'));
 
         $pdo = Double::for(PDO::class);
@@ -490,8 +490,14 @@ class DatabaseConnectionTest extends TestCase
         $pdo = Double::for(PDO::class);
 
         $statement = Double::for(PDOStatement::class);
-        $statement->expects('execute')->throws(new PDOException('server has gone away'));
-        $statement->expects('execute')->returns(true);
+        $executions = 0;
+        $statement->expects('execute')->times(2)->resolves(function () use (&$executions) {
+            if ($executions++ === 0) {
+                throw new PDOException('server has gone away');
+            }
+
+            return true;
+        });
 
         $pdo->expects('prepare')->times(2)->returns($statement);
 

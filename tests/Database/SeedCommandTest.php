@@ -37,7 +37,7 @@ class SeedCommandTest extends TestCase
 
         $resolver = new ConnectionResolver;
 
-        $container = Double::for(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
         $container->expects('environment')->returns('testing');
         $container->allows('runningUnitTests')->returns('true');
@@ -46,7 +46,7 @@ class SeedCommandTest extends TestCase
         $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
@@ -70,7 +70,7 @@ class SeedCommandTest extends TestCase
         $resolver = new SeedCommandTestConnectionResolver;
         $resolver->default = 'mysql';
 
-        $container = Double::for(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
         $container->expects('environment')->returns('testing');
         $container->allows('runningUnitTests')->returns('true');
@@ -79,7 +79,7 @@ class SeedCommandTest extends TestCase
         $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
@@ -112,7 +112,7 @@ class SeedCommandTest extends TestCase
 
         $resolver = new ConnectionResolver;
 
-        $container = Double::for(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
         $container->expects('environment')->returns('testing');
         $container->allows('runningUnitTests')->returns('true');
@@ -121,7 +121,7 @@ class SeedCommandTest extends TestCase
         $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         $dispatcher = new Dispatcher;
         Model::setEventDispatcher($dispatcher);
@@ -143,14 +143,14 @@ class SeedCommandTest extends TestCase
 
         $resolver = new ConnectionResolver;
 
-        $container = Double::for(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
         $container->allows('runningUnitTests')->returns('true');
         $container->expects('make')->with(OutputStyle::class, Argument::any())->returns($outputStyle);
         $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);

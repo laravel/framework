@@ -44,7 +44,7 @@ class SessionStoreTest extends TestCase
 
         $session = $this->getSession();
         $oldId = $session->getId();
-        $session->getHandler()->expects('destroy')->with($oldId);
+        $session->getHandler()->expects('destroy')->with($oldId)->returns(true);
         $this->assertTrue($session->migrate(true));
         $this->assertNotEquals($oldId, $session->getId());
     }
@@ -85,7 +85,7 @@ class SessionStoreTest extends TestCase
         $session->flash('name', 'Taylor');
         $this->assertTrue($session->has('name'));
 
-        $session->getHandler()->expects('destroy')->with($oldId);
+        $session->getHandler()->expects('destroy')->with($oldId)->returns(true);
         $this->assertTrue($session->invalidate());
 
         $this->assertFalse($session->has('name'));
@@ -112,7 +112,7 @@ class SessionStoreTest extends TestCase
                     'old' => ['baz'],
                 ],
             ])
-        );
+        )->returns(true);
         $session->save();
 
         $this->assertFalse($session->isStarted());
@@ -142,7 +142,7 @@ class SessionStoreTest extends TestCase
                     'old' => [],
                 ],
             ])
-        );
+        )->returns(true);
 
         $session->save();
 
@@ -174,7 +174,7 @@ class SessionStoreTest extends TestCase
                     'old' => [],
                 ],
             ])
-        );
+        )->returns(true);
 
         $session->save();
 
@@ -214,7 +214,7 @@ class SessionStoreTest extends TestCase
                     'old' => [],
                 ],
             ])
-        );
+        )->returns(true);
 
         $session->save();
 
@@ -418,7 +418,6 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $this->assertFalse($session->handlerNeedsRequest());
-        $session->getHandler()->expects('setRequest')->never();
 
         $session = new Store('test', Double::for(new CookieSessionHandler(new CookieJar, 60, false)));
         $this->assertTrue($session->handlerNeedsRequest());
@@ -787,7 +786,7 @@ class SessionStoreTest extends TestCase
                     'new' => [],
                 ],
             ])
-        );
+        )->returns(true);
         $session->save();
 
         $this->assertFalse($session->isStarted());

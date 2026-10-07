@@ -302,12 +302,12 @@ class ConsoleApplicationTest extends TestCase
 
     protected function getMockConsole(array $methods)
     {
-        $app = Double::for(ApplicationContract::class);
+        $app = Double::for(ApplicationContract::class, override: true);
         $app->allows('version')->returns('6.0');
         $events = new EventsDispatcher;
 
         return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
-            $app, $events, 'test-version',
+            $app->instance(), $events, 'test-version',
         ])->getMock();
     }
 }

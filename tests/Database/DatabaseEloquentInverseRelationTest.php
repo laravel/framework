@@ -213,7 +213,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         $parent = clone $related;
         $parent->expects('getForeignKey')->returns('recursive_parent_id');
-        $parent->expects('getKeyName')->returns('id');
+        $parent->expects('getKeyName')->times(2)->returns('id');
 
         $builder = Double::for(Builder::class);
         $builder->expects('getModel')->times(6)->returns($related);
@@ -245,7 +245,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         $parent = clone $related;
         $parent->expects('getForeignKey')->returns('recursive_parent_id');
-        $parent->expects('getKeyName')->returns('id');
+        $parent->expects('getKeyName')->times(2)->returns('id');
 
         $builder = Double::for(Builder::class);
         $builder->expects('getModel')->times(7)->returns($related);

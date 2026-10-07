@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Scheduling\Event;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
@@ -31,9 +32,11 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testBasicCronCompilation()
     {
-        $app = Double::for(Application::class)->passthru();
-        $app->expects('isDownForMaintenance')->times(3)->returns(false);
-        $app->expects('environment')->times(3)->returns('production');
+        $appDouble = Double::for(ApplicationContract::class, override: true);
+        $appDouble->expects('isDownForMaintenance')->times(3)->returns(false);
+        $appDouble->expects('environment')->times(3)->returns('production');
+        $appDouble->allows('call')->resolves(fn ($callback) => $callback());
+        $app = $appDouble->instance();
 
         $event = new Event(new FakeEventMutex, 'php foo');
         $this->assertSame('* * * * *', $event->getExpression());
@@ -75,9 +78,11 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testEventIsDueCheck()
     {
-        $app = Double::for(Application::class)->passthru();
-        $app->expects('isDownForMaintenance')->times(2)->returns(false);
-        $app->expects('environment')->times(2)->returns('production');
+        $appDouble = Double::for(ApplicationContract::class, override: true);
+        $appDouble->expects('isDownForMaintenance')->times(2)->returns(false);
+        $appDouble->expects('environment')->times(2)->returns('production');
+        $appDouble->allows('call')->resolves(fn ($callback) => $callback());
+        $app = $appDouble->instance();
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event(new FakeEventMutex, 'php foo');

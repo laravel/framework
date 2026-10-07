@@ -39,7 +39,7 @@ class QueueRetryCommandTest extends TestCase
 
         $failer->expects('find')->with('5')->returns($job);
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '5'), 'default', []);
-        $failer->expects('forget')->with('5');
+        $failer->expects('forget')->with(5);
 
         $this->runRetryCommand(['id' => ['5']], $failer, ['database' => $queue]);
     }
@@ -54,7 +54,7 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('find')->with('5')->returns($job);
         $queue->expects('getQueueableOptions')->with(Argument::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '5'), 'default', ['MySpecialOption' => 'option-1']);
-        $failer->expects('forget')->with('5');
+        $failer->expects('forget')->with(5);
 
         $this->runRetryCommand(['id' => ['5']], $failer, ['database' => $queue]);
     }
@@ -78,11 +78,11 @@ class QueueRetryCommandTest extends TestCase
 
         $failer->expects('find')->with('1')->returns($this->failedJob(id: '1', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '1'), 'default', []);
-        $failer->expects('forget')->with('1');
+        $failer->expects('forget')->with(1);
 
         $failer->expects('find')->with('2')->returns($this->failedJob(id: '2', connection: 'database', queue: 'emails'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '2'), 'emails', []);
-        $failer->expects('forget')->with('2');
+        $failer->expects('forget')->with(2);
 
         $output = $this->runRetryCommand(['id' => ['all']], $failer, ['database' => $queue]);
 
@@ -98,7 +98,7 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('ids')->with('emails')->returns(['2']);
         $failer->expects('find')->with('2')->returns($this->failedJob(id: '2', connection: 'database', queue: 'emails'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '2'), 'emails', []);
-        $failer->expects('forget')->with('2');
+        $failer->expects('forget')->with(2);
 
         $this->runRetryCommand(['--queue' => 'emails'], $failer, ['database' => $queue]);
     }
@@ -119,15 +119,15 @@ class QueueRetryCommandTest extends TestCase
         $failer = Double::for(FailedJobProviderInterface::class);
         $queue = Double::for(QueueContract::class);
 
-        $failer->expects('find')->with(1)->returns($this->failedJob(id: '1', connection: 'database', queue: 'default'));
+        $failer->expects('find')->with('1')->returns($this->failedJob(id: '1', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '1'), 'default', []);
         $failer->expects('forget')->with(1);
 
-        $failer->expects('find')->with(2)->returns($this->failedJob(id: '2', connection: 'database', queue: 'default'));
+        $failer->expects('find')->with('2')->returns($this->failedJob(id: '2', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '2'), 'default', []);
         $failer->expects('forget')->with(2);
 
-        $failer->expects('find')->with(3)->returns($this->failedJob(id: '3', connection: 'database', queue: 'default'));
+        $failer->expects('find')->with('3')->returns($this->failedJob(id: '3', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '3'), 'default', []);
         $failer->expects('forget')->with(3);
 
@@ -154,7 +154,7 @@ class QueueRetryCommandTest extends TestCase
         $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['attempts'] === 0;
         }), 'default', []);
-        $failer->expects('forget')->with('1');
+        $failer->expects('forget')->with(1);
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue]);
     }
@@ -176,7 +176,7 @@ class QueueRetryCommandTest extends TestCase
         $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['retryUntil'] === 1234567890;
         }), 'default', []);
-        $failer->expects('forget')->with('1');
+        $failer->expects('forget')->with(1);
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue]);
     }
@@ -191,7 +191,7 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('find')->with('1')->returns($job);
         $queue->expects('getQueueableOptions')->with(Argument::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
         $queue->expects('pushRaw')->with(Argument::type('string'), 'default', ['MySpecialOption' => 'option-1']);
-        $failer->expects('forget')->with('1');
+        $failer->expects('forget')->with(1);
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['sqs' => $queue]);
     }
@@ -207,7 +207,7 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('find')->with('1')->returns($job);
         $events->expects('dispatch')->with(Argument::type(JobRetryRequested::class));
         $queue->expects('pushRaw');
-        $failer->expects('forget')->with('1');
+        $failer->expects('forget')->with(1);
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue], $events);
     }
@@ -363,7 +363,7 @@ class QueueRetryCommandTest extends TestCase
 
         $failer->expects('find')->with('2')->returns($this->failedJob(id: '2', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '2'), 'default', []);
-        $failer->expects('forget')->with('2');
+        $failer->expects('forget')->with(2);
 
         $output = $this->runRetryCommand(['id' => ['1', '2']], $failer, ['database' => $queue]);
 
@@ -380,7 +380,7 @@ class QueueRetryCommandTest extends TestCase
 
         $failer->expects('find')->with('2')->returns($this->failedJob(id: '2', connection: 'database', queue: 'default'));
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '2'), 'default', []);
-        $failer->expects('forget')->with('2');
+        $failer->expects('forget')->with(2);
 
         $output = $this->runRetryCommand(['id' => ['batch', '2']], $failer, ['database' => $queue]);
 
@@ -407,7 +407,7 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('forget')->with('job-2');
 
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '9'), 'default', []);
-        $failer->expects('forget')->with('9');
+        $failer->expects('forget')->with(9);
 
         $this->runRetryCommand(['id' => ['batch', '9']], $failer, ['database' => $queue]);
     }

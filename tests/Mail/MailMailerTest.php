@@ -324,12 +324,15 @@ class MailMailerTest extends TestCase
     protected function viewFactory(string ...$rendered)
     {
         $factory = Double::for(Factory::class);
+        $views = [];
 
         foreach ($rendered as $contents) {
             $view = Double::for(View::class);
             $view->expects('render')->returns($contents);
-            $factory->expects('make')->returns($view);
+            $views[] = $view;
         }
+
+        $factory->expects('make')->times(count($views))->returns(...$views);
 
         return $factory;
     }

@@ -15,6 +15,7 @@ use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Concerns\CreatesAnsweredOutputStyles;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -40,8 +41,9 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = Double::for(FoundationApplication::class);
-        $command->setLaravel($application);
+        $application = Double::for(FoundationApplication::class, override: true);
+        $laravel = $application->instance();
+        $command->setLaravel($laravel);
 
         $input = new ArrayInput([]);
         $output = new NullOutput;
@@ -49,13 +51,13 @@ class CommandTest extends TestCase
         $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->returns($outputStyle);
         $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->returns(new Factory($outputStyle));
 
-        $application->expects('call')->with([$command, 'handle'])->resolves(function () use ($command, $application) {
+        $application->expects('call')->with([$command, 'handle'])->resolves(function () use ($command, $application, $laravel) {
             $commandCalled = Double::for(Command::class);
 
             $application->expects('make')->with(Command::class)->returns($commandCalled);
 
             $commandCalled->expects('setApplication')->with(null);
-            $commandCalled->expects('setLaravel')->with($application);
+            $commandCalled->expects('setLaravel')->with($laravel);
             $commandCalled->expects('run');
 
             $command->call(Command::class);
@@ -190,9 +192,7 @@ class CommandTest extends TestCase
     public function testTheOutputSetterOverwrite()
     {
         $output = Double::for(OutputStyle::class);
-        $output->expects('writeln')->withArgs(function (...$args) {
-            return $args[0] === '<info>foo</info>';
-        });
+        $output->expects('writeln')->with('<info>foo</info>', Argument::remaining());
 
         $command = new Command;
         $command->setOutput($output);

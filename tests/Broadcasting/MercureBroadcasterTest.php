@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use ArrayObject;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
@@ -234,6 +235,22 @@ class MercureBroadcasterTest extends TestCase
         $this->assertSame('strict', $cookie->getSameSite());
     }
 
+    /**
+     * @return \ArrayObject<int, Update>
+     */
+    protected function capturePublishedUpdates(): ArrayObject
+    {
+        $updates = new ArrayObject;
+
+        $this->hub->allows('publish')->resolves(function (Update $update) use ($updates) {
+            $updates[] = $update;
+
+            return 'id';
+        });
+
+        return $updates;
+    }
+
     public function testBroadcastPublishesOneUnprivatedUpdateWhenEveryChannelIsPublic()
     {
         $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
@@ -249,17 +266,19 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastPublishesOnePrivateUpdatePerGuardedChannel()
     {
-        foreach (['private-room.1', 'presence-room.2'] as $channel) {
-            $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use ($channel) {
-                $data = json_decode($update->getData(), true);
-
-                return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
-                    && $update->isPrivate()
-                    && $data['channels'] === [$channel];
-            }));
-        }
+        $updates = $this->capturePublishedUpdates();
 
         $this->broadcaster->broadcast(['private-room.1', 'presence-room.2'], 'MessageSent', []);
+
+        $this->assertCount(2, $updates);
+
+        foreach (['private-room.1', 'presence-room.2'] as $index => $channel) {
+            $data = json_decode($updates[$index]->getData(), true);
+
+            $this->assertSame(['https://laravel.alt/echo/channel/'.$channel], $updates[$index]->getTopics());
+            $this->assertTrue($updates[$index]->isPrivate());
+            $this->assertSame([$channel], $data['channels']);
+        }
     }
 
     public function testBroadcastStripsTheSocketKeyFromThePayloadAndEmbedsItInTheEnvelope()
@@ -284,15 +303,15 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastSplitsAMixedBatchIntoTwoUpdates()
     {
-        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
-            return $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate();
-        }));
-
-        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
-            return $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate();
-        }));
+        $updates = $this->capturePublishedUpdates();
 
         $this->broadcaster->broadcast(['news', 'private-room.1'], 'MessageSent', ['text' => 'hi']);
+
+        $this->assertCount(2, $updates);
+        $this->assertSame(['https://laravel.alt/echo/channel/news'], $updates[0]->getTopics());
+        $this->assertFalse($updates[0]->isPrivate());
+        $this->assertSame(['https://laravel.alt/echo/channel/private-room.1'], $updates[1]->getTopics());
+        $this->assertTrue($updates[1]->isPrivate());
     }
 
     public function testTopicsEncodeChannelNamesIntoASinglePathSegment()
@@ -505,22 +524,26 @@ class MercureBroadcasterTest extends TestCase
     {
         $broadcaster = $this->encryptedBroadcaster();
 
-        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate()));
-        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate()));
-
-        foreach (['private-encrypted-a', 'private-encrypted-b'] as $channel) {
-            $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use ($channel) {
-                $data = json_decode($update->getData(), true);
-
-                return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
-                    && $update->isPrivate()
-                    && array_keys($data) === ['channels', 'data']
-                    && $data['channels'] === [$channel]
-                    && count(explode('.', $data['data'])) === 5;
-            }));
-        }
+        $updates = $this->capturePublishedUpdates();
 
         $broadcaster->broadcast(['news', 'private-room.1', 'private-encrypted-a', 'private-encrypted-b'], 'MessageSent', ['text' => 'hi']);
+
+        $this->assertCount(4, $updates);
+        $this->assertSame(['https://laravel.alt/echo/channel/news'], $updates[0]->getTopics());
+        $this->assertFalse($updates[0]->isPrivate());
+        $this->assertSame(['https://laravel.alt/echo/channel/private-room.1'], $updates[1]->getTopics());
+        $this->assertTrue($updates[1]->isPrivate());
+
+        foreach (['private-encrypted-a', 'private-encrypted-b'] as $index => $channel) {
+            $update = $updates[$index + 2];
+            $data = json_decode($update->getData(), true);
+
+            $this->assertSame(['https://laravel.alt/echo/channel/'.$channel], $update->getTopics());
+            $this->assertTrue($update->isPrivate());
+            $this->assertSame(['channels', 'data'], array_keys($data));
+            $this->assertSame([$channel], $data['channels']);
+            $this->assertCount(5, explode('.', $data['data']));
+        }
     }
 
     public function testBroadcastEncryptedUpdateRoundTrips()

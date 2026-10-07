@@ -79,7 +79,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getQuery()->expects('upsert')->with(
             [
-                ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
+                ['email' => 'foo3', 'name' => 'bar', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
             ],
             ['email'],
             ['name']
@@ -93,8 +93,8 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getQuery()->expects('upsert')->with(
             [
-                ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
-                ['name' => 'bar2', 'email' => 'foo2', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
+                ['email' => 'foo3', 'name' => 'bar', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
+                ['name' => 'bar2', 'email' => 'foo2', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
             ],
             ['email'],
             ['name']

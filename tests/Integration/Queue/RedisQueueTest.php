@@ -59,7 +59,7 @@ class RedisQueueTest extends TestCase
     private function setQueue($driver, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
     {
         $this->queue = new RedisQueue($this->redis[$driver], $default, $connection, $retryAfter, $blockFor);
-        $this->container = Double::for(Container::class);
+        $this->container = Double::for(Container::class, override: true);
         $this->queue->setContainer($this->container);
     }
 
@@ -517,13 +517,13 @@ class RedisQueueTest extends TestCase
             return true;
         })->andReturnNull();
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('bound')->with('events')->returns(true)->times(2);
         $container->expects('offsetGet')->with('events')->returns($events)->times(2);
 
         $default = config('queue.connections.redis.queue', 'default');
         $queue = new RedisQueue($this->redis[$driver], $default);
-        $queue->setContainer($container);
+        $queue->setContainer($container->instance());
 
         $queue->push(new RedisQueueIntegrationTestJob(5));
     }
@@ -538,13 +538,13 @@ class RedisQueueTest extends TestCase
         $events->expects('dispatch')->with(Argument::type(JobQueueing::class))->returns(null)->times(3);
         $events->expects('dispatch')->with(Argument::type(JobQueued::class))->returns(null)->times(3);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('bound')->with('events')->returns(true)->times(6);
         $container->expects('offsetGet')->with('events')->returns($events)->times(6);
 
         $default = config('queue.connections.redis.queue', 'default');
         $queue = new RedisQueue($this->redis[$driver], $default);
-        $queue->setContainer($container);
+        $queue->setContainer($container->instance());
 
         $queue->bulk([
             new RedisQueueIntegrationTestJob(5),

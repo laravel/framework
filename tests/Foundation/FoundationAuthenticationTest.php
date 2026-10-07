@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
@@ -18,7 +19,7 @@ class FoundationAuthenticationTest extends TestCase
     use InteractsWithAuthentication;
 
     /**
-     * @var \Mockery
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -35,13 +36,14 @@ class FoundationAuthenticationTest extends TestCase
      */
     protected function mockGuard()
     {
-        $guard = Double::for(Guard::class);
+        $guard = Double::for(SessionGuard::class);
 
         $auth = Double::for(AuthManager::class);
         $auth->expects('guard')->returns($guard);
 
-        $this->app = Double::for(Application::class);
-        $this->app->expects('make')->with('auth')->returns($auth);
+        $app = Double::for(Application::class, override: true);
+        $app->expects('make')->with('auth')->returns($auth);
+        $this->app = $app->instance();
 
         return $guard;
     }

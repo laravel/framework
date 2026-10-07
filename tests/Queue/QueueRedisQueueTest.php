@@ -33,8 +33,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $redis->expects('connection')->times(minimum: 1)->returns($redis);
         $redis->expects('isCluster')->returns(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -60,8 +60,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $redis->expects('connection')->times(minimum: 1)->returns($redis);
         $redis->expects('isCluster')->returns(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -93,8 +93,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $redis->expects('connection')->times(minimum: 1)->returns($redis);
         $redis->expects('isCluster')->returns(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -129,8 +129,8 @@ class QueueRedisQueueTest extends TestCase
 
         $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
@@ -163,8 +163,8 @@ class QueueRedisQueueTest extends TestCase
         Carbon::setTestNow($time);
         $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Double::for(Container::class);
-        $queue->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Application;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Exceptions\OriginMismatchException;
@@ -161,7 +161,7 @@ class PreventRequestForgeryTest extends TestCase
     protected function createMiddleware()
     {
         return new PreventRequestForgeryTestStub(
-            Double::for(Application::class),
+            new Application,
             new Encrypter(str_repeat('a', 16))
         );
     }

@@ -58,13 +58,17 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected $request;
 
+    protected $requestDouble;
+
     protected function setUp(): void
     {
         $this->config = Double::for(Config::class);
 
         $this->viewFactory = Double::for(ViewFactory::class);
 
-        $this->request = Double::for(Request::class);
+        $this->requestDouble = Double::for(Request::class, override: true);
+
+        $this->request = $this->requestDouble->instance();
 
         $this->container = Container::setInstance(new Container);
 
@@ -204,7 +208,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testShouldReturnJsonWhen()
     {
-        $this->request->expects('expectsJson')->never();
+        $this->requestDouble->expects('expectsJson')->never();
         $exception = new Exception('My custom error message');
 
         $request = $this->request;
@@ -410,7 +414,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testSuspiciousOperationReturns400WithoutReporting()
     {
         $this->config->expects('get')->with('app.debug', null)->returns(true);
-        $this->request->expects('expectsJson')->returns(true);
+        $this->requestDouble->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
@@ -427,7 +431,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testRecordsNotFoundReturns404WithoutReporting()
     {
         $this->config->expects('get')->with('app.debug', null)->returns(true);
-        $this->request->expects('expectsJson')->returns(true);
+        $this->requestDouble->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new RecordsNotFoundException);
 

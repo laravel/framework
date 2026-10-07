@@ -20,7 +20,7 @@ class SupportServiceProviderTest extends TestCase
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
-        $this->app = $app = Double::for(Application::class)->passthru();
+        $this->app = $app = new Application;
         $config = new Config();
 
         $app->instance('config', $config);
@@ -169,11 +169,7 @@ class SupportServiceProviderTest extends TestCase
         $translator = Double::for(Translator::class);
         $translator->expects('addPath')->with(__DIR__.'/translations');
 
-        $this->app->expects('afterResolving')->with('translator', Argument::satisfies(function ($callback) use ($translator) {
-            $callback($translator);
-
-            return true;
-        }));
+        $this->app->instance('translator', $translator);
 
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadTranslationsFrom(__DIR__.'/translations');
@@ -184,11 +180,7 @@ class SupportServiceProviderTest extends TestCase
         $translator = Double::for(Translator::class);
         $translator->expects('addNamespace')->with('namespace', __DIR__.'/translations');
 
-        $this->app->expects('afterResolving')->with('translator', Argument::satisfies(function ($callback) use ($translator) {
-            $callback($translator);
-
-            return true;
-        }));
+        $this->app->instance('translator', $translator);
 
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadTranslationsFrom(__DIR__.'/translations', 'namespace');

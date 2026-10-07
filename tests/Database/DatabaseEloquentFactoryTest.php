@@ -32,9 +32,9 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $app = Double::for(Application::class);
+        $app = Double::for(Application::class, override: true);
         $app->allows('getNamespace')->returns('App\\');
-        $container->instance(Application::class, $app);
+        $container->instance(Application::class, $app->instance());
 
         $db = new DB;
 
@@ -728,9 +728,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        $app = Double::for(Application::class);
+        $app = Double::for(Application::class, override: true);
         $app->allows('getNamespace')->returns('Illuminate\\Tests\\Database\\Fixtures\\');
-        Container::getInstance()->instance(Application::class, $app);
+        Container::getInstance()->instance(Application::class, $app->instance());
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
 
@@ -741,9 +741,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        $app = Double::for(Application::class);
+        $app = Double::for(Application::class, override: true);
         $app->allows('getNamespace')->returns('Foo\\');
-        Container::getInstance()->instance(Application::class, $app);
+        Container::getInstance()->instance(Application::class, $app->instance());
 
         Factory::useNamespace('Factories\\');
 

@@ -44,6 +44,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection = Double::for(SQLiteConnection::class);
         $connection->expects('getDatabaseName')->returns($config['database']);
         $pdo = Double::for(PDO::class);
+        $pdo->allows('exec')->returns(0);
         $connection->expects('getPdo')->returns($pdo);
 
         $files = Double::for(Filesystem::class);

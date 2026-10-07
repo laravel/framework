@@ -286,7 +286,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
 
         $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
+            ['foo', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
         $this->assertTrue($result->wasRecentlyCreated);
@@ -342,7 +342,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
 
         $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "count", "updated_at", "created_at") values (?, ?, ?, ?, ?)',
-            ['foo', 'baz', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
+            ['foo', 'baz', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
         $this->assertTrue($result->wasRecentlyCreated);
@@ -366,7 +366,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
 
         $sql = 'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)';
-        $bindings = ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+        $bindings = ['foo', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
 
         $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 

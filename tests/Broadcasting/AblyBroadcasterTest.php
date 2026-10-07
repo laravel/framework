@@ -110,16 +110,22 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = Double::for(Request::class);
-        $request->expects('all')->times(4)->returns(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+        $request = new Request(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
-        $request->allows('input')->with('callback', false)->returns(false);
+        $user = new class
+        {
+            public function getAuthIdentifierForBroadcasting()
+            {
+                return 42;
+            }
 
-        $user = Double::for('User');
-        $user->allows('getAuthIdentifierForBroadcasting')->returns(42);
-        $user->allows('getAuthIdentifier')->returns(42);
+            public function getAuthIdentifier()
+            {
+                return 42;
+            }
+        };
 
-        $request->expects('user')->times(2)->returns($user);
+        $request->setUserResolver(fn () => $user);
 
         return $request;
     }
@@ -130,10 +136,9 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = Double::for(Request::class);
-        $request->expects('all')->times(4)->returns(['channel_name' => $channel]);
+        $request = new Request(['channel_name' => $channel]);
 
-        $request->expects('user')->returns(null);
+        $request->setUserResolver(fn () => null);
 
         return $request;
     }

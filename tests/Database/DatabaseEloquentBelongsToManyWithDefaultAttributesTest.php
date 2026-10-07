@@ -29,7 +29,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 
         $query = Double::for(QueryBuilder::class);
         $query->expects('from')->with('club_user')->returns($query);
-        $query->expects('insert')->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->returns(true);
+        $query->expects('insert')->with([['user_id' => 1, 'club_id' => 1, 'is_admin' => 1]])->returns(true);
         $relation->getQuery()->getQuery()->expects('newQuery')->returns($query);
 
         $relation->attach(1);

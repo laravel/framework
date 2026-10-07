@@ -24,14 +24,14 @@ class LoadEnvironmentVariablesTest extends TestCase
 
     protected function getAppMock($file)
     {
-        $app = Double::for(Application::class);
+        $app = Double::for(Application::class, override: true);
 
         $app->expects('configurationIsCached')->with()->returns(false);
         $app->expects('runningInConsole')->with()->returns(false);
         $app->expects('environmentPath')->with()->returns(__DIR__.'/../Fixtures');
         $app->expects('environmentFile')->with()->returns($file);
 
-        return $app;
+        return $app->instance();
     }
 
     public function testCanLoad()

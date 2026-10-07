@@ -31,8 +31,8 @@ class DatabaseSeederTest extends TestCase
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
-        $container = Double::for(Container::class);
-        $seeder->setContainer($container);
+        $container = Double::for(Container::class, override: true);
+        $seeder->setContainer($container->instance());
         $output = Double::for(OutputInterface::class);
         $output->expects('writeln')->times(3);
         $command = Double::for(Command::class);
@@ -40,7 +40,7 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
         $child = Double::for(Seeder::class);
         $container->expects('make')->with('ClassName')->returns($child);
-        $child->expects('setContainer')->with($container)->returns($child);
+        $child->expects('setContainer')->with($container->instance())->returns($child);
         $child->expects('setCommand')->with($command)->returns($child);
         $child->expects('__invoke');
 
@@ -63,11 +63,11 @@ class DatabaseSeederTest extends TestCase
 
     public function testInjectDependenciesOnRunMethod()
     {
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;
-        $seeder->setContainer($container);
+        $seeder->setContainer($container->instance());
 
         $seeder->__invoke();
 
@@ -76,11 +76,11 @@ class DatabaseSeederTest extends TestCase
 
     public function testSendParamsOnCallMethodWithDeps()
     {
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;
-        $seeder->setContainer($container);
+        $seeder->setContainer($container->instance());
 
         $seeder->__invoke(['test1', 'test2']);
 

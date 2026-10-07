@@ -50,7 +50,7 @@ class QueueSqsJobTest extends TestCase
         $this->mockedSqsClient = Double::for(SqsClient::class)->passthru();
 
         // Use Mockery to mock the IoC Container
-        $this->mockedContainer = Double::for(Container::class);
+        $this->mockedContainer = Double::for(Container::class, override: true);
 
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -105,13 +105,13 @@ class QueueSqsJobTest extends TestCase
         $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->returns($store);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('cache')->returns($cache);
 
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
 
-        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+        $job = new SqsJob($container->instance(), $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
             'store' => 'database',
             'delete_after_processing' => true,
@@ -150,13 +150,13 @@ class QueueSqsJobTest extends TestCase
         $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->returns($store);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('cache')->returns($cache);
 
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
 
-        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+        $job = new SqsJob($container->instance(), $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
             'store' => 'database',
             'delete_after_processing' => true,
@@ -178,7 +178,7 @@ class QueueSqsJobTest extends TestCase
         $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->returns($store);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('cache')->returns($cache);
 
         $jobData = $this->mockedJobData;
@@ -187,7 +187,7 @@ class QueueSqsJobTest extends TestCase
         $sqsClient = Double::for(SqsClient::class)->passthru();
         $sqsClient->expects('deleteMessage');
 
-        $job = new SqsJob($container, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+        $job = new SqsJob($container->instance(), $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
             'store' => 'database',
             'delete_after_processing' => true,

@@ -196,6 +196,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects('put')->times(3)->with(__DIR__.'/'.$cache_dir.'/'.$hash, Argument::any(), Argument::any())->resolves(function ($name, $value) {
             return strlen($value);
         });
+        $files->allows('exists')->returns(true);
         $files->expects('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash)->returns('0600', '0644')->times(3);
         $files->expects('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash, 0644)->returns([true]);
         $result = $store->put('foo', 'foo', 10);
@@ -220,6 +221,7 @@ class CacheFileStoreTest extends TestCase
         });
 
         $files->expects('exists')->with(__DIR__.'/'.$cache_dir)->returns(false);
+        $files->allows('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash)->returns('0606');
         $files->expects('makeDirectory')->with(__DIR__.'/'.$cache_dir, 0777, true, true);
         $files->expects('chmod')->with(__DIR__.'/'.$cache_parent_dir)->returns(['0600']);
         $files->expects('chmod')->with(__DIR__.'/'.$cache_parent_dir, 0606)->returns([true]);

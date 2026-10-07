@@ -24,12 +24,8 @@ class RoutingRedirectorTest extends TestCase
     {
         $this->headers = new HeaderBag;
 
-        $this->request = Double::for(Request::class);
-        $this->request->allows('isMethod')->returns(true);
-        $this->request->allows('method')->returns('GET');
-        $this->request->allows('route')->returns(true);
-        $this->request->allows('ajax')->returns(false);
-        $this->request->allows('expectsJson')->returns(false);
+        $this->request = Request::create('/', 'GET');
+        $this->request->setRouteResolver(fn () => true);
         $this->request->headers = $this->headers;
 
         $this->url = Double::for(UrlGenerator::class);
@@ -79,7 +75,7 @@ class RoutingRedirectorTest extends TestCase
 
     public function testGuestPutPreviousUrlInSession()
     {
-        $this->request->expects('isMethod')->with('GET')->returns(false);
+        $this->request->setMethod('POST');
         $this->url->expects('previous')->returns('http://foo.com/bar');
 
         $response = $this->redirect->guest('login');
@@ -111,7 +107,8 @@ class RoutingRedirectorTest extends TestCase
 
     public function testRefreshRedirectToCurrentUrl()
     {
-        $this->request->expects('path')->returns('http://foo.com/bar');
+        $this->url->allows('getRequest')->returns(Request::create('/bar'));
+
         $response = $this->redirect->refresh();
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
     }

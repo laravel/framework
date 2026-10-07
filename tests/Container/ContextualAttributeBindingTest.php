@@ -137,25 +137,25 @@ class ContextualAttributeBindingTest extends TestCase
             $manager->expects('userResolver')->times(4)->returns(fn ($guard = null) => $manager->guard($guard)->user());
             $manager->expects('guard')->with('foo')->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with('bar')->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
@@ -243,11 +243,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('request', function () {
-            $request = Double::for(Request::class);
+            $request = Double::for(Request::class, override: true);
             $request->expects('route')->with('foo')->returns(Double::for(Model::class));
             $request->expects('route')->with('bar')->returns('bar');
 
-            return $request;
+            return $request->instance();
         });
 
         $container->make(RouteParameterTest::class);
@@ -257,11 +257,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('request', function () {
-            $request = Double::for(Request::class);
+            $request = Double::for(Request::class, override: true);
             $request->expects('route')->with('foo')->returns(Double::for(Model::class));
             $request->expects('route')->with('bar')->returns('bar');
 
-            return $request;
+            return $request->instance();
         });
 
         $container->make(RouteParameterTestWithoutParameterName::class);

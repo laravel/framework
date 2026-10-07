@@ -33,7 +33,7 @@ class EncryptedSessionStoreTest extends TestCase
         $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             $serialized
-        );
+        )->returns(true);
         $session->save();
 
         $this->assertFalse($session->isStarted());

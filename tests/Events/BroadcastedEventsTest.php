@@ -42,8 +42,8 @@ class BroadcastedEventsTest extends TestCase
     public function testShouldBroadcastAsQueuedAndCallNormalListeners()
     {
         unset($_SERVER['__event.test']);
-        $container = Double::for(Container::class);
-        $d = new Dispatcher($container);
+        $container = Double::for(Container::class, override: true);
+        $d = new Dispatcher($container->instance());
         $broadcast = Double::for(BroadcastManager::class);
         $broadcast->expects('queue');
         $container->expects('make')->with(BroadcastFactory::class)->returns($broadcast);
@@ -72,8 +72,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithMultipleChannels()
     {
-        $container = Double::for(Container::class);
-        $d = new Dispatcher($container);
+        $container = Double::for(Container::class, override: true);
+        $d = new Dispatcher($container->instance());
         $broadcast = Double::for(BroadcastManager::class);
         $broadcast->expects('queue');
         $container->expects('make')->with(BroadcastFactory::class)->returns($broadcast);
@@ -91,8 +91,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomConnectionName()
     {
-        $container = Double::for(Container::class);
-        $d = new Dispatcher($container);
+        $container = Double::for(Container::class, override: true);
+        $d = new Dispatcher($container->instance());
         $broadcast = Double::for(BroadcastManager::class);
         $broadcast->expects('queue');
         $container->expects('make')->with(BroadcastFactory::class)->returns($broadcast);
@@ -112,8 +112,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomEventName()
     {
-        $container = Double::for(Container::class);
-        $d = new Dispatcher($container);
+        $container = Double::for(Container::class, override: true);
+        $d = new Dispatcher($container->instance());
         $broadcast = Double::for(BroadcastManager::class);
         $broadcast->expects('queue');
         $container->expects('make')->with(BroadcastFactory::class)->returns($broadcast);
@@ -136,8 +136,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomPayload()
     {
-        $container = Double::for(Container::class);
-        $d = new Dispatcher($container);
+        $container = Double::for(Container::class, override: true);
+        $d = new Dispatcher($container->instance());
         $broadcast = Double::for(BroadcastManager::class);
         $broadcast->expects('queue');
         $container->expects('make')->with(BroadcastFactory::class)->returns($broadcast);

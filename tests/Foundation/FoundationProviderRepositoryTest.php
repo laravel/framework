@@ -110,7 +110,7 @@ class FoundationProviderRepositoryTest extends TestCase
 
         $files = Double::for(Filesystem::class);
         $files->expects('replace')->never();
-        $repo = new ProviderRepository(Double::for(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
+        $repo = new ProviderRepository(Double::for(ApplicationContract::class, override: true)->instance(), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);
     }

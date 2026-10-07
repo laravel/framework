@@ -146,8 +146,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testNestedDefaultComponentParsing()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -405,9 +405,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessed()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
+        $app = Double::for(Application::class, override: true);
         $app->expects('getNamespace')->returns('App\\');
-        $container->instance(Application::class, $app);
+        $container->instance(Application::class, $app->instance());
         Container::setInstance($container);
 
         $result = $this->compiler()->guessClassName('alert');
@@ -420,8 +420,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessedWithNamespaces()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $app->expects('getNamespace')->returns('App\\');
         Container::setInstance($container);
 
@@ -541,8 +541,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponents()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -562,8 +562,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithIndexView()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -583,8 +583,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithComponentView()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -604,8 +604,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testPackagesClasslessComponents()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -626,8 +626,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -662,8 +662,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -698,8 +698,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -734,8 +734,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -769,8 +769,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -804,8 +804,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
@@ -872,8 +872,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testItThrowsAnExceptionForNonExistingClass()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->returns('App\\');
@@ -888,8 +888,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testAttributesTreatedAsPropsAreRemovedFromFinalAttributes()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
@@ -927,8 +927,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
     {
         $container = new Container;
-        $app = Double::for(Application::class);
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $container->instance(Application::class, $app->instance());
         $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');

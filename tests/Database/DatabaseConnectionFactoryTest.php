@@ -370,18 +370,18 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Unsupported driver [foo]'));
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('bound')->returns(false);
-        $factory = new ConnectionFactory($container);
+        $factory = new ConnectionFactory($container->instance());
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('bound')->with('db.connector.foo')->returns(true);
         $container->expects('make')->with('db.connector.foo')->returns('connector');
-        $factory = new ConnectionFactory($container);
+        $factory = new ConnectionFactory($container->instance());
 
         $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
     }

@@ -1319,7 +1319,7 @@ class ValidationValidatorTest extends TestCase
 
         $hasher = Double::for(Hasher::class);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('auth')->returns($auth);
         $container->expects('make')->with('hash')->returns($hasher);
 
@@ -1327,7 +1327,7 @@ class ValidationValidatorTest extends TestCase
         $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
@@ -1344,7 +1344,7 @@ class ValidationValidatorTest extends TestCase
         $hasher = Double::for(Hasher::class);
         $hasher->expects('check')->returns(false);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('auth')->returns($auth);
         $container->expects('make')->with('hash')->returns($hasher);
 
@@ -1352,7 +1352,7 @@ class ValidationValidatorTest extends TestCase
         $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
@@ -1369,7 +1369,7 @@ class ValidationValidatorTest extends TestCase
         $hasher = Double::for(Hasher::class);
         $hasher->expects('check')->returns(true);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('auth')->returns($auth);
         $container->expects('make')->with('hash')->returns($hasher);
 
@@ -1377,7 +1377,7 @@ class ValidationValidatorTest extends TestCase
         $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
 
@@ -1394,7 +1394,7 @@ class ValidationValidatorTest extends TestCase
         $hasher = Double::for(Hasher::class);
         $hasher->expects('check')->returns(true);
 
-        $container = Double::for(Container::class);
+        $container = Double::for(Container::class, override: true);
         $container->expects('make')->with('auth')->returns($auth);
         $container->expects('make')->with('hash')->returns($hasher);
 
@@ -1402,7 +1402,7 @@ class ValidationValidatorTest extends TestCase
         $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
     }

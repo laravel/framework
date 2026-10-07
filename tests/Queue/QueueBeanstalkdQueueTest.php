@@ -155,7 +155,7 @@ class QueueBeanstalkdQueueTest extends TestCase
             $timeToRun,
             $blockFor
         );
-        $this->container = Double::for(Container::class);
+        $this->container = Double::for(Container::class, override: true);
         $this->queue->setContainer($this->container);
     }
 }
