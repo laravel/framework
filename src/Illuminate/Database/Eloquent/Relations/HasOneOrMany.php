@@ -305,6 +305,25 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Create a related record matching the attributes, or increment the existing record.
+     *
+     * @param  array  $attributes
+     * @param  string  $column
+     * @param  int|float  $default
+     * @param  int|float  $step
+     * @param  array  $extra
+     * @return TRelatedModel
+     */
+    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
+    {
+        return tap($this->firstOrCreate($attributes, array_merge($extra, [$column => $default])), function ($instance) use ($column, $step, $extra) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->increment($column, $step, $extra);
+            }
+        });
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
@@ -415,6 +434,8 @@ abstract class HasOneOrMany extends Relation
      */
     public function forceCreate(array $attributes = [])
     {
+        $attributes = array_merge($this->getQuery()->pendingAttributes, $attributes);
+
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
         return $this->applyInverseRelationToModel($this->related->forceCreate($attributes));

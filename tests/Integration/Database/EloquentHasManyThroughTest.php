@@ -48,6 +48,19 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         });
     }
 
+    public function testEagerLoadingSpecificColumns()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $team = Team::create(['owner_id' => $user->id]);
+        $mate = User::create(['name' => 'John', 'team_id' => $team->id]);
+
+        $user = User::with('teamMates:id,name')->find($user->id);
+
+        $this->assertCount(1, $user->teamMates);
+        $this->assertSame($mate->id, $user->teamMates[0]->id);
+        $this->assertSame('John', $user->teamMates[0]->name);
+    }
+
     public function testBasicCreateAndRetrieve()
     {
         $user = User::create(['name' => Str::random()]);

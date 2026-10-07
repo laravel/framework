@@ -1416,6 +1416,13 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testFlattenWithMixedCollectionTypes($collection)
+    {
+        $c = new $collection([new Collection(['#foo', new LazyCollection(['#bar'])]), new LazyCollection(['#baz', new Collection(['#zap'])])]);
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testFlattenWithDepth($collection)
     {
         // No depth flattens recursively
@@ -1969,6 +1976,13 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testCollapseWithMixedCollectionTypes($collection)
+    {
+        $data = new $collection([new Collection([1, 2]), new LazyCollection([3, 4]), [5]]);
+        $this->assertEquals([1, 2, 3, 4, 5], $data->collapse()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCollapseWithKeys($collection)
     {
         $data = new $collection([[1 => 'a'], [3 => 'c'], [2 => 'b'], 'drop']);
@@ -1984,6 +1998,13 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([new $collection(['a' => '1a', 'b' => '1b']), new $collection(['b' => '2b', 'c' => '2c']), 'drop']);
         $this->assertEquals(['a' => '1a', 'b' => '2b', 'c' => '2c'], $data->collapseWithKeys()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCollapseWithKeysWithMixedCollectionTypes($collection)
+    {
+        $data = new $collection([new Collection(['a' => 1, 'b' => 2]), new LazyCollection(['b' => 3, 'c' => 4])]);
+        $this->assertEquals(['a' => 1, 'b' => 3, 'c' => 4], $data->collapseWithKeys()->all());
     }
 
     #[DataProvider('collectionClassProvider')]

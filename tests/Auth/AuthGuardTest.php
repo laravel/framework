@@ -23,6 +23,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Timebox;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -283,6 +284,29 @@ class AuthGuardTest extends TestCase
         $this->assertNotSame($sessionId, $session->getId());
     }
 
+    public function testLoginWithGenericUserWithoutPasswordDoesNotStorePasswordHash()
+    {
+        [$guard, , $session] = $this->getRealGuard();
+        $user = new GenericUser(['id' => 'foo']);
+        $warnings = [];
+
+        set_error_handler(function ($level, $message) use (&$warnings) {
+            $warnings[] = $message;
+
+            return true;
+        }, E_WARNING);
+
+        try {
+            $guard->login($user);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+        $this->assertSame('foo', $session->get($guard->getName()));
+        $this->assertFalse($session->has('password_hash_default'));
+    }
+
     public function testSessionGuardIsMacroable()
     {
         $guard = $this->getGuard();
@@ -481,6 +505,7 @@ class AuthGuardTest extends TestCase
         $events->assertDispatchedOnce(Logout::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLogoutDoesNotSetRememberTokenIfNotPreviouslySet()
     {
         [$session, $provider, $request] = $this->getMocks();
@@ -700,6 +725,27 @@ class AuthGuardTest extends TestCase
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
         $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
         $this->assertNull($guard->user());
+    }
+
+    public function testHashPasswordForCookieAcceptsNullPassword()
+    {
+        $guard = $this->getGuard();
+        $deprecations = [];
+
+        set_error_handler(function ($level, $message) use (&$deprecations) {
+            $deprecations[] = $message;
+
+            return true;
+        }, E_DEPRECATED);
+
+        try {
+            $hash = $guard->hashPasswordForCookie(null);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertSame($guard->hashPasswordForCookie(''), $hash);
     }
 
     public function testLoginOnceSetsUser()

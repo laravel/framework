@@ -190,7 +190,8 @@ class FilesystemManager implements FactoryContract
             : LocalAdapter::DISALLOW_LINKS;
 
         $adapter = new LocalAdapter(
-            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links
+            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links,
+            lazyRootCreation: $config['lazy_root_creation'] ?? false,
         );
 
         return (new LocalFilesystemAdapter(
@@ -427,13 +428,13 @@ class FilesystemManager implements FactoryContract
     /**
      * Set the given disk instance.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @param  mixed  $disk
      * @return $this
      */
     public function set($name, $disk)
     {
-        $this->disks[$name] = $disk;
+        $this->disks[enum_value($name)] = $disk;
 
         return $this;
     }
@@ -472,13 +473,13 @@ class FilesystemManager implements FactoryContract
     /**
      * Unset the given disk instances.
      *
-     * @param  array|string  $disk
+     * @param  array<\UnitEnum|string>|\UnitEnum|string  $disk
      * @return $this
      */
     public function forgetDisk($disk)
     {
-        foreach ((array) $disk as $diskName) {
-            unset($this->disks[$diskName]);
+        foreach (Arr::wrap($disk) as $diskName) {
+            unset($this->disks[enum_value($diskName)]);
         }
 
         return $this;
@@ -487,12 +488,12 @@ class FilesystemManager implements FactoryContract
     /**
      * Disconnect the given disk and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = enum_value($name) ?? $this->getDefaultDriver();
 
         unset($this->disks[$name]);
     }

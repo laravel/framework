@@ -69,11 +69,13 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
     /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
+        $query = parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+
         if ($this->isOneOfMany()) {
             $this->mergeOneOfManyJoinsTo($query);
         }
 
-        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+        return $query;
     }
 
     /** @inheritDoc */
@@ -108,6 +110,16 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
     public function newRelatedInstanceFor(Model $parent)
     {
         return $this->related->newInstance();
+    }
+
+    /** @inheritDoc */
+    public function is($model)
+    {
+        return ! is_null($model) &&
+               ! is_null($this->getParentKey()) &&
+               $this->related->getTable() === $model->getTable() &&
+               $this->related->getConnectionName() === $model->getConnectionName() &&
+               (clone $this->query)->whereKey($model->getKey())->exists();
     }
 
     /** @inheritDoc */

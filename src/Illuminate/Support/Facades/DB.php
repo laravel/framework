@@ -18,7 +18,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \Illuminate\Database\Connection reconnect(\UnitEnum|string|null $name = null)
  * @method static mixed usingConnection(\UnitEnum|string $name, callable $callback)
  * @method static string getDefaultConnection()
- * @method static void setDefaultConnection(string $name)
+ * @method static void setDefaultConnection(\UnitEnum|string $name)
  * @method static string[] supportedDrivers()
  * @method static string[] availableDrivers()
  * @method static void extend(string $name, callable $resolver)

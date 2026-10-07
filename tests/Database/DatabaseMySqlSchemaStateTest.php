@@ -7,6 +7,7 @@ use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use Pdo\Mysql;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -14,6 +15,7 @@ use Symfony\Component\Process\Process;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     #[DataProvider('provider')]
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
@@ -138,6 +140,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testExecuteDumpProcessForDepth()
     {
         $mockProcess = $this->createMock(Process::class);

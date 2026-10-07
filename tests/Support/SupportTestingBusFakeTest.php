@@ -378,6 +378,14 @@ class SupportTestingBusFakeTest extends TestCase
         }, 2);
     }
 
+    public function testAssertDispatchedWithArrayOfProperties()
+    {
+        $this->fake->dispatch(new BusJobWithPropertiesStub('pending'));
+
+        $this->fake->assertDispatched(BusJobWithPropertiesStub::class, ['status' => 'pending']);
+        $this->fake->assertNotDispatched(BusJobWithPropertiesStub::class, ['status' => 'complete']);
+    }
+
     public function testAssertNotDispatched()
     {
         $this->fake->assertNotDispatched(BusJobStub::class);
@@ -1044,6 +1052,13 @@ class SupportTestingBusFakeTest extends TestCase
 class BusJobStub
 {
     //
+}
+
+class BusJobWithPropertiesStub
+{
+    public function __construct(public string $status)
+    {
+    }
 }
 
 class ChainedJobStub

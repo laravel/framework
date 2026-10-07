@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\View\ViewException;
+use Laravel\Octane\Events\RequestReceived;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -1389,6 +1390,9 @@ class ExceptionReportingTest extends TestCase
         // captured when the job was dispatched.
         ExceptionReportingJobThatReportsException::dispatch(function () {
             Auth::setUser(new GenericUser(['id' => 'abc123', 'remember_token' => '']));
+
+            report(new RuntimeException('While logged in!'));
+
             Auth::logout();
         });
         ExceptionReportingJobThatReportsException::dispatch(fn () => true);
@@ -1404,8 +1408,54 @@ class ExceptionReportingTest extends TestCase
         // The reporter writes to the socket it has already opened, so each
         // report within the worker is another write to the same stream.
         $this->assertCount(1, $streams);
-        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 0);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'While logged in!'], write: 0);
         $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 1);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 2);
+    }
+
+    public function testItDoesNotRememberTheUserWhenTheyLogOutInAScheduledTask(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // The scheduler runs every task in the one process, so remembering the
+        // user would attribute them to the rest of the run.
+        $schedule = $this->app->make(Schedule::class);
+
+        $schedule->call(function () {
+            Auth::login(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']));
+
+            report(new RuntimeException('While logged in!'));
+
+            Auth::logout();
+
+            report(new RuntimeException('Whoops!'));
+        })->name('first-task')->everyMinute();
+
+        $schedule->call(fn () => report(new RuntimeException('Whoops!')))
+            ->name('second-task')
+            ->everyMinute();
+
+        $this->runArtisanCommand(['artisan', 'schedule:run']);
+
+        // The reporter writes to the socket it has already opened, so each
+        // report within the run is another write to the same stream.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => 'abc123',
+            'execution_type' => 'scheduled_task',
+            'message' => 'While logged in!',
+        ], write: 0);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => null,
+            'execution_type' => 'scheduled_task',
+            'message' => 'Whoops!',
+        ], write: 1);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => null,
+            'execution_type' => 'scheduled_task',
+            'message' => 'Whoops!',
+        ], write: 2);
     }
 
     public function testItDoesNotCauseRecursionWhenRetrievingUserId(): void
@@ -1941,6 +1991,38 @@ class ExceptionReportingTest extends TestCase
                 'http://localhost/',
                 $payload['execution_context']['url'],
             );
+
+            return true;
+        });
+    }
+
+    public function testItCapturesTheTimestampOfTheRequestOctaneReceived(): void
+    {
+        $this->freezeTime();
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Octane workers handle many requests, so the timestamp the process
+        // started with is the time the worker booted.
+        $_SERVER['REQUEST_TIME_FLOAT'] = (float) now()->subHour()->format('U.u');
+
+        Route::get('/test', fn () => throw new RuntimeException('Whoops!'));
+
+        // Octane is not installed, so the event it hands the worker is faked.
+        // The event is dispatched by name, as the fake carries the name of
+        // the event by alias rather than by declaration.
+        if (! class_exists(RequestReceived::class)) {
+            class_alias(FakeOctaneRequestReceived::class, RequestReceived::class);
+        }
+
+        Event::dispatch(RequestReceived::class, new RequestReceived);
+
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(now()->format('Y-m-d H:i:s.u'), $payload['execution_context']['timestamp']);
 
             return true;
         });
@@ -4258,6 +4340,11 @@ class ExceptionThrownOnWindows extends RuntimeException
         $this->file = 'D:\\a\\framework\\framework\\tests\\Foundation\\Cloud\\Whoops.php';
         $this->line = 1;
     }
+}
+
+class FakeOctaneRequestReceived
+{
+    //
 }
 
 class HeaderBagThatThrows extends HeaderBag

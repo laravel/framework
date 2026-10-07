@@ -94,6 +94,14 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
     }
 
+    public function testAssertDispatchedWithArrayOfProperties()
+    {
+        $this->fake->dispatch(new EventWithPropertiesStub('pending'));
+
+        $this->fake->assertDispatched(EventWithPropertiesStub::class, ['status' => 'pending']);
+        $this->fake->assertNotDispatched(EventWithPropertiesStub::class, ['status' => 'complete']);
+    }
+
     public function testAssertNotDispatched()
     {
         $this->fake->assertNotDispatched(EventStub::class);
@@ -171,4 +179,11 @@ class EventStub
 class ListenerStub
 {
     //
+}
+
+class EventWithPropertiesStub
+{
+    public function __construct(public string $status)
+    {
+    }
 }

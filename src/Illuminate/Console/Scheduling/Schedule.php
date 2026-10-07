@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -114,6 +115,13 @@ class Schedule
      * @var bool
      */
     public static $interruptible = true;
+
+    /**
+     * Indicates if every event should only run on one server for each cron expression.
+     *
+     * @var bool
+     */
+    public static $alwaysOnOneServer = false;
 
     /**
      * Create a new schedule instance.
@@ -432,7 +440,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return (new Collection($this->events))->filter->isDue($app);
+        return (new Collection($this->events()))->filter->isDue($app);
     }
 
     /**
@@ -442,6 +450,16 @@ class Schedule
      */
     public function events()
     {
+        if (static::$alwaysOnOneServer) {
+            foreach ($this->events as $event) {
+                if ($event instanceof CallbackEvent && is_null($event->description)) {
+                    continue;
+                }
+
+                $event->onOneServer();
+            }
+        }
+
         return $this->events;
     }
 
@@ -514,6 +532,34 @@ class Schedule
     {
         static::$pausable = false;
         static::$interruptible = false;
+    }
+
+    /**
+     * Determine if the schedule has been interrupted since the given time.
+     *
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function hasBeenInterruptedSince(DateTimeInterface $time)
+    {
+        if (! static::$interruptible) {
+            return false;
+        }
+
+        $interruptedAt = Container::getInstance()->make(Cache::class)->get('illuminate:schedule:interrupt');
+
+        return is_numeric($interruptedAt) && (int) $interruptedAt >= Date::instance($time)->getTimestampMs();
+    }
+
+    /**
+     * Indicate that every event on the schedule should only run on one server for each cron expression.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function alwaysOnOneServer($value = true)
+    {
+        static::$alwaysOnOneServer = $value;
     }
 
     /**

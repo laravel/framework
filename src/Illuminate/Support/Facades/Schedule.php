@@ -17,6 +17,8 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\Event[] eventsForEnvironments(array $environments)
  * @method static \Illuminate\Console\Scheduling\Schedule useCache(\UnitEnum|string $store)
  * @method static void withoutInterruptionPolling()
+ * @method static bool hasBeenInterruptedSince(\DateTimeInterface $time)
+ * @method static void alwaysOnOneServer(bool $value = true)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)

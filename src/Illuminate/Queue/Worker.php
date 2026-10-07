@@ -200,6 +200,13 @@ class Worker
     public static $pausable = true;
 
     /**
+     * Indicates if the worker should flush sticky database connections between jobs.
+     *
+     * @var bool
+     */
+    public static $flushStickyConnections = false;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
@@ -1069,12 +1076,16 @@ class Worker
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int  $memoryLimit
+     * @param  int|string  $memoryLimit
      * @return bool
      */
     public function memoryExceeded($memoryLimit)
     {
-        return ((int) $memoryLimit) > 0 && $this->currentMemoryUsage() >= ((int) $memoryLimit);
+        $memoryLimit = str_ends_with((string) $memoryLimit, '%')
+            ? ini_parse_quantity(ini_get('memory_limit')) / 1024 / 1024 * ((float) $memoryLimit / 100)
+            : (int) $memoryLimit;
+
+        return $memoryLimit > 0 && $this->currentMemoryUsage() >= $memoryLimit;
     }
 
     /**

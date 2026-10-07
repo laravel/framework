@@ -14,7 +14,10 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher as EventDispatcher;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -1177,6 +1180,29 @@ class QueueSqsQueueTest extends TestCase
         $this->assertSame(['mid-0', 'mid-1'], array_map(fn ($e) => $e->id, array_values($queuedEvents)));
     }
 
+    public function testBulkNormalizesEnumQueueNameInEvents()
+    {
+        $container = new Container;
+        $container->instance('events', $events = new EventDispatcher);
+
+        $queues = [];
+        $events->listen([JobQueueing::class, JobQueued::class], function ($event) use (&$queues) {
+            $queues[] = $event->queue;
+        });
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer($container);
+        $queue->setConnectionName('sqs');
+
+        $this->sqs->expects('sendMessageBatch')->andReturn(
+            new Result(['Successful' => [['Id' => '0', 'MessageId' => 'mid-0']], 'Failed' => []])
+        );
+
+        $queue->bulk(['a'], 'data', SqsQueueName::Emails);
+
+        $this->assertSame([$this->queueName, $this->queueName], $queues);
+    }
+
     public function testBulkHonoursPerJobDelay(): void
     {
         $jobA = new FakeSqsJob;
@@ -1523,4 +1549,9 @@ class QueueSqsQueueTest extends TestCase
 
         $this->assertInstanceOf(SqsJob::class, $job);
     }
+}
+
+enum SqsQueueName: string
+{
+    case Emails = 'emails';
 }

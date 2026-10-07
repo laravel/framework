@@ -20,6 +20,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -28,6 +29,7 @@ use stdClass;
 class QueueDatabaseQueueUnitTest extends TestCase
 {
     #[DataProvider('pushJobsDataProvider')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {
         Str::createUuidsUsing(function () use ($uuid) {
@@ -71,6 +73,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDelayedPushProperlyPushesJobOntoDatabase()
     {
         $uuid = Str::uuid();
@@ -107,6 +110,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testPushIncludesBatchIdInPayloadForBatchableJob()
     {
         $uuid = Str::uuid()->toString();
@@ -215,6 +219,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBulkBatchPushesOntoDatabase()
     {
         $uuid = Str::uuid();
@@ -255,6 +260,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDelayAttributeIsRespectedWhenBulkPushing()
     {
         $database = Mockery::mock(Connection::class);

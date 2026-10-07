@@ -546,6 +546,53 @@ class CompiledRouteCollectionTest extends TestCase
         $this->assertSame('foo', $this->collection()->match($request)->getName());
     }
 
+    public function testMatchingRootUriWhenServedFromSubdirectory()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('http://example.com/app/', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
+    public function testMatchingRootUriWithRepeatedSlashes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('http://example.com//'))->getName());
+
+        $request = Request::create('http://example.com/app//', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
+    public function testMatchingUriWhenServedFromSubdirectory()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('http://example.com/app/foo/bar/', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
     public function testRouteWithSamePathAndSameMethodButDiffDomainNameWithOptionsMethod()
     {
         $routes = [

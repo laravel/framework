@@ -78,6 +78,21 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->assertSame('A title', $contract->title);
     }
 
+    public function testIsMethod()
+    {
+        $otherPosition = HasOneThroughTestPosition::create(['id' => 1, 'name' => 'Engineer', 'shortname' => 'eng']);
+        $position = HasOneThroughTestPosition::create(['id' => 2, 'name' => 'President', 'shortname' => 'ps']);
+        $user = $position->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+        $otherUser = $otherPosition->user()->create(['id' => 2, 'email' => 'abigailotwell@gmail.com', 'position_short' => 'eng']);
+        $contract = $user->contract()->create(['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+        $otherContract = $otherUser->contract()->create(['title' => 'Another title', 'body' => 'Another body', 'email' => 'abigailotwell@gmail.com']);
+
+        $this->assertTrue($position->contract()->is($contract));
+        $this->assertFalse($position->contract()->is($otherContract));
+        $this->assertTrue($otherPosition->contract()->isNot($contract));
+        $this->assertFalse($otherPosition->contract()->isNot($otherContract));
+    }
+
     public function testItLoadsADefaultHasOneThroughRelation()
     {
         $this->migrateDefault();

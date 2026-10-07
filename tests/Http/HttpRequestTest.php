@@ -17,6 +17,7 @@ use Illuminate\Tests\Http\Fixtures\TestEnum;
 use Illuminate\Tests\Http\Fixtures\TestEnumBacked;
 use Illuminate\Tests\Http\Fixtures\TestIntegerEnumBacked;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -1399,6 +1400,7 @@ class HttpRequestTest extends TestCase
         );
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAllInputReturnsInputAndFiles()
     {
         $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
@@ -1406,6 +1408,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAllInputReturnsNestedInputAndFiles()
     {
         $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();

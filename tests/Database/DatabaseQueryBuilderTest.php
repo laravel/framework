@@ -6653,6 +6653,40 @@ SQL;
         ]), $result);
     }
 
+    public function testCursorPaginateWrapsOrderColumnsContainingParentheses()
+    {
+        $perPage = 16;
+        $columns = ['*'];
+        $cursorName = 'cursor-name';
+        $column = 'id) or 1=1 or (id';
+        $cursor = new Cursor([$column => 'bar', 'id' => 'foo']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy($column)->orderBy('id');
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['id' => 1], ['id' => 2]]);
+
+        $builder->expects('get')->andReturnUsing(function () use ($builder, $results) {
+            $this->assertSame(
+                'select * from "foobar" where ("id) or 1=1 or (id" > ? or ("id) or 1=1 or (id" = ? and ("id" > ?))) order by "id) or 1=1 or (id" asc, "id" asc limit 17',
+                $builder->toSql()
+            );
+            $this->assertEquals(['bar', 'bar', 'foo'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+    }
+
     public function testCursorPaginateWithDefaultArguments()
     {
         $perPage = 15;
@@ -6952,6 +6986,54 @@ SQL;
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionSelectAndJoinBindings()
+    {
+        $ts = Carbon::now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'created_at')->selectRaw('? as type', ['video'])->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw('? as type', ['news'])->from('news')->join('authors', function ($join) {
+            $join->on('authors.id', '=', 'news.author_id')->where('authors.active', true);
+        }));
+        $builder->orderBy('created_at');
+
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
+        ]);
+
+        $builder->expects('get')->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertSame(
+                '(select "id", "created_at", ? as type from "videos" where ("created_at" > ?)) union (select "id", "created_at", ? as type from "news" inner join "authors" on "authors"."id" = "news"."author_id" and "authors"."active" = ? where ("created_at" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals(['video', $ts, 'news', true, $ts], $builder->getBindings());
 
             return $results;
         });
@@ -7298,6 +7380,14 @@ SQL;
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
+    public function testWhereRowValuesInvalidOperator()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid operator passed to whereRowValues method.'));
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereRowValues(['last_update', 'order_number'], '< (1, 2) or 1=1 or (1, 2) <', [1, 2]);
+    }
+
     public function testWhereJsonContainsMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -7325,12 +7415,12 @@ SQL;
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonOverlaps('users.options->languages', ['en', 'fr']);
-        $this->assertSame('select * from `users` where json_overlaps(`users`.`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where json_overlaps(json_extract(`users`.`options`, \'$."languages"\'), ?)', $builder->toSql());
         $this->assertEquals(['["en","fr"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonOverlaps('options->languages', new Raw("'[\"en\", \"fr\"]'"));
-        $this->assertSame('select * from `users` where `id` = ? or json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where `id` = ? or json_overlaps(json_extract(`options`, \'$."languages"\'), \'["en", "fr"]\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
@@ -7400,12 +7490,12 @@ SQL;
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonDoesntOverlap('options->languages', ['en', 'fr']);
-        $this->assertSame('select * from `users` where not json_overlaps(`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where not json_overlaps(json_extract(`options`, \'$."languages"\'), ?)', $builder->toSql());
         $this->assertEquals(['["en","fr"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntOverlap('options->languages', new Raw("'[\"en\", \"fr\"]'"));
-        $this->assertSame('select * from `users` where `id` = ? or not json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where `id` = ? or not json_overlaps(json_extract(`options`, \'$."languages"\'), \'["en", "fr"]\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 

@@ -415,7 +415,7 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
-    protected function replayMacros(Builder $query)
+    public function replayMacros(Builder $query)
     {
         foreach ($this->macroBuffer as $macro) {
             $query->{$macro['method']}(...$macro['parameters']);

@@ -114,6 +114,7 @@ class ScheduleListCommand extends Command
                 'has_mutex' => $event->mutex->exists($event),
                 'repeat_seconds' => $event->isRepeatable() ? $event->repeatSeconds : null,
                 'environments' => $event->environments,
+                'on_one_server' => $event->onOneServer,
             ]);
         })->values()->toJson());
     }

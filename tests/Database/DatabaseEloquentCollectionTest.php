@@ -239,6 +239,20 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->findOrFail([1, 2, 3]);
     }
 
+    public function testFindOrFailFindsManyModelsByArrayableIds()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
+
+        $c = new Collection([$model1, $model2]);
+
+        $this->assertCount(2, $c->findOrFail(new BaseCollection([1, 2])));
+
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 3'));
+
+        $c->findOrFail(new BaseCollection([1, 3]));
+    }
+
     public function testFindOrFailThrowsExceptionWithMessageWhenOtherModelsArePresent()
     {
         $model = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
@@ -270,6 +284,15 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->load('bar', 'baz');
 
         $this->assertEquals(['results'], $c->all());
+    }
+
+    public function testLoadMissingWithoutRelationsDoesNotBuildAQuery()
+    {
+        $model = Mockery::mock(Model::class);
+        $model->shouldNotReceive('newQueryWithoutRelationships');
+        $c = new Collection([$model]);
+
+        $this->assertSame($c, $c->loadMissing([]));
     }
 
     public function testCollectionDictionaryReturnsModelKeys()

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\CallQueuedClosure;
@@ -86,6 +87,26 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(function (JobStub $job) {
             return true;
         });
+    }
+
+    public function testAssertPushedWithArrayOfProperties()
+    {
+        $this->fake->pushOn('high', new JobWithPropertiesStub('pending', new ModelForQueueFakeStub(['id' => 1])));
+
+        $this->fake->assertPushed(JobWithPropertiesStub::class, ['status' => 'pending', 'model' => new ModelForQueueFakeStub(['id' => 1])]);
+        $this->fake->assertPushedOn('high', JobWithPropertiesStub::class, ['status' => 'pending']);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['status' => 'complete']);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['model' => new ModelForQueueFakeStub(['id' => 2])]);
+    }
+
+    public function testAssertPushedWithArrayOfPropertiesDoesNotMatchMissingOrMismatchedProperties()
+    {
+        $this->fake->push(new JobWithPropertiesStub('pending'));
+
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['status' => new ModelForQueueFakeStub(['id' => 1])]);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['model' => new ModelForQueueFakeStub(['id' => 1])]);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['missing' => null]);
+        $this->fake->assertPushed(JobWithPropertiesStub::class, ['model' => null]);
     }
 
     public function testQueueSize()
@@ -860,6 +881,18 @@ class JobToFakeStub
     {
         //
     }
+}
+
+class JobWithPropertiesStub
+{
+    public function __construct(public string $status, public ?ModelForQueueFakeStub $model = null)
+    {
+    }
+}
+
+class ModelForQueueFakeStub extends Model
+{
+    protected $guarded = [];
 }
 
 #[Delay(15)]

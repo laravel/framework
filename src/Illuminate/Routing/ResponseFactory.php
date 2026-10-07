@@ -121,6 +121,21 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new Markdown response instance.
+     *
+     * @param  string  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function markdown($content = '', $status = 200, array $headers = [])
+    {
+        return $this->make($content, $status, array_merge($headers, [
+            'Content-Type' => 'text/markdown',
+        ]));
+    }
+
+    /**
      * Create a new event stream response.
      *
      * @param  \Closure  $callback
@@ -292,7 +307,9 @@ class ResponseFactory implements FactoryContract
      */
     protected function fallbackName($name)
     {
-        return str_replace('%', '', Str::ascii($name));
+        $fallback = str_replace('%', '', Str::ascii($name));
+
+        return $fallback !== '' ? $fallback : str_repeat('_', mb_strlen($name));
     }
 
     /**

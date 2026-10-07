@@ -14,6 +14,7 @@ use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use WeakReference;
 
 class MailMailableTest extends TestCase
 {
@@ -592,6 +593,30 @@ class MailMailableTest extends TestCase
 
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
+    }
+
+    public function testMailableIsReleasedWithoutGarbageCollectionAfterSettingPriority(): void
+    {
+        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+
+        gc_disable();
+
+        try {
+            $mailable = new WelcomeMailableStub;
+            $mailable->to('hello@laravel.com');
+            $mailable->from('taylor@laravel.com');
+            $mailable->html('test content');
+            $mailable->priority(1);
+
+            $mailer->send($mailable);
+
+            $reference = WeakReference::create($mailable);
+            unset($mailable);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
     }
 
     public function testMailableMetadataGetsSent(): void
@@ -1191,6 +1216,29 @@ class MailMailableTest extends TestCase
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('x-custom-header'));
         $this->assertSame('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
         $this->assertSame('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
+    }
+
+    public function testMailableIsReleasedWithoutGarbageCollectionAfterSendingWithHeaders(): void
+    {
+        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+
+        gc_disable();
+
+        try {
+            $mailable = new MailableHeadersStub;
+            $mailable->to('hello@laravel.com');
+            $mailable->from('taylor@laravel.com');
+            $mailable->html('test content');
+
+            $mailer->send($mailable);
+
+            $reference = WeakReference::create($mailable);
+            unset($mailable);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
     }
 
     public function testMailableAttributesInBuild(): void
