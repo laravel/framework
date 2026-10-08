@@ -618,6 +618,20 @@ class DatabaseConnectionTest extends TestCase
         ], array_column($queries, 'query'));
     }
 
+    public function testOlapSetsWorkloadOnReadAndWriteConnections()
+    {
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['getAttribute', 'exec'])->getMock();
+        $writePdo->expects($this->once())->method('getAttribute')->willReturn('8.0.34-PlanetScale');
+        $writePdo->expects($this->exactly(2))->method('exec');
+
+        $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['exec'])->getMock();
+        $readPdo->expects($this->exactly(2))->method('exec');
+
+        $connection = (new MySqlConnection($writePdo))->setReadPdo($readPdo);
+
+        $this->assertSame('foo', $connection->olap(fn () => 'foo'));
+    }
+
     #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {

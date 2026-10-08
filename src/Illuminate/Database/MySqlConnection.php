@@ -73,13 +73,38 @@ class MySqlConnection extends Connection
             return $callback($this);
         }
 
-        $this->statement("set workload = 'olap'");
+        $this->setWorkload('olap');
 
         try {
             return $callback($this);
         } finally {
-            $this->statement("set workload = 'oltp'");
+            $this->setWorkload('oltp');
         }
+    }
+
+    /**
+     * Set the Vitess workload for the connection.
+     *
+     * @param  'olap'|'oltp'  $workload
+     * @return void
+     */
+    protected function setWorkload($workload)
+    {
+        $this->run("set workload = '{$workload}'", [], function ($query) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            $this->getPdo()->exec($query);
+
+            if ($this->readPdo instanceof Closure) {
+                $this->readPdo = call_user_func($this->readPdo);
+            }
+
+            $this->readPdo?->exec($query);
+
+            return true;
+        });
     }
 
     /**
