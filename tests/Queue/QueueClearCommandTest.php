@@ -8,12 +8,15 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ClearCommand;
 use Illuminate\Queue\QueueManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueClearCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testClearingDefaultQueue()
     {
         $queue = new FakeClearableQueue(['default' => 2]);

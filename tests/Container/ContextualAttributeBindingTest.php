@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -40,6 +41,8 @@ use ReflectionParameter;
 
 class ContextualAttributeBindingTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;

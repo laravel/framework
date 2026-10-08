@@ -10,11 +10,14 @@ use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\ViewException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ViewCompilerEngineTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testViewsMayBeRecompiledAndRendered()
     {
         $engine = $this->getEngine();
@@ -85,13 +88,16 @@ class ViewCompilerEngineTest extends TestCase
         $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
-        $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
+        $calls = 0;
+        $files->expects('getRequire')->with($compiled, [])->times(3)->resolves(function () use (&$calls, $path) {
+            if (++$calls === 2) {
+                throw new FileNotFoundException(
+                "File does not exist at path {$path}."
+            );
+            }
 
-        $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-            "File does not exist at path {$path}."
-        ));
-
-        $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
+            return 'compiled-content';
+        });
 
         $engine->getCompiler()->expects('getCompiledPath')->times(3)->with($path)->returns($compiled);
 
@@ -114,13 +120,16 @@ class ViewCompilerEngineTest extends TestCase
         $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
-        $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
+        $calls = 0;
+        $files->expects('getRequire')->with($compiled, [])->times(3)->resolves(function () use (&$calls, $path) {
+            if (++$calls === 2) {
+                throw new ErrorException(
+                "require({$path}): Failed to open stream: No such file or directory",
+            );
+            }
 
-        $files->expects('getRequire')->with($compiled, [])->throws(new ErrorException(
-            "require({$path}): Failed to open stream: No such file or directory",
-        ));
-
-        $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
+            return 'compiled-content';
+        });
 
         $engine->getCompiler()->expects('getCompiledPath')->times(3)->with($path)->returns($compiled);
 

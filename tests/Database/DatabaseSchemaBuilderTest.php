@@ -7,10 +7,13 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase()
     {
         $connection = Double::for(Connection::class);

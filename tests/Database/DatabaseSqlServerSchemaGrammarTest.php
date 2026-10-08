@@ -10,10 +10,13 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

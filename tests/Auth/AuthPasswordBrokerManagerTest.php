@@ -7,10 +7,13 @@ use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBrokerCanResolveBackedEnum(): void
     {
         $app = $this->getApp();

@@ -12,11 +12,14 @@ use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 class TranslationTranslatorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSetLocaleRejectsPathTraversal()
     {
         $t = new Translator($this->getLoader(), 'en');

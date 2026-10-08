@@ -7,10 +7,13 @@ use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHasTable()
     {
         $connection = Double::for(Connection::class);

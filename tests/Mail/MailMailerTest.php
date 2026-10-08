@@ -14,11 +14,14 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 
 class MailMailerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         unset($_SERVER['__mailer.test']);

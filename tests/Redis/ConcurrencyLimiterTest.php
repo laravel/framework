@@ -8,31 +8,32 @@ use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class ConcurrencyLimiterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
         $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        // release() also calls eval → command('eval', ...) with the release script
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 3
                 && $args[1][0] === '{test-limiter}1'
                 && $args[1][1] === '{test-limiter}2'
                 && $args[1][2] === '{test-limiter}3'
                 && $args[1][3] === '{test-limiter}'; // ARGV[1] = hash-tagged prefix
-        }))->returns('{test-limiter}1');
-
-        // release() also calls eval → command('eval', ...) with the release script
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, '{test-limiter}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{test-limiter}1'; // released key matches acquired key
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'test-limiter', 3, 60);
         $result = $limiter->block(0, function () {
@@ -47,18 +48,16 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = Double::for(PhpRedisConnection::class)->passthru();
         $connection->expects('isCluster')->returns(false);
 
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 2
                 && $args[1][0] === 'mylock1'
                 && $args[1][1] === 'mylock2'
                 && $args[1][2] === 'mylock'; // ARGV[1] = plain name
-        }))->returns('mylock1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, 'mylock1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === 'mylock1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'mylock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -74,19 +73,17 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->expects('isCluster')->returns(true);
 
         // Predis forwards eval() through __call() into command('eval', [script, numkeys, ...keys, ...argv]).
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1] === 2
                 && $args[2] === '{limiter}1'
                 && $args[3] === '{limiter}2'
                 && $args[4] === '{limiter}';
-        }))->returns('{limiter}1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, '{limiter}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1] === 1
                 && $args[2] === '{limiter}1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'limiter', 2, 60);
         $result = $limiter->block(0, function () {
@@ -102,15 +99,13 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->expects('isCluster')->returns(true);
 
         // Acquire returns the slot key
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
-            return str_contains($args[0], 'mget');
-        }))->returns('{mykey}2');
-
         // Release should be called with the exact same key
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
+            return str_contains($args[0], 'mget');
+        }, '{mykey}2', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mykey}2';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'mykey', 3, 60);
         $limiter->block(0, function () {
@@ -124,17 +119,15 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->expects('isCluster')->returns(true);
 
         // Name already has hash tags — should NOT be double-wrapped
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{mylock}1'
                 && $args[1][1] === '{mylock}2'
                 && $args[1][2] === '{mylock}'; // ARGV[1] = unchanged name with existing tags
-        }))->returns('{mylock}1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, '{mylock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mylock}1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, '{mylock}', 2, 60);
         $result = $limiter->block(0, function () {
@@ -150,17 +143,15 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->expects('isCluster')->returns(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{lock}1'
                 && $args[1][1] === '{my{lock}2'
                 && $args[1][2] === '{my{lock}'; // ARGV[1] = wrapped prefix
-        }))->returns('{my{lock}1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, '{my{lock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{lock}1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'my{lock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -176,17 +167,15 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->expects('isCluster')->returns(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{}lock}1'
                 && $args[1][1] === '{my{}lock}2'
                 && $args[1][2] === '{my{}lock}'; // ARGV[1] = wrapped prefix
-        }))->returns('{my{}lock}1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, '{my{}lock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{}lock}1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'my{}lock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -201,19 +190,17 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = Double::for(PredisConnection::class)->passthru();
         $connection->expects('isCluster')->returns(false);
 
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1] === 2
                 && $args[2] === 'lock1'
                 && $args[3] === 'lock2'
                 && $args[4] === 'lock';
-        }))->returns('lock1');
-
-        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+        }, 'lock1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1] === 1
                 && $args[2] === 'lock1';
-        }))->returns(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'lock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -221,5 +208,23 @@ class ConcurrencyLimiterTest extends TestCase
         });
 
         $this->assertSame('ok', $result);
+    }
+
+    /**
+     * Expect the acquire (mget) and release (del) eval commands, in either order.
+     */
+    protected function expectsEval($connection, callable $acquire, string $acquiredKey, callable $release): void
+    {
+        $connection->expects('command')->with('eval', Argument::any())->times(2)->resolves(function ($command, $args) use ($acquire, $acquiredKey, $release) {
+            if (str_contains($args[0], 'mget')) {
+                $this->assertTrue($acquire($args));
+
+                return $acquiredKey;
+            }
+
+            $this->assertTrue($release($args));
+
+            return 1;
+        });
     }
 }

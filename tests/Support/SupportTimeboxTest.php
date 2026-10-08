@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Support;
 use Exception;
 use Illuminate\Support\Timebox;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SupportTimeboxTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testMakeExecutesCallback()
     {
         $callback = function () {

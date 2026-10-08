@@ -8,12 +8,15 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
 class DatabaseMigratorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         (new ReflectionProperty(Migrator::class, 'connectionResolverCallback'))->setValue(null, null);

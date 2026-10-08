@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mime\Address;
@@ -26,6 +27,8 @@ use Symfony\Component\Mime\Email;
 
 class SendingMailNotificationsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('mail.default', 'array');

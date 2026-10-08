@@ -22,12 +22,15 @@ use Illuminate\View\View;
 use Illuminate\View\ViewFinderInterface;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use ReflectionFunction;
 
 class ViewFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
     {
         unset($_SERVER['__test.view']);
@@ -111,9 +114,11 @@ class ViewFactoryTest extends TestCase
     {
         $factory = Double::for(Factory::class)->passthru(new Factory(...$this->getFactoryArgs()));
         $mockView1 = Double::for(ViewContract::class);
-        $factory->expects('make')->with('foo', ['key' => 'bar', 'value' => 'baz'])->returns($mockView1);
         $mockView2 = Double::for(ViewContract::class);
-        $factory->expects('make')->with('foo', ['key' => 'breeze', 'value' => 'boom'])->returns($mockView2);
+        $factory->expects('make')->times(2)->resolves(fn ($view, $data) => match ([$view, $data]) {
+            ['foo', ['key' => 'bar', 'value' => 'baz']] => $mockView1,
+            ['foo', ['key' => 'breeze', 'value' => 'boom']] => $mockView2,
+        });
         $mockView1->expects('render')->returns('dayle');
         $mockView2->expects('render')->returns('rees');
 

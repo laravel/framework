@@ -5,18 +5,20 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -324,8 +326,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignID()
     {
         $connection = $this->getConnection();
-        $connection->expects('getPostProcessor')->returns(new SQliteProcessor);
-        $connection->expects('selectFromWriteConnection')->returns([]);
         $connection->allows('scalar')->returns('');
 
         $blueprint = new Blueprint($connection, 'users');
@@ -366,8 +366,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignIdSpecifyingIndexNameInConstraint()
     {
         $connection = $this->getConnection();
-        $connection->expects('getPostProcessor')->returns(new SQliteProcessor);
-        $connection->expects('selectFromWriteConnection')->returns([]);
         $connection->expects('scalar')->returns('');
 
         $blueprint = new Blueprint($connection, 'users');
@@ -581,8 +579,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $connection->expects('getTablePrefix')->returns('');
         $connection->expects('getConfig')->with('use_native_json')->returns(true);
         $connection->expects('getSchemaGrammar')->returns($this->getGrammar($connection));
-        $connection->expects('getSchemaBuilder')->returns($this->getBuilder());
-        $connection->expects('getServerVersion')->returns('3.35');
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->json('foo');
@@ -608,8 +604,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $connection->expects('getTablePrefix')->returns('');
         $connection->expects('getConfig')->with('use_native_jsonb')->returns(true);
         $connection->expects('getSchemaGrammar')->returns($this->getGrammar($connection));
-        $connection->expects('getSchemaBuilder')->returns($this->getBuilder());
-        $connection->expects('getServerVersion')->returns('3.35');
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->jsonb('foo');
@@ -832,8 +826,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignUuid()
     {
         $connection = $this->getConnection();
-        $connection->expects('getPostProcessor')->returns(new SQliteProcessor);
-        $connection->expects('selectFromWriteConnection')->returns([]);
         $connection->allows('scalar')->returns('');
 
         $blueprint = new Blueprint($connection, 'users');

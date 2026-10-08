@@ -6,11 +6,14 @@ use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class RedisManagerExtensionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Redis\RedisManager
      */

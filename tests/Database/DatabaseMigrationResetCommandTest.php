@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         ResetCommand::prohibit(false);

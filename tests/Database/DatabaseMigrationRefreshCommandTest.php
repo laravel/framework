@@ -10,6 +10,7 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Foundation\Application;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -18,6 +19,8 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         RefreshCommand::prohibit(false);

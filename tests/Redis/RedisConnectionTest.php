@@ -10,6 +10,7 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\RedisManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
@@ -18,6 +19,7 @@ use Redis;
 class RedisConnectionTest extends TestCase
 {
     use InteractsWithRedis;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {

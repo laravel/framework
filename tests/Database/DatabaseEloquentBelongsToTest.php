@@ -12,11 +12,14 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $builder;
 
     protected $related;

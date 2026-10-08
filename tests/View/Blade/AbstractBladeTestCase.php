@@ -7,10 +7,13 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractBladeTestCase extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\View\Compilers\BladeCompiler
      */

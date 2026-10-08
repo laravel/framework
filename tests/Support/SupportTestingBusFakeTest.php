@@ -13,12 +13,15 @@ use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class SupportTestingBusFakeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /** @var \Illuminate\Support\Testing\Fakes\BusFake */
     protected $fake;
 
@@ -675,16 +678,16 @@ class SupportTestingBusFakeTest extends TestCase
         $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->expects('dispatch')->with($job);
-        $dispatcher->expects('dispatchNow')->with($job, null);
-
         $otherJob = new OtherBusJobStub;
-        $dispatcher->expects('dispatch')->with($otherJob);
-        $dispatcher->expects('dispatchNow')->with($otherJob, null);
-
         $anotherJob = new OtherBusJobStub(1);
-        $dispatcher->expects('dispatch')->never()->with($anotherJob);
-        $dispatcher->expects('dispatchNow')->never()->with($anotherJob, null);
+
+        $dispatched = [];
+        $dispatcher->expects('dispatch')->times(2)->resolves(function ($command) use (&$dispatched) {
+            $dispatched[] = $command;
+        });
+        $dispatcher->expects('dispatchNow')->times(2)->resolves(function ($command) use (&$dispatched) {
+            $dispatched[] = $command;
+        });
 
         $fake = new BusFake($dispatcher, [
             function ($command) {
@@ -709,6 +712,8 @@ class SupportTestingBusFakeTest extends TestCase
         $fake->assertDispatched(OtherBusJobStub::class, function ($job) {
             return $job->id === 1;
         });
+
+        $this->assertSame([$job, $job, $otherJob, $otherJob], $dispatched);
     }
 
     public function testAssertNothingBatched()

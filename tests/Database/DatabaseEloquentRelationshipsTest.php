@@ -20,11 +20,13 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {

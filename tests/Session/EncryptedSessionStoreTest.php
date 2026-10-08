@@ -5,12 +5,15 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\EncryptedStore;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
 
 class EncryptedSessionStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSessionIsProperlyEncrypted()
     {
         $session = $this->getSession();

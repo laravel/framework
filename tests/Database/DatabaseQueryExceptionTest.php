@@ -8,11 +8,14 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseQueryExceptionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         DB::clearResolvedInstance('db');

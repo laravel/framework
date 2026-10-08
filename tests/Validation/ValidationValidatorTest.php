@@ -32,6 +32,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -43,6 +44,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Validator::flushState();

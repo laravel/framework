@@ -9,6 +9,7 @@ use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
@@ -17,6 +18,8 @@ use Throwable;
 #[WithConfig('queue.connections.sqs.after_commit', true)]
 class QueueConnectionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         QueueConnectionTestJob::$ran = false;

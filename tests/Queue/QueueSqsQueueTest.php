@@ -30,6 +30,7 @@ use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDelayAttribute;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithMessageGroup;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,8 @@ use RuntimeException;
 
 class QueueSqsQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $sqs;
     protected $account;
     protected $queueName;

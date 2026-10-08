@@ -15,12 +15,15 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class BusDispatcherTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;

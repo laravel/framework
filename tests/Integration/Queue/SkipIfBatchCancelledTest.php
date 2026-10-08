@@ -10,10 +10,13 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\SkipIfBatchCancelled;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 
 class SkipIfBatchCancelledTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testJobsAreSkippedOnceBatchIsCancelled()
     {
         [$beforeCancelled] = (new SkipCancelledBatchableTestJob())->withFakeBatch();

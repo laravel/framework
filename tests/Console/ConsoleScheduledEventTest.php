@@ -8,10 +8,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleScheduledEventTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * The default configuration timezone.
      *
@@ -81,7 +84,6 @@ class ConsoleScheduledEventTest extends TestCase
         $appDouble = Double::for(ApplicationContract::class, override: true);
         $appDouble->expects('isDownForMaintenance')->times(2)->returns(false);
         $appDouble->expects('environment')->times(2)->returns('production');
-        $appDouble->expects('call')->resolves(fn ($callback) => $callback());
         $app = $appDouble->instance();
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 

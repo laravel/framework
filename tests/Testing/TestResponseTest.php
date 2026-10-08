@@ -25,6 +25,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use Illuminate\View\View;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -37,6 +38,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Container::setInstance(new Container);

@@ -6,11 +6,14 @@ use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class DatabaseTransactionsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * Setup the database schema.
      *

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Broadcasting;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -13,6 +14,8 @@ require_once __DIR__.'/Fixtures/PusherStub.php';
 
 class PusherBroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\PusherBroadcaster
      */

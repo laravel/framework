@@ -6,12 +6,15 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueListFailedCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testQueuedListenerShowsUnderlyingListenerClassNotWrapper()
     {
         // CallQueuedListener is the wrapper class Laravel uses to dispatch

@@ -13,11 +13,14 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $auth;
 
     protected function setUp(): void

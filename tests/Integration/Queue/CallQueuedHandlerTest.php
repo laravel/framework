@@ -16,10 +16,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Support\Facades\Event;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 
 class CallQueuedHandlerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;

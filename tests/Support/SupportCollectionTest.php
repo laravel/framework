@@ -26,6 +26,7 @@ use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestTraversableAndJsonSerializableObject;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -43,6 +44,8 @@ include_once 'Fixtures/Enums.php';
 
 class SupportCollectionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[DataProvider('collectionClassProvider')]
     public function testFirstReturnsFirstItemInCollection($collection)
     {

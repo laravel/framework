@@ -19,10 +19,13 @@ use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ImageManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function test_default_driver_returns_configured_value()
     {
         $app = $this->makeApp(['images.default' => 'imagick']);

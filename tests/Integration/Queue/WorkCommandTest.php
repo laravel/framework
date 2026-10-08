@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 
@@ -24,6 +25,7 @@ use RuntimeException;
 class WorkCommandTest extends QueueTestCase
 {
     use DatabaseMigrations;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {

@@ -26,6 +26,7 @@ use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
@@ -33,6 +34,8 @@ use PHPUnit\Framework\TestCase;
 
 class QueuedEventsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testQueuedEventHandlersAreQueued()
     {
         $d = new Dispatcher;

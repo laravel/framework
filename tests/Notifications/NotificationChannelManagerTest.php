@@ -25,12 +25,15 @@ use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationChannelManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);

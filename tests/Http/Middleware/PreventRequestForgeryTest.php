@@ -12,10 +12,13 @@ use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Session\TokenMismatchException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class PreventRequestForgeryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         PreventRequestForgery::flushState();

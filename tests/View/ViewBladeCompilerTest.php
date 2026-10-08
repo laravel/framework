@@ -6,11 +6,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);

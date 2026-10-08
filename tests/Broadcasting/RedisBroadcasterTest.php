@@ -7,11 +7,14 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\RedisBroadcaster
      */

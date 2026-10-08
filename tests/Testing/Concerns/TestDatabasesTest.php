@@ -7,12 +7,15 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
 class TestDatabasesTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Container::setInstance($container = new Container);

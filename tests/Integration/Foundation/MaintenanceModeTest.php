@@ -17,12 +17,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class MaintenanceModeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {

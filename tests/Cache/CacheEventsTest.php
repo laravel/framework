@@ -23,10 +23,13 @@ use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class CacheEventsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHasTriggersEvents()
     {
         $dispatcher = $this->getDispatcher();

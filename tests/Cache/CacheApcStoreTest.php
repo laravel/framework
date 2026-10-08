@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();

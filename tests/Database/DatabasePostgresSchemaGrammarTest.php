@@ -11,12 +11,15 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         PostgresBuilder::defaultTimePrecision(0);
@@ -89,7 +92,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $connection = $this->getConnection();
-        $connection->getSchemaBuilder()->expects('parseSchemaAndTable')->returns([null, 'users']);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();

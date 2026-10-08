@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbQueryGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testToRawSql()
     {
         $connection = Double::for(Connection::class);

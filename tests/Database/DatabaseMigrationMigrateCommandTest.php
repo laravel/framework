@@ -12,12 +12,15 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         $migrator = Double::for(Migrator::class);

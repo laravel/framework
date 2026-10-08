@@ -8,11 +8,14 @@ use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class BroadcastEventTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicEventBroadcastParameterFormatting()
     {
         $broadcaster = Double::for(Broadcaster::class);

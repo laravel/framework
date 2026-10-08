@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 class FoundationInteractsWithDatabaseTest extends TestCase
 {
     use InteractsWithDatabase;
+    use VerifiesDoubles;
 
     protected $table = 'products';
 
@@ -66,8 +68,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseSupportsArrays()
     {
         $builder = Double::for(Builder::class);
-        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->returns($builder);
-        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->returns($builder);
+        $expectedConditions = [
+            ['title' => 'Spark', 'name' => 'Laravel'],
+            ['title' => 'Forge', 'name' => 'Laravel'],
+        ];
+        $builder->expects('where')->times(2)->resolves(function ($conditions) use (&$expectedConditions, $builder) {
+            $this->assertSame(array_shift($expectedConditions), $conditions);
+
+            return $builder;
+        });
         $builder->expects('exists')->times(2)->returns(true);
 
         $this->connection->allows('table')->with($this->table)->returns($builder);
@@ -112,8 +121,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseMissingSupportsArrays()
     {
         $builder = Double::for(Builder::class);
-        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->returns($builder);
-        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->returns($builder);
+        $expectedConditions = [
+            ['title' => 'Spark', 'name' => 'Laravel'],
+            ['title' => 'Forge', 'name' => 'Laravel'],
+        ];
+        $builder->expects('where')->times(2)->resolves(function ($conditions) use (&$expectedConditions, $builder) {
+            $this->assertSame(array_shift($expectedConditions), $conditions);
+
+            return $builder;
+        });
         $builder->expects('exists')->times(2)->returns(false);
 
         $this->connection->allows('table')->with($this->table)->returns($builder);
@@ -221,8 +237,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertSoftDeletedSupportsArrays()
     {
         $builder = Double::for(Builder::class);
-        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->returns($builder);
-        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->returns($builder);
+        $expectedConditions = [
+            ['title' => 'Spark', 'name' => 'Laravel'],
+            ['title' => 'Forge', 'name' => 'Laravel'],
+        ];
+        $builder->expects('where')->times(2)->resolves(function ($conditions) use (&$expectedConditions, $builder) {
+            $this->assertSame(array_shift($expectedConditions), $conditions);
+
+            return $builder;
+        });
         $builder->expects('whereNotNull')->with('deleted_at')->times(2)->returns($builder);
         $builder->expects('exists')->times(2)->returns(true);
 
@@ -237,8 +260,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertNotSoftDeletedSupportsArrays()
     {
         $builder = Double::for(Builder::class);
-        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->returns($builder);
-        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->returns($builder);
+        $expectedConditions = [
+            ['title' => 'Spark', 'name' => 'Laravel'],
+            ['title' => 'Forge', 'name' => 'Laravel'],
+        ];
+        $builder->expects('where')->times(2)->resolves(function ($conditions) use (&$expectedConditions, $builder) {
+            $this->assertSame(array_shift($expectedConditions), $conditions);
+
+            return $builder;
+        });
         $builder->expects('whereNull')->with('deleted_at')->times(2)->returns($builder);
         $builder->expects('exists')->times(2)->returns(true);
 

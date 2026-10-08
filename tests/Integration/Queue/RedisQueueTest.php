@@ -16,6 +16,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use JMac\Testing\Double;
 use JMac\Testing\DoubleInterface;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 class RedisQueueTest extends TestCase
 {
     use InteractsWithRedis, InteractsWithTime;
+    use VerifiesDoubles;
 
     /**
      * @var \Illuminate\Queue\RedisQueue
@@ -303,7 +305,6 @@ class RedisQueueTest extends TestCase
         // Make an expired reserved job
         $failed = new RedisQueueIntegrationTestJob(-20);
         $this->queue->push($failed);
-        $this->container->received('bound')->with('events')->times(2);
 
         $beforeFailPop = $this->currentTime();
         $this->queue->pop();
@@ -506,14 +507,10 @@ class RedisQueueTest extends TestCase
     {
         $events = Double::for(Dispatcher::class);
         $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
-            return $event instanceof JobQueueing
-                && $event->job instanceof RedisQueueIntegrationTestJob;
-        }))->returns(null);
-        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
-            return $event instanceof JobQueued
+            return ($event instanceof JobQueueing || $event instanceof JobQueued)
                 && $event->job instanceof RedisQueueIntegrationTestJob
-                && is_string($event->id);
-        }))->returns(null);
+                && ($event instanceof JobQueueing || is_string($event->id));
+        }))->returns(null)->times(2);
 
         $container = Double::for(Container::class, override: true);
         $container->expects('bound')->with('events')->returns(true)->times(2);

@@ -10,11 +10,14 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Arr;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
 class AuthPasswordBrokerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
         $broker = $this->getBroker($mocks = $this->getMocks());

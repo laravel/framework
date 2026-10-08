@@ -6,10 +6,13 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class QueueRedisJobTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();

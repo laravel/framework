@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
@@ -105,7 +108,6 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
-        $source->getConnection()->expects('transactionLevel')->returns(0);
         $source->getConnection()->expects('getName')->returns('sqlite');
 
         $source->getConnection()->expects('select')->with('select "related_table".*, "pivot_table"."source_id" as "pivot_source_id", "pivot_table"."related_id" as "pivot_related_id" from "related_table" inner join "pivot_table" on "related_table"."id" = "pivot_table"."related_id" where "pivot_table"."source_id" = ? and ("attr" = ?) limit 1',

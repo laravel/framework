@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use function Orchestra\Testbench\terminate;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
@@ -18,6 +19,8 @@ use SplFileInfo;
 
 class FilesystemTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private static $tempDir;
 
     #[BeforeClass]

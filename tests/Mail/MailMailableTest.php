@@ -12,12 +12,15 @@ use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
 class MailMailableTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testMailableSetsRecipientsCorrectly(): void
     {
         $this->stubMailer();

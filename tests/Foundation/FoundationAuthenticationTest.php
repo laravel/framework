@@ -12,11 +12,13 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationAuthenticationTest extends TestCase
 {
     use InteractsWithAuthentication;
+    use VerifiesDoubles;
 
     /**
      * @var \Illuminate\Contracts\Foundation\Application

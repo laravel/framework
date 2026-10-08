@@ -8,11 +8,14 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlQueryGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testToRawSql()
     {
         $connection = Double::for(Connection::class);

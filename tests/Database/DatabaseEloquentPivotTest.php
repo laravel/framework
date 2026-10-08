@@ -10,10 +10,13 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testPropertiesAreSetCorrectly()
     {
         $parent = Double::for(Model::class)->passthru();

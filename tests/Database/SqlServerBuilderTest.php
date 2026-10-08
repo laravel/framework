@@ -6,10 +6,13 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SqlServerBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase()
     {
         $connection = Double::for(Connection::class);

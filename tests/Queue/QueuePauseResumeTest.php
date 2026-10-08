@@ -13,11 +13,14 @@ use Illuminate\Queue\Events\QueuesPaused;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class QueuePauseResumeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $manager;
     protected $cache;
 

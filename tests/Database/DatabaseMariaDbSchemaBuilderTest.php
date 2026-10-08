@@ -7,10 +7,13 @@ use Illuminate\Database\Query\Processors\MariaDbProcessor;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHasTable()
     {
         $connection = Double::for(Connection::class);

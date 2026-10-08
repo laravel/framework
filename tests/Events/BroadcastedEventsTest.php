@@ -10,12 +10,15 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class BroadcastedEventsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function exposedDispatcher(): Dispatcher
     {
         return new class extends Dispatcher

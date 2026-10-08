@@ -8,11 +8,14 @@ use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);

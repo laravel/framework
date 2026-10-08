@@ -6,10 +6,13 @@ use Illuminate\Auth\TokenGuard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class AuthTokenGuardTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = Double::for(UserProvider::class);

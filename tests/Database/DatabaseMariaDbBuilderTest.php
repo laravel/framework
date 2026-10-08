@@ -6,10 +6,13 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase()
     {
         $connection = Double::for(Connection::class);

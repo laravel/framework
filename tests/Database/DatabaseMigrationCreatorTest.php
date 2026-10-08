@@ -7,11 +7,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[AllowMockObjectsWithoutExpectations]
     public function testBasicCreateMethodStoresMigrationFile()
     {

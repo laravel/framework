@@ -8,11 +8,14 @@ use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCount()
     {
         $conn = Double::for(ConnectionInterface::class);

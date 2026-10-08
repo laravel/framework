@@ -20,6 +20,7 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -29,6 +30,8 @@ use ReflectionClass;
 
 class DatabaseConnectionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();

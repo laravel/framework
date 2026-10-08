@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Translation;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class TranslationFileLoaderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testLoadMethodLoadsTranslationsFromAddedPath()
     {
         $files = Double::for(Filesystem::class);

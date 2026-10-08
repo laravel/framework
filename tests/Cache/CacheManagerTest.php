@@ -14,11 +14,14 @@ use Illuminate\Events\Dispatcher as Event;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class CacheManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
         $manager = new CacheManager($this->getApp([

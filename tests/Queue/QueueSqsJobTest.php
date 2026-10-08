@@ -10,10 +10,13 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class QueueSqsJobTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $key;
     protected $secret;
     protected $service;

@@ -11,6 +11,7 @@ use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
@@ -20,6 +21,8 @@ use RuntimeException;
 
 class HandleExceptionsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $app;
     protected $config;
 

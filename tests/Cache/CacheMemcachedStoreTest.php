@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Memcached;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();

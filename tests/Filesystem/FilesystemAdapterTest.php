@@ -17,6 +17,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -32,6 +33,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FilesystemAdapterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private $tempDir;
     private $filesystem;
     private $adapter;

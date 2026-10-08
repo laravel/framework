@@ -7,11 +7,14 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresQueryGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testToRawSql()
     {
         $connection = Double::for(Connection::class);

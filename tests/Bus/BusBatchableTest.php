@@ -7,10 +7,13 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Testing\Fakes\BatchFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class BusBatchableTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function test_batch_may_be_retrieved()
     {
         $class = new class

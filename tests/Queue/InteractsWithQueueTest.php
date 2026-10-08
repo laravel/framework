@@ -6,11 +6,14 @@ use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreatesAnExceptionFromString()
     {
         $queueJob = Double::for(Job::class);

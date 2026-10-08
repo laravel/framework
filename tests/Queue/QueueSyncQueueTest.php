@@ -15,11 +15,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         SyncQueue::createPayloadUsing(null);

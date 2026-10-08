@@ -22,6 +22,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -29,6 +30,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NotificationSenderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);

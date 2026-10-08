@@ -6,10 +6,13 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class RoutingResponseFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testStreamDownloadFilenameWithoutAsciiEquivalent()
     {
         $factory = new ResponseFactory(Double::for(ViewFactory::class), Double::for(Redirector::class));

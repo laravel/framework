@@ -8,11 +8,14 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class CacheCommandMutexTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Console\CacheCommandMutex
      */

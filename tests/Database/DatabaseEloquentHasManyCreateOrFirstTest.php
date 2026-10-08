@@ -12,12 +12,15 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
@@ -157,7 +160,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
@@ -247,7 +249,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
@@ -337,7 +338,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
@@ -362,7 +362,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[

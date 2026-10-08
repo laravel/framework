@@ -9,10 +9,13 @@ use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;

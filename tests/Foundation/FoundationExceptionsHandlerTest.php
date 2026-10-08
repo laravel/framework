@@ -30,6 +30,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -47,6 +48,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FoundationExceptionsHandlerTest extends TestCase
 {
     use InteractsWithExceptionHandling;
+    use VerifiesDoubles;
 
     protected $config;
 

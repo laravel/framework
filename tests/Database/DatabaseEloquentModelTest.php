@@ -64,6 +64,7 @@ use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use LogicException;
 use Mockery;
 use PDO;
@@ -79,6 +80,7 @@ include_once 'Fixtures/Enums/Enums.php';
 class DatabaseEloquentModelTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -1657,9 +1659,6 @@ class DatabaseEloquentModelTest extends TestCase
 
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
-        $schemaBuilder = Double::for(SchemaBuilder::class);
-        $schemaBuilder->expects('getColumnListing')->returns(['name', 'age', 'foo']);
-        $connection->expects('getSchemaBuilder')->returns($schemaBuilder);
 
         $model->guard([]);
         $model->fillable(['name']);
@@ -1677,9 +1676,6 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
-        $schemaBuilder = Double::for(SchemaBuilder::class);
-        $schemaBuilder->expects('getColumnListing')->returns(['name', 'age', 'foo']);
-        $connection->expects('getSchemaBuilder')->returns($schemaBuilder);
 
         Model::preventSilentlyDiscardingAttributes();
 

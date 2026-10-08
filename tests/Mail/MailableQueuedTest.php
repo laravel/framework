@@ -18,6 +18,7 @@ use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,8 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableSent(): void
     {

@@ -6,10 +6,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Env;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         // Testbench disables putenv and may not re-enable it.

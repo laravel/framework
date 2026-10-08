@@ -19,10 +19,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private $events;
 
     protected function setUp(): void

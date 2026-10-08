@@ -9,11 +9,14 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class RoutingRedirectorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $headers;
     protected $request;
     protected $url;

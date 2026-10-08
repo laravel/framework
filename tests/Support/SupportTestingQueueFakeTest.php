@@ -16,12 +16,15 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Support\Testing\Fakes\QueueFake
      */

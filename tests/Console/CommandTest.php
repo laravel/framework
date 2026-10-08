@@ -15,6 +15,7 @@ use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Concerns\CreatesAnsweredOutputStyles;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,7 @@ use Symfony\Component\Console\Output\NullOutput;
 class CommandTest extends TestCase
 {
     use CreatesAnsweredOutputStyles;
+    use VerifiesDoubles;
 
     protected function tearDown(): void
     {

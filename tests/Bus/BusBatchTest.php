@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -41,6 +42,8 @@ use RuntimeException;
 
 class BusBatchTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         $db = new DB;

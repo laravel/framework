@@ -9,12 +9,15 @@ use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;

@@ -9,6 +9,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\SQLiteConnection;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,8 @@ use stdClass;
 
 class CacheDatabaseStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();
@@ -164,36 +167,21 @@ class CacheDatabaseStoreTest extends TestCase
         $table = Double::for(Builder::class);
         $cache = new stdClass;
 
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
+        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->times(3)->resolves(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns(null);
+        $store->getConnection()->expects('table')->with('table')->times(4)->returns($table);
+        $table->expects('where')->with('key', 'prefixfoo')->times(4)->returns($table);
+        $table->expects('lockForUpdate')->times(3)->returns($table);
+        $table->expects('first')->times(3)->returns(null, $cache, $cache);
+        $table->expects('update')->with(['value' => serialize(3)]);
+
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
-            return $closure();
-        });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns($cache);
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize(2);
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
-            return $closure();
-        });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns($cache);
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('update')->with(['value' => serialize(3)]);
         $this->assertEquals(3, $store->increment('foo'));
     }
 
@@ -203,36 +191,22 @@ class CacheDatabaseStoreTest extends TestCase
         $table = Double::for(Builder::class);
         $cache = new stdClass;
 
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
+        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->times(3)->resolves(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns(null);
+        $store->getConnection()->expects('table')->with('table')->times(4)->returns($table);
+        $table->expects('where')->with('key', 'prefixfoo')->times(2)->returns($table);
+        $table->expects('where')->with('key', 'prefixbar')->times(2)->returns($table);
+        $table->expects('lockForUpdate')->times(3)->returns($table);
+        $table->expects('first')->times(3)->returns(null, $cache, $cache);
+        $table->expects('update')->with(['value' => serialize(2)]);
+
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
-            return $closure();
-        });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixfoo')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns($cache);
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize(3);
-        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class))->resolves(function ($closure) {
-            return $closure();
-        });
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixbar')->returns($table);
-        $table->expects('lockForUpdate')->returns($table);
-        $table->expects('first')->returns($cache);
-        $store->getConnection()->expects('table')->with('table')->returns($table);
-        $table->expects('where')->with('key', 'prefixbar')->returns($table);
-        $table->expects('update')->with(['value' => serialize(2)]);
         $this->assertEquals(2, $store->decrement('bar'));
     }
 

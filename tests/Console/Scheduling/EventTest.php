@@ -11,12 +11,15 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {

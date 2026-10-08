@@ -14,12 +14,15 @@ use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testPushProperlyPushesJobOntoRedis()
     {
         $uuid = Str::uuid();

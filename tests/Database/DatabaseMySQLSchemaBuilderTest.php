@@ -7,10 +7,13 @@ use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySQLSchemaBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHasTable()
     {
         $connection = Double::for(Connection::class);

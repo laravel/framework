@@ -12,12 +12,15 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class ClearCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Tests\Cache\ClearCommandTestStub
      */

@@ -10,11 +10,14 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testGetRanMigrationsListMigrationsByPackage()
     {
         $query = Double::for(QueryBuilder::class);

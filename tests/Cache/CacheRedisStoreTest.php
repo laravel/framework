@@ -6,12 +6,15 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();

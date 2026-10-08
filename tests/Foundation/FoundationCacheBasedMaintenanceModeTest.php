@@ -6,10 +6,13 @@ use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\CacheBasedMaintenanceMode;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationCacheBasedMaintenanceModeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function test_it_determines_whether_maintenance_mode_is_active()
     {
         $cache = Double::for(Factory::class, Repository::class);
@@ -17,10 +20,9 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->expects('has')->with('key')->returns(false);
-        $this->assertFalse($manager->active());
+        $cache->expects('has')->with('key')->times(2)->returns(false, true);
 
-        $cache->expects('has')->with('key')->returns(true);
+        $this->assertFalse($manager->active());
         $this->assertTrue($manager->active());
     }
 

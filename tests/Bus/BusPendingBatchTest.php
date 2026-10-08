@@ -13,6 +13,7 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -20,6 +21,8 @@ use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function test_pending_batch_may_be_configured_and_dispatched()
     {
         $container = new Container;

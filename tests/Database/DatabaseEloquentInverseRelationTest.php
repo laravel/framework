@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Stringable;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBuilderCallbackIsNotAppliedWhenInverseRelationIsNotSet()
     {
         $builder = Double::for(Builder::class);

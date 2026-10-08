@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[WithMigration('cache')]
 class DatabaseLockTest extends DatabaseTestCase
 {
+    use VerifiesDoubles;
+
     public function testLockCanHaveASeparateConnection()
     {
         $this->app['config']->set('cache.stores.database.lock_connection', 'test');
@@ -163,7 +166,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException($message, $code)
         ));
 
-        $connection->expects('transactionLevel')->returns(0);
+        $connection->expects('transactionLevel')->times($hasConcurrenyError ? 1 : 0)->returns(0);
         $connection->expects('table')->times(2)->with('cache_locks')->returns($insertBuilder, $deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 0, lottery: [1, 1]);
@@ -192,7 +195,7 @@ class DatabaseLockTest extends DatabaseTestCase
         ));
 
         $updateBuilder->allows('where')->returns($updateBuilder);
-        $updateBuilder->expects('update')->returns(1);
+        $updateBuilder->expects('update')->times($shouldThrow ? 0 : 1)->returns(1);
 
         $connection->expects('transactionLevel')->returns($transactionLevel);
         $connection->allows('table')->with('cache_locks')->returns($insertBuilder, $updateBuilder);
@@ -226,7 +229,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException($message, $code)
         ));
 
-        $connection->expects('transactionLevel')->returns(0);
+        $connection->expects('transactionLevel')->times($hasConcurrencyError ? 1 : 0)->returns(0);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner); // same owner...

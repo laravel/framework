@@ -14,12 +14,15 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
@@ -121,7 +124,6 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->expects('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
@@ -229,7 +231,6 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->expects('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',

@@ -10,11 +10,14 @@ use Illuminate\Queue\Events\QueueFailedOver;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class FailoverQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);

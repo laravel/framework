@@ -15,10 +15,13 @@ use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ComponentTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $viewFactory;
 
     protected $config;

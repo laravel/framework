@@ -6,12 +6,15 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use function Illuminate\Support\php_binary;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 use Symfony\Component\Process\Process;
 
 class SupportComposerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testDumpAutoloadRunsTheCorrectCommand()
     {
         $composer = $this->mockComposer(['composer', 'dump-autoload']);

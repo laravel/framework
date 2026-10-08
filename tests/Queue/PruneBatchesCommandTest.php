@@ -7,12 +7,15 @@ use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\PruneBatchesCommand;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class PruneBatchesCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testAllowPruningAllUnfinishedBatches()
     {
         $container = new Application;

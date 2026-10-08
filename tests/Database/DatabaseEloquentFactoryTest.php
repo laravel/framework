@@ -21,11 +21,14 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         $container = Container::getInstance();

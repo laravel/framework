@@ -9,6 +9,7 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -18,6 +19,7 @@ use RuntimeException;
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {

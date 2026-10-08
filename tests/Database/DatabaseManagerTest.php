@@ -8,11 +8,14 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\DatabaseManager;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testParseConnectionNameRecognizesDirectType()
     {
         $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));

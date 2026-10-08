@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSerializesPivotsEntitiesId()
     {
         $spy = Double::for(Pivot::class);
@@ -42,7 +45,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
         // serialization + JSON encoding breaks because of UTF-8 issues. Encoding
         // of a QueueableCollection must favor QueueableEntity::queueableId().
         $mock = Double::for(Model::class);
-        $mock->expects('getKey')->returns(random_bytes(10));
+        $mock->expects('getKey')->never();
         $mock->expects('getQueueableId')->returns('mocked');
 
         $c = new Collection([$mock]);

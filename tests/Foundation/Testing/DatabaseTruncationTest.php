@@ -10,11 +10,13 @@ use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseTruncationTest extends TestCase
 {
     use DatabaseTruncation;
+    use VerifiesDoubles;
 
     private ?array $app;
 

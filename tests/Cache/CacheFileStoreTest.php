@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -17,6 +18,8 @@ use RuntimeException;
 
 class CacheFileStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private static $tempDir;
 
     #[BeforeClass]

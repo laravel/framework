@@ -6,11 +6,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\FileViewFinder;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ViewFileViewFinderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicViewFinding()
     {
         $finder = $this->getFinder();

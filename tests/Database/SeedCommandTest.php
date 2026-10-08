@@ -16,6 +16,7 @@ use Illuminate\Events\NullDispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Testing\Assert;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -24,6 +25,8 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class SeedCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHandle()
     {
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);

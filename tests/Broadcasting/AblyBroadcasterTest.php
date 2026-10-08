@@ -6,11 +6,14 @@ use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class AblyBroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\AblyBroadcaster
      */

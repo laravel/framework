@@ -6,12 +6,15 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
         $migrator = Double::for(Migrator::class);

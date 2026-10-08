@@ -24,6 +24,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,6 +34,7 @@ use stdClass;
 class DatabaseEloquentBuilderTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function tearDown(): void
     {
@@ -87,7 +89,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('newCollection')->with(Argument::none())->returns('emptycollection');
-        $model->expects('getKeyType')->returns('int');
         $builder->setModel($model);
         $builder->getQuery()->expects('whereIntegerInRaw')->never();
         $builder->expects('get')->never();
@@ -548,8 +549,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('pluck')->with('name', null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(true);
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'baz'])->returns(new EloquentBuilderTestPluckStub(['name' => 'baz']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckStub($attributes));
 
         $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
     }
@@ -561,8 +561,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(false);
         $builder->getModel()->expects('hasCast')->with('name')->returns(true);
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'baz'])->returns(new EloquentBuilderTestPluckStub(['name' => 'baz']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckStub($attributes));
 
         $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
     }
@@ -575,8 +574,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getModel()->expects('hasAnyGetMutator')->with('created_at')->returns(false);
         $builder->getModel()->expects('hasCast')->with('created_at')->returns(false);
         $builder->getModel()->expects('getDates')->returns(['created_at']);
-        $builder->getModel()->expects('newFromBuilder')->with(['created_at' => '2010-01-01 00:00:00'])->returns(new EloquentBuilderTestPluckDatesStub(['created_at' => '2010-01-01 00:00:00']));
-        $builder->getModel()->expects('newFromBuilder')->with(['created_at' => '2011-01-01 00:00:00'])->returns(new EloquentBuilderTestPluckDatesStub(['created_at' => '2011-01-01 00:00:00']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckDatesStub($attributes));
 
         $this->assertEquals(['date_2010-01-01 00:00:00', 'date_2011-01-01 00:00:00'], $builder->pluck('created_at')->all());
     }
@@ -590,8 +588,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('name'), null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($model);
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(true);
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'baz'])->returns(new EloquentBuilderTestPluckStub(['name' => 'baz']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckStub($attributes));
 
         $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck($model->qualifyColumn('name'))->all());
     }
@@ -606,8 +603,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(false);
         $builder->getModel()->expects('hasCast')->with('name')->returns(true);
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->expects('newFromBuilder')->with(['name' => 'baz'])->returns(new EloquentBuilderTestPluckStub(['name' => 'baz']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckStub($attributes));
 
         $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck($model->qualifyColumn('name'))->all());
     }
@@ -623,8 +619,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getModel()->expects('hasAnyGetMutator')->with('created_at')->returns(false);
         $builder->getModel()->expects('hasCast')->with('created_at')->returns(false);
         $builder->getModel()->expects('getDates')->returns(['created_at']);
-        $builder->getModel()->expects('newFromBuilder')->with(['created_at' => '2010-01-01 00:00:00'])->returns(new EloquentBuilderTestPluckDatesStub(['created_at' => '2010-01-01 00:00:00']));
-        $builder->getModel()->expects('newFromBuilder')->with(['created_at' => '2011-01-01 00:00:00'])->returns(new EloquentBuilderTestPluckDatesStub(['created_at' => '2011-01-01 00:00:00']));
+        $builder->getModel()->expects('newFromBuilder')->times(2)->resolves(fn ($attributes) => new EloquentBuilderTestPluckDatesStub($attributes));
 
         $this->assertEquals(['date_2010-01-01 00:00:00', 'date_2011-01-01 00:00:00'], $builder->pluck($model->qualifyColumn('created_at'))->all());
     }

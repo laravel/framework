@@ -11,10 +11,13 @@ use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();

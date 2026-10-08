@@ -23,6 +23,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +31,8 @@ use stdClass;
 
 class CacheRepositoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Carbon::setTestNow(Carbon::parse(self::getTestDate()));

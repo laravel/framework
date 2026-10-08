@@ -10,10 +10,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = new Application;

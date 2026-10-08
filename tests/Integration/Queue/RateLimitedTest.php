@@ -17,10 +17,13 @@ use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);

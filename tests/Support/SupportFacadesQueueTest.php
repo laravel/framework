@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private $queueManager;
 
     protected function setUp(): void

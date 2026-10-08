@@ -15,6 +15,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);

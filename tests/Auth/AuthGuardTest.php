@@ -23,6 +23,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Timebox;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -31,6 +32,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicReturnsNullOnValidAttempt()
     {
         [$guard, $provider, $session] = $this->getRealGuard();

@@ -26,10 +26,13 @@ use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $mocks = [];
 
     protected function tearDown(): void

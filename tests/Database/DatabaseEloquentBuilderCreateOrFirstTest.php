@@ -11,12 +11,15 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
@@ -79,7 +82,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -161,7 +163,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -249,7 +250,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -303,7 +303,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -422,7 +421,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -467,7 +465,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
@@ -496,7 +493,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -511,7 +507,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[

@@ -38,6 +38,7 @@ use Illuminate\Tests\Database\Fixtures\Enums\NonBackedStatus;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -48,6 +49,8 @@ include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseQueryBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $called;
 
     public function testBasicSelect()

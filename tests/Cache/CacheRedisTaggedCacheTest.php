@@ -6,11 +6,14 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\RedisTaggedCache;
 use Illuminate\Cache\RedisTagSet;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisTaggedCacheTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[DataProvider('successfulWrites')]
     public function testTagEntriesAreRegisteredAfterSuccessfulWrites(string $method, array $arguments, string $storeMethod, array $storeArguments, array $tagArguments, mixed $result)
     {

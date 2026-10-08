@@ -13,12 +13,15 @@ use Illuminate\Testing\Concerns\TestViews;
 use Illuminate\Testing\ParallelTesting;
 use Illuminate\View\Compilers\BladeCompiler;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
 
 class TestViewsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Container::setInstance($container = new Container);

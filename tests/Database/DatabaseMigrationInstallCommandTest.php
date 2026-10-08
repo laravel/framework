@@ -6,12 +6,15 @@ use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Foundation\Application;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationInstallCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testFireCallsRepositoryToInstall()
     {
         $repo = Double::for(MigrationRepositoryInterface::class);

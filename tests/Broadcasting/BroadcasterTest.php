@@ -10,12 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteBinding;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Tests\Broadcasting\FakeBroadcaster
      */

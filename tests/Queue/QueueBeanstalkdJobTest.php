@@ -10,6 +10,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\PheanstalkSubscriberInterface;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdJobTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob(json_encode(['job' => 'foo', 'data' => ['data']]));

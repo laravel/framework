@@ -9,11 +9,14 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithDatabaseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Facade::clearResolvedInstances();

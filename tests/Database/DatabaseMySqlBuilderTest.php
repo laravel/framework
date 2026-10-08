@@ -9,10 +9,13 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as MySqlGrammarSchema;
 use Illuminate\Database\Schema\MySqlBuilder;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase(): void
     {
         $connection = Double::for(Connection::class);

@@ -8,6 +8,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\SqlServerConnection;
 use InvalidArgumentException;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,8 @@ use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $db;
 
     protected function setUp(): void

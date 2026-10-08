@@ -7,12 +7,15 @@ use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Composer;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationMakeCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCreateDumpsAutoload()
     {
         $creator = Double::for(MigrationCreator::class);

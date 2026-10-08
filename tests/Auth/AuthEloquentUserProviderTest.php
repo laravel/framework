@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     public function testRetrieveByIDReturnsUser()
     {

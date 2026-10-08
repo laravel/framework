@@ -20,6 +20,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,6 +30,8 @@ use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[DataProvider('pushJobsDataProvider')]
     #[AllowMockObjectsWithoutExpectations]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)

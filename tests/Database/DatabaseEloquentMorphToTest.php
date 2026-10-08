@@ -15,12 +15,14 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\TestEnum;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {

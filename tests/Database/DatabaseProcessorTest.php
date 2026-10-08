@@ -6,11 +6,14 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseProcessorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);

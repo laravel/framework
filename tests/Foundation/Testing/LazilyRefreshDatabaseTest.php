@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use function Orchestra\Testbench\package_path;
@@ -20,6 +21,7 @@ class LazilyRefreshDatabaseTest extends TestCase
     use ApplicationTestingHooks;
     use InteractsWithConsole;
     use LazilyRefreshDatabase;
+    use VerifiesDoubles;
 
     public $dropViews = false;
 

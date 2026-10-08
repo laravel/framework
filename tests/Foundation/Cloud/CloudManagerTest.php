@@ -6,12 +6,15 @@ use Illuminate\Foundation\Cloud\CloudManager;
 use Illuminate\Foundation\Cloud\Queue as CloudQueue;
 use Illuminate\Support\Facades\Cloud;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
 
 class CloudManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[TestWith([null, false])]
     #[TestWith(['sqs', false])]
     #[TestWith(['cloud', true])]

@@ -10,11 +10,14 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Hashing\BcryptHasher;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $provider = $this->newProvider();

@@ -7,12 +7,15 @@ use Illuminate\Queue\ListenerOptions;
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testRunProcessCallsProcess()
     {
         $process = Double::for(Process::class)->passthru();

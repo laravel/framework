@@ -9,6 +9,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();

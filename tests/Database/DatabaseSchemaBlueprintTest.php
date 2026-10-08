@@ -11,10 +11,13 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Tests\Database\Fixtures\Models\User;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Builder::$defaultMorphKeyType = 'int';
@@ -198,9 +201,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             $connection = $this->getConnection($grammar);
-            $connection->expects('getServerVersion')->returns('8.0.4');
 
             if ($grammar === 'MySql') {
+                $connection->expects('getServerVersion')->returns('8.0.4');
                 $connection->expects('isMaria')->returns(false);
             }
 
@@ -242,7 +245,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testNativeRenameColumnOnLegacyMariaDB()
     {
         $connection = $this->getConnection('MariaDb');
-        $connection->expects('isMaria')->returns(true);
         $connection->allows('getServerVersion')->returns('10.1.35');
         $connection->getSchemaBuilder()->allows('getColumns')->returns([
             ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false, 'generation' => null],
