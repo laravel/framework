@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class PresentIf implements Stringable
+class PresentIf implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -23,9 +23,9 @@ class PresentIf implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
         $values = array_map(static fn ($value) => match (true) {
             is_null($value) => 'null',
@@ -34,6 +34,6 @@ class PresentIf implements Stringable
             default => (string) $value,
         }, $this->values);
 
-        return 'present_if:'.$this->formatParameters([$this->anotherField, ...$values]);
+        return ['present_if', $this->anotherField, ...array_values($values)];
     }
 }

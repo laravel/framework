@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class CurrentPassword implements Stringable
+class CurrentPassword implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -22,10 +22,10 @@ class CurrentPassword implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'current_password'.($this->guard !== null ? ':'.$this->formatParameters([$this->guard]) : '');
+        return $this->guard === null ? ['current_password'] : ['current_password', $this->guard];
     }
 }

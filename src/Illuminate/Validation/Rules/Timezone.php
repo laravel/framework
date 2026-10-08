@@ -2,10 +2,13 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Stringable;
+use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Validation\Rules\Concerns\FormatsParameters;
 
-class Timezone implements Stringable
+class Timezone implements ParameterizedRule
 {
+    use FormatsParameters;
+
     /**
      * Create a new timezone rule instance.
      */
@@ -14,10 +17,10 @@ class Timezone implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'timezone'.($this->arguments ? ':'.implode(',', $this->arguments) : '');
+        return ['timezone', ...array_values($this->arguments ?? [])];
     }
 }

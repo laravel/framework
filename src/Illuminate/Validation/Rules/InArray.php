@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class InArray implements Stringable
+class InArray implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -17,10 +17,10 @@ class InArray implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'in_array:'.$this->formatParameters([$this->otherField]);
+        return ['in_array', $this->otherField];
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class MissingWithAll implements Stringable
+class MissingWithAll implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -20,10 +20,10 @@ class MissingWithAll implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'missing_with_all:'.$this->formatParameters($this->fields);
+        return ['missing_with_all', ...array_values($this->fields)];
     }
 }

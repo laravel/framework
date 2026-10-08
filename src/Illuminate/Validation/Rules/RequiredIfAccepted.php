@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class RequiredIfAccepted implements Stringable
+class RequiredIfAccepted implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -17,10 +17,10 @@ class RequiredIfAccepted implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'required_if_accepted:'.$this->formatParameters([$this->field]);
+        return ['required_if_accepted', $this->field];
     }
 }

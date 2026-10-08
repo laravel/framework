@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class ExcludeWith implements Stringable
+class ExcludeWith implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -17,10 +17,10 @@ class ExcludeWith implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'exclude_with:'.$this->formatParameters([$this->anotherField]);
+        return ['exclude_with', $this->anotherField];
     }
 }

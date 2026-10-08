@@ -2,10 +2,13 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Stringable;
+use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Validation\Rules\Concerns\FormatsParameters;
 
-class Distinct implements Stringable
+class Distinct implements ParameterizedRule
 {
+    use FormatsParameters;
+
     protected array $options = [];
 
     /**
@@ -29,14 +32,10 @@ class Distinct implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        if ($this->options) {
-            return 'distinct:'.implode(',', array_unique($this->options));
-        }
-
-        return 'distinct';
+        return ['distinct', ...array_values(array_unique($this->options))];
     }
 }

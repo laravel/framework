@@ -2,10 +2,13 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Stringable;
+use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Validation\Rules\Concerns\FormatsParameters;
 
-class Uuid implements Stringable
+class Uuid implements ParameterizedRule
 {
+    use FormatsParameters;
+
     /**
      * @var int<0, 8>|'nil'|'max'|null
      */
@@ -24,10 +27,10 @@ class Uuid implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'uuid'.($this->version !== null ? ':'.$this->version : '');
+        return $this->version === null ? ['uuid'] : ['uuid', $this->version];
     }
 }

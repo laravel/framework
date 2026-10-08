@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class RequiredWithout implements Stringable
+class RequiredWithout implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -20,10 +20,10 @@ class RequiredWithout implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'required_without:'.$this->formatParameters($this->fields);
+        return ['required_without', ...array_values($this->fields)];
     }
 }

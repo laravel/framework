@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class PresentWith implements Stringable
+class PresentWith implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -20,10 +20,10 @@ class PresentWith implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'present_with:'.$this->formatParameters($this->fields);
+        return ['present_with', ...array_values($this->fields)];
     }
 }

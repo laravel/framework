@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class ProhibitedIfDeclined implements Stringable
+class ProhibitedIfDeclined implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -17,10 +17,10 @@ class ProhibitedIfDeclined implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'prohibited_if_declined:'.$this->formatParameters([$this->field]);
+        return ['prohibited_if_declined', $this->field];
     }
 }

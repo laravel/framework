@@ -115,14 +115,14 @@ class ValidationRuleBuilderMethodTest extends TestCase
     }
 
     /**
-     * Test that conditional rule parameters survive parsing.
+     * Test that conditional rule parameters survive parsing without serialization.
      */
     #[DataProvider('conditionalRuleParametersProvider')]
-    public function testConditionalRuleParametersAreEscaped($method, $value)
+    public function testConditionalRuleParametersArePreserved($method, $value)
     {
-        $rule = Rule::$method('other,field', $value);
+        $rule = Rule::$method('other\\",field', $value);
 
-        $this->assertSame(['other,field', $value], ValidationRuleParser::parse((string) $rule)[1]);
+        $this->assertSame(['other\\",field', $value], ValidationRuleParser::parse($rule)[1]);
     }
 
     /**
@@ -131,7 +131,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
     public static function conditionalRuleParametersProvider()
     {
         foreach (['acceptedIf', 'declinedIf', 'missingIf', 'missingUnless', 'presentIf', 'presentUnless'] as $method) {
-            foreach (['foo,bar', '"quoted"', 'foo"bar,baz', 'foo|bar'] as $value) {
+            foreach (['foo,bar', '"quoted"', 'foo"bar,baz', 'foo|bar', 'foo,bar\\', 'foo\\",bar', '\\",admin,true', ''] as $value) {
                 yield "$method: $value" => [$method, $value];
             }
         }
@@ -159,6 +159,51 @@ class ValidationRuleBuilderMethodTest extends TestCase
     }
 
     /**
+     * Test that CSV metacharacters cannot bypass conditional validation.
+     */
+    #[DataProvider('conditionalRuleParametersProvider')]
+    public function testConditionalRuleParametersCannotBypassValidation($method, $value)
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        $rule = Rule::$method('other', $value);
+        $data = ['other' => $value];
+
+        if (! str_starts_with($method, 'present')) {
+            $data['field'] = match ($method) {
+                'acceptedIf' => false,
+                'declinedIf' => true,
+                default => 'value',
+            };
+        }
+
+        foreach ([$rule, [$rule], [Rule::when(true, [$rule])]] as $rules) {
+            $this->assertSame(str_ends_with($method, 'Unless'), (new Validator($translator, $data, ['field' => $rules]))->passes());
+
+            $differentData = array_replace($data, ['other' => 'different:'.$value]);
+
+            $this->assertSame(! str_ends_with($method, 'Unless'), (new Validator($translator, $differentData, ['field' => $rules]))->passes());
+        }
+    }
+
+    /**
+     * Test that wildcard and nested rules preserve conditional parameters.
+     */
+    public function testConditionalRuleParametersArePreservedForWildcardAndNestedRules()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        $value = 'foo\\",bar';
+        $data = ['items' => [['other' => $value, 'terms' => false]]];
+        $rule = Rule::acceptedIf('items.*.other', $value);
+
+        foreach ([$rule, [$rule], Rule::forEach(fn () => [$rule])] as $rules) {
+            $validator = new Validator($translator, $data, ['items.*.terms' => $rules]);
+
+            $this->assertFalse($validator->passes());
+            $this->assertSame(['items.0.terms' => ['validation.accepted_if']], $validator->errors()->toArray());
+        }
+    }
+
+    /**
      * Test that field and key lists survive parsing.
      */
     public function testFieldAndKeyParametersAreEscaped()
@@ -168,21 +213,21 @@ class ValidationRuleBuilderMethodTest extends TestCase
             'presentWith', 'presentWithAll', 'prohibits', 'requiredArrayKeys',
             'requiredWith', 'requiredWithAll', 'requiredWithout', 'requiredWithoutAll',
         ] as $method) {
-            $parameters = ['foo,bar', '"quoted"'];
+            $parameters = ['foo,bar', '"quoted"', 'foo,bar\\', 'foo\\",bar'];
 
-            $this->assertSame($parameters, ValidationRuleParser::parse((string) Rule::$method($parameters))[1]);
-            $this->assertSame($parameters, ValidationRuleParser::parse((string) Rule::$method(...$parameters))[1]);
+            $this->assertSame($parameters, ValidationRuleParser::parse(Rule::$method($parameters))[1]);
+            $this->assertSame($parameters, ValidationRuleParser::parse(Rule::$method(...$parameters))[1]);
         }
 
         foreach ([
             'excludeWith', 'inArray', 'prohibitedIfAccepted',
             'prohibitedIfDeclined', 'requiredIfAccepted', 'requiredIfDeclined',
         ] as $method) {
-            $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::$method('foo,bar'))[1]);
+            $this->assertSame(['foo\\",bar'], ValidationRuleParser::parse(Rule::$method('foo\\",bar'))[1]);
         }
 
-        $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::confirmed()->customField('foo,bar'))[1]);
-        $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::currentPassword()->guard('foo,bar'))[1]);
+        $this->assertSame(['foo\\",bar'], ValidationRuleParser::parse(Rule::confirmed()->customField('foo\\",bar'))[1]);
+        $this->assertSame(['foo\\",bar'], ValidationRuleParser::parse(Rule::currentPassword()->guard('foo\\",bar'))[1]);
     }
 
     /**
@@ -193,10 +238,40 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $translator = new Translator(new ArrayLoader, 'en');
 
         foreach (['requiredArrayKeys', 'inArrayKeys'] as $method) {
-            $rules = ['settings' => [Rule::$method(['foo,bar'])]];
+            foreach (['foo,bar', 'foo,bar\\', 'foo\\",bar'] as $key) {
+                $rules = ['settings' => [Rule::$method([$key])]];
 
-            $this->assertTrue((new Validator($translator, ['settings' => ['foo,bar' => 1]], $rules))->passes());
-            $this->assertFalse((new Validator($translator, ['settings' => ['foo' => 1, 'bar' => 1]], $rules))->passes());
+                $this->assertTrue((new Validator($translator, ['settings' => [$key => 1]], $rules))->passes());
+                $this->assertFalse((new Validator($translator, ['settings' => ['foo' => 1, 'bar' => 1]], $rules))->passes());
+            }
+        }
+    }
+
+    /**
+     * Test that associative parameter arrays become positional parameter lists.
+     */
+    public function testAssociativeRuleParametersAreNormalized()
+    {
+        $this->assertSame(['other', 'foo,bar'], ValidationRuleParser::parse(Rule::acceptedIf('other', ['value' => 'foo,bar']))[1]);
+        $this->assertSame(['foo,bar'], ValidationRuleParser::parse(Rule::requiredWith(['field' => 'foo,bar']))[1]);
+        $this->assertSame(['foo,bar'], ValidationRuleParser::parse(Rule::requiredArrayKeys(['key' => 'foo,bar']))[1]);
+    }
+
+    /**
+     * Test that numeric conditional values retain their existing string representation.
+     */
+    public function testConditionalRulesPreserveScalarSemantics()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        foreach (['acceptedIf', 'declinedIf', 'missingIf', 'missingUnless', 'presentIf', 'presentUnless'] as $method) {
+            $this->assertSame(['other', 'true', 'false', 'null', '1', '1.5'], ValidationRuleParser::parse(Rule::$method('other', [true, false, null, 1, 1.5]))[1]);
+        }
+
+        foreach ([true, false, null, 1, 1.5] as $value) {
+            $this->assertFalse((new Validator($translator, ['other' => $value, 'terms' => false], [
+                'terms' => [Rule::acceptedIf('other', $value)],
+            ]))->passes());
         }
     }
 

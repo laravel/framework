@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Validation\Rules\Concerns\FormatsParameters;
-use Stringable;
 
-class AcceptedIf implements Stringable
+class AcceptedIf implements ParameterizedRule
 {
     use FormatsParameters;
 
@@ -26,15 +26,15 @@ class AcceptedIf implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
         $values = array_map(
             static fn ($value) => is_string($value) ? $value : json_encode($value),
             $this->values,
         );
 
-        return 'accepted_if:'.$this->formatParameters([$this->anotherField, ...$values]);
+        return ['accepted_if', $this->anotherField, ...array_values($values)];
     }
 }

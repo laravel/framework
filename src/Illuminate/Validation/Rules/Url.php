@@ -2,10 +2,13 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Stringable;
+use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Validation\Rules\Concerns\FormatsParameters;
 
-class Url implements Stringable
+class Url implements ParameterizedRule
 {
+    use FormatsParameters;
+
     /**
      * @var string[]|null
      */
@@ -24,10 +27,10 @@ class Url implements Stringable
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Get the rule name followed by its parameters.
      */
-    public function __toString(): string
+    public function toArray(): array
     {
-        return 'url'.($this->protocols ? ':'.implode(',', $this->protocols) : '');
+        return ['url', ...array_values($this->protocols ?? [])];
     }
 }
