@@ -526,20 +526,20 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  int  $numkeys
      * @param  mixed  ...$arguments
      * @return mixed
+     *
+     * @throws \RedisException
      */
     public function evalsha($script, $numkeys, ...$arguments)
     {
-        $this->client->clearLastError();
+        return $this->evaluateScript(function () use ($script, $numkeys, $arguments) {
+            // Evaluating an unloaded hash only answers with NOSCRIPT, so we stop here and let
+            // the reason the load itself failed surface from the client's last error...
+            if (($sha = $this->loadScript($script)) === false) {
+                return false;
+            }
 
-        $result = $this->command('evalsha', [
-            $this->script('load', $script), $arguments, $numkeys,
-        ]);
-
-        if ($result === false && ($error = $this->client->getLastError())) {
-            throw new RedisException($error);
-        }
-
-        return $result;
+            return $this->command('evalsha', [$sha, $arguments, $numkeys]);
+        });
     }
 
     /**
@@ -549,15 +549,51 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  int  $numberOfKeys
      * @param  mixed  ...$arguments
      * @return mixed
+     *
+     * @throws \RedisException
      */
     public function eval($script, $numberOfKeys, ...$arguments)
     {
-        $this->client->clearLastError();
+        return $this->evaluateScript(
+            fn () => $this->command('eval', [$script, $arguments, $numberOfKeys])
+        );
+    }
 
-        $result = $this->command('eval', [$script, $arguments, $numberOfKeys]);
+    /**
+     * Load the given LUA script onto the server and return its SHA1 hash.
+     *
+     * @param  string  $script
+     * @return string|false
+     */
+    protected function loadScript($script)
+    {
+        return $this->script('load', $script);
+    }
 
-        if ($result === false && ($error = $this->client->getLastError())) {
-            throw new RedisException($error);
+    /**
+     * Run the given script evaluation, turning a server side script error into an exception.
+     *
+     * phpredis reports these errors by returning false and recording the message on the client
+     * instead of throwing, so they never reach the handling in the command method and the
+     * client has to be rebuilt here when the error turns out to be a lost connection...
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     *
+     * @throws \RedisException
+     */
+    protected function evaluateScript(Closure $callback)
+    {
+        $this->client?->clearLastError();
+
+        $result = $callback();
+
+        if ($result === false && ($error = $this->client?->getLastError())) {
+            $exception = new RedisException($error);
+
+            $this->rebuildClientOnLostConnection($exception);
+
+            throw $exception;
         }
 
         return $result;

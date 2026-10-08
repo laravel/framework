@@ -125,6 +125,29 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     }
 
     /**
+     * Load the given LUA script onto every master in the cluster and return its SHA1 hash.
+     *
+     * @param  string  $script
+     * @return string|false
+     */
+    #[\Override]
+    protected function loadScript($script)
+    {
+        $sha = false;
+
+        // Unlike Redis::script(), RedisCluster::script() takes the node to run on as its first
+        // argument, and the script has to be loaded on every master since the node that
+        // ends up evaluating the hash depends on the keys the script is given...
+        foreach ($this->client->_masters() as $master) {
+            if (($sha = $this->command('script', [$master, 'load', $script])) === false) {
+                return false;
+            }
+        }
+
+        return $sha;
+    }
+
+    /**
      * Determine if the connection is a cluster connection.
      *
      * @return bool

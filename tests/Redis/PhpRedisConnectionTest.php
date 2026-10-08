@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use Redis;
+use RedisCluster;
 use RedisException;
 
 #[RequiresPhpExtension('redis')]
@@ -69,9 +71,83 @@ class PhpRedisConnectionTest extends TestCase
 
         $this->assertFalse($connection->evalsha('return false', 0));
     }
+
+    public function testEvalRebuildsTheClientWhenTheScriptErrorWasCausedByALostConnection()
+    {
+        $client = new FakePhpRedisClient;
+        $client->evalResult = false;
+        $client->errorOnEval = "READONLY You can't write against a read only replica.";
+
+        $rebuilt = new FakePhpRedisClient;
+
+        $connection = new PhpRedisConnection($client, fn () => $rebuilt);
+
+        try {
+            $connection->eval('return 1', 0);
+
+            $this->fail('The script error should have been thrown.');
+        } catch (RedisException) {
+            //
+        }
+
+        $this->assertSame($rebuilt, $connection->client());
+    }
+
+    public function testEvalMayStillBeCalledOnAMockedConnection()
+    {
+        $connection = Mockery::mock(PhpRedisConnection::class);
+        $connection->expects('command')->with('eval', ['return 1', [], 0])->andReturn(1);
+
+        $this->assertSame(1, $connection->eval('return 1', 0));
+    }
+
+    public function testEvalShaLoadsTheScriptOnEveryMasterOfACluster()
+    {
+        $client = Mockery::mock(RedisCluster::class);
+        $client->expects('clearLastError')->andReturn(true);
+        $client->expects('_masters')->andReturn([['127.0.0.1', 6379], ['127.0.0.1', 6380]]);
+        $client->expects('script')->with(['127.0.0.1', 6379], 'load', 'return 1')->andReturn('sha');
+        $client->expects('script')->with(['127.0.0.1', 6380], 'load', 'return 1')->andReturn('sha');
+        $client->expects('evalsha')->with('sha', [], 0)->andReturn(1);
+
+        $connection = new PhpRedisClusterConnection($client);
+
+        $this->assertSame(1, $connection->evalsha('return 1', 0));
+    }
+
+    public function testEvalShaThrowsTheScriptLoadErrorOnACluster()
+    {
+        $client = Mockery::mock(RedisCluster::class);
+        $client->expects('clearLastError')->andReturn(true);
+        $client->expects('_masters')->andReturn([['127.0.0.1', 6379]]);
+        $client->expects('script')->with(['127.0.0.1', 6379], 'load', 'return 1')->andReturn(false);
+        $client->expects('getLastError')->andReturn('ERR Lua redis lib command arguments must be strings or integers');
+        $client->expects('evalsha')->never();
+
+        $connection = new PhpRedisClusterConnection($client);
+
+        $this->expectException(RedisException::class);
+        $this->expectExceptionMessage('ERR Lua redis lib command arguments must be strings or integers');
+
+        $connection->evalsha('return 1', 0);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+
+        parent::tearDown();
+    }
 }
 
-class FakePhpRedisClient extends Redis
+/**
+ * A stand-in for the phpredis client.
+ *
+ * This deliberately does not extend \Redis: the parent would be resolved while the file is
+ * being included, before the extension requirement above can skip anything, so the whole
+ * suite would die with a fatal error wherever the extension is not installed...
+ */
+class FakePhpRedisClient
 {
     public mixed $evalResult = null;
 
@@ -80,11 +156,6 @@ class FakePhpRedisClient extends Redis
     public ?string $lastError = null;
 
     public bool $lastErrorCleared = false;
-
-    public function __construct()
-    {
-        //
-    }
 
     public function eval(string $script, array $args = [], int $num_keys = 0): mixed
     {

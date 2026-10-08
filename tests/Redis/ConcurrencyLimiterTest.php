@@ -45,7 +45,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnNonClusterConnection()
     {
-        $connection = Mockery::mock(PhpRedisConnection::class, [new Redis]);
+        $connection = Mockery::mock(PhpRedisConnection::class, [Mockery::mock(Redis::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(false);
 
         $connection->expects('command')->with('eval', Mockery::on(function ($args) {
