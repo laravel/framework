@@ -13,6 +13,7 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\MultipleColumnsSelectedException;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
@@ -599,6 +600,22 @@ class DatabaseConnectionTest extends TestCase
         });
         $this->assertSame('foo bar', $queries[0]['query']);
         $this->assertEquals(['baz'], $queries[0]['bindings']);
+    }
+
+    public function testOlapRunsCallbackUsingOlapWorkloadOnVitess()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['getAttribute'])->getMock();
+        $pdo->expects($this->once())->method('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->willReturn('8.0.23-PlanetScale');
+
+        $queries = (new MySqlConnection($pdo))->pretend(function ($connection) {
+            $connection->olap(fn ($connection) => $connection->select('foo bar'));
+        });
+
+        $this->assertSame([
+            "set workload = 'olap'",
+            'foo bar',
+            "set workload = 'oltp'",
+        ], array_column($queries, 'query'));
     }
 
     #[AllowMockObjectsWithoutExpectations]
