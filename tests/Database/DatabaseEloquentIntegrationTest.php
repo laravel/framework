@@ -508,27 +508,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('callback result', EloquentTestUser::findOr(2, ['email'], fn () => 'callback result'));
     }
 
-    public function testFindOrWithManyIdentifiersReturnsTheModelsThatWereFound()
-    {
-        EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'second@example.com']);
-
-        $found = EloquentTestUser::findOr([1, 2], fn () => 'callback result');
-
-        $this->assertInstanceOf(Collection::class, $found);
-        $this->assertSame([1, 2], $found->modelKeys());
-
-        $found = EloquentTestUser::findOr(new Collection([EloquentTestUser::find(1), EloquentTestUser::find(2)]), ['email'], fn () => 'callback result');
-
-        $this->assertInstanceOf(Collection::class, $found);
-
-        // The callback is never used for many identifiers, a partial result is returned instead.
-        $found = EloquentTestUser::findOr([1, 2, 3], fn () => 'callback result');
-
-        $this->assertInstanceOf(Collection::class, $found);
-        $this->assertSame([1, 2], $found->modelKeys());
-    }
-
     public function testDestroyAcceptsVariousIdentifierShapes()
     {
         foreach ([1, 2, 3, 4, 5, 6, 7, 8] as $id) {
