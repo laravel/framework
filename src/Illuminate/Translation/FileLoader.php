@@ -157,7 +157,7 @@ class FileLoader implements Loader
                         throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
                     }
 
-                    $output = array_merge($output, $decoded);
+                    $output = array_replace($output, $decoded);
                 }
 
                 return $output;
