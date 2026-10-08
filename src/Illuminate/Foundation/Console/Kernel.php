@@ -99,6 +99,13 @@ class Kernel implements KernelContract
     protected $loadedPaths = [];
 
     /**
+     * The commands registered through the "load" and "command" methods.
+     *
+     * @var array
+     */
+    protected $kernelCommands = [];
+
+    /**
      * All of the registered command duration handlers.
      *
      * @var array
@@ -336,9 +343,7 @@ class Kernel implements KernelContract
     {
         $command = new ClosureCommand($signature, $callback);
 
-        Artisan::starting(function ($artisan) use ($command) {
-            $artisan->add($command);
-        });
+        $this->kernelCommands[] = $command;
 
         return $command;
     }
@@ -382,9 +387,7 @@ class Kernel implements KernelContract
         };
 
         foreach ($this->findCommands($paths)->filter($filterCommands) as $file) {
-            Artisan::starting(function ($artisan) use ($file, $possibleCommands) {
-                $artisan->resolve($possibleCommands[$file]);
-            });
+            $this->kernelCommands[] = $possibleCommands[$file];
         }
     }
 
@@ -571,7 +574,7 @@ class Kernel implements KernelContract
     {
         if (is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
-                ->resolveCommands($this->commands)
+                ->resolveCommands([...$this->kernelCommands, ...$this->commands])
                 ->setContainerCommandLoader();
 
             if ($this->symfonyDispatcher instanceof EventDispatcher) {

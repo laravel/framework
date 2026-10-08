@@ -90,6 +90,15 @@ class KernelTest extends TestCase
         $this->assertSame(1, KernelTestLazyCommand::$constructionAttempts);
     }
 
+    public function testClosureCommandsAreOnlyRegisteredWithTheKernelThatDefinedThem()
+    {
+        $kernel = $this->makeKernel();
+        $kernel->command('kernel-test-closure-command', fn () => 0);
+
+        $this->assertTrue($this->getArtisan($kernel)->has('kernel-test-closure-command'));
+        $this->assertFalse($this->getArtisan($this->makeKernel())->has('kernel-test-closure-command'));
+    }
+
     protected function makeKernel(): Kernel
     {
         $app = new Application;
