@@ -29,8 +29,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('insert')->with('insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)',
             ['foo', 'bar', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
@@ -52,8 +52,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $sql = 'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)';
         $bindings = ['foo', 'bar', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
@@ -86,7 +86,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -111,8 +111,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('insert')->with('insert into "child_table" ("attr", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?)',
             ['foo', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
@@ -133,7 +133,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -157,8 +157,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
             'id' => 456,
@@ -186,7 +186,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -222,7 +222,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -247,8 +247,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
             'id' => 456,
@@ -279,7 +279,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -319,7 +319,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite', [456]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([]);
@@ -337,8 +337,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
             'id' => 456,
@@ -362,8 +362,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])->returns([[
             'id' => 456,

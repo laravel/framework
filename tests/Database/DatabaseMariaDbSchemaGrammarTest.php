@@ -49,7 +49,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $conn = $this->getConnection();
         $conn->allows('getConfig')->returns(null);
-        $conn->allows('getServerVersion')->returns('10.7.0');
+        $conn->expects('getServerVersion')->returns('10.7.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1164,7 +1164,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingUuid()
     {
         $conn = $this->getConnection();
-        $conn->allows('getServerVersion')->returns('10.7.0');
+        $conn->expects('getServerVersion')->returns('10.7.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid('foo');
@@ -1190,7 +1190,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingUuidDefaultsColumnName()
     {
         $conn = $this->getConnection();
-        $conn->allows('getServerVersion')->returns('10.7.0');
+        $conn->expects('getServerVersion')->returns('10.7.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid();

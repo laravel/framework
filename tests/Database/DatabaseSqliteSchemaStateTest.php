@@ -44,7 +44,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection = Double::for(SQLiteConnection::class);
         $connection->expects('getDatabaseName')->returns($config['database']);
         $pdo = Double::for(PDO::class);
-        $pdo->allows('exec')->returns(0);
+        $pdo->expects('exec')->returns(0);
         $connection->expects('getPdo')->returns($pdo);
 
         $files = Double::for(Filesystem::class);
@@ -64,9 +64,9 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection->statement('create virtual table temp.logs using fts5(message)');
 
         $process = Double::for(Process::class);
-        $process->allows('setTimeout')->returns($process);
-        $process->allows('mustRun')->returns($process);
-        $process->allows('getOutput')->returns(<<<'SQL'
+        $process->expects('setTimeout')->returns($process);
+        $process->expects('mustRun')->returns($process);
+        $process->expects('getOutput')->returns(<<<'SQL'
             CREATE VIRTUAL TABLE posts using fts5(body)
             /* posts(body) */;
             CREATE TABLE IF NOT EXISTS 'posts_data'(id INTEGER PRIMARY KEY, block BLOB);

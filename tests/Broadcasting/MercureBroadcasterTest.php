@@ -87,7 +87,7 @@ class MercureBroadcasterTest extends TestCase
     public function testSettingAHubRegistersItsCookieNameAsNeverEncrypted()
     {
         $hub = Double::for(HubInterface::class);
-        $hub->allows('getCookieName')->returns('custom_mercure_cookie');
+        $hub->expects('getCookieName')->returns('custom_mercure_cookie');
 
         $this->broadcaster->setHub($hub);
 
@@ -327,7 +327,7 @@ class MercureBroadcasterTest extends TestCase
     {
         $this->expectException(BroadcastException::class);
 
-        $this->hub->allows('publish')->throws(new MercureRuntimeException('unreachable'));
+        $this->hub->expects('publish')->throws(new MercureRuntimeException('unreachable'));
 
         $this->broadcaster->broadcast(['news'], 'Tick');
     }
@@ -338,7 +338,7 @@ class MercureBroadcasterTest extends TestCase
             'Failed to send an update.', 0, new RuntimeException('HTTP/2 401 from the hub')
         );
 
-        $this->hub->allows('publish')->throws($hubException);
+        $this->hub->expects('publish')->throws($hubException);
 
         try {
             $this->broadcaster->broadcast(['news'], 'Tick');
@@ -353,7 +353,7 @@ class MercureBroadcasterTest extends TestCase
     {
         $hubException = new RuntimeException('No Mercure hub configured');
 
-        $this->hub->allows('publish')->throws($hubException);
+        $this->hub->expects('publish')->throws($hubException);
 
         try {
             $this->broadcaster->broadcast(['news'], 'Tick');

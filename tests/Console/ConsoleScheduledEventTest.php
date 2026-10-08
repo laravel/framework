@@ -81,7 +81,7 @@ class ConsoleScheduledEventTest extends TestCase
         $appDouble = Double::for(ApplicationContract::class, override: true);
         $appDouble->expects('isDownForMaintenance')->times(2)->returns(false);
         $appDouble->expects('environment')->times(2)->returns('production');
-        $appDouble->allows('call')->resolves(fn ($callback) => $callback());
+        $appDouble->expects('call')->resolves(fn ($callback) => $callback());
         $app = $appDouble->instance();
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 

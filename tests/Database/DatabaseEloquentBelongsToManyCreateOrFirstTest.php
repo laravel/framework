@@ -37,8 +37,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             'SQLite',
             [456],
         );
-        $source->getConnection()->allows('transactionLevel')->returns(0);
-        $source->getConnection()->allows('getName')->returns('sqlite');
+        $source->getConnection()->expects('transactionLevel')->returns(0);
+        $source->getConnection()->expects('getName')->returns('sqlite');
 
         $source->getConnection()->expects('insert')->with('insert into "related_table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
@@ -66,7 +66,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             'SQLite',
         );
         $source->getConnection()->allows('transactionLevel')->returns(0);
-        $source->getConnection()->allows('getName')->returns('sqlite');
+        $source->getConnection()->expects('getName')->returns('sqlite');
 
         $sql = 'insert into "related_table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
         $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
@@ -105,8 +105,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
-        $source->getConnection()->allows('transactionLevel')->returns(0);
-        $source->getConnection()->allows('getName')->returns('sqlite');
+        $source->getConnection()->expects('transactionLevel')->returns(0);
+        $source->getConnection()->expects('getName')->returns('sqlite');
 
         $source->getConnection()->expects('select')->with('select "related_table".*, "pivot_table"."source_id" as "pivot_source_id", "pivot_table"."related_id" as "pivot_related_id" from "related_table" inner join "pivot_table" on "related_table"."id" = "pivot_table"."related_id" where "pivot_table"."source_id" = ? and ("attr" = ?) limit 1',
             [123, 'foo'],
@@ -203,7 +203,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
-        $source->getConnection()->allows('transactionLevel')->returns(0);
+        $source->getConnection()->expects('transactionLevel')->returns(0);
         $source->getConnection()->allows('getName')->returns('sqlite');
 
         $source->getConnection()->expects('select')->with('select "related_table".*, "pivot_table"."source_id" as "pivot_source_id", "pivot_table"."related_id" as "pivot_related_id" from "related_table" inner join "pivot_table" on "related_table"."id" = "pivot_table"."related_id" where "pivot_table"."source_id" = ? and ("attr" = ?) limit 1',

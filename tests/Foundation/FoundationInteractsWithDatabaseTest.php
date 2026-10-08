@@ -204,8 +204,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder = Double::for(Builder::class);
         $builder->expects('count')->times(2)->returns(0);
 
-        $this->connection->allows('table')->with($this->table)->returns($builder);
-        $this->connection->allows('table')->with('orders')->returns($builder);
+        $this->connection->expects('table')->with($this->table)->returns($builder);
+        $this->connection->expects('table')->with('orders')->returns($builder);
 
         $this->assertDatabaseEmpty([ProductStub::class, OrderStub::class]);
     }
@@ -257,8 +257,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->expects('whereNotNull')->with('removed_at')->times(2)->returns($builder);
         $builder->expects('exists')->times(2)->returns(true);
 
-        $this->connection->allows('table')->with($this->table)->returns($builder);
-        $this->connection->allows('table')->with('orders')->returns($builder);
+        $this->connection->expects('table')->with($this->table)->returns($builder);
+        $this->connection->expects('table')->with('orders')->returns($builder);
 
         $this->assertSoftDeleted(['products', 'orders'], $this->data, deletedAtColumn: 'removed_at');
     }
@@ -270,8 +270,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->expects('whereNull')->with('removed_at')->times(2)->returns($builder);
         $builder->expects('exists')->times(2)->returns(true);
 
-        $this->connection->allows('table')->with($this->table)->returns($builder);
-        $this->connection->allows('table')->with('orders')->returns($builder);
+        $this->connection->expects('table')->with($this->table)->returns($builder);
+        $this->connection->expects('table')->with('orders')->returns($builder);
 
         $this->assertNotSoftDeleted(['products', 'orders'], $this->data, deletedAtColumn: 'removed_at');
     }

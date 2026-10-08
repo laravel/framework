@@ -1624,8 +1624,8 @@ class DatabaseEloquentModelTest extends TestCase
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $schemaBuilder = Double::for(SchemaBuilder::class);
-        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
-        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
+        $schemaBuilder->expects('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->expects('getSchemaBuilder')->returns($schemaBuilder);
 
         $model->guard(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
@@ -1658,8 +1658,8 @@ class DatabaseEloquentModelTest extends TestCase
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $schemaBuilder = Double::for(SchemaBuilder::class);
-        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
-        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
+        $schemaBuilder->expects('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->expects('getSchemaBuilder')->returns($schemaBuilder);
 
         $model->guard([]);
         $model->fillable(['name']);
@@ -1678,8 +1678,8 @@ class DatabaseEloquentModelTest extends TestCase
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $schemaBuilder = Double::for(SchemaBuilder::class);
-        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
-        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
+        $schemaBuilder->expects('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->expects('getSchemaBuilder')->returns($schemaBuilder);
 
         Model::preventSilentlyDiscardingAttributes();
 

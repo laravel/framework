@@ -107,7 +107,7 @@ class RoutingRedirectorTest extends TestCase
 
     public function testRefreshRedirectToCurrentUrl()
     {
-        $this->url->allows('getRequest')->returns(Request::create('/bar'));
+        $this->url->expects('getRequest')->returns(Request::create('/bar'));
 
         $response = $this->redirect->refresh();
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());

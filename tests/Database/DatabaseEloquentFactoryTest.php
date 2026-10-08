@@ -729,7 +729,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_resolve_nested_model_name_from_factory()
     {
         $app = Double::for(Application::class, override: true);
-        $app->allows('getNamespace')->returns('Illuminate\\Tests\\Database\\Fixtures\\');
+        $app->expects('getNamespace')->returns('Illuminate\\Tests\\Database\\Fixtures\\');
         Container::getInstance()->instance(Application::class, $app->instance());
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');

@@ -89,7 +89,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $connection = $this->getConnection();
-        $connection->getSchemaBuilder()->allows('parseSchemaAndTable')->returns([null, 'users']);
+        $connection->getSchemaBuilder()->expects('parseSchemaAndTable')->returns([null, 'users']);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
@@ -195,7 +195,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testDropPrimary()
     {
         $connection = $this->getConnection();
-        $connection->getSchemaBuilder()->allows('parseSchemaAndTable')->returns([null, 'users']);
+        $connection->getSchemaBuilder()->expects('parseSchemaAndTable')->returns([null, 'users']);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropPrimary();

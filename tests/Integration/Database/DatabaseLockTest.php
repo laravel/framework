@@ -163,7 +163,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException($message, $code)
         ));
 
-        $connection->allows('transactionLevel')->returns(0);
+        $connection->expects('transactionLevel')->returns(0);
         $connection->expects('table')->times(2)->with('cache_locks')->returns($insertBuilder, $deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 0, lottery: [1, 1]);
@@ -192,9 +192,9 @@ class DatabaseLockTest extends DatabaseTestCase
         ));
 
         $updateBuilder->allows('where')->returns($updateBuilder);
-        $updateBuilder->allows('update')->returns(1);
+        $updateBuilder->expects('update')->returns(1);
 
-        $connection->allows('transactionLevel')->returns($transactionLevel);
+        $connection->expects('transactionLevel')->returns($transactionLevel);
         $connection->allows('table')->with('cache_locks')->returns($insertBuilder, $updateBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, lottery: null);
@@ -226,7 +226,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException($message, $code)
         ));
 
-        $connection->allows('transactionLevel')->returns(0);
+        $connection->expects('transactionLevel')->returns(0);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner); // same owner...
@@ -253,7 +253,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException('Deadlock found when trying to get lock', 1213)
         ));
 
-        $connection->allows('transactionLevel')->returns(1);
+        $connection->expects('transactionLevel')->returns(1);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10);
@@ -279,7 +279,7 @@ class DatabaseLockTest extends DatabaseTestCase
             new PDOException('Serialization failure: 1213 Deadlock', 40001)
         ));
 
-        $connection->allows('transactionLevel')->returns(1);
+        $connection->expects('transactionLevel')->returns(1);
         $connection->expects('table')->with('cache_locks')->returns($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner);

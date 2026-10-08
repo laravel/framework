@@ -359,7 +359,7 @@ class FilesystemAdapterTest extends TestCase
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
         $filesystemFactory3 = Double::for(FilesystemFactory::class);
-        $filesystemFactory3->allows('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+        $filesystemFactory3->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
 
         Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory3);
 
@@ -377,7 +377,7 @@ class FilesystemAdapterTest extends TestCase
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
         $filesystemFactory2 = Double::for(FilesystemFactory::class);
-        $filesystemFactory2->allows('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+        $filesystemFactory2->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
 
         Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory2);
 
@@ -395,7 +395,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $filesystemFactory = Double::for(FilesystemFactory::class);
-        $filesystemFactory->allows('disk')->returns($filesystemAdapter);
+        $filesystemFactory->expects('disk')->returns($filesystemAdapter);
 
         Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory);
 

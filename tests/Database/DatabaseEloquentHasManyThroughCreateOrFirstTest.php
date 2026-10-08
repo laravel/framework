@@ -31,8 +31,8 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
-        $parent->getConnection()->allows('getName')->returns('sqlite');
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('getName')->returns('sqlite');
         $parent->getConnection()->expects('insert')->with('insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
 
@@ -53,7 +53,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $sql = 'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
@@ -93,7 +93,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
@@ -121,8 +121,8 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
-        $parent->getConnection()->allows('getName')->returns('sqlite');
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
             [123, 'foo'],
@@ -156,7 +156,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
@@ -201,7 +201,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
@@ -229,8 +229,8 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
-        $parent->getConnection()->allows('getName')->returns('sqlite');
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
             [123, 'foo'],
@@ -267,7 +267,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $parent->id = 123;
         $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
-        $parent->getConnection()->allows('transactionLevel')->returns(0);
+        $parent->getConnection()->expects('transactionLevel')->returns(0);
         $parent->getConnection()->allows('getName')->returns('sqlite');
 
         $parent->getConnection()->expects('select')->with('select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',

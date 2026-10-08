@@ -87,7 +87,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('newCollection')->with(Argument::none())->returns('emptycollection');
-        $model->allows('getKeyType')->returns('int');
+        $model->expects('getKeyType')->returns('int');
         $builder->setModel($model);
         $builder->getQuery()->expects('whereIntegerInRaw')->never();
         $builder->expects('get')->never();
@@ -1055,7 +1055,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         ]);
 
         $builder = $this->getBuilder();
-        $builder->allows('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->expects('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
         $builder->getQuery()->expects('whereIn')->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
@@ -1063,7 +1063,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
 
         $builder = $this->getBuilder();
-        $builder->allows('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->expects('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
         $builder->getQuery()->expects('whereIn')->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
@@ -1079,7 +1079,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         ])]);
 
         $builder = $this->getBuilder();
-        $builder->allows('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->expects('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
         $builder->getQuery()->expects('whereIn')->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
 
@@ -1087,7 +1087,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
 
         $builder = $this->getBuilder();
-        $builder->allows('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->expects('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
         $builder->getQuery()->expects('whereIn')->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
 

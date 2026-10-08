@@ -42,8 +42,8 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
         // serialization + JSON encoding breaks because of UTF-8 issues. Encoding
         // of a QueueableCollection must favor QueueableEntity::queueableId().
         $mock = Double::for(Model::class);
-        $mock->allows('getKey')->returns(random_bytes(10));
-        $mock->allows('getQueueableId')->returns('mocked');
+        $mock->expects('getKey')->returns(random_bytes(10));
+        $mock->expects('getQueueableId')->returns('mocked');
 
         $c = new Collection([$mock]);
 

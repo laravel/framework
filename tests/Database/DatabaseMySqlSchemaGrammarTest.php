@@ -871,8 +871,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDate()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('8.0.13');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
@@ -885,8 +885,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('8.0.13');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -899,8 +899,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrentOn57()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('5.7');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('5.7');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -913,8 +913,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYear()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('8.0.13');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
@@ -926,8 +926,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('8.0.13');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();
@@ -940,8 +940,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrentOn57()
     {
         $conn = $this->getConnection();
-        $conn->allows('isMaria')->returns(false);
-        $conn->allows('getServerVersion')->returns('5.7');
+        $conn->expects('isMaria')->returns(false);
+        $conn->expects('getServerVersion')->returns('5.7');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();

@@ -28,9 +28,9 @@ class CacheRedisStoreTest extends TestCase
         $calls = 0;
 
         $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $connection->allows('command')->with('_prefix', [''])->returns('');
-        $connection->allows('command')->with('zremrangebyscore', Argument::any());
-        $connection->allows('scan')->resolves(function () use (&$calls) {
+        $connection->expects('command')->with('_prefix', [''])->returns('');
+        $connection->expects('command')->with('zremrangebyscore', Argument::any());
+        $connection->expects('scan')->resolves(function () use (&$calls) {
             $calls++;
 
             // A second call means the loop did not recognise the cursor it started with.
@@ -38,7 +38,7 @@ class CacheRedisStoreTest extends TestCase
         });
 
         $redis = $this->getRedis();
-        $redis->getRedis()->allows('connection')->with('default')->returns($connection);
+        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
 
         $redis->flushStaleTags();
 

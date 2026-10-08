@@ -27,8 +27,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
@@ -48,7 +48,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $sql = 'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
@@ -79,8 +79,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -105,7 +105,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -128,7 +128,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -161,8 +161,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -190,7 +190,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -213,7 +213,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -249,8 +249,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -280,7 +280,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -303,8 +303,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -336,7 +336,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -360,7 +360,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -399,7 +399,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -422,8 +422,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -445,7 +445,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -467,8 +467,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
@@ -496,7 +496,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
+        $model->getConnection()->expects('transactionLevel')->returns(0);
         $model->getConnection()->allows('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
@@ -511,8 +511,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $model->getConnection()->expects('transactionLevel')->returns(0);
+        $model->getConnection()->expects('getName')->returns('sqlite');
 
         $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
             'id' => 123,
