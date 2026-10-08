@@ -521,6 +521,20 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
 
+    public function testOnlyAndExceptWithArrayableModelKeys()
+    {
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
+
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
+
+        $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals(new Collection([$two, $three]), $c->only(new BaseCollection([2, 3])));
+        $this->assertEquals(new Collection([$one]), $c->except(new BaseCollection([2, 3])));
+    }
+
     public function testMakeHiddenAddsHiddenOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
