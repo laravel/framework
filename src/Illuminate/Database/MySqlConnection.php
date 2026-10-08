@@ -85,7 +85,7 @@ class MySqlConnection extends Connection
     /**
      * Set the Vitess workload for the connection.
      *
-     * @param  string  $workload
+     * @param  'olap'|'oltp'  $workload
      * @return void
      */
     protected function setWorkload($workload)
