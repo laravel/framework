@@ -440,9 +440,9 @@ class MailManager implements FactoryContract
         $transports = [];
 
         foreach ($config['mailers'] as $name) {
-            $config = $this->getConfig($name);
+            $mailerConfig = $this->getConfig($name);
 
-            if (is_null($config)) {
+            if (is_null($mailerConfig)) {
                 throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
             }
 
@@ -450,8 +450,8 @@ class MailManager implements FactoryContract
             // the transport configuration parameter in order to offer compatibility
             // with any Laravel <= 6.x application style mail configuration files.
             $transports[] = $this->app['config']['mail.driver']
-                ? $this->createSymfonyTransport(array_merge($config, ['transport' => $name]))
-                : $this->createSymfonyTransport($config);
+                ? $this->createSymfonyTransport(array_merge($mailerConfig, ['transport' => $name]))
+                : $this->createSymfonyTransport($mailerConfig);
         }
 
         return new $class($transports, $config['retry_after'] ?? 60, $this->app->make(LoggerInterface::class));
