@@ -4,11 +4,14 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\Jobs\InspectedJob;
+use Illuminate\Queue\NullQueue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -33,6 +36,20 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
+    }
+
+    private function managerFor(NullQueue $queue): QueueManager
+    {
+        $app = new Application;
+        $app->instance('config', new Repository(['queue' => ['default' => 'null']]));
+
+        $connector = Double::for(ConnectorInterface::class);
+        $connector->expects('connect')->returns($queue);
+
+        $manager = new QueueManager($app);
+        $manager->addConnector('null', fn () => $connector);
+
+        return $manager;
     }
 
     public function testAssertPushed()
@@ -67,10 +84,11 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Double::for(QueueManagerStub::class);
-        $manager->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
+        $queue = Double::for(NullQueue::class)->passthru();
+        $queue->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
             return $passedJob === $job;
         }), Argument::remaining());
+        $manager = $this->managerFor($queue);
 
         $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
 
@@ -443,10 +461,11 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Double::for(QueueManagerStub::class);
-        $manager->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
+        $queue = Double::for(NullQueue::class)->passthru();
+        $queue->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
             return $passedJob === $job;
         }), Argument::remaining());
+        $manager = $this->managerFor($queue);
 
         $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
 
@@ -510,10 +529,11 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
         $steps = [];
 
-        $manager = Double::for(QueueManagerStub::class);
-        $manager->expects('push')->with(Argument::all(function ($passedJob, $passedData, $passedQueue) use ($job) {
+        $queue = Double::for(NullQueue::class)->passthru();
+        $queue->expects('push')->with(Argument::all(function ($passedJob, $passedData, $passedQueue) use ($job) {
             return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
         }));
+        $manager = $this->managerFor($queue);
 
         $fake = (new QueueFake(new Application, [], $manager))
             ->except(JobStub::class)
@@ -966,13 +986,5 @@ class JobWithSerialization
     public function __unserialize(array $data): void
     {
         $this->value = $data['value'].'-unserialized';
-    }
-}
-
-class QueueManagerStub extends QueueManager
-{
-    public function push($job, $data = '', $queue = null)
-    {
-        //
     }
 }
