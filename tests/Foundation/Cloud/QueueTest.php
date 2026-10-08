@@ -201,7 +201,7 @@ class QueueTest extends TestCase
         } finally {
             Worker::$timedOutExitCode = null;
             Worker::killUsing(null);
-            
+
             $_SERVER['argv'] = $argv;
         }
     }
