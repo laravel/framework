@@ -187,13 +187,10 @@ class FilesystemManagerTest extends TestCase
 
     public function testExceptionThrownOnUnsupportedDriver()
     {
-        $this->expectExceptionObject(new InvalidArgumentException('Disk [local] does not have a configured driver.'));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid credential provider [unknown].');
 
-        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
-            $app['config'] = ['filesystems.disks.local' => null];
-        }));
-
-        $filesystem->disk('local');
+        $this->s3Config(['credentials' => 'unknown']);
     }
 
     public function testCanBuildOnDemandDisk()

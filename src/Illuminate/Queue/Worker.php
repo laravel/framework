@@ -1129,6 +1129,10 @@ class Worker
             call_user_func(static::$killCallback, $status);
         }
 
+        if (static::$killCallback) {
+            call_user_func(static::$killCallback, $status);
+        }
+
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
