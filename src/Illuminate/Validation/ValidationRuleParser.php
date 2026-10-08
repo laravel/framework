@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Closure;
 use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
@@ -134,6 +135,7 @@ class ValidationRuleParser
 
         if (! is_object($rule) ||
             $rule instanceof RuleContract ||
+            $rule instanceof ParameterizedRule ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -254,6 +256,10 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
+        if ($rule instanceof ParameterizedRule) {
+            $rule = $rule->toArray();
+        }
+
         if ($rule instanceof RuleContract || $rule instanceof CompilableRules) {
             return [$rule, []];
         }
