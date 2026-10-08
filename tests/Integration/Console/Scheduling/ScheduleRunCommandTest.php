@@ -5,9 +5,11 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -274,5 +276,77 @@ class ScheduleRunCommandTest extends TestCase
         $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
         $this->assertEquals($originalTimestamp, $startedAtAfter->getTimestamp());
         $this->assertEquals($originalMicro, $startedAtAfter->micro);
+    }
+
+    public function test_catch_up_runs_a_missed_event_once()
+    {
+        $runs = 0;
+
+        $this->app->make(Schedule::class)->call(function () use (&$runs) {
+            $runs++;
+        })->name('report')->dailyAt('03:00')->catchUp();
+
+        $this->runScheduler('2026-03-24 03:00:00');
+        $this->assertSame(1, $runs);
+
+        // The scheduler was down at 03:00, so the missed run happens once it is back...
+        $this->runScheduler('2026-03-25 09:00:00');
+        $this->assertSame(2, $runs);
+
+        $this->runScheduler('2026-03-25 09:01:00');
+        $this->assertSame(2, $runs);
+    }
+
+    public function test_catch_up_respects_the_event_environments()
+    {
+        $runs = 0;
+
+        $this->app->make(Schedule::class)->call(function () use (&$runs) {
+            $runs++;
+        })->name('report')->dailyAt('03:00')->environments('production')->catchUp();
+
+        $this->app['env'] = 'production';
+        $this->runScheduler('2026-03-24 03:00:00');
+        $this->assertSame(1, $runs);
+
+        $this->app['env'] = 'local';
+        $this->runScheduler('2026-03-25 09:00:00');
+        $this->assertSame(1, $runs);
+    }
+
+    public function test_catch_up_runs_on_one_server_only()
+    {
+        $runs = 0;
+
+        $task = $this->app->make(Schedule::class)->call(function () use (&$runs) {
+            $runs++;
+        })->name('report')->dailyAt('03:00')->onOneServer()->catchUp();
+
+        $this->runScheduler('2026-03-24 03:00:00');
+        $this->assertSame(1, $runs);
+
+        // Another server has already claimed the missed run for this minute...
+        $this->app->make(CacheSchedulingMutex::class)->create($task, Carbon::parse('2026-03-25 09:00:00'));
+
+        $this->runScheduler('2026-03-25 09:00:00');
+        $this->assertSame(1, $runs);
+    }
+
+    /**
+     * Run the scheduler at the given time, as a fresh "schedule:run" process would.
+     *
+     * @param  string  $time
+     * @return void
+     */
+    protected function runScheduler($time)
+    {
+        Carbon::setTestNow($time);
+
+        $this->app[Kernel::class]->setArtisan(null);
+
+        (new ReflectionProperty(Schedule::class, 'mutexCache'))
+            ->setValue($this->app->make(Schedule::class), []);
+
+        $this->artisan('schedule:run');
     }
 }
