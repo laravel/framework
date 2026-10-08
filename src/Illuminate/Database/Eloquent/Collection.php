@@ -542,7 +542,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Returns only the models from the collection with the specified keys.
      *
-     * @param  array<array-key, mixed>|null  $keys
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<array-key, mixed>|null  $keys
      * @return static
      */
     public function only($keys)
@@ -550,6 +550,8 @@ class Collection extends BaseCollection implements QueueableCollection
         if (is_null($keys)) {
             return new static($this->items);
         }
+
+        $keys = $keys instanceof Arrayable ? $keys->toArray() : $keys;
 
         $dictionary = Arr::only($this->getDictionary(), array_map($this->getDictionaryKey(...), (array) $keys));
 
@@ -559,7 +561,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Returns all models in the collection except the models with specified keys.
      *
-     * @param  array<array-key, mixed>|null  $keys
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<array-key, mixed>|null  $keys
      * @return static
      */
     public function except($keys)
@@ -567,6 +569,8 @@ class Collection extends BaseCollection implements QueueableCollection
         if (is_null($keys)) {
             return new static($this->items);
         }
+
+        $keys = $keys instanceof Arrayable ? $keys->toArray() : $keys;
 
         $dictionary = Arr::except($this->getDictionary(), array_map($this->getDictionaryKey(...), (array) $keys));
 
