@@ -823,6 +823,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function max($callback = null);
 
     /**
+     * Get the item with the min value of a given key.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return TValue|null
+     */
+    public function minBy($callback = null);
+
+    /**
+     * Get the item with the max value of a given key.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return TValue|null
+     */
+    public function maxBy($callback = null);
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step

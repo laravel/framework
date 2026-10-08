@@ -39,7 +39,9 @@ use function Illuminate\Support\enum_value;
  * @property-read HigherOrderCollectionProxy<'last', TValue, static> $last
  * @property-read HigherOrderCollectionProxy<'map', TValue, static> $map
  * @property-read HigherOrderCollectionProxy<'max', TValue, static> $max
+ * @property-read HigherOrderCollectionProxy<'maxBy', TValue, static> $maxBy
  * @property-read HigherOrderCollectionProxy<'min', TValue, static> $min
+ * @property-read HigherOrderCollectionProxy<'minBy', TValue, static> $minBy
  * @property-read HigherOrderCollectionProxy<'partition', TValue, static> $partition
  * @property-read HigherOrderCollectionProxy<'percentage', TValue, static> $percentage
  * @property-read HigherOrderCollectionProxy<'reject', TValue, static> $reject
@@ -90,7 +92,9 @@ trait EnumeratesValues
         'last',
         'map',
         'max',
+        'maxBy',
         'min',
+        'minBy',
         'partition',
         'percentage',
         'reject',
@@ -519,6 +523,56 @@ trait EnumeratesValues
 
             return is_null($result) || $value > $result ? $value : $result;
         });
+    }
+
+    /**
+     * Get the item with the min value of a given key.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return TValue|null
+     */
+    public function minBy($callback = null)
+    {
+        $callback = $this->valueRetriever($callback);
+
+        $result = null;
+        $min = null;
+
+        foreach ($this as $key => $item) {
+            $value = $callback($item, $key);
+
+            if (! is_null($value) && (is_null($min) || $value < $min)) {
+                $result = $item;
+                $min = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the item with the max value of a given key.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return TValue|null
+     */
+    public function maxBy($callback = null)
+    {
+        $callback = $this->valueRetriever($callback);
+
+        $result = null;
+        $max = null;
+
+        foreach ($this as $key => $item) {
+            $value = $callback($item, $key);
+
+            if (! is_null($value) && (is_null($max) || $value > $max)) {
+                $result = $item;
+                $max = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**

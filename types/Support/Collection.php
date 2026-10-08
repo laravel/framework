@@ -680,6 +680,14 @@ assertType("'foo'|null", $collection::make([1])->max(function ($int) {
 }));
 assertType('mixed', $collection::make([new User])->max('id'));
 
+assertType('User|null', $collection->minBy('id'));
+assertType('User|null', $collection->maxBy(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return 1;
+}));
+
 assertType('Illuminate\Support\Collection<int, User>', $collection->nth(1, 2));
 
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->only(['string']));

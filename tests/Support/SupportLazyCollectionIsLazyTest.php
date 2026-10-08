@@ -781,6 +781,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testMaxByEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->maxBy();
+        });
+    }
+
     public function testMedianEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
@@ -821,6 +828,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->min();
+        });
+    }
+
+    public function testMinByEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->minBy();
         });
     }
 

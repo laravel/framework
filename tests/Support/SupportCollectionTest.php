@@ -4823,6 +4823,42 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMaxBy($collection)
+    {
+        $c = new $collection([
+            ['name' => 'Taylor', 'age' => 30],
+            ['name' => 'Abigail', 'age' => 25],
+            ['name' => 'Dayle', 'age' => null],
+            ['name' => 'Jess', 'age' => 30],
+        ]);
+
+        $this->assertSame('Taylor', $c->maxBy('age')['name']);
+        $this->assertSame('Abigail', $c->maxBy(fn ($user) => strlen($user['name']))['name']);
+        $this->assertSame('Taylor', $c->maxBy->age['name']);
+
+        $c = new $collection;
+        $this->assertNull($c->maxBy('age'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMinBy($collection)
+    {
+        $c = new $collection([
+            ['name' => 'Taylor', 'age' => 30],
+            ['name' => 'Abigail', 'age' => 25],
+            ['name' => 'Dayle', 'age' => null],
+            ['name' => 'Jess', 'age' => 25],
+        ]);
+
+        $this->assertSame('Abigail', $c->minBy('age')['name']);
+        $this->assertSame('Jess', $c->minBy(fn ($user) => strlen($user['name']))['name']);
+        $this->assertSame('Abigail', $c->minBy->age['name']);
+
+        $c = new $collection;
+        $this->assertNull($c->minBy('age'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testOnly($collection)
     {
         $data = new $collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
