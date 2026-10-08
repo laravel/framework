@@ -605,7 +605,7 @@ class DatabaseConnectionTest extends TestCase
     public function testOlapRunsCallbackUsingOlapWorkloadOnVitess()
     {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['getAttribute'])->getMock();
-        $pdo->expects($this->once())->method('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->willReturn('8.0.23-PlanetScale');
+        $pdo->expects($this->once())->method('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->willReturn('8.0.34-PlanetScale');
 
         $queries = (new MySqlConnection($pdo))->pretend(function ($connection) {
             $connection->olap(fn ($connection) => $connection->select('foo bar'));
