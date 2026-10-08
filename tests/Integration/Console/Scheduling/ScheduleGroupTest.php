@@ -144,16 +144,16 @@ class ScheduleGroupTest extends TestCase
         }
     }
 
-    public function testGroupCanApplyCatchUpToSchedules()
+    public function testGroupCanApplyRunIfMissedToSchedules()
     {
-        Schedule::catchUp(3600)->group(function () {
+        Schedule::runIfMissed(3600)->group(function () {
             Schedule::command('inspire');
         });
 
         $events = Schedule::events();
 
-        $this->assertTrue($events[0]->catchUp);
-        $this->assertSame(3600, $events[0]->catchUpWithin);
+        $this->assertTrue($events[0]->runIfMissed);
+        $this->assertSame(3600, $events[0]->missedWithin);
     }
 
     public static function groupAttributes(): array

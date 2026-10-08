@@ -460,7 +460,7 @@ class Schedule
     public function missedEvents($app)
     {
         return (new Collection($this->events()))->filter(function ($event) use ($app) {
-            if (! $event->catchUp ||
+            if (! $event->runIfMissed ||
                 $event->isRepeatable() ||
                 (! $event->runsInMaintenanceMode() && $app->isDownForMaintenance()) ||
                 ! $event->runsInEnvironment($app->environment())) {
@@ -483,7 +483,7 @@ class Schedule
             $missedAt = $event->previousRunDate($now)->getTimestamp();
 
             return $missedAt > $checkedAt &&
-                   (is_null($event->catchUpWithin) || $missedAt >= $now->getTimestamp() - $event->catchUpWithin);
+                   (is_null($event->missedWithin) || $missedAt >= $now->getTimestamp() - $event->missedWithin);
         });
     }
 

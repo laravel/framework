@@ -81,20 +81,6 @@ trait ManagesAttributes
     public $onOneServer = false;
 
     /**
-     * Indicates if the command should run once to catch up on missed runs.
-     *
-     * @var bool
-     */
-    public $catchUp = false;
-
-    /**
-     * The number of seconds within which a missed run may be caught up.
-     *
-     * @var int|null
-     */
-    public $catchUpWithin;
-
-    /**
      * The number of minutes the mutex should be valid.
      *
      * @var int
@@ -107,6 +93,20 @@ trait ManagesAttributes
      * @var bool
      */
     public $runInBackground = false;
+
+    /**
+     * Indicates if the command should run once if it missed a run.
+     *
+     * @var bool
+     */
+    public $runIfMissed = false;
+
+    /**
+     * The number of seconds within which a missed run may still run.
+     *
+     * @var int|null
+     */
+    public $missedWithin;
 
     /**
      * The array of filter callbacks.
@@ -223,23 +223,6 @@ trait ManagesAttributes
     }
 
     /**
-     * Run the event once if it missed a run while the scheduler was not running.
-     *
-     * @param  \DateInterval|int|null  $within
-     * @return $this
-     */
-    public function catchUp($within = null)
-    {
-        $this->catchUp = true;
-
-        $this->catchUpWithin = $within instanceof DateInterval
-            ? (int) CarbonInterval::instance($within)->totalSeconds
-            : $within;
-
-        return $this;
-    }
-
-    /**
      * State that the command should run in the background.
      *
      * @return $this
@@ -247,6 +230,23 @@ trait ManagesAttributes
     public function runInBackground()
     {
         $this->runInBackground = true;
+
+        return $this;
+    }
+
+    /**
+     * Run the event once if it missed a run while the scheduler was not running.
+     *
+     * @param  \DateInterval|int|null  $within
+     * @return $this
+     */
+    public function runIfMissed($within = null)
+    {
+        $this->runIfMissed = true;
+
+        $this->missedWithin = $within instanceof DateInterval
+            ? (int) CarbonInterval::instance($within)->totalSeconds
+            : $within;
 
         return $this;
     }

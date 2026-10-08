@@ -283,13 +283,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertEquals($originalMicro, $startedAtAfter->micro);
     }
 
-    public function test_catch_up_runs_a_missed_event_once()
+    public function test_missed_event_runs_once()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp();
+        })->name('report')->dailyAt('03:00')->runIfMissed();
 
         $this->runScheduler('2026-03-24 03:00:00');
         $this->assertSame(1, $runs);
@@ -302,13 +302,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(2, $runs);
     }
 
-    public function test_catch_up_respects_the_event_environments()
+    public function test_missed_event_respects_the_event_environments()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->environments('production')->catchUp();
+        })->name('report')->dailyAt('03:00')->environments('production')->runIfMissed();
 
         $this->app['env'] = 'production';
         $this->runScheduler('2026-03-24 03:00:00');
@@ -319,13 +319,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(1, $runs);
     }
 
-    public function test_catch_up_runs_on_one_server_only()
+    public function test_missed_event_runs_on_one_server_only()
     {
         $runs = 0;
 
         $task = $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->onOneServer()->catchUp();
+        })->name('report')->dailyAt('03:00')->onOneServer()->runIfMissed();
 
         $this->runScheduler('2026-03-24 03:00:00');
         $this->assertSame(1, $runs);
@@ -339,7 +339,7 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(1, $runs);
     }
 
-    public function test_missed_events_do_not_run_without_catch_up()
+    public function test_missed_events_do_not_run_without_run_if_missed()
     {
         $runs = 0;
 
@@ -354,13 +354,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertNull(Cache::get('illuminate:schedule:checked:'.$task->mutexName()));
     }
 
-    public function test_catch_up_does_not_run_when_the_event_has_never_been_checked()
+    public function test_missed_event_does_not_run_when_the_event_has_never_been_checked()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp();
+        })->name('report')->dailyAt('03:00')->runIfMissed();
 
         $this->runScheduler('2026-03-25 09:00:00');
         $this->assertSame(0, $runs);
@@ -369,13 +369,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(1, $runs);
     }
 
-    public function test_catch_up_does_not_run_an_event_twice_when_it_is_due()
+    public function test_missed_event_does_not_run_twice_when_it_is_due()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp();
+        })->name('report')->dailyAt('03:00')->runIfMissed();
 
         $this->runScheduler('2026-03-23 03:00:00');
         $this->runScheduler('2026-03-25 03:00:00');
@@ -383,13 +383,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(2, $runs);
     }
 
-    public function test_catch_up_only_runs_missed_events_within_the_given_seconds()
+    public function test_missed_events_only_run_within_the_given_seconds()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp(3600);
+        })->name('report')->dailyAt('03:00')->runIfMissed(3600);
 
         $this->runScheduler('2026-03-24 03:00:00');
         $this->runScheduler('2026-03-25 09:00:00');
@@ -399,16 +399,16 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(2, $runs);
     }
 
-    public function test_catch_up_accepts_an_interval()
+    public function test_run_if_missed_accepts_an_interval()
     {
         $schedule = $this->app->make(Schedule::class);
 
-        $this->assertSame(3600, $schedule->command('inspire')->catchUp(hours(1))->catchUpWithin);
-        $this->assertSame(90, $schedule->command('inspire')->catchUp(minutes(1.5))->catchUpWithin);
-        $this->assertSame(60, $schedule->command('inspire')->catchUp(60)->catchUpWithin);
+        $this->assertSame(3600, $schedule->command('inspire')->runIfMissed(hours(1))->missedWithin);
+        $this->assertSame(90, $schedule->command('inspire')->runIfMissed(minutes(1.5))->missedWithin);
+        $this->assertSame(60, $schedule->command('inspire')->runIfMissed(60)->missedWithin);
     }
 
-    public function test_catch_up_does_not_retry_runs_skipped_by_filters()
+    public function test_missed_event_does_not_retry_runs_skipped_by_filters()
     {
         $runs = 0;
         $skip = false;
@@ -417,7 +417,7 @@ class ScheduleRunCommandTest extends TestCase
             $runs++;
         })->name('report')->dailyAt('03:00')->skip(function () use (&$skip) {
             return $skip;
-        })->catchUp();
+        })->runIfMissed();
 
         $this->runScheduler('2026-03-24 03:00:00');
 
@@ -430,7 +430,7 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(1, $runs);
     }
 
-    public function test_catch_up_runs_after_maintenance_mode_ends()
+    public function test_missed_event_runs_after_maintenance_mode_ends()
     {
         Config::set('app.maintenance.driver', 'cache');
         Config::set('app.maintenance.store', 'array');
@@ -439,7 +439,7 @@ class ScheduleRunCommandTest extends TestCase
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp();
+        })->name('report')->dailyAt('03:00')->runIfMissed();
 
         $this->runScheduler('2026-03-24 03:00:00');
 
@@ -453,13 +453,13 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(2, $runs);
     }
 
-    public function test_catch_up_respects_the_event_timezone()
+    public function test_missed_event_respects_the_event_timezone()
     {
         $runs = 0;
 
         $this->app->make(Schedule::class)->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->timezone('Asia/Dhaka')->catchUp();
+        })->name('report')->dailyAt('03:00')->timezone('Asia/Dhaka')->runIfMissed();
 
         // 03:00 in Dhaka is 21:00 UTC on the previous day...
         $this->runScheduler('2026-03-23 21:00:00');
@@ -472,7 +472,7 @@ class ScheduleRunCommandTest extends TestCase
         $this->assertSame(2, $runs);
     }
 
-    public function test_catch_up_uses_the_schedule_cache_store()
+    public function test_missed_event_uses_the_schedule_cache_store()
     {
         $this->app['config']->set('cache.stores.scheduler', ['driver' => 'array']);
 
@@ -482,7 +482,7 @@ class ScheduleRunCommandTest extends TestCase
 
         $schedule->call(function () use (&$runs) {
             $runs++;
-        })->name('report')->dailyAt('03:00')->catchUp();
+        })->name('report')->dailyAt('03:00')->runIfMissed();
 
         $this->runScheduler('2026-03-24 03:00:00');
 
