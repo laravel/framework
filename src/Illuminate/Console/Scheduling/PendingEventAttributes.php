@@ -117,6 +117,10 @@ class PendingEventAttributes
             $event->onOneServer();
         }
 
+        if ($this->catchUp) {
+            $event->catchUp($this->catchUpWithin);
+        }
+
         if ($this->runInBackground) {
             $event->runInBackground();
         }

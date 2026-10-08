@@ -111,7 +111,8 @@ class ScheduleRunCommand extends Command
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
 
-        $events = $this->schedule->dueEvents($this->laravel);
+        $events = $this->schedule->dueEvents($this->laravel)
+            ->merge($this->schedule->missedEvents($this->laravel));
 
         $paused = $this->isPaused();
 

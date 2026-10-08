@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Carbon\CarbonInterval;
+use DateInterval;
 use Illuminate\Support\Reflector;
 
 use function Illuminate\Support\enum_value;
@@ -77,6 +79,20 @@ trait ManagesAttributes
      * @var bool
      */
     public $onOneServer = false;
+
+    /**
+     * Indicates if the command should run once to catch up on missed runs.
+     *
+     * @var bool
+     */
+    public $catchUp = false;
+
+    /**
+     * The number of seconds within which a missed run may be caught up.
+     *
+     * @var int|null
+     */
+    public $catchUpWithin;
 
     /**
      * The number of minutes the mutex should be valid.
@@ -202,6 +218,23 @@ trait ManagesAttributes
     public function onOneServer()
     {
         $this->onOneServer = true;
+
+        return $this;
+    }
+
+    /**
+     * Run the event once if it missed a run while the scheduler was not running.
+     *
+     * @param  \DateInterval|int|null  $within
+     * @return $this
+     */
+    public function catchUp($within = null)
+    {
+        $this->catchUp = true;
+
+        $this->catchUpWithin = $within instanceof DateInterval
+            ? (int) CarbonInterval::instance($within)->totalSeconds
+            : $within;
 
         return $this;
     }

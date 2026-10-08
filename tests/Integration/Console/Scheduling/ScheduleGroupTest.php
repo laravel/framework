@@ -144,6 +144,18 @@ class ScheduleGroupTest extends TestCase
         }
     }
 
+    public function testGroupCanApplyCatchUpToSchedules()
+    {
+        Schedule::catchUp(3600)->group(function () {
+            Schedule::command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertTrue($events[0]->catchUp);
+        $this->assertSame(3600, $events[0]->catchUpWithin);
+    }
+
     public static function groupAttributes(): array
     {
         return [

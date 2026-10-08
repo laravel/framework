@@ -9,6 +9,7 @@ use Illuminate\Bus\UniqueLock;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -87,6 +88,13 @@ class Schedule
      * @var array<string, bool>
      */
     protected $mutexCache = [];
+
+    /**
+     * The cache store that should be used by the schedule.
+     *
+     * @var string|null
+     */
+    protected $cacheStore;
 
     /**
      * The attributes to pass to the event.
@@ -444,6 +452,42 @@ class Schedule
     }
 
     /**
+     * Get all of the events on the schedule that missed a run and should catch up.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return \Illuminate\Support\Collection
+     */
+    public function missedEvents($app)
+    {
+        return (new Collection($this->events()))->filter(function ($event) use ($app) {
+            if (! $event->catchUp ||
+                $event->isRepeatable() ||
+                (! $event->runsInMaintenanceMode() && $app->isDownForMaintenance()) ||
+                ! $event->runsInEnvironment($app->environment())) {
+                return false;
+            }
+
+            // We will record the time the scheduler last checked this event. If a scheduled run
+            // falls between the last check and now, the scheduler was not running at the time
+            // and the event missed that run, so we'll run it once now to catch up on it...
+            $cache = Container::getInstance()->make(CacheFactory::class)->store($this->cacheStore);
+
+            $checkedAt = $cache->get($key = 'illuminate:schedule:checked:'.$event->mutexName());
+
+            $cache->forever($key, ($now = Date::now())->getTimestamp());
+
+            if (is_null($checkedAt) || $event->isDue($app)) {
+                return false;
+            }
+
+            $missedAt = $event->previousRunDate($now)->getTimestamp();
+
+            return $missedAt > $checkedAt &&
+                   (is_null($event->catchUpWithin) || $missedAt >= $now->getTimestamp() - $event->catchUpWithin);
+        });
+    }
+
+    /**
      * Get all of the events on the schedule.
      *
      * @return \Illuminate\Console\Scheduling\Event[]
@@ -485,7 +529,7 @@ class Schedule
      */
     public function useCache($store)
     {
-        $store = enum_value($store);
+        $this->cacheStore = $store = enum_value($store);
 
         if ($this->eventMutex instanceof CacheAware) {
             $this->eventMutex->useStore($store);

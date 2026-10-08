@@ -829,6 +829,20 @@ class Event
     }
 
     /**
+     * Determine the previous due date for an event.
+     *
+     * @param  \DateTimeInterface|string  $currentTime
+     * @param  int  $nth
+     * @param  bool  $allowCurrentDate
+     * @return \Illuminate\Support\Carbon
+     */
+    public function previousRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
+    {
+        return Date::instance((new CronExpression($this->getExpression()))
+            ->getPreviousRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
+    }
+
+    /**
      * Get the Cron expression for the event.
      *
      * @return string
