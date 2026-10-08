@@ -32,7 +32,7 @@ class RedisQueueTest extends TestCase
     private $queue;
 
     /**
-     * @var DoubleInterface|\Mockery\LegacyMockInterface
+     * @var DoubleInterface
      */
     private $container;
 

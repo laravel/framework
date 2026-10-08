@@ -2261,6 +2261,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([1, 2], $query->getBindings());
     }
 
+    public function testWhereKeyMethodWithArrayAndCollection()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $this->assertSame('select * from "table" where "table"."id" in (1, 2, 3)', $model->newQuery()->whereKey([1, 2, 3])->toSql());
+        $this->assertSame('select * from "table" where "table"."id" in (1, 2, 3)', $model->newQuery()->whereKey(new Collection([1, 2, 3]))->toSql());
+    }
+
+    public function testWhereKeyNotMethodWithArrayAndCollection()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $this->assertSame('select * from "table" where "table"."id" not in (1, 2, 3)', $model->newQuery()->whereKeyNot([1, 2, 3])->toSql());
+        $this->assertSame('select * from "table" where "table"."id" not in (1, 2, 3)', $model->newQuery()->whereKeyNot(new Collection([1, 2, 3]))->toSql());
+    }
+
     public function testOrWhereKeyMethodWithArray()
     {
         $model = new EloquentBuilderTestStub;

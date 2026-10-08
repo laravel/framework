@@ -32,7 +32,7 @@ class FoundationAuthenticationTest extends TestCase
     ];
 
     /**
-     * @return \Illuminate\Contracts\Auth\Guard|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+     * @return \Illuminate\Contracts\Auth\Guard|\JMac\Testing\DoubleInterface
      */
     protected function mockGuard()
     {

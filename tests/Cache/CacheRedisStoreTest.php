@@ -38,7 +38,7 @@ class CacheRedisStoreTest extends TestCase
         });
 
         $redis = $this->getRedis();
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
+        $redis->getRedis()->expects('connection')->times(2)->with('default')->returns($connection);
 
         $redis->flushStaleTags();
 

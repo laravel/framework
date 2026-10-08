@@ -14,9 +14,9 @@ use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
-use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use function Orchestra\Testbench\default_skeleton_path;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -30,12 +30,10 @@ use Throwable;
 
 class ConsoleApplicationTest extends TestCase
 {
-    use InteractsWithMockery;
+    use VerifiesDoubles;
 
     protected function tearDown(): void
     {
-        $this->tearDownTheTestEnvironmentUsingMockery();
-
         Prompt::setOutput(new NullOutput);
     }
 

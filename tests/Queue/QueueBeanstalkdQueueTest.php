@@ -29,7 +29,7 @@ class QueueBeanstalkdQueueTest extends TestCase
     private $queue;
 
     /**
-     * @var \Illuminate\Container\Container|DoubleInterface|\Mockery\MockInterface
+     * @var \Illuminate\Container\Container|DoubleInterface
      */
     private $container;
 

@@ -497,6 +497,148 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Real Post', $post->name);
     }
 
+    public function testHasManyCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->posts()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->user_id);
+
+        $madeMany = $user->posts()->makeMany([['name' => 'a'], ['name' => 'b']]);
+        $this->assertSame([7, 7], $madeMany->pluck('user_id')->all());
+        $this->assertSame(0, EloquentTestPost::count());
+
+        $user->posts()->create(['name' => 'created']);
+        $user->posts()->forceCreate(['name' => 'forced']);
+        $user->posts()->createMany([['name' => 'many-a'], ['name' => 'many-b']]);
+        $user->posts()->save(new EloquentTestPost(['name' => 'saved']));
+
+        $posts = EloquentTestPost::orderBy('id')->get();
+        $this->assertSame(['created', 'forced', 'many-a', 'many-b', 'saved'], $posts->pluck('name')->all());
+        $this->assertSame([7, 7, 7, 7, 7], $posts->pluck('user_id')->all());
+    }
+
+    public function testHasManyFindingOrCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+        $existing = $user->posts()->create(['name' => 'existing']);
+
+        $this->assertTrue($user->posts()->findOrNew($existing->id)->is($existing));
+        $new = $user->posts()->findOrNew(999);
+        $this->assertFalse($new->exists);
+        $this->assertSame(7, $new->user_id);
+
+        $this->assertTrue($user->posts()->firstOrNew(['name' => 'existing'])->is($existing));
+        $new = $user->posts()->firstOrNew(['name' => 'new'], ['user_id' => 1]);
+        $this->assertFalse($new->exists);
+        $this->assertSame(7, $new->user_id);
+
+        $this->assertTrue($user->posts()->firstOrCreate(['name' => 'existing'], ['name' => 'ignored'])->is($existing));
+        $created = $user->posts()->firstOrCreate(['name' => 'first-or-create']);
+        $this->assertTrue($created->exists);
+        $this->assertSame(7, $created->user_id);
+
+        $updated = $user->posts()->updateOrCreate(['name' => 'existing'], ['name' => 'updated']);
+        $this->assertTrue($updated->is($existing));
+        $this->assertSame('updated', $existing->fresh()->name);
+        $created = $user->posts()->updateOrCreate(['name' => 'update-or-create']);
+        $this->assertTrue($created->exists);
+        $this->assertSame(7, $created->user_id);
+    }
+
+    public function testHasOneCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->post()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->user_id);
+        $this->assertSame(0, EloquentTestPost::count());
+
+        $user->post()->create(['name' => 'created']);
+        $user->post()->forceCreate(['name' => 'forced']);
+        $user->post()->save(new EloquentTestPost(['name' => 'saved']));
+
+        $this->assertSame([7, 7, 7], EloquentTestPost::pluck('user_id')->all());
+    }
+
+    public function testHasOneWithDynamicDefaultReceivesTheParent()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $post = $user->post()->withDefault(function ($newPost, $parent) {
+            $newPost->name = $parent->email;
+        })->getResults();
+
+        $this->assertSame('taylorotwell@gmail.com', $post->name);
+    }
+
+    public function testMorphManyCreatingMethodsFillTheMorphColumns()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->photos()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->imageable_id);
+        $this->assertSame(EloquentTestUser::class, $made->imageable_type);
+
+        $user->photos()->create(['name' => 'created']);
+        $user->photos()->forceCreate(['name' => 'forced']);
+        $user->photos()->createMany([['name' => 'many']]);
+
+        $photos = EloquentTestPhoto::orderBy('id')->get();
+        $this->assertSame(['created', 'forced', 'many'], $photos->pluck('name')->all());
+        $this->assertSame([7, 7, 7], $photos->pluck('imageable_id')->all());
+        $this->assertSame(array_fill(0, 3, EloquentTestUser::class), $photos->pluck('imageable_type')->all());
+    }
+
+    public function testMorphManyUsesTheMorphMapAlias()
+    {
+        Relation::morphMap(['user' => EloquentTestUser::class]);
+
+        try {
+            $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+            $photo = $user->photos()->create(['name' => 'created']);
+
+            $this->assertSame('user', $photo->imageable_type);
+            $this->assertTrue($photo->imageable->is($user));
+        } finally {
+            Relation::morphMap([], false);
+        }
+    }
+
+    public function testMorphManyFindingOrCreatingMethodsFillTheMorphColumns()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+        $existing = $user->photos()->create(['name' => 'existing']);
+
+        $this->assertTrue($user->photos()->findOrNew($existing->id)->is($existing));
+        $this->assertTrue($user->photos()->firstOrNew(['name' => 'existing'])->is($existing));
+        $this->assertTrue($user->photos()->firstOrCreate(['name' => 'existing'])->is($existing));
+        $this->assertTrue($user->photos()->updateOrCreate(['name' => 'existing'], ['name' => 'updated'])->is($existing));
+        $this->assertSame('updated', $existing->fresh()->name);
+
+        foreach ([
+            $user->photos()->findOrNew(999),
+            $user->photos()->firstOrNew(['name' => 'a']),
+        ] as $new) {
+            $this->assertFalse($new->exists);
+            $this->assertSame(7, $new->imageable_id);
+            $this->assertSame(EloquentTestUser::class, $new->imageable_type);
+        }
+
+        foreach ([
+            $user->photos()->firstOrCreate(['name' => 'b']),
+            $user->photos()->createOrFirst(['name' => 'c']),
+            $user->photos()->updateOrCreate(['name' => 'd']),
+        ] as $created) {
+            $this->assertTrue($created->exists);
+            $this->assertSame(7, $created->imageable_id);
+            $this->assertSame(EloquentTestUser::class, $created->imageable_type);
+        }
+    }
+
     public function testFindOrReturnsTheModelOrTheCallbackResult()
     {
         $user = EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);

@@ -10,7 +10,6 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
 use JMac\Testing\Double;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class QueueSqsJobTest extends TestCase
@@ -57,7 +56,7 @@ class QueueSqsJobTest extends TestCase
             'handler' => $this->handler,
         ]);
 
-        // Use Mockery to mock the IoC Container
+        // Use a double for the IoC Container
         $this->mockedContainer = Double::for(Container::class, override: true);
 
         $this->mockedJob = 'foo';
