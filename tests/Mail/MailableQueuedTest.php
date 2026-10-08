@@ -319,6 +319,20 @@ class MailableQueuedTest extends TestCase
         $this->assertTrue($job->failOnTimeout);
     }
 
+    public function testQueuedMailableUsesCustomQueueDisplayName(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithQueueDisplayName);
+
+        $this->assertSame('Send order confirmation', $job->displayName());
+    }
+
+    public function testQueuedMailableUsesClassNameWhenQueueDisplayNameIsNotDefined(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStub);
+
+        $this->assertSame(MailableQueueableStub::class, $job->displayName());
+    }
+
     protected function getMocks()
     {
         return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
@@ -337,6 +351,14 @@ class MailableQueueableStub extends Mailable implements ShouldQueue
             ->to('foo@example.tld');
 
         return $this;
+    }
+}
+
+class MailableQueueableStubWithQueueDisplayName extends MailableQueueableStub
+{
+    public function queueDisplayName(): string
+    {
+        return 'Send order confirmation';
     }
 }
 

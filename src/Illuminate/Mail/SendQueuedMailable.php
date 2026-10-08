@@ -155,7 +155,9 @@ class SendQueuedMailable
      */
     public function displayName()
     {
-        return get_class($this->mailable);
+        return method_exists($this->mailable, 'queueDisplayName')
+            ? $this->mailable->queueDisplayName()
+            : get_class($this->mailable);
     }
 
     /**
