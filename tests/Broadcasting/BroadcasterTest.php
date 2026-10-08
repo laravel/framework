@@ -195,7 +195,7 @@ class BroadcasterTest extends TestCase
         $request->setUserResolver(function ($guard = null) use ($users, &$guards) {
             $guards[] = $guard;
 
-            return $users[$guard] ?? null;
+            return $users[$guard ?? ''] ?? null;
         });
 
         return $request;
@@ -207,7 +207,7 @@ class BroadcasterTest extends TestCase
             //
         });
 
-        $request = $this->requestResolvingUsers([null => new DummyUser]);
+        $request = $this->requestResolvingUsers(['' => new DummyUser]);
 
         $this->assertInstanceOf(
             DummyUser::class,

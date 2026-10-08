@@ -50,9 +50,13 @@ class MailResendTransportTest extends TestCase
         $email->sender('myself@example.com');
         $email->to('me@example.com');
 
-        $client = Double::for(Client::class);
         $emailService = Double::for(EmailService::class);
-        $client->emails = $emailService;
+        $client = new class($emailService->instance()) implements Client
+        {
+            public function __construct(public EmailService $emails)
+            {
+            }
+        };
 
         $emailService->expects('send')->returns(ResendEmail::from([
             'id' => 'resend_id_test',
