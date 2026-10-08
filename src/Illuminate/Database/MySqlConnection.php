@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
@@ -55,6 +56,54 @@ class MySqlConnection extends Connection
             $this->lastInsertId = $this->getPdo()->lastInsertId($sequence);
 
             return $result;
+        });
+    }
+
+    /**
+     * Execute the given callback using OLAP workload.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function olap(Closure $callback)
+    {
+        if (! $this->isVitess()) {
+            return $callback($this);
+        }
+
+        $this->setWorkload('olap');
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->setWorkload('oltp');
+        }
+    }
+
+    /**
+     * Set the Vitess workload for the connection.
+     *
+     * @param  'olap'|'oltp'  $workload
+     * @return void
+     */
+    protected function setWorkload($workload)
+    {
+        $this->run("set workload = '{$workload}'", [], function ($query) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            $this->getPdo()->exec($query);
+
+            if ($this->readPdo instanceof Closure) {
+                $this->readPdo = call_user_func($this->readPdo);
+            }
+
+            $this->readPdo?->exec($query);
+
+            return true;
         });
     }
 
@@ -117,6 +166,16 @@ class MySqlConnection extends Connection
     public function isMaria()
     {
         return str_contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB');
+    }
+
+    /**
+     * Determine if the connected database is a Vitess database.
+     *
+     * @return bool
+     */
+    public function isVitess()
+    {
+        return Str::contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), ['Vitess', 'PlanetScale'], ignoreCase: true);
     }
 
     /**
