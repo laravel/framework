@@ -12,6 +12,8 @@ class Url implements Stringable
     protected ?array $protocols = null;
 
     /**
+     * Specify the allowed URL protocols.
+     *
      * @param  string[]|null  $protocols
      */
     public function protocols(array $protocols): static
@@ -21,6 +23,9 @@ class Url implements Stringable
         return $this;
     }
 
+    /**
+     * Convert the rule to a validation string.
+     */
     public function __toString(): string
     {
         return 'url'.($this->protocols ? ':'.implode(',', $this->protocols) : '');

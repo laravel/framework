@@ -224,11 +224,12 @@ class Rule
     /**
      * Get a boolean validation rule.
      *
+     * @param  bool  $strict
      * @return string
      */
-    public static function boolean()
+    public static function boolean($strict = false)
     {
-        return 'boolean';
+        return $strict ? 'boolean:strict' : 'boolean';
     }
 
     /**
@@ -375,7 +376,7 @@ class Rule
      * Get an accepted_if rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\AcceptedIf
      */
     public static function acceptedIf($anotherField, $value)
@@ -387,7 +388,7 @@ class Rule
      * Get a declined_if rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\DeclinedIf
      */
     public static function declinedIf($anotherField, $value)
@@ -399,7 +400,7 @@ class Rule
      * Get a missing_if rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\MissingIf
      */
     public static function missingIf($anotherField, $value)
@@ -411,7 +412,7 @@ class Rule
      * Get a missing_unless rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\MissingUnless
      */
     public static function missingUnless($anotherField, $value)
@@ -423,7 +424,7 @@ class Rule
      * Get a present_if rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\PresentIf
      */
     public static function presentIf($anotherField, $value)
@@ -435,7 +436,7 @@ class Rule
      * Get a present_unless rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  string|int|float|bool|null|array  $value
      * @return \Illuminate\Validation\Rules\PresentUnless
      */
     public static function presentUnless($anotherField, $value)

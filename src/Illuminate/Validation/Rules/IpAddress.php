@@ -40,6 +40,8 @@ class IpAddress implements Stringable
     }
 
     /**
+     * Convert the rule to a validation string.
+     *
      * @return 'ip'|'ipv4'|'ipv6'
      */
     public function __toString(): string

@@ -2,10 +2,13 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Validation\Rules\Concerns\FormatsParameters;
 use Stringable;
 
 class AcceptedIf implements Stringable
 {
+    use FormatsParameters;
+
     protected string $anotherField;
 
     /**
@@ -13,12 +16,18 @@ class AcceptedIf implements Stringable
      */
     protected array $values;
 
+    /**
+     * Create a new accepted_if rule instance.
+     */
     public function __construct(string $anotherField, string|int|float|bool|null|array $values)
     {
         $this->anotherField = $anotherField;
         $this->values = is_array($values) ? $values : array_slice(func_get_args(), 1);
     }
 
+    /**
+     * Convert the rule to a validation string.
+     */
     public function __toString(): string
     {
         $values = array_map(
@@ -26,6 +35,6 @@ class AcceptedIf implements Stringable
             $this->values,
         );
 
-        return 'accepted_if:'.$this->anotherField.','.implode(',', $values);
+        return 'accepted_if:'.$this->formatParameters([$this->anotherField, ...$values]);
     }
 }

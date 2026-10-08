@@ -2,11 +2,19 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationRuleParser;
+use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ValidationRuleBuilderMethodTest extends TestCase
 {
+    /**
+     * Test the simple rule factory methods.
+     */
     public function testSimpleRuleBuilders()
     {
         $this->assertSame('accepted', Rule::accepted());
@@ -14,6 +22,8 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame('base64', Rule::base64());
         $this->assertSame('bail', Rule::bail());
         $this->assertSame('boolean', Rule::boolean());
+        $this->assertSame('boolean', Rule::boolean(false));
+        $this->assertSame('boolean:strict', Rule::boolean(true));
         $this->assertSame('declined', Rule::declined());
         $this->assertSame('exclude', Rule::exclude());
         $this->assertSame('filled', Rule::filled());
@@ -30,6 +40,9 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame('ulid', Rule::ulid());
     }
 
+    /**
+     * Test the conditional rule factory methods.
+     */
     public function testConditionalRuleBuilders()
     {
         $this->assertSame('accepted_if:user,null', (string) Rule::acceptedIf('user', null));
@@ -46,14 +59,22 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame('present_unless:user,null,foo', (string) Rule::presentUnless('user', null, 'foo'));
     }
 
+    /**
+     * Test the additional rule factory methods.
+     */
     public function testAdditionalRuleBuilders()
     {
         $this->assertSame('confirmed', (string) Rule::confirmed());
         $this->assertSame('confirmed:email_confirmation', (string) Rule::confirmed()->customField('email_confirmation'));
+        $this->assertSame('confirmed:0', (string) Rule::confirmed()->customField('0'));
         $this->assertSame('current_password', (string) Rule::currentPassword());
         $this->assertSame('current_password:api', (string) Rule::currentPassword()->guard('api'));
         $this->assertSame('distinct', (string) Rule::distinct());
         $this->assertSame('distinct:strict', (string) Rule::distinct()->strict());
+        $this->assertSame('distinct:ignore_case', (string) Rule::distinct()->ignoreCase());
+        $this->assertSame('distinct:strict,ignore_case', (string) Rule::distinct()->strict()->ignoreCase());
+        $this->assertSame('distinct:ignore_case,strict', (string) Rule::distinct()->ignoreCase()->strict());
+        $this->assertSame('distinct:strict,ignore_case', (string) Rule::distinct()->strict()->ignoreCase()->strict()->ignoreCase());
         $this->assertSame('exclude_with:foo', (string) Rule::excludeWith('foo'));
         $this->assertSame('exclude_without:foo', (string) Rule::excludeWithout('foo'));
         $this->assertSame('exclude_without:foo,bar', (string) Rule::excludeWithout('foo', 'bar'));
@@ -91,5 +112,134 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame('uuid:0', (string) Rule::uuid()->version(0));
         $this->assertSame('uuid:nil', (string) Rule::uuid()->version('nil'));
         $this->assertSame('uuid:max', (string) Rule::uuid()->version('max'));
+    }
+
+    /**
+     * Test that conditional rule parameters survive parsing.
+     */
+    #[DataProvider('conditionalRuleParametersProvider')]
+    public function testConditionalRuleParametersAreEscaped($method, $value)
+    {
+        $rule = Rule::$method('other,field', $value);
+
+        $this->assertSame(['other,field', $value], ValidationRuleParser::parse((string) $rule)[1]);
+    }
+
+    /**
+     * Provide conditional rule methods and values requiring escaping.
+     */
+    public static function conditionalRuleParametersProvider()
+    {
+        foreach (['acceptedIf', 'declinedIf', 'missingIf', 'missingUnless', 'presentIf', 'presentUnless'] as $method) {
+            foreach (['foo,bar', '"quoted"', 'foo"bar,baz', 'foo|bar'] as $value) {
+                yield "$method: $value" => [$method, $value];
+            }
+        }
+    }
+
+    /**
+     * Test that escaped values trigger conditional validation.
+     */
+    public function testConditionalRulesValidateEscapedValues()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        foreach ([
+            ['acceptedIf', ['other' => 'foo,bar', 'field' => false]],
+            ['declinedIf', ['other' => 'foo,bar', 'field' => true]],
+            ['missingIf', ['other' => 'foo,bar', 'field' => 'value']],
+            ['missingUnless', ['other' => 'foo', 'field' => 'value']],
+            ['presentIf', ['other' => 'foo,bar']],
+            ['presentUnless', ['other' => 'foo']],
+        ] as [$method, $data]) {
+            $validator = new Validator($translator, $data, ['field' => [Rule::$method('other', 'foo,bar')]]);
+
+            $this->assertFalse($validator->passes(), $method);
+        }
+    }
+
+    /**
+     * Test that field and key lists survive parsing.
+     */
+    public function testFieldAndKeyParametersAreEscaped()
+    {
+        foreach ([
+            'excludeWithout', 'inArrayKeys', 'missingWith', 'missingWithAll',
+            'presentWith', 'presentWithAll', 'prohibits', 'requiredArrayKeys',
+            'requiredWith', 'requiredWithAll', 'requiredWithout', 'requiredWithoutAll',
+        ] as $method) {
+            $parameters = ['foo,bar', '"quoted"'];
+
+            $this->assertSame($parameters, ValidationRuleParser::parse((string) Rule::$method($parameters))[1]);
+            $this->assertSame($parameters, ValidationRuleParser::parse((string) Rule::$method(...$parameters))[1]);
+        }
+
+        foreach ([
+            'excludeWith', 'inArray', 'prohibitedIfAccepted',
+            'prohibitedIfDeclined', 'requiredIfAccepted', 'requiredIfDeclined',
+        ] as $method) {
+            $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::$method('foo,bar'))[1]);
+        }
+
+        $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::confirmed()->customField('foo,bar'))[1]);
+        $this->assertSame(['foo,bar'], ValidationRuleParser::parse((string) Rule::currentPassword()->guard('foo,bar'))[1]);
+    }
+
+    /**
+     * Test that array key builders validate literal comma-containing keys.
+     */
+    public function testArrayKeyRulesValidateEscapedKeys()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        foreach (['requiredArrayKeys', 'inArrayKeys'] as $method) {
+            $rules = ['settings' => [Rule::$method(['foo,bar'])]];
+
+            $this->assertTrue((new Validator($translator, ['settings' => ['foo,bar' => 1]], $rules))->passes());
+            $this->assertFalse((new Validator($translator, ['settings' => ['foo' => 1, 'bar' => 1]], $rules))->passes());
+        }
+    }
+
+    /**
+     * Test that distinct options remain active when chained.
+     */
+    public function testDistinctRulesValidateCombinedOptions()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        foreach ([Rule::distinct()->strict()->ignoreCase(), Rule::distinct()->ignoreCase()->strict()] as $rule) {
+            $rules = ['items.*' => [$rule]];
+
+            $this->assertTrue((new Validator($translator, ['items' => [1, true]], $rules))->passes());
+            $this->assertFalse((new Validator($translator, ['items' => ['foo', 'FOO']], $rules))->passes());
+            $this->assertFalse((new Validator($translator, ['items' => [1, 1]], $rules))->passes());
+        }
+    }
+
+    /**
+     * Test that zero is retained as a custom confirmation field.
+     */
+    public function testConfirmedRuleValidatesZeroField()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        $rules = ['password' => [Rule::confirmed()->customField('0')]];
+
+        $this->assertTrue((new Validator($translator, ['password' => 'secret', '0' => 'secret'], $rules))->passes());
+        $this->assertFalse((new Validator($translator, ['password' => 'secret', '0' => 'different'], $rules))->passes());
+    }
+
+    /**
+     * Test that strict boolean validation rejects non-boolean values.
+     */
+    public function testBooleanRuleValidatesStrictly()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        foreach ([true, false, 0, 1, '0', '1'] as $value) {
+            $data = ['field' => $value];
+
+            $this->assertTrue((new Validator($translator, $data, ['field' => [Rule::boolean()]]))->passes());
+            $this->assertSame(is_bool($value), (new Validator($translator, $data, ['field' => [Rule::boolean(true)]]))->passes());
+        }
     }
 }

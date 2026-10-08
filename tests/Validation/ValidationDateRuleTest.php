@@ -27,6 +27,9 @@ class ValidationDateRuleTest extends TestCase
         $this->assertSame('date_format:d/m/Y', (string) $rule);
     }
 
+    /**
+     * Test the date equality constraint.
+     */
     public function testDateEqualsRule()
     {
         $rule = Rule::date()->equals('2024-01-01');
