@@ -746,7 +746,11 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         if (! $this->isCluster()) {
-            rescue(fn () => $this->client->close(), report: false);
+            try {
+                $this->client->close();
+            } catch (Throwable) {
+                //
+            }
         }
 
         $this->client = call_user_func($this->connector);
