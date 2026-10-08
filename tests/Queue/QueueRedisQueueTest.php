@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use RedisCluster;
 
 class QueueRedisQueueTest extends TestCase
 {
@@ -343,7 +344,7 @@ class QueueRedisQueueTest extends TestCase
         $container = new Container;
         $queue->setContainer($container);
 
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()])->shouldIgnoreMissing();
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -377,7 +378,7 @@ class QueueRedisQueueTest extends TestCase
         $container = new Container;
         $queue->setContainer($container);
 
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()])->shouldIgnoreMissing();
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -401,7 +402,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = Mockery::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()])->shouldIgnoreMissing();
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -420,7 +421,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = Mockery::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()])->shouldIgnoreMissing();
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 

@@ -9,12 +9,14 @@ use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Redis;
+use RedisCluster;
 
 class ConcurrencyLimiterTest extends TestCase
 {
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
@@ -43,7 +45,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnNonClusterConnection()
     {
-        $connection = Mockery::mock(PhpRedisConnection::class);
+        $connection = Mockery::mock(PhpRedisConnection::class, [new Redis]);
         $connection->expects('isCluster')->andReturn(false);
 
         $connection->expects('command')->with('eval', Mockery::on(function ($args) {
@@ -95,7 +97,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testReleaseKeyMatchesAcquireKeyOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(true);
 
         // Acquire returns the slot key
@@ -117,7 +119,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireDoesNotDoubleWrapPreExistingHashTags()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(true);
 
         // Name already has hash tags — should NOT be double-wrapped
@@ -143,7 +145,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsUnmatchedBraceOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
@@ -169,7 +171,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsEmptyBracesOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class, [Mockery::mock(RedisCluster::class)->shouldIgnoreMissing()]);
         $connection->expects('isCluster')->andReturn(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
