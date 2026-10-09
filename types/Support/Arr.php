@@ -171,11 +171,17 @@ assertType('non-empty-string', Arr::toCssClasses(['hidden']));
 assertType('non-empty-string', Arr::toCssClasses('hidden'));
 
 assertType('\'\'', Arr::toCssStyles(['background: red' => false]));
+assertType('string', Arr::toCssStyles(['background: red' => null]));
 assertType('\'\'', Arr::toCssStyles([]));
 assertType('\'\'', Arr::toCssStyles(''));
+assertType('string', Arr::toCssStyles([null, '']));
+assertType('string', Arr::toCssStyles(['1.5' => null]));
 assertType('non-empty-string', Arr::toCssStyles(['background: red' => true]));
 assertType('non-empty-string', Arr::toCssStyles(['background: red']));
 assertType('non-empty-string', Arr::toCssStyles('background: red'));
+/** @var list<string> $styleList */
+$styleList = [];
+assertType('string', Arr::toCssStyles($styleList));
 
 assertType('array{}', Arr::wrap(null));
 assertType('array{}', Arr::wrap([]));

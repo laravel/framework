@@ -1656,6 +1656,22 @@ class SupportArrTest extends TestCase
         ]);
 
         $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
+
+        $styles = Arr::toCssStyles([
+            'font-weight: bold',
+            null,
+            '',
+            'margin-top: 4px',
+            'margin-left: 2px' => null,
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px;', $styles);
+        $this->assertSame('', Arr::toCssStyles([null]));
+        $this->assertSame('', Arr::toCssStyles(['']));
+        $this->assertSame('', Arr::toCssStyles([null, '']));
+        $this->assertSame('', Arr::toCssStyles(''));
+        $this->assertSame('0;', Arr::toCssStyles([0]));
+        $this->assertSame('0;', Arr::toCssStyles(['0']));
     }
 
     public function testWhere()
