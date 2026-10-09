@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\Events;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
@@ -32,6 +33,7 @@ class Cloud
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
+                static::registerEvents($app);
             },
             default => fn () => true,
         })();
@@ -129,12 +131,28 @@ class Cloud
                 'includeStacktraces' => true,
             ],
             'with' => [
-                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      'unix:///tmp/cloud-init.sock',
+                'connectionString' => Cloud::socket(),
                 'persistent' => true,
                 'timeout' => 2.0,
             ],
         ]);
+    }
+
+    /**
+     * Register the events system for Laravel Cloud.
+     */
+    public static function registerEvents(Application $app): void
+    {
+        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
+    }
+
+    /**
+     * The cloud socket address.
+     */
+    protected static function socket(): string
+    {
+        return $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
+            $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
+                'unix:///tmp/cloud-init.sock';
     }
 }
