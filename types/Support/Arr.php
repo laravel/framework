@@ -167,10 +167,11 @@ assertType('\'\'', Arr::toCssClasses(['hidden' => false]));
 assertType('\'\'', Arr::toCssClasses(['hidden' => null]));
 assertType('\'\'', Arr::toCssClasses([]));
 assertType('\'\'', Arr::toCssClasses(''));
+assertType('string', Arr::toCssClasses([null]));
+assertType('string', Arr::toCssClasses([null, '']));
 assertType('non-empty-string', Arr::toCssClasses(['hidden' => true]));
 assertType('non-empty-string', Arr::toCssClasses(['hidden']));
 assertType('non-empty-string', Arr::toCssClasses('hidden'));
-assertType('non-empty-string', Arr::toCssClasses(['hidden', null]));
 /** @var list<string> $classList */
 $classList = [];
 assertType('string', Arr::toCssClasses($classList));
