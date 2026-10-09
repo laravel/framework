@@ -106,10 +106,10 @@ class RedisEventsTest extends TestCase
     #[RequiresPhpExtension('redis')]
     public function testCommandFailingWithLastErrorThrowsRedisExceptionAndDispatchesCommandFailed()
     {
-        $client = Mockery::mock(Redis::class);
-        $client->expects('rpush')->with('key', 'val')->andReturn(false);
-        $client->expects('getLastError')->andReturn('ERR ACL failure in script: User laravel has no permissions to run the \'rpush\' command');
-        $client->expects('clearLastError');
+        $client = $this->createMock(Redis::class);
+        $client->expects($this->exactly(2))->method('clearLastError');
+        $client->expects($this->once())->method('eval')->willReturn(false);
+        $client->expects($this->once())->method('getLastError')->willReturn('ERR ACL failure in script: User laravel has no permissions to run the \'rpush\' command');
 
         $events = new EventFake(new Dispatcher);
 
@@ -118,14 +118,14 @@ class RedisEventsTest extends TestCase
         $connection->setEventDispatcher($events);
 
         try {
-            $connection->command('rpush', ['key', 'val']);
+            $connection->eval('script', 1, 'key');
             $this->fail('Expected RedisException was not thrown');
         } catch (\RedisException $e) {
             $this->assertStringContainsString('ERR ACL failure in script', $e->getMessage());
         }
 
         $events->assertDispatched(CommandFailed::class, function ($event) {
-            return $event->command === 'rpush'
+            return $event->command === 'eval'
                 && $event->connectionName === 'test-connection'
                 && $event->exception instanceof \RedisException;
         });

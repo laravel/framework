@@ -530,9 +530,27 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function evalsha($script, $numkeys, ...$arguments)
     {
-        return $this->command('evalsha', [
+        $this->clearLastError();
+
+        $result = $this->command('evalsha', [
             $this->script('load', $script), $arguments, $numkeys,
         ]);
+
+        if ($result === false && ! is_null($error = $this->getLastError())) {
+            $this->clearLastError();
+
+            $exception = class_exists(RedisException::class)
+                ? new RedisException($error)
+                : new \Exception($error);
+
+            $this->events?->dispatch(new CommandFailed(
+                'evalsha', $this->parseParametersForEvent([$script, $numkeys, ...$arguments]), $exception, $this
+            ));
+
+            throw $exception;
+        }
+
+        return $result;
     }
 
     /**
@@ -545,7 +563,25 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function eval($script, $numberOfKeys, ...$arguments)
     {
-        return $this->command('eval', [$script, $arguments, $numberOfKeys]);
+        $this->clearLastError();
+
+        $result = $this->command('eval', [$script, $arguments, $numberOfKeys]);
+
+        if ($result === false && ! is_null($error = $this->getLastError())) {
+            $this->clearLastError();
+
+            $exception = class_exists(RedisException::class)
+                ? new RedisException($error)
+                : new \Exception($error);
+
+            $this->events?->dispatch(new CommandFailed(
+                'eval', $this->parseParametersForEvent([$script, $numberOfKeys, ...$arguments]), $exception, $this
+            ));
+
+            throw $exception;
+        }
+
+        return $result;
     }
 
     /**
@@ -635,23 +671,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         while (true) {
             try {
-                $result = parent::command($method, $parameters);
-
-                if ($result === false && ! is_null($error = $this->getLastError())) {
-                    $this->clearLastError();
-
-                    $exception = class_exists(RedisException::class)
-                        ? new RedisException($error)
-                        : new \Exception($error);
-
-                    $this->events?->dispatch(new CommandFailed(
-                        $method, $this->parseParametersForEvent($parameters), $exception, $this
-                    ));
-
-                    throw $exception;
-                }
-
-                return $result;
+                return parent::command($method, $parameters);
             } catch (RedisClusterException|RedisException|ErrorException $e) {
                 if (! $this->causedByLostConnection($e)) {
                     throw $e;
