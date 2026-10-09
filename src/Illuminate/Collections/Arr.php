@@ -1225,7 +1225,7 @@ class Arr
      * Conditionally compile styles from an array into a style list.
      *
      * @param  array<string, bool|null>|array<int, string|int|null>|string  $array
-     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : ($array is array{} ? '' : ($array is array<array-key, ''|false|null> ? string : non-empty-string))))
+     * @return ($array is array<string, false> ? '' : ($array is ''|array{} ? '' : ($array is array<array-key, ''|false|null> ? string : non-empty-string)))
      */
     public static function toCssStyles($array)
     {
