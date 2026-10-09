@@ -9,6 +9,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use WeakReference;
 
 class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 {
@@ -58,6 +60,34 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 
         $this->assertNotNull($comments[0]->commentable);
         $this->assertNotNull($comments[1]->commentable);
+    }
+
+    #[DataProvider('softDeleteConstraints')]
+    public function testRelationIsReleasedWithoutGarbageCollectionAfterSoftDeleteConstraint(string $method)
+    {
+        $comment = Comment::first();
+
+        gc_disable();
+
+        try {
+            $relation = $comment->commentable()->{$method}();
+
+            $reference = WeakReference::create($relation);
+            unset($relation);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
+    }
+
+    public static function softDeleteConstraints(): array
+    {
+        return [
+            'withTrashed' => ['withTrashed'],
+            'withoutTrashed' => ['withoutTrashed'],
+            'onlyTrashed' => ['onlyTrashed'],
+        ];
     }
 
     public function testLazyLoading()
