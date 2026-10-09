@@ -113,6 +113,15 @@ class SupportBinaryCodecTest extends TestCase
         $this->assertSame($uuid, BinaryCodec::decode($uuid, 'uuid'));
     }
 
+    public function testUuidWhoseBytesAreValidUtf8()
+    {
+        $uuid = '1c036967-1b08-4acb-9a54-4d5e6374766e';
+        $bytes = Uuid::fromString($uuid)->getBytes();
+
+        $this->assertSame($bytes, BinaryCodec::encode($bytes, 'uuid'));
+        $this->assertSame($uuid, BinaryCodec::decode($bytes, 'uuid'));
+    }
+
     public function testUlidEncodeFromString()
     {
         $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';

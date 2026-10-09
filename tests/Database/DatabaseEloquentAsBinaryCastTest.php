@@ -55,6 +55,16 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
         $this->assertSame(Uuid::fromString($uuid)->getBytes(), $model->getAttributes()['uuid']);
     }
 
+    public function testUuidWhoseBytesAreValidUtf8RoundTrips()
+    {
+        $uuid = '1c036967-1b08-4acb-9a54-4d5e6374766e';
+        $model = new AsBinaryTestModel;
+        $model->uuid = $uuid;
+
+        $this->assertSame(Uuid::fromString($uuid)->getBytes(), $model->getAttributes()['uuid']);
+        $this->assertSame($uuid, $model->uuid);
+    }
+
     public function testGetDecodesUlidFromBinary()
     {
         $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';

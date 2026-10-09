@@ -41,7 +41,7 @@ class BinaryCodec
         return match ($format) {
             'uuid' => match (true) {
                 $value instanceof UuidInterface => $value->getBytes(),
-                self::isBinary($value) => $value,
+                strlen($value) === 16 => $value,
                 default => Uuid::fromString($value)->getBytes(),
             },
             'ulid' => match (true) {
@@ -69,7 +69,7 @@ class BinaryCodec
         }
 
         return match ($format) {
-            'uuid' => (self::isBinary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
+            'uuid' => (strlen($value) === 16 ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
             'ulid' => (self::isBinary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toString(),
             default => throw new InvalidArgumentException("Format [$format] is invalid."),
         };
