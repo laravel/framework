@@ -55,12 +55,33 @@ class DevCommand extends Command
             return self::FAILURE;
         }
 
+        foreach (DevCommands::beforeCommands() as $command) {
+            $this->runBeforeCommand($command);
+        }
+
         $devCommands = DevCommands::commands();
 
         return match (PHP_OS_FAMILY) {
             'Windows' => $this->runViaConcurrently($devCommands, $packageManager),
             default => $this->runViaMultiplex($devCommands, $packageManager),
         };
+    }
+
+    /**
+     * Run the given command before the dev processes start, failing if it fails.
+     *
+     * @param  string  $command
+     * @return void
+     */
+    protected function runBeforeCommand(string $command): void
+    {
+        $result = Process::forever()
+            ->tty(Process::supportsTty())
+            ->run($command, fn ($type, $output) => $this->output->write($output));
+
+        if ($result->failed()) {
+            $this->fail("The [{$command}] command failed.");
+        }
     }
 
     /**

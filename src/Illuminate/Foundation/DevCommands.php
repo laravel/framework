@@ -37,6 +37,13 @@ class DevCommands
     protected static $commands = [];
 
     /**
+     * The commands that should run before the "dev" command starts its processes.
+     *
+     * @var array<int, string>
+     */
+    protected static $before = [];
+
+    /**
      * The names of commands that should be included when running the "dev" command.
      *
      * @var array<int, string>
@@ -191,6 +198,27 @@ class DevCommands
     public static function nodeExec(string $command, ?string $name = null): DevCommand
     {
         return self::register(self::getPackageManager()->getExecCommand($command), $name ?? DevCommand::nameFromCommand($command));
+    }
+
+    /**
+     * Register a command that should run before the "dev" command starts its processes.
+     *
+     * @param  string  $command
+     * @return void
+     */
+    public static function before(string $command): void
+    {
+        self::$before[] = $command;
+    }
+
+    /**
+     * Get the commands that should run before the "dev" command starts its processes.
+     *
+     * @return array<int, string>
+     */
+    public static function beforeCommands(): array
+    {
+        return self::$before;
     }
 
     /**
