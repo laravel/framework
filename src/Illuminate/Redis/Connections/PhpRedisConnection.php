@@ -808,7 +808,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             }
         }
 
-        return method_exists($this->client, 'getLastError')
+        return is_object($this->client) && method_exists($this->client, 'getLastError')
             ? $this->client->getLastError()
             : null;
     }
@@ -830,7 +830,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             return;
         }
 
-        if (method_exists($this->client, 'clearLastError')) {
+        if (is_object($this->client) && method_exists($this->client, 'clearLastError')) {
             $this->client->clearLastError();
         }
     }
