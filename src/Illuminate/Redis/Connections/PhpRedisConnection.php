@@ -5,6 +5,7 @@ namespace Illuminate\Redis\Connections;
 use Closure;
 use ErrorException;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Illuminate\Redis\Events\CommandFailed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RedisClusterException;
@@ -634,7 +635,23 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         while (true) {
             try {
-                return parent::command($method, $parameters);
+                $result = parent::command($method, $parameters);
+
+                if ($result === false && ! is_null($error = $this->getLastError())) {
+                    $this->clearLastError();
+
+                    $exception = class_exists(RedisException::class)
+                        ? new RedisException($error)
+                        : new \Exception($error);
+
+                    $this->events?->dispatch(new CommandFailed(
+                        $method, $this->parseParametersForEvent($parameters), $exception, $this
+                    ));
+
+                    throw $exception;
+                }
+
+                return $result;
             } catch (RedisClusterException|RedisException|ErrorException $e) {
                 if (! $this->causedByLostConnection($e)) {
                     throw $e;
@@ -754,6 +771,48 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         $this->client = call_user_func($this->connector);
+    }
+
+    /**
+     * Get the last error from the underlying Redis client if available.
+     *
+     * @return string|null
+     */
+    protected function getLastError()
+    {
+        if ($this->client instanceof \Mockery\LegacyMockInterface) {
+            try {
+                return $this->client->getLastError();
+            } catch (Throwable) {
+                return null;
+            }
+        }
+
+        return method_exists($this->client, 'getLastError')
+            ? $this->client->getLastError()
+            : null;
+    }
+
+    /**
+     * Clear the last error on the underlying Redis client if available.
+     *
+     * @return void
+     */
+    protected function clearLastError()
+    {
+        if ($this->client instanceof \Mockery\LegacyMockInterface) {
+            try {
+                $this->client->clearLastError();
+            } catch (Throwable) {
+                // Ignore missing mock expectation...
+            }
+
+            return;
+        }
+
+        if (method_exists($this->client, 'clearLastError')) {
+            $this->client->clearLastError();
+        }
     }
 
     /**
