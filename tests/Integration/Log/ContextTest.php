@@ -221,6 +221,13 @@ class ContextTest extends TestCase
         Context::pop('breadcrumbs');
     }
 
+    public function test_throws_when_popping_from_missing_key()
+    {
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from context stack for key [breadcrumbs].'));
+
+        Context::pop('breadcrumbs');
+    }
+
     public function test_throws_when_popping_from_non_list_array()
     {
         Context::add('breadcrumbs', ['foo' => 'bar']);
@@ -243,6 +250,13 @@ class ContextTest extends TestCase
         Context::pushHidden('breadcrumbs', 'bar');
         Context::popHidden('breadcrumbs');
 
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from hidden context stack for key [breadcrumbs].'));
+
+        Context::popHidden('breadcrumbs');
+    }
+
+    public function test_throws_when_popping_from_missing_hidden_key()
+    {
         $this->expectExceptionObject(new RuntimeException('Unable to pop value from hidden context stack for key [breadcrumbs].'));
 
         Context::popHidden('breadcrumbs');
