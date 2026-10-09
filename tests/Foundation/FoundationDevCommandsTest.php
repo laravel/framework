@@ -26,6 +26,7 @@ class FoundationDevCommandsTest extends TestCase
 
         foreach ([
             'commands' => [],
+            'before' => [],
             'except' => [],
             'only' => [],
             'order' => [],
@@ -188,6 +189,17 @@ class FoundationDevCommandsTest extends TestCase
         $commands = DevCommands::commands();
 
         $this->assertSame(['four', 'one', 'two', 'three'], array_column($commands, 'name'));
+    }
+
+    public function testBeforeRegistersCommandsAndCallbacksInOrder()
+    {
+        $callback = fn () => null;
+
+        DevCommands::before('docker compose up -d --wait');
+        DevCommands::before($callback);
+
+        $this->assertSame(['docker compose up -d --wait', $callback], DevCommands::beforeCommands());
+        $this->assertEmpty(DevCommands::commands());
     }
 
     public function testCommandsGetAutoAssignedColors()

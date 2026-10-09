@@ -7,10 +7,15 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\DevCommand;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Process\Factory;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\NodePackageManager;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class DevCommandTest extends TestCase
 {
@@ -19,6 +24,7 @@ class DevCommandTest extends TestCase
         $ref = new ReflectionClass(DevCommands::class);
 
         foreach ([
+            'before' => [],
             'mode' => DevCommandMode::TABS,
             'withTimestamps' => false,
             'autoRestart' => true,
@@ -35,6 +41,7 @@ class DevCommandTest extends TestCase
 
     protected function tearDown(): void
     {
+        Facade::clearResolvedInstances();
         Application::setInstance(null);
     }
 
@@ -189,10 +196,65 @@ class DevCommandTest extends TestCase
         );
     }
 
+    public function testBeforeCommandsAndCallbacksRunInOrder()
+    {
+        $ran = [];
+
+        Process::swap((new Factory)->fake(function ($process) use (&$ran) {
+            $ran[] = $process->command;
+
+            return 0;
+        }));
+
+        DevCommands::before('docker compose up -d --wait');
+        DevCommands::before(function () use (&$ran) {
+            $ran[] = 'callback';
+        });
+        DevCommands::before('php artisan migrate');
+
+        $command = $this->command();
+
+        $this->assertSame(0, $command->run(new ArrayInput([]), new BufferedOutput));
+        $this->assertSame(['docker compose up -d --wait', 'callback', 'php artisan migrate'], $ran);
+        $this->assertTrue($command->launched);
+    }
+
+    public function testFailedBeforeCommandStopsTheDevCommand()
+    {
+        Process::swap((new Factory)->preventStrayProcesses()->fake([
+            'docker compose up -d --wait' => 1,
+        ]));
+
+        DevCommands::before('docker compose up -d --wait');
+        DevCommands::before('php artisan migrate');
+
+        $command = $this->command();
+
+        $this->assertSame(1, $command->run(new ArrayInput([]), $output = new BufferedOutput));
+        $this->assertStringContainsString('The [docker compose up -d --wait] command failed.', $output->fetch());
+        $this->assertFalse($command->launched);
+    }
+
     protected function command(array $options = [])
     {
         $command = new class extends DevCommand
         {
+            public bool $launched = false;
+
+            protected function runViaMultiplex(array $devCommands, NodePackageManager $packageManager): int
+            {
+                $this->launched = true;
+
+                return 0;
+            }
+
+            protected function runViaConcurrently(array $devCommands, NodePackageManager $packageManager): int
+            {
+                $this->launched = true;
+
+                return 0;
+            }
+
             public function buildMultiplexCommandForTesting(array $devCommands): string
             {
                 return $this->buildMultiplexCommand($devCommands);
@@ -204,6 +266,7 @@ class DevCommandTest extends TestCase
             }
         };
 
+        $command->setLaravel(Application::getInstance());
         $command->setInput(new ArrayInput($options, $command->getDefinition()));
 
         return $command;

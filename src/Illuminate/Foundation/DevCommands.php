@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\NodePackageManager;
@@ -35,6 +36,13 @@ class DevCommands
      * @var array
      */
     protected static $commands = [];
+
+    /**
+     * The commands and callbacks that should run before the "dev" command starts its processes.
+     *
+     * @var array<int, string|\Closure>
+     */
+    protected static $before = [];
 
     /**
      * The names of commands that should be included when running the "dev" command.
@@ -191,6 +199,27 @@ class DevCommands
     public static function nodeExec(string $command, ?string $name = null): DevCommand
     {
         return self::register(self::getPackageManager()->getExecCommand($command), $name ?? DevCommand::nameFromCommand($command));
+    }
+
+    /**
+     * Register a command or callback that should run before the "dev" command starts its processes.
+     *
+     * @param  string|\Closure  $command
+     * @return void
+     */
+    public static function before(string|Closure $command): void
+    {
+        self::$before[] = $command;
+    }
+
+    /**
+     * Get the commands and callbacks that should run before the "dev" command starts its processes.
+     *
+     * @return array<int, string|\Closure>
+     */
+    public static function beforeCommands(): array
+    {
+        return self::$before;
     }
 
     /**
@@ -529,5 +558,15 @@ class DevCommands
     protected static function getPackageManager(): NodePackageManager
     {
         return self::$packageManager ??= new NodePackageManager();
+    }
+
+    /**
+     * Flush the registered before commands and callbacks.
+     *
+     * @return void
+     */
+    public static function flushState(): void
+    {
+        self::$before = [];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommandMode;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\NodePackageManager;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Termwind\terminal;
 
@@ -55,12 +57,40 @@ class DevCommand extends Command
             return self::FAILURE;
         }
 
+        $this->runBeforeCommands();
+
         $devCommands = DevCommands::commands();
 
         return match (PHP_OS_FAMILY) {
             'Windows' => $this->runViaConcurrently($devCommands, $packageManager),
             default => $this->runViaMultiplex($devCommands, $packageManager),
         };
+    }
+
+    /**
+     * Run the commands and callbacks that should run before the dev processes start.
+     *
+     * @return void
+     */
+    protected function runBeforeCommands(): void
+    {
+        $output = $this->option('json') ? $this->output->getErrorStyle() : $this->output;
+
+        foreach (DevCommands::beforeCommands() as $command) {
+            if ($command instanceof Closure) {
+                $this->laravel->call($command);
+
+                continue;
+            }
+
+            $result = Process::forever()
+                ->tty(! $this->option('json') && Process::supportsTty())
+                ->run($command, fn ($type, $buffer) => $output->write($buffer, false, OutputInterface::OUTPUT_RAW));
+
+            if ($result->failed()) {
+                $this->fail("The [{$command}] command failed.");
+            }
+        }
     }
 
     /**
