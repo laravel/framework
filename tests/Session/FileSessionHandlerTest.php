@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Session;
 
 use Illuminate\Filesystem\Filesystem;
-use function Illuminate\Filesystem\join_paths;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Support\Carbon;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-
 use PHPUnit\Framework\TestCase;
+
+use function Illuminate\Filesystem\join_paths;
 
 class FileSessionHandlerTest extends TestCase
 {

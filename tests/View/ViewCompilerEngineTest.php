@@ -92,8 +92,8 @@ class ViewCompilerEngineTest extends TestCase
         $files->expects('getRequire')->with($compiled, [])->times(3)->resolves(function () use (&$calls, $path) {
             if (++$calls === 2) {
                 throw new FileNotFoundException(
-                "File does not exist at path {$path}."
-            );
+                    "File does not exist at path {$path}."
+                );
             }
 
             return 'compiled-content';
@@ -124,8 +124,8 @@ class ViewCompilerEngineTest extends TestCase
         $files->expects('getRequire')->with($compiled, [])->times(3)->resolves(function () use (&$calls, $path) {
             if (++$calls === 2) {
                 throw new ErrorException(
-                "require({$path}): Failed to open stream: No such file or directory",
-            );
+                    "require({$path}): Failed to open stream: No such file or directory",
+                );
             }
 
             return 'compiled-content';

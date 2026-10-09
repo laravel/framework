@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Container\Container;
-use function Illuminate\Support\php_binary;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -13,8 +12,9 @@ use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
-
 use PHPUnit\Framework\TestCase;
+
+use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
 {

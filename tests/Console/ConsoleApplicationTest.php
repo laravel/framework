@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Filesystem\Filesystem;
-use function Illuminate\Filesystem\join_paths;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
@@ -17,16 +16,17 @@ use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
-use function Orchestra\Testbench\default_skeleton_path;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-
 use Symfony\Component\Console\Output\NullOutput;
 use Throwable;
+
+use function Illuminate\Filesystem\join_paths;
+use function Orchestra\Testbench\default_skeleton_path;
 
 class ConsoleApplicationTest extends TestCase
 {

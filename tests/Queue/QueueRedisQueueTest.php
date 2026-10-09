@@ -191,7 +191,6 @@ class QueueRedisQueueTest extends TestCase
 
         $this->assertSame(['default'], $queue->testAllQueueNames()->all());
     }
-
 }
 
 class TestableRedisQueue extends RedisQueue

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Http\Request;
@@ -11,7 +11,6 @@ use Illuminate\Http\Response;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Session\TokenMismatchException;
-use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 

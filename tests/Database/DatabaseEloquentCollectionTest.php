@@ -12,9 +12,9 @@ use Illuminate\Support\Collection as BaseCollection;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use LogicException;
-use function Orchestra\Testbench\phpunit_version_compare;
-
 use PHPUnit\Framework\TestCase;
+
+use function Orchestra\Testbench\phpunit_version_compare;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {

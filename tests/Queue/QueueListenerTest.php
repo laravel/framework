@@ -4,13 +4,13 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
-use function Illuminate\Support\artisan_binary;
-use function Illuminate\Support\php_binary;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+
+use function Illuminate\Support\artisan_binary;
+use function Illuminate\Support\php_binary;
 
 class QueueListenerTest extends TestCase
 {

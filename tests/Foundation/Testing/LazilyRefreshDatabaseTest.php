@@ -12,9 +12,9 @@ use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
-use function Orchestra\Testbench\package_path;
-
 use PHPUnit\Framework\TestCase;
+
+use function Orchestra\Testbench\package_path;
 
 class LazilyRefreshDatabaseTest extends TestCase
 {

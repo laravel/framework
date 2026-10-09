@@ -8,14 +8,14 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use function Orchestra\Testbench\terminate;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-
 use SplFileInfo;
+
+use function Orchestra\Testbench\terminate;
 
 class FilesystemTest extends TestCase
 {

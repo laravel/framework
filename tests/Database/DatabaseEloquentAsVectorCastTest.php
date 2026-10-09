@@ -21,7 +21,6 @@ class DatabaseEloquentAsVectorCastTest extends TestCase
 
     protected function tearDown(): void
     {
-
         Model::unsetConnectionResolver();
     }
 

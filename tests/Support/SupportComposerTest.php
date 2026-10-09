@@ -4,12 +4,12 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
-use function Illuminate\Support\php_binary;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
-
 use Symfony\Component\Process\Process;
+
+use function Illuminate\Support\php_binary;
 
 class SupportComposerTest extends TestCase
 {
