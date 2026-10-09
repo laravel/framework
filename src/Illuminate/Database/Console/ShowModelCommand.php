@@ -161,8 +161,32 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         if ($modelData->observers->isNotEmpty()) {
             foreach ($modelData->observers as $observer) {
                 $this->components->twoColumnDetail(
-                    sprintf('%s', $observer['event']),
-                    implode(', ', $observer['observer'])
+                    first: $observer['event'],
+                    second: (new Collection($observer['observer']))
+                        ->map(function ($value) {
+                            if (str_contains($value, ':')) {
+                                $value = explode(':', $value);
+
+                                return str_replace(
+                                    'Closure ',
+                                    '<fg=yellow;options=bold>Closure</> ',
+                                    sprintf('%s:<fg=gray;options=bold>%s</>', $value[0], $value[1])
+                                );
+                            }
+
+                            if (str_contains($value, '@')) {
+                                $value = explode('@', $value);
+
+                                return sprintf(
+                                    '%s@<fg=gray;options=bold>%s</>',
+                                    $value[0],
+                                    $value[1]
+                                );
+                            }
+
+                            return $value;
+                        })
+                        ->join(', ')
                 );
             }
         }
