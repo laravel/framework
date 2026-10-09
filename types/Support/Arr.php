@@ -171,6 +171,9 @@ assertType('non-empty-string', Arr::toCssClasses(['hidden' => true]));
 assertType('non-empty-string', Arr::toCssClasses(['hidden']));
 assertType('non-empty-string', Arr::toCssClasses('hidden'));
 assertType('non-empty-string', Arr::toCssClasses(['hidden', null]));
+/** @var list<string> $classList */
+$classList = [];
+assertType('string', Arr::toCssClasses($classList));
 
 assertType('\'\'', Arr::toCssStyles(['background: red' => false]));
 assertType('\'\'', Arr::toCssStyles([]));
