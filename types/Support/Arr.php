@@ -164,11 +164,12 @@ assertType('array<0|1|2, 1|2|3>', Arr::sortRecursiveDesc([1, 3, 2]));
 assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sortRecursiveDesc(['a' => 1, 'c' => 3, 'b' => 2]));
 
 assertType('\'\'', Arr::toCssClasses(['hidden' => false]));
-assertType('\'\'', Arr::toCssClasses(['hidden' => null]));
+assertType('string', Arr::toCssClasses(['hidden' => null]));
 assertType('\'\'', Arr::toCssClasses([]));
 assertType('\'\'', Arr::toCssClasses(''));
 assertType('string', Arr::toCssClasses([null]));
 assertType('string', Arr::toCssClasses([null, '']));
+assertType('string', Arr::toCssClasses(['1.5' => null, '2.5' => null]));
 assertType('non-empty-string', Arr::toCssClasses(['hidden' => true]));
 assertType('non-empty-string', Arr::toCssClasses(['hidden']));
 assertType('non-empty-string', Arr::toCssClasses('hidden'));
