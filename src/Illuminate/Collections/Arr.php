@@ -1201,8 +1201,8 @@ class Arr
     /**
      * Conditionally compile classes from an array into a CSS class list.
      *
-     * @param  array<string, bool>|array<int, string|int>|string  $array
-     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : ($array is array{} ? '' : non-empty-string)))
+     * @param  array<string, bool|null>|array<int, string|int|null>|string  $array
+     * @return ($array is array<string, false|null> ? '' : ($array is '' ? '' : ($array is array{} ? '' : non-empty-string)))
      */
     public static function toCssClasses($array)
     {
