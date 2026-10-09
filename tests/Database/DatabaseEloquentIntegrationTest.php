@@ -39,9 +39,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
+    protected DB $db;
+
     protected function setUp(): void
     {
-        $db = new DB;
+        $this->db = $db = new DB;
 
         $db->addConnection([
             'driver' => 'sqlite',
@@ -430,17 +432,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testMorphToManyPivotClausesAcceptExpressions()
     {
         $post = EloquentTestPost::create(['name' => 'Post', 'user_id' => 1]);
-        $column = new \Illuminate\Database\Query\Expression("CONCAT(foo, '_', bar)");
+        // The tag ids and the taxonomies sort in opposite orders...
+        $b = EloquentTestTag::create(['name' => 'b']);
+        $a = EloquentTestTag::create(['name' => 'a']);
+        $none = EloquentTestTag::create(['name' => 'none']);
 
-        $sql = $post->tags()
-            ->wherePivot($column, '=', 'pivot_value')
-            ->wherePivotBetween($column, ['a', 'b'])
-            ->wherePivotIn($column, ['pivot_value'])
-            ->wherePivotNull($column)
-            ->orderByPivot($column)
-            ->toSql();
+        $post->tags()->attach($a->id, ['taxonomy' => 'a']);
+        $post->tags()->attach($b->id, ['taxonomy' => 'b']);
+        $post->tags()->attach($none->id);
 
-        $this->assertSame(5, substr_count($sql, "CONCAT(foo, '_', bar)"));
+        // An expression is used as given, instead of being qualified as a pivot column name...
+        $column = new \Illuminate\Database\Query\Expression('upper("taggables"."taxonomy")');
+
+        $ids = fn ($relation) => $relation->pluck('tags.id')->all();
+
+        $this->assertSame([$a->id], $ids($post->tags()->wherePivot($column, '=', 'A')));
+        $this->assertSame([$b->id, $a->id], $ids($post->tags()->wherePivotIn($column, ['A', 'B'])->orderBy('tags.id')));
+        $this->assertSame([$a->id], $ids($post->tags()->wherePivotBetween($column, ['A', 'A'])));
+        $this->assertSame([$none->id], $ids($post->tags()->wherePivotNull($column)));
+        $this->assertSame([$a->id, $b->id], $ids($post->tags()->wherePivotNotNull($column)->orderByPivot($column)));
+        $this->assertSame([$b->id, $a->id], $ids($post->tags()->wherePivotNotNull($column)->orderByPivot($column, 'desc')));
+        $this->assertSame([$b->id], $ids($post->tags()->withPivotValue($column, 'B')));
     }
 
     public function testBelongsToManyMatchesStringablePivotKeysToTheirParents()
@@ -650,6 +662,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('callback result', EloquentTestUser::findOr(2, ['email'], fn () => 'callback result'));
     }
 
+    public function testFindOrWithManyIdentifiersReturnsACollection()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'second@example.com']);
+
+        $found = EloquentTestUser::findOr([1, 2], fn () => 'callback result');
+
+        $this->assertInstanceOf(Collection::class, $found);
+        $this->assertSame([1, 2], $found->modelKeys());
+
+        $found = EloquentTestUser::findOr(new Collection([EloquentTestUser::find(1), EloquentTestUser::find(2)]), ['email'], fn () => 'callback result');
+
+        $this->assertInstanceOf(Collection::class, $found);
+        $this->assertSame(['first@example.com', 'second@example.com'], $found->pluck('email')->all());
+        $this->assertNull($found->first()->name);
+    }
+
     public function testDestroyAcceptsVariousIdentifierShapes()
     {
         foreach ([1, 2, 3, 4, 5, 6, 7, 8] as $id) {
@@ -675,15 +704,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(1, EloquentTestUser::count());
     }
 
-    public function testOnWriteConnectionUsesTheWritePdo()
+    public function testOnWriteConnectionFindsRecordsTheReplicaHasNotSeenYet()
     {
-        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'read' => ['database' => ':memory:'],
+            'write' => ['database' => ':memory:'],
+        ], 'replicated');
 
-        $query = EloquentTestUser::onWriteConnection();
+        $connection = $this->connection('replicated');
 
-        $this->assertTrue($query->getQuery()->useWritePdo);
-        $this->assertFalse(EloquentTestUser::query()->getQuery()->useWritePdo);
-        $this->assertSame($user->id, $query->find($user->id)->id);
+        foreach ([$connection->getPdo(), $connection->getReadPdo()] as $pdo) {
+            $pdo->exec('create table "users" ("id" integer primary key autoincrement not null, "email" varchar not null, "created_at" datetime null, "updated_at" datetime null)');
+        }
+
+        $connection->table('users')->insert(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertNull(EloquentTestReplicatedUser::find(1));
+        $this->assertSame('taylorotwell@gmail.com', EloquentTestReplicatedUser::onWriteConnection()->find(1)->email);
     }
 
     public function testIncrementAndDecrementAreScopedToTheModelKey()
@@ -829,12 +868,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $counter = EloquentTestCounter::create(['foo' => 1, 'name' => 'taylor']);
         $events = $this->recordEvents();
 
+        // Another process changes a column this model never touched...
+        $this->connection()->table('counters')->where('id', $counter->id)->update(['foo' => 99]);
+
         $counter->name = 'abigail';
 
         $this->assertTrue($counter->save());
         $this->assertSame(['eloquent.saving', 'eloquent.updating', 'eloquent.updated', 'eloquent.saved'], $events->getArrayCopy());
         $this->assertSame('abigail', $counter->fresh()->name);
-        $this->assertSame(1, $counter->fresh()->foo);
+        $this->assertSame(99, $counter->fresh()->foo);
     }
 
     public function testUpdateUsesTheOriginalPrimaryKey()
@@ -3805,6 +3847,11 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+class EloquentTestReplicatedUser extends EloquentTestUser
+{
+    protected $connection = 'replicated';
 }
 
 class EloquentTestStringableKey implements \Stringable

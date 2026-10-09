@@ -52,21 +52,23 @@ class JsonResourceTest extends TestCase
     {
         Container::getInstance()->instance('request', Request::create('/'));
 
-        $resource = new JsonResource(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
+        try {
+            $resource = new JsonResource(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
 
-        $results = $resource->toPrettyJson();
-        $expected = $resource->toJson(JSON_PRETTY_PRINT);
+            $results = $resource->toPrettyJson();
+            $expected = $resource->toJson(JSON_PRETTY_PRINT);
 
-        $this->assertJsonStringEqualsJsonString($expected, $results);
-        $this->assertSame($expected, $results);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
+            $this->assertJsonStringEqualsJsonString($expected, $results);
+            $this->assertSame($expected, $results);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
 
-        $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
-        $this->assertStringContainsString('"number": 123', $results);
-
-        Container::getInstance()->forgetInstance('request');
+            $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
+            $this->assertStringContainsString('"number": 123', $results);
+        } finally {
+            Container::getInstance()->forgetInstance('request');
+        }
     }
 }

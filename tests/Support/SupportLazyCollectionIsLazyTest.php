@@ -15,6 +15,11 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 {
     use Concerns\CountsEnumerations;
 
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+    }
+
     public function testMakeWithClosureIsLazy()
     {
         [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder();

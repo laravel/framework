@@ -6,6 +6,8 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use JMac\Testing\Double;
@@ -389,6 +391,38 @@ class RedisStoreTest extends TestCase
         $this->assertTrue($store->touch('touched', 100));
         $this->assertGreaterThan(10, $connection->ttl($store->getPrefix().'touched'));
         $this->assertSame('value', $store->get('touched'));
+    }
+
+    public function testFlushStaleTagsRemovesExpiredEntriesAndStopsScanning(): void
+    {
+        $store = Cache::store('redis');
+
+        if ($store->connection() instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Predis cannot SCAN a cluster, so the current tags cannot be listed.');
+        }
+
+        $store->clear();
+
+        // An entry that expired five minutes ago, and one that is still fresh...
+        Carbon::setTestNow(Carbon::now()->subMinutes(5));
+
+        try {
+            $store->tags(['foo'])->put('expired', 'value', 60);
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $store->tags(['foo'])->put('fresh', 'value', 3600);
+
+        $tagSet = $store->getPrefix().'tag:foo:entries';
+
+        $this->assertSame(2, $store->connection()->zcard($tagSet));
+
+        // The scan has to recognise it is back at its starting cursor, or this never returns...
+        $store->flushStaleTags();
+
+        $this->assertSame(1, $store->connection()->zcard($tagSet));
+        $this->assertSame('value', $store->tags(['foo'])->get('fresh'));
     }
 
     public function testItForgetsAndFlushesValues(): void

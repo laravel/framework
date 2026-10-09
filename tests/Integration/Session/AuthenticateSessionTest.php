@@ -35,6 +35,19 @@ class AuthenticateSessionTest extends TestCase
         Auth::extend('legacy-session', fn ($app, $name, $config) => new LegacySessionGuard(
             $name, Auth::createUserProvider($config['provider']), $app['session.store']
         ));
+
+        $app['config']->set('auth.guards.unchecked', ['driver' => 'unchecked-session', 'provider' => 'users']);
+
+        Auth::extend('unchecked-session', function ($app, $name, $config) {
+            $guard = new UncheckedRecallerSessionGuard(
+                $name, Auth::createUserProvider($config['provider']), $app['session.store']
+            );
+
+            $guard->setCookieJar($app['cookie']);
+            $app->refresh('request', $guard, 'setRequest');
+
+            return $guard;
+        });
     }
 
     protected function defineRoutes($router)
@@ -53,6 +66,13 @@ class AuthenticateSessionTest extends TestCase
 
     public function testItPassesThroughForGuests()
     {
+        $this->get('protected')->assertOk()->assertSessionMissing('password_hash_web');
+    }
+
+    public function testItPassesThroughForUsersWithoutAPassword()
+    {
+        $this->actingAs(UserFactory::new()->make(['password' => null]));
+
         $this->get('protected')->assertOk()->assertSessionMissing('password_hash_web');
     }
 
@@ -144,6 +164,22 @@ class AuthenticateSessionTest extends TestCase
         $this->assertGuest();
     }
 
+    public function testItLogsOutWhenACustomGuardRemembersTheUserWithoutCheckingTheCookieHash()
+    {
+        $user = UserFactory::new()->create();
+
+        $this->app['config']->set('auth.defaults.guard', 'unchecked');
+
+        $name = Auth::guard('unchecked')->getRecallerName();
+
+        // The built-in guard rejects a stale hash itself, but a custom guard might not...
+        $this->withCookie($name, "{$user->getAuthIdentifier()}|{$user->getRememberToken()}|stale-hash")
+            ->withSession(['a' => '1'])
+            ->get('protected')
+            ->assertRedirect(route('login'))
+            ->assertSessionMissing('a');
+    }
+
     public function testItUpgradesTheOldFormatPasswordHash()
     {
         $user = UserFactory::new()->create();
@@ -187,5 +223,23 @@ class LegacySessionGuard extends SessionGuard
     public function hashPasswordForCookie($passwordHash)
     {
         throw new BadMethodCallException;
+    }
+}
+
+class UncheckedRecallerSessionGuard extends SessionGuard
+{
+    protected function userFromRecaller($recaller)
+    {
+        if (! $recaller->valid() || $this->recallAttempted) {
+            return;
+        }
+
+        $this->recallAttempted = true;
+
+        $this->viaRemember = ! is_null($user = $this->provider->retrieveByToken(
+            $recaller->id(), $recaller->token()
+        ));
+
+        return $this->viaRemember ? $user : null;
     }
 }

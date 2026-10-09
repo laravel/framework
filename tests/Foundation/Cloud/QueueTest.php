@@ -1137,7 +1137,7 @@ class QueueTest extends TestCase
     public function testDeletingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue($this->unreachableSqsClient());
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -1153,7 +1153,7 @@ class QueueTest extends TestCase
     public function testReleasingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue($this->unreachableSqsClient());
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -1169,7 +1169,7 @@ class QueueTest extends TestCase
     public function testReportingThrowsWhenTheAgentRejectsTheResult()
     {
         $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue($this->unreachableSqsClient());
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -1187,7 +1187,7 @@ class QueueTest extends TestCase
     public function testReportingEscalatesWhenTheAgentReturnsAServerError()
     {
         $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue($this->unreachableSqsClient());
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -2288,7 +2288,7 @@ class QueueTest extends TestCase
     /**
      * Build an SqsClient that fails on any request.
      */
-    private function unreachableSqsClient(): SqsClient
+    private function failOnAnyRequestSqsClient(): SqsClient
     {
         return new SqsClient([
             'region' => 'us-east-2',

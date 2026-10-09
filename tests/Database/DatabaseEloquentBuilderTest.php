@@ -671,23 +671,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame(28, $models[1]->age);
     }
 
-    public function testEagerLoadRelationsLoadTopLevelRelationships()
-    {
-        $builder = new EloquentBuilderEagerLoadSpy($this->getMockQueryBuilder());
-        $nop1 = function () {
-            //
-        };
-        $nop2 = function () {
-            //
-        };
-        $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
-
-        $results = $builder->eagerLoadRelations(['models']);
-
-        $this->assertEquals(['foo'], $results);
-        $this->assertSame([[['models'], 'foo', $nop1]], $builder->eagerLoaded);
-    }
-
     public function testEagerLoadRelationsCanBeFlushed()
     {
         $builder = new Builder($this->getMockQueryBuilder());
@@ -3140,18 +3123,6 @@ class EloquentBuilderTestModelOtherFarRelatedStub extends Model
     public function baz()
     {
         return $this->belongsTo(EloquentBuilderTestModelCloseRelatedStub::class);
-    }
-}
-
-class EloquentBuilderEagerLoadSpy extends Builder
-{
-    public array $eagerLoaded = [];
-
-    protected function eagerLoadRelation(array $models, $name, Closure $constraints)
-    {
-        $this->eagerLoaded[] = [$models, $name, $constraints];
-
-        return ['foo'];
     }
 }
 

@@ -4,12 +4,14 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
@@ -505,22 +507,28 @@ class RedisQueueTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testPushJobQueueingAndJobQueuedEvents($driver)
     {
-        $events = Double::for(Dispatcher::class);
-        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
-            return ($event instanceof JobQueueing || $event instanceof JobQueued)
-                && $event->job instanceof RedisQueueIntegrationTestJob
-                && ($event instanceof JobQueueing || is_string($event->id));
-        }))->returns(null)->times(2);
+        $dispatched = [];
 
-        $container = Double::for(Container::class, override: true);
-        $container->expects('bound')->with('events')->returns(true)->times(2);
-        $container->expects('offsetGet')->with('events')->returns($events)->times(2);
+        $events = new EventsDispatcher;
+        $events->listen([JobQueueing::class, JobQueued::class], function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
+
+        $container = new Container;
+        $container->instance('events', $events);
 
         $default = config('queue.connections.redis.queue', 'default');
         $queue = new RedisQueue($this->redis[$driver], $default);
-        $queue->setContainer($container->instance());
+        $queue->setContainer($container);
 
-        $queue->push(new RedisQueueIntegrationTestJob(5));
+        $queue->push($job = new RedisQueueIntegrationTestJob(5));
+
+        $this->assertCount(2, $dispatched);
+        $this->assertInstanceOf(JobQueueing::class, $dispatched[0]);
+        $this->assertSame($job, $dispatched[0]->job);
+        $this->assertInstanceOf(JobQueued::class, $dispatched[1]);
+        $this->assertSame($job, $dispatched[1]->job);
+        $this->assertIsString($dispatched[1]->id);
     }
 
     /**
@@ -799,6 +807,74 @@ class RedisQueueTest extends TestCase
     }
 
     #[DataProvider('redisDriverProvider')]
+    public function testPayloadHooksAreAppliedToTheQueuedPayload($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $receivedQueue = null;
+
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) use (&$receivedQueue) {
+            $receivedQueue = $queue;
+
+            return ['custom' => 'taylor'];
+        });
+
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['bar' => 'foo'];
+        });
+
+        try {
+            $this->queue->push('foo', ['data']);
+        } finally {
+            Queue::createPayloadUsing(null);
+        }
+
+        $payload = json_decode($this->queue->pop()->getRawBody(), true);
+
+        $this->assertSame('foo', $payload['job']);
+        $this->assertSame(['data'], $payload['data']);
+        $this->assertSame('taylor', $payload['custom']);
+        $this->assertSame('foo', $payload['bar']);
+
+        // The hook sees the queue name as configured, without any cluster hash tags...
+        $this->assertSame('queues:'.$default, $receivedQueue);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testLaterAcceptsADateTimeDelay($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $due = new RedisQueueIntegrationTestJob(1);
+        $notDue = new RedisQueueIntegrationTestJob(2);
+
+        $this->queue->later(Carbon::now()->subSeconds(100), $due);
+        $this->queue->later(Carbon::now()->addSeconds(1000), $notDue);
+
+        $this->assertEquals($due, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertNull($this->queue->pop());
+
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testQueueNamesCanBeEnums($driver)
+    {
+        $this->setQueue($driver, 'default');
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1), '', 'emails');
+        $this->queue->push(new RedisQueueIntegrationTestJob(2), '', 'emails');
+        $this->queue->push(new RedisQueueIntegrationTestJob(3), '', 'other');
+
+        $this->assertSame(2, $this->queue->size(RedisQueueIntegrationTestQueue::Emails));
+        $this->assertSame(2, $this->queue->pendingJobs(RedisQueueIntegrationTestQueue::Emails)->count());
+        $this->assertSame('emails', $this->queue->pendingJobs(RedisQueueIntegrationTestQueue::Emails)->first()->queue);
+    }
+
+    #[DataProvider('redisDriverProvider')]
     public function testBulkPushesDelayedJobsOntoDelayedQueue($driver)
     {
         $this->setQueue($driver, 'default');
@@ -882,4 +958,9 @@ class RedisQueueIntegrationTestDelayedJob
     {
         //
     }
+}
+
+enum RedisQueueIntegrationTestQueue: string
+{
+    case Emails = 'emails';
 }

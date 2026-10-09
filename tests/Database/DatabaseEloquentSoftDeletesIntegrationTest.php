@@ -308,6 +308,29 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(SoftDeletesTestUser::find(2));
     }
 
+    public function testDeleteSetsTheDeletedAtAndUpdatedAtColumnsAndLeavesTheModelClean()
+    {
+        Carbon::setTestNow($now = Carbon::parse('2023-01-02 03:04:05'));
+
+        try {
+            $user = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+            Carbon::setTestNow($now->copy()->addDay());
+
+            $user->delete();
+
+            $this->assertTrue($user->trashed());
+            $this->assertFalse($user->isDirty());
+            $this->assertSame('2023-01-03 03:04:05', $user->deleted_at->toDateTimeString());
+
+            $row = (array) $this->connection()->table('users')->where('id', 1)->first();
+            $this->assertSame('2023-01-03 03:04:05', $row['deleted_at']);
+            $this->assertSame('2023-01-03 03:04:05', $row['updated_at']);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function testRestoreRestoresRecords()
     {
         $this->createUsers();

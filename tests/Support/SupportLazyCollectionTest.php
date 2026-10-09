@@ -13,6 +13,11 @@ use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+    }
+
     public function testCanCreateEmptyCollection()
     {
         $this->assertSame([], LazyCollection::make()->all());

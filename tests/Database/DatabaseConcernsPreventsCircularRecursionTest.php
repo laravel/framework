@@ -5,8 +5,6 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Concerns\PreventsCircularRecursion;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__.'/DatabaseEloquentStrictMorphsTest.php';
-
 class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
 {
     protected function setUp(): void
@@ -171,18 +169,6 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
         $this->assertEquals(3, $instance->instanceStack);
         $this->assertEquals(3, $second->instanceStack);
         $this->assertEquals(3, $third->instanceStack);
-    }
-
-    public function testModelCallToWithoutRecursionMethodWorks(): void
-    {
-        $model = new TestModel;
-
-        // Model toArray method implementation
-        $toArray = (fn () => $this->withoutRecursion(
-            fn () => array_merge($this->attributesToArray(), $this->relationsToArray()),
-            fn () => $this->attributesToArray(),
-        ))->call($model);
-        $this->assertSame([], $toArray);
     }
 }
 

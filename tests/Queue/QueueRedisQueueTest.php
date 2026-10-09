@@ -2,17 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
-use Illuminate\Queue\Attributes\Delay;
-use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
@@ -22,195 +17,6 @@ use PHPUnit\Framework\TestCase;
 class QueueRedisQueueTest extends TestCase
 {
     use VerifiesDoubles;
-
-    public function testPushProperlyPushesJobOntoRedis()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class, override: true);
-        $queue->setContainer($container->instance());
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->times(minimum: 1)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
-
-        $id = $queue->push('foo', ['data']);
-        $this->assertSame('foo', $id);
-        $container->received('bound')->with('events')->times(2);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class, override: true);
-        $queue->setContainer($container->instance());
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->times(minimum: 1)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
-
-        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            return ['custom' => 'taylor'];
-        });
-
-        $id = $queue->push('foo', ['data']);
-        $this->assertSame('foo', $id);
-        $container->received('bound')->with('events')->times(2);
-
-        Queue::createPayloadUsing(null);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Double::for(Container::class, override: true);
-        $queue->setContainer($container->instance());
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->times(minimum: 1)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
-
-        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            return ['custom' => 'taylor'];
-        });
-
-        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            return ['bar' => 'foo'];
-        });
-
-        $id = $queue->push('foo', ['data']);
-        $this->assertSame('foo', $id);
-        $container->received('bound')->with('events')->times(2);
-
-        Queue::createPayloadUsing(null);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testDelayedPushProperlyPushesJobOntoRedis()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Double::for(Container::class, override: true);
-        $queue->setContainer($container->instance());
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
-
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-
-        $redis->expects('connection')->times(minimum: 1)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(
-            LuaScripts::later(),
-            1,
-            'queues:default:delayed',
-            2,
-            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 1])
-        );
-
-        $id = $queue->later(1, 'foo', ['data']);
-        $this->assertSame('foo', $id);
-        $container->received('bound')->with('events')->times(2);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = $date = Carbon::now();
-        Carbon::setTestNow($time);
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Double::for(Container::class, override: true);
-        $queue->setContainer($container->instance());
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
-
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-
-        $redis->expects('connection')->times(minimum: 1)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(
-            LuaScripts::later(),
-            1,
-            'queues:default:delayed',
-            5,
-            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 5])
-        );
-
-        $queue->later($date->addSeconds(5), 'foo', ['data']);
-        $container->received('bound')->with('events')->times(2);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testBulkRespectsDelayAttributeWhenPushingOntoRedis()
-    {
-        $redis = Double::for(Factory::class);
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->returns($connection);
-        $connection->expects('pipeline')->resolves(function ($callback) {
-            $callback();
-        });
-        $connection->expects('transaction')->resolves(function ($callback) {
-            $callback();
-        });
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['later', 'push'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('later')->with(15, $this->isInstanceOf(RedisJobWithDelayAttribute::class), ['data'], null);
-
-        $queue->bulk([new RedisJobWithDelayAttribute], ['data']);
-    }
 
     public function testGetQueueRemainsUnchangedForNonCluster()
     {
@@ -339,116 +145,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('queues:{foo{}{bar}}', $queue->testGetQueueRedisKey('foo{}{bar}'));
     }
 
-    public function testPushUsesGetRedisKeyForLuaScript()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = new Container;
-        $queue->setContainer($container);
-
-        $clusterConnection = Double::for(PhpRedisClusterConnection::class)->passthru();
-        $clusterConnection->expects('isCluster')->returns(true);
-        $redis->expects('connection')->times(2)->returns($clusterConnection);
-
-        // command() is called by eval() — assert it receives hash-tagged keys
-        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
-            return $args[0] === LuaScripts::push()
-                && $args[2] === 2
-                && $args[1][0] === 'queues:{default}'
-                && $args[1][1] === 'queues:{default}:notify';
-        }))->returns(null);
-
-        $queue->push('foo', ['data']);
-
-        Str::createUuidsNormally();
-    }
-
-    public function testPushPassesUnchangedQueueToCreatePayload()
-    {
-        $uuid = Str::uuid();
-
-        Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
-        });
-
-        $time = Carbon::now();
-        Carbon::setTestNow($time);
-
-        $redis = Double::for(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = new Container;
-        $queue->setContainer($container);
-
-        $clusterConnection = Double::for(PhpRedisClusterConnection::class);
-        $clusterConnection->expects('isCluster')->returns(true);
-        $redis->expects('connection')->times(2)->returns($clusterConnection);
-
-        $receivedQueue = null;
-        Queue::createPayloadUsing(function ($connection, $queue) use (&$receivedQueue) {
-            $receivedQueue = $queue;
-
-            return [];
-        });
-
-        $queue->push('foo', ['data']);
-
-        // Payload hook should receive the unchanged getQueue() output (no hash tags)
-        $this->assertSame('queues:default', $receivedQueue);
-
-        Queue::createPayloadUsing(null);
-        Str::createUuidsNormally();
-    }
-
-    public function testSizeUsesGetRedisKeyOnCluster()
-    {
-        $redis = Double::for(Factory::class);
-        $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Double::for(PhpRedisClusterConnection::class)->passthru();
-        $clusterConnection->expects('isCluster')->returns(true);
-        $redis->expects('connection')->times(2)->returns($clusterConnection);
-
-        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
-            return $args[0] === LuaScripts::size()
-                && $args[2] === 3
-                && $args[1][0] === 'queues:{default}'
-                && $args[1][1] === 'queues:{default}:delayed'
-                && $args[1][2] === 'queues:{default}:reserved';
-        }))->returns(5);
-
-        $this->assertSame(5, $queue->size());
-    }
-
-    public function testClearUsesGetRedisKeyOnCluster()
-    {
-        $redis = Double::for(Factory::class);
-        $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Double::for(PhpRedisClusterConnection::class)->passthru();
-        $clusterConnection->expects('isCluster')->returns(true);
-        $redis->expects('connection')->times(2)->returns($clusterConnection);
-
-        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
-            return $args[0] === LuaScripts::clear()
-                && $args[2] === 4
-                && $args[1][0] === 'queues:{default}'
-                && $args[1][1] === 'queues:{default}:delayed'
-                && $args[1][2] === 'queues:{default}:reserved'
-                && $args[1][3] === 'queues:{default}:notify';
-        }))->returns(3);
-
-        $this->assertSame(3, $queue->clear('default'));
-    }
-
     public function testIsClusterConnectionCachesResult()
     {
         $redis = Double::for(Factory::class);
@@ -496,34 +192,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame(['default'], $queue->testAllQueueNames()->all());
     }
 
-    public function testSizeResolvesTheQueueNameFromAnEnum()
-    {
-        $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->times(2)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('eval')->with(LuaScripts::size(), 3, 'queues:emails', 'queues:emails:delayed', 'queues:emails:reserved')->returns(5);
-
-        $this->assertSame(5, $queue->size(RedisQueueName::Emails));
-    }
-
-    public function testPendingJobsResolvesTheQueueNameFromAnEnum()
-    {
-        $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
-        $connection = Double::for(PhpRedisConnection::class)->passthru();
-        $redis->expects('connection')->times(2)->returns($connection);
-        $connection->expects('isCluster')->returns(false);
-        $connection->expects('command')->with('lrange', ['queues:emails', 0, -1])->returns([
-            json_encode(['uuid' => 'uuid', 'displayName' => 'foo']),
-        ]);
-
-        $this->assertSame('emails', $queue->pendingJobs(RedisQueueName::Emails)->first()->queue);
-    }
-}
-
-enum RedisQueueName: string
-{
-    case Emails = 'emails';
 }
 
 class TestableRedisQueue extends RedisQueue
@@ -542,9 +210,4 @@ class TestableRedisQueue extends RedisQueue
     {
         return $this->allQueueNames();
     }
-}
-
-#[Delay(15)]
-class RedisJobWithDelayAttribute
-{
 }

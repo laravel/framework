@@ -3,522 +3,323 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
-use Exception;
-use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Carbon;
-use JMac\Testing\Double;
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 {
-    use VerifiesDoubles;
-
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
+
+        $db = new DB;
+
+        $db->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+
+        // Reads come from a replica that has not caught up with the writer yet...
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'read' => ['database' => ':memory:'],
+            'write' => ['database' => ':memory:'],
+        ], 'replicated');
+
+        $db->setEventDispatcher(new Dispatcher);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $schema = 'create table "records" (
+            "id" integer primary key autoincrement not null,
+            "attr" varchar not null unique,
+            "val" varchar null,
+            "count" integer not null default 0,
+            "created_at" datetime null,
+            "updated_at" datetime null
+        )';
+
+        $db->getConnection()->getPdo()->exec($schema);
+        $db->getConnection('replicated')->getPdo()->exec($schema);
+        $db->getConnection('replicated')->getReadPdo()->exec($schema);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        EloquentBuilderCreateOrFirstTestModel::unsetConnectionResolver();
+        EloquentBuilderCreateOrFirstTestModel::unsetEventDispatcher();
     }
 
     #[DataProvider('createOrFirstValues')]
     public function testCreateOrFirstMethodCreatesNewRecord(Closure|array $values): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $result = $this->query()->createOrFirst(['attr' => 'foo'], $values);
 
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
-            'id' => 123,
+            'id' => 1,
             'attr' => 'foo',
             'val' => 'bar',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+        $this->assertSame(1, $this->rows());
     }
 
     public function testCreateOrFirstMethodRetrievesExistingRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
-        $sql = 'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
-        $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+        $result = $this->query()->createOrFirst(['attr' => 'foo'], ['val' => 'baz']);
 
-        $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
-
-        $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertSame('bar', $result->val);
+        $this->assertSame(1, $this->rows());
     }
 
     public function testFirstOrCreateMethodRetrievesExistingRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $result = $this->query()->firstOrCreate(['attr' => 'foo'], ['val' => 'baz']);
 
-        $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertSame('bar', $result->val);
+        $this->assertSame(1, $this->rows());
     }
 
     public function testFirstOrCreateMethodCreatesNewRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
-            'id' => 123,
+            'id' => 1,
             'attr' => 'foo',
             'val' => 'bar',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+        $this->assertSame(1, $this->rows());
     }
 
     public function testFirstOrCreateMethodRetrievesRecordCreatedJustNow(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        // The replica has not seen the record yet, so the insert collides and the writer is asked again...
+        $this->seedWriter(['attr' => 'foo', 'val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
+        $result = $this->query('replicated')->firstOrCreate(['attr' => 'foo'], ['val' => 'baz']);
 
-        $sql = 'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
-        $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
-
-        $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
-
-        $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertSame('bar', $result->val);
+        $this->assertSame(1, $this->rows('replicated'));
+    }
+
+    public function testFirstOrCreateDoesNotTouchTheWriterWhenTheReplicaHasTheRecord(): void
+    {
+        $this->seedReplica(['attr' => 'foo', 'val' => 'bar']);
+        $queries = $this->recordQueries('replicated');
+
+        $result = $this->query('replicated')->firstOrCreate(['attr' => 'foo'], ['val' => 'baz']);
+
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertSame('bar', $result->val);
+        $this->assertNotContains('write', array_column($queries->getArrayCopy(), 1));
+    }
+
+    public function testUpdateOrCreateLeavesOtherColumnsAndCreatedAtAlone(): void
+    {
+        $this->seed(['attr' => 'foo', 'val' => 'bar', 'count' => 5, 'created_at' => '2022-12-31 00:00:00', 'updated_at' => '2022-12-31 00:00:00']);
+
+        $this->query()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
+
+        $record = (array) DB::connection()->table('records')->first();
+        $this->assertSame('baz', $record['val']);
+        $this->assertEquals(5, $record['count']);
+        $this->assertSame('2022-12-31 00:00:00', $record['created_at']);
+        $this->assertSame('2023-01-01 00:00:00', $record['updated_at']);
     }
 
     public function testUpdateOrCreateMethodUpdatesExistingRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
 
-        $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'baz',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertSame('baz', $result->val);
+        $this->assertSame('baz', $this->fresh()->val);
+        $this->assertSame(1, $this->rows());
     }
 
     public function testUpdateOrCreateMethodCreatesNewRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], ['val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
-            'id' => 123,
+            'id' => 1,
             'attr' => 'foo',
             'val' => 'bar',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+        $this->assertSame(1, $this->rows());
     }
 
     public function testUpdateOrCreateMethodUpdatesRecordCreatedJustNow(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $this->seedWriter(['attr' => 'foo', 'val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
+        $result = $this->query('replicated')->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
 
-        $sql = 'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
-        $bindings = ['foo', 'baz', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
-
-        $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
-
-        $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'baz',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertSame('baz', $result->val);
+        $this->assertSame('baz', $this->fresh('replicated', onWriter: true)->val);
+        $this->assertSame(1, $this->rows('replicated'));
     }
 
     public function testIncrementOrCreateMethodIncrementsExistingRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'count' => 1]);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'count' => 1,
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $result = $this->query()->incrementOrCreate(['attr' => 'foo'], 'count');
 
-        $model->getConnection()->expects('raw')->with('"count" + 1')->returns('2');
-
-        $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
-            ['2', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], 'count');
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'count' => 2,
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertEquals(2, $result->count);
+        $this->assertEquals(2, $this->fresh()->count);
     }
 
     public function testIncrementOrCreateMethodCreatesNewRecord(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->incrementOrCreate(['attr' => 'foo']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
-            'id' => 123,
+            'id' => 1,
             'attr' => 'foo',
             'count' => 1,
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+        $this->assertEquals(1, $this->fresh()->count);
     }
 
     public function testIncrementOrCreateMethodIncrementParametersArePassed(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'val' => 'bar', 'count' => 1]);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'count' => 1,
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $result = $this->query()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
 
-        $model->getConnection()->expects('raw')->with('"count" + 2')->returns('3');
-
-        $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "val" = ?, "updated_at" = ? where "id" = ?',
-            ['3', 'baz', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'count' => 3,
-            'val' => 'baz',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertEquals(3, $result->count);
+        $this->assertSame('baz', $result->val);
+        $this->assertEquals(3, $this->fresh()->count);
+        $this->assertSame('baz', $this->fresh()->val);
     }
 
     public function testIncrementOrCreateMethodExtraParametersArePassedWhenCreating(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "count", "updated_at", "created_at") values (?, ?, ?, ?, ?)',
-            ['foo', 'baz', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
         $this->assertTrue($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'baz',
-            'count' => 1,
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame('baz', $result->val);
+        $this->assertSame(1, $result->count);
+        $this->assertEquals(1, $this->fresh()->count);
+        $this->assertSame('baz', $this->fresh()->val);
     }
 
     public function testIncrementOrCreateMethodRetrievesRecordCreatedJustNow(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $this->seedWriter(['attr' => 'foo', 'count' => 1]);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
+        $result = $this->query('replicated')->incrementOrCreate(['attr' => 'foo']);
 
-        $sql = 'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)';
-        $bindings = ['foo', 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
-
-        $model->getConnection()->expects('insert')->with($sql, $bindings)->throws(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'count' => 1,
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
-
-        $model->getConnection()->expects('raw')->with('"count" + 1')->returns('2');
-
-        $model->getConnection()->expects('update')->with('update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
-            ['2', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'count' => 2,
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame(1, $result->id);
+        $this->assertEquals(2, $result->count);
+        $this->assertEquals(2, $this->fresh('replicated', onWriter: true)->count);
     }
 
     #[DataProvider('createOrFirstValues')]
     public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(Closure|array $values): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], $values);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
-        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
-        $this->assertEquals([
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01T00:00:00.000000Z',
-            'updated_at' => '2023-01-01T00:00:00.000000Z',
-        ], $result->toArray());
+        $this->assertSame('foo', $result->attr);
+        $this->assertSame('bar', $result->val);
+        $this->assertSame('bar', $this->fresh()->val);
     }
 
     public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
 
-        $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
-
-        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
         $this->assertSame('baz', $result->val);
+        $this->assertSame('baz', $this->fresh()->val);
     }
 
     public function testUpdateOrCreateInvokesClosureExactlyOnceWhenCreating(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite', [123]);
-        $model->getConnection()->expects('transactionLevel')->returns(0);
-        $model->getConnection()->allows('getName')->returns('sqlite');
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $model->getConnection()->expects('insert')->with('insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'])->returns(true);
-
         $callCount = 0;
-        $model->newQuery()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
             $callCount++;
 
             return ['val' => 'bar'];
         });
 
         $this->assertSame(1, $callCount);
+        $this->assertSame('bar', $result->val);
     }
 
     public function testUpdateOrCreateInvokesClosureExactlyOnceWhenUpdating(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
-
-        $model->getConnection()->expects('update')->with('update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
-            ['baz', '2023-01-01 00:00:00', 123])->returns(1);
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
         $callCount = 0;
-        $model->newQuery()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+
+        $result = $this->query()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
             $callCount++;
 
             return ['val' => 'baz'];
         });
 
         $this->assertSame(1, $callCount);
+        $this->assertSame('baz', $result->val);
     }
 
     #[DataProvider('createOrFirstValues')]
     public function testFirstOrNewMethodAcceptsClosureValuesAndInstantiates(Closure|array $values): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->allows('getName')->returns('sqlite');
+        $result = $this->query()->firstOrNew(['attr' => 'foo'], $values);
 
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([]);
-
-        $result = $model->newQuery()->firstOrNew(['attr' => 'foo'], $values);
         $this->assertFalse($result->exists);
         $this->assertSame('foo', $result->attr);
         $this->assertSame('bar', $result->val);
+        $this->assertSame(0, $this->rows());
     }
 
     public function testFirstOrNewDoesNotInvokeClosureWhenRecordExists(): void
     {
-        $model = new EloquentBuilderCreateOrFirstTestModel();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $model->getConnection()->expects('getName')->returns('sqlite');
-
-        $model->getConnection()->expects('select')->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])->returns([[
-            'id' => 123,
-            'attr' => 'foo',
-            'val' => 'bar',
-            'created_at' => '2023-01-01 00:00:00',
-            'updated_at' => '2023-01-01 00:00:00',
-        ]]);
+        $this->seed(['attr' => 'foo', 'val' => 'bar']);
 
         $callCount = 0;
-        $result = $model->newQuery()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {
+        $result = $this->query()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {
             $callCount++;
 
             return ['val' => 'should-not-be-called'];
@@ -537,37 +338,61 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ];
     }
 
-    protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
+    protected function query(string $connection = 'default')
     {
-        $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
-        $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $processor = new $processorClass;
-        $connection = Double::for(Connection::class);
-        $connection->allows('getPostProcessor')->returns($processor);
-        $grammar = new $grammarClass($connection);
-        $connection->allows('getQueryGrammar')->returns($grammar);
-        $connection->allows('getTablePrefix')->returns('');
-        $connection->allows('query')->resolves(function () use ($connection, $grammar, $processor) {
-            return new Builder($connection, $grammar, $processor);
+        return (new EloquentBuilderCreateOrFirstTestModel)->setConnection($connection)->newQuery();
+    }
+
+    protected function seed(array $attributes): void
+    {
+        $this->seedWriter($attributes, 'default');
+    }
+
+    protected function seedWriter(array $attributes, string $connection = 'replicated'): void
+    {
+        DB::connection($connection)->table('records')->insert($attributes + [
+            'created_at' => '2023-01-01 00:00:00',
+            'updated_at' => '2023-01-01 00:00:00',
+        ]);
+    }
+
+    protected function seedReplica(array $attributes): void
+    {
+        DB::connection('replicated')->getReadPdo()->exec(sprintf(
+            'insert into "records" ("attr", "val", "created_at", "updated_at") values (%s)',
+            implode(', ', array_map(fn ($value) => "'{$value}'", [$attributes['attr'], $attributes['val'], '2023-01-01 00:00:00', '2023-01-01 00:00:00']))
+        ));
+    }
+
+    /**
+     * Record the verb and read/write side of each query the connection reports.
+     */
+    protected function recordQueries(string $connection): \ArrayObject
+    {
+        $queries = new \ArrayObject;
+
+        DB::connection($connection)->listen(function (QueryExecuted $query) use ($queries) {
+            $queries[] = [strtok($query->sql, ' '), $query->readWriteType];
         });
-        $connection->allows('getDatabaseName')->returns('database');
-        $resolver = Double::for(ConnectionResolverInterface::class);
-        $resolver->allows('connection')->returns($connection);
 
-        $class = get_class($model);
-        $class::setConnectionResolver($resolver);
+        return $queries;
+    }
 
-        $pdo = Double::for(PDO::class);
-        $connection->allows('getPdo')->returns($pdo);
+    protected function fresh(string $connection = 'default', bool $onWriter = false): EloquentBuilderCreateOrFirstTestModel
+    {
+        $query = $this->query($connection);
 
-        foreach ($lastInsertIds as $id) {
-            $pdo->expects('lastInsertId')->returns($id);
-        }
+        return ($onWriter ? $query->useWritePdo() : $query)->where('attr', 'foo')->firstOrFail();
+    }
+
+    protected function rows(string $connection = 'default'): int
+    {
+        return DB::connection($connection)->table('records')->useWritePdo()->count();
     }
 }
 
 class EloquentBuilderCreateOrFirstTestModel extends Model
 {
-    protected $table = 'table';
+    protected $table = 'records';
     protected $guarded = [];
 }
