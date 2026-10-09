@@ -380,7 +380,7 @@ class Repository
      */
     public function pop($key)
     {
-        if (! $this->isStackable($key) || ! count($this->data[$key])) {
+        if (! $this->isStackable($key) || empty($this->data[$key])) {
             throw new RuntimeException("Unable to pop value from context stack for key [{$key}].");
         }
 
@@ -420,7 +420,7 @@ class Repository
      */
     public function popHidden($key)
     {
-        if (! $this->isHiddenStackable($key) || ! count($this->hidden[$key])) {
+        if (! $this->isHiddenStackable($key) || empty($this->hidden[$key])) {
             throw new RuntimeException("Unable to pop value from hidden context stack for key [{$key}].");
         }
 

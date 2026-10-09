@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationRuleParser;
@@ -9,6 +10,37 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationRuleParserTest extends TestCase
 {
+    /**
+     * Test that parameterized rules are prepared without being stringified.
+     */
+    public function testParameterizedRulesAreNotStringified()
+    {
+        $rule = new class implements ParameterizedRule
+        {
+            /**
+             * Get the rule name followed by its parameters.
+             */
+            public function toArray(): array
+            {
+                return ['accepted_if', 'other', 'foo\\",bar'];
+            }
+
+            /**
+             * Reject serialization to verify the structured parsing path.
+             */
+            public function __toString(): string
+            {
+                throw new \LogicException('This rule must not be stringified.');
+            }
+        };
+
+        $parser = new ValidationRuleParser([]);
+
+        $this->assertSame(['field' => [$rule]], $parser->explode(['field' => $rule])->rules);
+        $this->assertSame(['field' => [$rule]], $parser->explode(['field' => [$rule]])->rules);
+        $this->assertSame(['AcceptedIf', ['other', 'foo\\",bar']], ValidationRuleParser::parse($rule));
+    }
+
     public function testConditionalRulesAreProperlyExpandedAndFiltered()
     {
         $isAdmin = true;
