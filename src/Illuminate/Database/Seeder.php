@@ -33,6 +33,16 @@ abstract class Seeder
     protected static $called = [];
 
     /**
+     * Get the seeder classes that have been called at least once.
+     *
+     * @return array
+     */
+    public static function calledClasses()
+    {
+        return static::$called;
+    }
+
+    /**
      * Run the given seeder class.
      *
      * @param  array|string  $class

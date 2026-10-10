@@ -19,6 +19,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class SeedCommandTest extends TestCase
@@ -175,6 +176,86 @@ class SeedCommandTest extends TestCase
         Assert::assertSame(Command::FAILURE, $command->handle());
     }
 
+    public function testDefaultSeederThatDoesNotDelegateReportsCompletion()
+    {
+        $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = Mockery::mock(Seeder::class);
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder->expects('__invoke');
+
+        $resolver = new ConnectionResolver;
+
+        $container = Mockery::mock(Application::class);
+        $container->expects('call');
+        $container->expects('environment')->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+            $outputStyle
+        );
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $rendered = $output->fetch();
+
+        $this->assertStringContainsString('DONE', $rendered);
+        $this->assertStringNotContainsString('RUNNING', $rendered);
+    }
+
+    public function testDefaultSeederThatDelegatesToChildSeedersDoesNotReportCompletion()
+    {
+        $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = new ConnectionResolver;
+
+        $container = Mockery::mock(Application::class);
+        $container->shouldReceive('call')->andReturnUsing(
+            fn ($callback) => $callback[1] === 'run' ? $callback() : null
+        );
+        $container->expects('environment')->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->expects('make')->with('DatabaseSeeder')->andReturn(
+            new SeedCommandDelegatingDatabaseSeeder
+        );
+        $container->expects('make')->with(SeedCommandChildSeeder::class)->andReturn(
+            new SeedCommandChildSeeder
+        );
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+            $outputStyle
+        );
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $rendered = $output->fetch();
+
+        $this->assertSame(1, substr_count($rendered, 'RUNNING'));
+        $this->assertSame(1, substr_count($rendered, 'DONE'));
+        $this->assertStringContainsString(SeedCommandChildSeeder::class, $rendered);
+        $this->assertStringNotContainsString(SeedCommandDelegatingDatabaseSeeder::class, $rendered);
+    }
+
     protected function tearDown(): void
     {
         SeedCommand::prohibit(false);
@@ -190,6 +271,22 @@ class UserWithoutModelEventsSeeder extends Seeder
     public function run()
     {
         Assert::assertInstanceOf(NullDispatcher::class, Model::getEventDispatcher());
+    }
+}
+
+class SeedCommandDelegatingDatabaseSeeder extends Seeder
+{
+    public function run()
+    {
+        $this->call(SeedCommandChildSeeder::class);
+    }
+}
+
+class SeedCommandChildSeeder extends Seeder
+{
+    public function run()
+    {
+        //
     }
 }
 

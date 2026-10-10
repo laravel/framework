@@ -7,6 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:seed')]
@@ -84,6 +85,8 @@ class SeedCommand extends Command
 
         $startTime = microtime(true);
 
+        $calledBefore = count(Seeder::calledClasses());
+
         try {
             Model::unguarded(function () use ($seeder) {
                 $seeder->__invoke();
@@ -94,7 +97,9 @@ class SeedCommand extends Command
             }
         }
 
-        if ($shouldReportProgress) {
+        $delegatedToChildSeeders = count(Seeder::calledClasses()) > $calledBefore;
+
+        if ($shouldReportProgress || ! $delegatedToChildSeeders) {
             $runTime = number_format((microtime(true) - $startTime) * 1000);
 
             $this->components->twoColumnDetail(
