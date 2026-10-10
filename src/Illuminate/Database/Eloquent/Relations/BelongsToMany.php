@@ -977,7 +977,11 @@ class BelongsToMany extends Relation
         return $callback();
     }
 
-    /** @inheritDoc */
+    /**
+     * Get the results of the relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel&object{pivot: TPivotModel}>
+     */
     public function getResults()
     {
         return ! is_null($this->parent->{$this->parentKey})
@@ -985,7 +989,12 @@ class BelongsToMany extends Relation
             : $this->related->newCollection();
     }
 
-    /** @inheritDoc */
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel&object{pivot: TPivotModel}>
+     */
     public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
