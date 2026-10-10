@@ -193,6 +193,13 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * The cache of whether each class uses the "HasDefaultAttributes" trait.
+     *
+     * @var array<class-string, bool>
+     */
+    protected static $defaultAttributesCache = [];
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -1746,7 +1753,11 @@ trait HasAttributes
      */
     protected function mergeDefaultAttributes()
     {
-        if (! in_array(HasDefaultAttributes::class, class_uses_recursive(static::class), true)) {
+        static::$defaultAttributesCache[static::class] ??= in_array(
+            HasDefaultAttributes::class, class_uses_recursive(static::class), true
+        );
+
+        if (! static::$defaultAttributesCache[static::class]) {
             return;
         }
 
