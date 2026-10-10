@@ -13,7 +13,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\Boot;
+https://github.com/laravel/framework/pull/59020/conflict?name=src%252FIlluminate%252FDatabase%252FEloquent%252FModel.php&ancestor_oid=b8f08af95560957fd673d60d2fbaeb4fad2b2be9&base_oid=5734759b605eed750396a9fc1a5b6e6bfc716740&head_oid=aaaa9fca21eb39831759a1ca65c42c945e3a052euse Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Refreshes;
@@ -304,6 +304,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $classAttributes = [];
 
     /**
+     * Cache of route key names.
+     *
+     * @var array<class-string<self>, string>
+     */
+    protected static array $routeKeyNames = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -512,6 +519,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         static::$bootedCallbacks = [];
         static::$classAttributes = [];
         static::$globalScopes = [];
+        static::$routeKeyNames = [];
     }
 
     /**
