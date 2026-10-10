@@ -2,12 +2,14 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionNamedType;
 use SplFileObject;
@@ -258,7 +260,19 @@ class ModelInspector
         foreach ($listeners as $key => $observerMethods) {
             $formatted[] = [
                 'event' => $extractVerb($key),
-                'observer' => array_map(fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
+                'observer' => array_map(function ($observer): string {
+                    if ($observer instanceof Closure) {
+                        $refFunc = new ReflectionFunction($observer);
+                        $file = $refFunc->getFileName();
+                        $startLine = $refFunc->getStartLine();
+
+                        $file = preg_replace('/^.+vendor\//', 'vendor/', $file);
+
+                        $observer = sprintf('Closure %s:%d', $file, $startLine);
+                    }
+
+                    return $observer;
+                }, $observerMethods),
             ];
         }
 

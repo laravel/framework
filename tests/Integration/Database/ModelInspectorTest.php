@@ -54,6 +54,31 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
     }
 
+    public function test_reports_closure_observer_path()
+    {
+        $line = __LINE__ + 1;
+        ModelInspectorTestModel::updated(fn () => null);
+
+        $extractor = new ModelInspector($this->app);
+        $modelInfo = $extractor->inspect(ModelInspectorTestModel::class);
+
+        $observer = $modelInfo['observers']->firstWhere('event', 'updated');
+
+        $this->assertNotNull($observer);
+        $this->assertSame([sprintf('Closure %s:%d', __FILE__, $line)], $observer['observer']);
+    }
+
+    public function test_command_displays_closure_observers()
+    {
+        $line = __LINE__ + 1;
+        ModelInspectorTestModel::updated(fn () => null);
+
+        $this->withoutMockingConsoleOutput()->artisan('model:show', ['model' => ModelInspectorTestModel::class]);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString(sprintf('Closure %s:%d', __FILE__, $line), $output);
+    }
+
     private function assertModelInfo(ModelInfo|array $modelInfo)
     {
         $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
