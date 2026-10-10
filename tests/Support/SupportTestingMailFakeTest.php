@@ -3,21 +3,27 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Testing\Fakes\MailFake;
-use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class SupportTestingMailFakeTest extends TestCase
 {
     /**
-     * @var \Mockery
+     * @var \Illuminate\Mail\MailManager
      */
     private $mailManager;
+
+    /**
+     * @var \Illuminate\Foundation\Application
+     */
+    private $app;
 
     /**
      * @var \Illuminate\Support\Testing\Fakes\MailFake
@@ -31,10 +37,9 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mailManager = Mockery::mock(MailManager::class, function ($mock) {
-            $mock->expects('getDefaultDriver')
-                ->andReturn('smtp');
-        });
+        $this->app = new Application;
+        $this->app->instance('config', new Repository(['mail' => ['default' => 'smtp']]));
+        $this->mailManager = new MailManager($this->app);
         $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
     }
@@ -422,9 +427,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testMissingMethodsAreForwarded()
     {
-        $this->mailManager->expects('foo')->andReturn('bar');
-
-        $this->assertSame('bar', $this->fake->foo());
+        $this->assertSame($this->app, $this->fake->getApplication());
     }
 
     public function testAssertMailer()

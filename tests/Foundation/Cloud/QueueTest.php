@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Foundation\Cloud;
 use Aws\CommandInterface;
 use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
-use Aws\HandlerList;
 use Aws\MockHandler;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
@@ -44,7 +43,6 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use InvalidArgumentException;
-use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -1146,15 +1144,13 @@ class QueueTest extends TestCase
     public function testDeletingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
 
         // An unreachable agent propagates rather than deleting from SQS directly.
         $agent->resultUnreachable = true;
-        $sqs->shouldNotReceive('deleteMessage');
 
         $this->expectException(AgentUnreachableException::class);
 
@@ -1164,15 +1160,13 @@ class QueueTest extends TestCase
     public function testReleasingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
 
         // An unreachable agent propagates rather than resetting visibility on SQS.
         $agent->resultUnreachable = true;
-        $sqs->shouldNotReceive('changeMessageVisibility');
 
         $this->expectException(AgentUnreachableException::class);
 
@@ -1182,8 +1176,7 @@ class QueueTest extends TestCase
     public function testReportingThrowsWhenTheAgentRejectsTheResult()
     {
         $this->fakeEvents();
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -1192,7 +1185,6 @@ class QueueTest extends TestCase
         // RequestException for the worker to report rather than deleting from
         // SQS directly or restarting the pod.
         $agent->resultStatus = 422;
-        $sqs->shouldNotReceive('deleteMessage');
 
         $this->expectException(RequestException::class);
 
@@ -1202,8 +1194,7 @@ class QueueTest extends TestCase
     public function testReportingEscalatesWhenTheAgentReturnsAServerError()
     {
         $this->fakeEvents();
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
+        [$queue, $agent] = $this->fakeQueue($this->failOnAnyRequestSqsClient());
         $agent->pushJob();
 
         $job = $queue->pop();
@@ -1211,7 +1202,6 @@ class QueueTest extends TestCase
         // A server error means the agent itself is wedged, so it escalates as
         // an unreachable fault to restart the pod rather than deleting from SQS.
         $agent->resultStatus = 500;
-        $sqs->shouldNotReceive('deleteMessage');
 
         $this->expectException(AgentUnreachableException::class);
 
@@ -1356,11 +1346,12 @@ class QueueTest extends TestCase
         CloudBootstrapper::configureManagedQueues($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-        $client->expects('sendMessage')->times(5)->andReturn(new Result());
-        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
-            'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
-        ]));
+        [$queue] = $this->mockedQueue([
+            ...array_fill(0, 5, new Result()),
+            fn (CommandInterface $cmd) => new Result([
+                'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $cmd['Entries']),
+            ]),
+        ]);
 
         $queue->push(new FakeJob, queue: '1');
         $queue->pushOn('2', new FakeJob);
@@ -1636,11 +1627,12 @@ class QueueTest extends TestCase
         CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
-        [$queue, $client] = $this->mockedQueue();
-        $client->expects('sendMessage')->times(5)->andReturn(new Result());
-        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
-            'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
-        ]));
+        [$queue] = $this->mockedQueue([
+            ...array_fill(0, 5, new Result()),
+            fn (CommandInterface $cmd) => new Result([
+                'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $cmd['Entries']),
+            ]),
+        ]);
 
         DB::beginTransaction();
 
@@ -2203,15 +2195,14 @@ class QueueTest extends TestCase
     {
         config(['queue.connections.cloud.queues' => ['default', 'emails']]);
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-
-        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+        $result = new Result([
             'Attributes' => [
                 'ApproximateNumberOfMessages' => 2,
                 'ApproximateNumberOfMessagesDelayed' => 1,
                 'ApproximateNumberOfMessagesNotVisible' => 3,
             ],
-        ]));
+        ]);
+        [$queue] = $this->mockedQueue([$result, $result]);
 
         $this->assertSame(12, $queue->totalSize());
     }
@@ -2220,11 +2211,10 @@ class QueueTest extends TestCase
     {
         config(['queue.connections.cloud.queues' => ['default', 'emails']]);
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-
-        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+        $result = new Result([
             'Attributes' => ['ApproximateNumberOfMessages' => 2],
-        ]));
+        ]);
+        [$queue] = $this->mockedQueue([$result, $result]);
 
         $this->assertSame(4, $queue->totalPendingSize());
     }
@@ -2233,11 +2223,10 @@ class QueueTest extends TestCase
     {
         config(['queue.connections.cloud.queues' => ['default', 'emails']]);
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-
-        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+        $result = new Result([
             'Attributes' => ['ApproximateNumberOfMessagesDelayed' => 1],
-        ]));
+        ]);
+        [$queue] = $this->mockedQueue([$result, $result]);
 
         $this->assertSame(2, $queue->totalDelayedSize());
     }
@@ -2246,11 +2235,10 @@ class QueueTest extends TestCase
     {
         config(['queue.connections.cloud.queues' => ['default', 'emails']]);
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-
-        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+        $result = new Result([
             'Attributes' => ['ApproximateNumberOfMessagesNotVisible' => 3],
-        ]));
+        ]);
+        [$queue] = $this->mockedQueue([$result, $result]);
 
         $this->assertSame(6, $queue->totalReservedSize());
     }
@@ -2294,36 +2282,27 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @return array{Queue, MockInterface<SqsClient>}
+     * @param  array<int, Result|callable>  $results
+     * @return array{Queue, MockHandler}
      */
-    private function mockedQueue()
+    private function mockedQueue(array $results = [])
     {
-        $client = $this->mock(SqsClient::class);
-        $client->expects('getHandlerList')->andReturn(new HandlerList());
+        $handler = new MockHandler($results);
 
-        $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
-        {
-            public function __construct(private $client)
-            {
-                //
-            }
+        return [$this->getRealQueue($handler), $handler];
+    }
 
-            public function connect($config)
-            {
-                return new SqsQueue(
-                    $this->client,
-                    $config['queue'],
-                    $config['prefix'] ?? '',
-                    $config['suffix'] ?? '',
-                    $config['after_commit'] ?? null,
-                    $config['overflow'] ?? [],
-                );
-            }
-        }, $this->app));
-
-        $this->app['queue']->addConnector('cloud', $this->app->factory(QueueConnector::class));
-
-        return [$this->app['queue']->connection('cloud'), $client];
+    /**
+     * Build an SqsClient that fails on any request.
+     */
+    private function failOnAnyRequestSqsClient(): SqsClient
+    {
+        return new SqsClient([
+            'region' => 'us-east-2',
+            'version' => 'latest',
+            'handler' => new MockHandler(),
+            'credentials' => false,
+        ]);
     }
 
     private function fakeEvents()
@@ -2367,7 +2346,7 @@ class QueueTest extends TestCase
         ]);
 
         // A real client suffices while the SQS seams stay no-ops; callers asserting
-        // direct SQS calls pass a mock instead.
+        // no direct SQS calls pass a client that fails on any request.
         $sqs ??= new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
         $fakeQueue = new class($this->app, $sqs) extends QueueFake

@@ -6,19 +6,22 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBrokerCanResolveBackedEnum(): void
     {
         $app = $this->getApp();
 
-        $broker = Mockery::mock(PasswordBroker::class);
+        $broker = Double::for(PasswordBroker::class);
 
-        $manager = Mockery::mock(PasswordBrokerManager::class, [$app])->makePartial()->shouldAllowMockingProtectedMethods();
-        $manager->expects('resolve')->with('users')->andReturn($broker);
+        $manager = Double::for(PasswordBrokerManager::class)->passthru(new PasswordBrokerManager($app));
+        $manager->expects('resolve')->with('users')->returns($broker);
 
         $result1 = $manager->broker(PasswordBrokerName::Users);
         $result2 = $manager->broker('users');

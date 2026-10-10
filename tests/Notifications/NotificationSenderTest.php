@@ -21,7 +21,8 @@ use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -29,6 +30,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NotificationSenderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -223,11 +226,11 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $response = Mockery::mock(ResponseInterface::class);
+        $response = Double::for(ResponseInterface::class);
         $driver->exception = new HttpTransportException('Transport error', $response);
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
 
         $events = new EventDispatcher;
@@ -251,9 +254,9 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
 
         $events = new EventFake(new EventDispatcher);

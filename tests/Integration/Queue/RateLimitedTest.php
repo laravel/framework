@@ -16,11 +16,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
@@ -59,12 +62,12 @@ class RateLimitedTest extends TestCase
 
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
-        $cache = Mockery::mock(Cache::class);
-        $cache->expects('get')->times(3)->andReturn(0, 1, null);
-        $cache->expects('add')->times(2)->andReturn(true, true);
-        $cache->expects('increment')->andReturn(1);
-        $cache->expects('has')->andReturn(true);
-        $cache->expects('getStore')->times(3)->andReturn(new ArrayStore);
+        $cache = Double::for(Cache::class);
+        $cache->expects('get')->times(3)->returns(0, 1, null);
+        $cache->expects('add')->times(2)->returns(true, true);
+        $cache->expects('increment')->returns(1);
+        $cache->expects('has')->returns(true);
+        $cache->expects('getStore')->times(3)->returns(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
         $this->app->instance(RateLimiter::class, $rateLimiter);

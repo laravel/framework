@@ -8,7 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
@@ -17,6 +18,8 @@ use Throwable;
 #[WithConfig('queue.connections.sqs.after_commit', true)]
 class QueueConnectionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         QueueConnectionTestJob::$ran = false;
@@ -28,9 +31,9 @@ class QueueConnectionTest extends TestCase
     public function testJobWontGetDispatchedInsideATransaction()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->expects('addCallback')->andReturn(null);
-            $transactionManager->shouldNotReceive('addCallbackForRollback');
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null);
+            $transactionManager->expects('addCallbackForRollback')->never();
 
             return $transactionManager;
         });
@@ -41,9 +44,9 @@ class QueueConnectionTest extends TestCase
     public function testJobWillGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->shouldNotReceive('addCallback')->andReturn(null);
-            $transactionManager->shouldNotReceive('addCallbackForRollback');
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null)->never();
+            $transactionManager->expects('addCallbackForRollback')->never();
 
             return $transactionManager;
         });
@@ -60,9 +63,9 @@ class QueueConnectionTest extends TestCase
         $this->app['config']->set('queue.connections.sqs.after_commit', false);
 
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->expects('addCallback')->andReturn(null);
-            $transactionManager->shouldNotReceive('addCallbackForRollback');
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null);
+            $transactionManager->expects('addCallbackForRollback')->never();
 
             return $transactionManager;
         });
@@ -77,9 +80,9 @@ class QueueConnectionTest extends TestCase
     public function testUniqueJobWontGetDispatchedInsideATransaction()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->expects('addCallback')->andReturn(null);
-            $transactionManager->expects('addCallbackForRollback')->andReturn(null);
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null);
+            $transactionManager->expects('addCallbackForRollback')->returns(null);
 
             return $transactionManager;
         });
@@ -90,9 +93,9 @@ class QueueConnectionTest extends TestCase
     public function testUniqueJobWillGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->shouldNotReceive('addCallback')->andReturn(null);
-            $transactionManager->shouldNotReceive('addCallbackForRollback')->andReturn(null);
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null)->never();
+            $transactionManager->expects('addCallbackForRollback')->returns(null)->never();
 
             return $transactionManager;
         });
@@ -109,9 +112,9 @@ class QueueConnectionTest extends TestCase
         $this->app['config']->set('queue.connections.sqs.after_commit', false);
 
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->expects('addCallback')->andReturn(null);
-            $transactionManager->expects('addCallbackForRollback')->andReturn(null);
+            $transactionManager = Double::for(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->returns(null);
+            $transactionManager->expects('addCallbackForRollback')->returns(null);
 
             return $transactionManager;
         });

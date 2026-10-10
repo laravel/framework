@@ -14,8 +14,10 @@ use Illuminate\Console\View\Components\Factory;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Concerns\CreatesAnsweredOutputStyles;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,6 +27,7 @@ use Symfony\Component\Console\Output\NullOutput;
 class CommandTest extends TestCase
 {
     use CreatesAnsweredOutputStyles;
+    use VerifiesDoubles;
 
     protected function tearDown(): void
     {
@@ -40,27 +43,28 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = Mockery::mock(FoundationApplication::class);
-        $command->setLaravel($application);
+        $application = Double::for(FoundationApplication::class, override: true);
+        $laravel = $application->instance();
+        $command->setLaravel($laravel);
 
         $input = new ArrayInput([]);
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
-        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
+        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->returns($outputStyle);
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->returns(new Factory($outputStyle));
 
-        $application->expects('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
-            $commandCalled = Mockery::mock(Command::class);
+        $application->expects('call')->with([$command, 'handle'])->resolves(function () use ($command, $application, $laravel) {
+            $commandCalled = Double::for(Command::class);
 
-            $application->expects('make')->with(Command::class)->andReturn($commandCalled);
+            $application->expects('make')->with(Command::class)->returns($commandCalled);
 
             $commandCalled->expects('setApplication')->with(null);
-            $commandCalled->expects('setLaravel')->with($application);
+            $commandCalled->expects('setLaravel')->with($laravel);
             $commandCalled->expects('run');
 
             $command->call(Command::class);
         });
-        $application->shouldReceive('runningUnitTests')->andReturn(true);
+        $application->allows('runningUnitTests')->returns(true);
 
         $command->run($input, $output);
     }
@@ -189,10 +193,8 @@ class CommandTest extends TestCase
 
     public function testTheOutputSetterOverwrite()
     {
-        $output = Mockery::mock(OutputStyle::class);
-        $output->expects('writeln')->withArgs(function (...$args) {
-            return $args[0] === '<info>foo</info>';
-        });
+        $output = Double::for(OutputStyle::class);
+        $output->expects('writeln')->with('<info>foo</info>', Argument::remaining());
 
         $command = new Command;
         $command->setOutput($output);

@@ -11,12 +11,15 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $builder;
 
     protected $related;
@@ -25,11 +28,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
     }
@@ -40,11 +43,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -55,11 +58,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -94,7 +97,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $model->expects('setRelation')->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
@@ -234,14 +237,14 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     protected function getRelation($parent = null, $keyType = 'int')
     {
-        $this->builder = Mockery::mock(Builder::class);
+        $this->builder = Double::for(Builder::class);
         $this->builder->expects('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = Mockery::mock(Model::class);
-        $this->related->shouldReceive('getKeyType')->andReturn($keyType);
-        $this->related->shouldReceive('getKeyName')->andReturn('id');
-        $this->related->shouldReceive('getTable')->andReturn('relation');
-        $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
-        $this->builder->expects('getModel')->andReturn($this->related);
+        $this->related = Double::for(Model::class);
+        $this->related->allows('getKeyType')->returns($keyType);
+        $this->related->allows('getKeyName')->returns('id');
+        $this->related->allows('getTable')->returns('relation');
+        $this->related->allows('qualifyColumn')->resolves(fn (string $column) => "relation.{$column}");
+        $this->builder->expects('getModel')->returns($this->related);
         $parent = $parent ?: new EloquentBelongsToModelStub;
 
         return new BelongsTo($this->builder, $parent, 'foreign_key', 'id', 'relation');

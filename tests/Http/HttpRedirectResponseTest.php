@@ -10,12 +10,15 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class HttpRedirectResponseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHeaderOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
@@ -32,7 +35,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = Mockery::mock(Store::class);
+        $session = Double::for(Store::class);
         $response->setSession($session);
         $session->expects('flash')->times(2);
         $response->with(['name', 'age']);
@@ -117,8 +120,8 @@ class HttpRedirectResponseTest extends TestCase
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $session = new Store('test', new NullSessionHandler);
         $response->setSession($session);
-        $provider = Mockery::mock(MessageProvider::class);
-        $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
+        $provider = Double::for(MessageProvider::class);
+        $provider->expects('getMessageBag')->returns(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 
         $this->assertContains('errors', $session->get('_flash.new', []));

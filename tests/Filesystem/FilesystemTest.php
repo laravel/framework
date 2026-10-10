@@ -6,7 +6,8 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -18,6 +19,8 @@ use function Orchestra\Testbench\terminate;
 
 class FilesystemTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private static $tempDir;
 
     #[BeforeClass]
@@ -322,8 +325,8 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/tmp6/foo.txt', '');
         mkdir(self::$tempDir.'/tmp7', 0777, true);
 
-        $files = Mockery::mock(Filesystem::class)->makePartial();
-        $files->expects('deleteDirectory')->andReturn(false);
+        $files = Double::for(Filesystem::class)->passthru();
+        $files->expects('deleteDirectory')->returns(false);
         $this->assertFalse($files->moveDirectory(self::$tempDir.'/tmp6', self::$tempDir.'/tmp7', true));
     }
 

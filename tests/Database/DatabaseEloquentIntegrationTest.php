@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -38,9 +39,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
+    protected DB $db;
+
     protected function setUp(): void
     {
-        $db = new DB;
+        $this->db = $db = new DB;
 
         $db->addConnection([
             'driver' => 'sqlite',
@@ -70,6 +73,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema('default')->create('with_json', function ($table) {
             $table->increments('id');
             $table->text('json')->default(json_encode([]));
+        });
+
+        $this->schema('default')->create('counters', function ($table) {
+            $table->increments('id');
+            $table->integer('foo')->default(0);
+            $table->integer('bar')->default(0);
+            $table->integer('category')->nullable();
+            $table->string('name')->nullable();
+            $table->timestamps();
         });
 
         $this->schema('default')->create('generated_users', function ($table) {
@@ -204,6 +216,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         Model::clearBootedModels();
+        Eloquent::unsetEventDispatcher();
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -340,6 +353,599 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($user->isDirty('first_name'));
 
         $user->save();
+    }
+
+    public function testHasManyUpsertFillsTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->schema()->table('posts', fn ($table) => $table->unique('name'));
+
+        $user->posts()->upsert([['name' => 'first'], ['name' => 'second']], ['name'], ['name']);
+        $user->posts()->upsert(['name' => 'second'], ['name'], ['name']);
+
+        $posts = EloquentTestPost::orderBy('id')->get();
+
+        $this->assertSame(['first', 'second'], $posts->pluck('name')->all());
+        $this->assertSame([1, 1], $posts->pluck('user_id')->all());
+    }
+
+    public function testMorphManyUpsertFillsTheMorphColumns()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->schema()->table('photos', fn ($table) => $table->unique('name'));
+
+        $user->photos()->upsert([['name' => 'first'], ['name' => 'second']], ['name'], ['name']);
+        $user->photos()->upsert(['name' => 'second'], ['name'], ['name']);
+
+        $photos = EloquentTestPhoto::orderBy('id')->get();
+
+        $this->assertSame(['first', 'second'], $photos->pluck('name')->all());
+        $this->assertSame([1, 1], $photos->pluck('imageable_id')->all());
+        $this->assertSame([EloquentTestUser::class, EloquentTestUser::class], $photos->pluck('imageable_type')->all());
+    }
+
+    public function testMorphToManyAttachInsertsThePivotRecordWithTheMorphColumns()
+    {
+        $post = EloquentTestPost::create(['name' => 'Post', 'user_id' => 1]);
+        $tag = EloquentTestTag::create(['name' => 'php']);
+
+        $post->tags()->attach($tag->id, ['taxonomy' => 'bar']);
+
+        $this->assertEquals([
+            (object) [
+                'tag_id' => $tag->id,
+                'taggable_id' => $post->id,
+                'taggable_type' => EloquentTestPost::class,
+                'taxonomy' => 'bar',
+            ],
+        ], $this->connection()->table('taggables')->get()->all());
+    }
+
+    public function testMorphToManyDetachOnlyRemovesTheOwnersPivotRecords()
+    {
+        $post = EloquentTestPost::create(['name' => 'Post', 'user_id' => 1]);
+        $tags = [
+            EloquentTestTag::create(['name' => 'php']),
+            EloquentTestTag::create(['name' => 'laravel']),
+            EloquentTestTag::create(['name' => 'testing']),
+        ];
+
+        $post->tags()->attach(collect($tags)->pluck('id')->all());
+        // Same ids, but owned by a different morph type, so they must survive.
+        foreach ($tags as $tag) {
+            $this->connection()->table('taggables')->insert([
+                'tag_id' => $tag->id,
+                'taggable_id' => $post->id,
+                'taggable_type' => EloquentTestPhoto::class,
+            ]);
+        }
+
+        $this->assertSame(2, $post->tags()->detach([$tags[0]->id, $tags[1]->id]));
+        $this->assertSame([$tags[2]->id], $post->tags()->pluck('tags.id')->all());
+        $this->assertSame(3, $this->connection()->table('taggables')->where('taggable_type', EloquentTestPhoto::class)->count());
+
+        $this->assertSame(1, $post->tags()->detach());
+        $this->assertSame([], $post->tags()->pluck('tags.id')->all());
+        $this->assertSame(3, $this->connection()->table('taggables')->where('taggable_type', EloquentTestPhoto::class)->count());
+    }
+
+    public function testMorphToManyPivotClausesAcceptExpressions()
+    {
+        $post = EloquentTestPost::create(['name' => 'Post', 'user_id' => 1]);
+        // The tag ids and the taxonomies sort in opposite orders...
+        $b = EloquentTestTag::create(['name' => 'b']);
+        $a = EloquentTestTag::create(['name' => 'a']);
+        $none = EloquentTestTag::create(['name' => 'none']);
+
+        $post->tags()->attach($a->id, ['taxonomy' => 'a']);
+        $post->tags()->attach($b->id, ['taxonomy' => 'b']);
+        $post->tags()->attach($none->id);
+
+        // An expression is used as given, instead of being qualified as a pivot column name...
+        $column = new \Illuminate\Database\Query\Expression('upper("taggables"."taxonomy")');
+
+        $ids = fn ($relation) => $relation->pluck('tags.id')->all();
+
+        $this->assertSame([$a->id], $ids($post->tags()->wherePivot($column, '=', 'A')));
+        $this->assertSame([$b->id, $a->id], $ids($post->tags()->wherePivotIn($column, ['A', 'B'])->orderBy('tags.id')));
+        $this->assertSame([$a->id], $ids($post->tags()->wherePivotBetween($column, ['A', 'A'])));
+        $this->assertSame([$none->id], $ids($post->tags()->wherePivotNull($column)));
+        $this->assertSame([$a->id, $b->id], $ids($post->tags()->wherePivotNotNull($column)->orderByPivot($column)));
+        $this->assertSame([$b->id, $a->id], $ids($post->tags()->wherePivotNotNull($column)->orderByPivot($column, 'desc')));
+        $this->assertSame([$b->id], $ids($post->tags()->withPivotValue($column, 'B')));
+    }
+
+    public function testBelongsToManyMatchesStringablePivotKeysToTheirParents()
+    {
+        $first = EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);
+        $second = EloquentTestUser::create(['id' => 2, 'email' => 'second@example.com']);
+
+        $result = (object) ['pivot' => (object) ['user_id' => new EloquentTestStringableKey('1')]];
+
+        $models = $first->friends()->match([$first, $second], new \Illuminate\Database\Eloquent\Collection([$result]), 'friends');
+
+        $this->assertSame(1, $models[0]->friends->count());
+        $this->assertContains($result, $models[0]->friends);
+        $this->assertCount(0, $models[1]->friends);
+    }
+
+    public function testHasOneWithDefaultReturnsAnUnsavedModelWithTheForeignKeySet()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $post = $user->post()->withDefault()->getResults();
+
+        $this->assertInstanceOf(EloquentTestPost::class, $post);
+        $this->assertFalse($post->exists);
+        $this->assertSame(7, $post->user_id);
+        $this->assertSame(0, EloquentTestPost::count());
+    }
+
+    public function testHasOneWithDefaultCanBeCustomizedWithAClosureOrArray()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $post = $user->post()->withDefault(function ($newPost, $parent) {
+            $newPost->name = $parent->email;
+        })->getResults();
+
+        $this->assertSame('taylorotwell@gmail.com', $post->name);
+        $this->assertSame(7, $post->user_id);
+
+        $post = $user->post()->withDefault(['name' => 'Default Post'])->getResults();
+
+        $this->assertSame('Default Post', $post->name);
+        $this->assertSame(7, $post->user_id);
+    }
+
+    public function testHasOneWithDefaultIsIgnoredWhenTheRelatedModelExists()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+        $user->post()->create(['name' => 'Real Post']);
+
+        $post = $user->post()->withDefault(['name' => 'Default Post'])->getResults();
+
+        $this->assertTrue($post->exists);
+        $this->assertSame('Real Post', $post->name);
+    }
+
+    public function testHasManyCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->posts()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->user_id);
+
+        $madeMany = $user->posts()->makeMany([['name' => 'a'], ['name' => 'b']]);
+        $this->assertSame([7, 7], $madeMany->pluck('user_id')->all());
+        $this->assertSame(0, EloquentTestPost::count());
+
+        $user->posts()->create(['name' => 'created']);
+        $user->posts()->forceCreate(['name' => 'forced']);
+        $user->posts()->createMany([['name' => 'many-a'], ['name' => 'many-b']]);
+        $user->posts()->save(new EloquentTestPost(['name' => 'saved']));
+
+        $posts = EloquentTestPost::orderBy('id')->get();
+        $this->assertSame(['created', 'forced', 'many-a', 'many-b', 'saved'], $posts->pluck('name')->all());
+        $this->assertSame([7, 7, 7, 7, 7], $posts->pluck('user_id')->all());
+    }
+
+    public function testHasManyFindingOrCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+        $existing = $user->posts()->create(['name' => 'existing']);
+
+        $this->assertTrue($user->posts()->findOrNew($existing->id)->is($existing));
+        $new = $user->posts()->findOrNew(999);
+        $this->assertFalse($new->exists);
+        $this->assertSame(7, $new->user_id);
+
+        $this->assertTrue($user->posts()->firstOrNew(['name' => 'existing'])->is($existing));
+        $new = $user->posts()->firstOrNew(['name' => 'new'], ['user_id' => 1]);
+        $this->assertFalse($new->exists);
+        $this->assertSame(7, $new->user_id);
+
+        $this->assertTrue($user->posts()->firstOrCreate(['name' => 'existing'], ['name' => 'ignored'])->is($existing));
+        $created = $user->posts()->firstOrCreate(['name' => 'first-or-create']);
+        $this->assertTrue($created->exists);
+        $this->assertSame(7, $created->user_id);
+
+        $updated = $user->posts()->updateOrCreate(['name' => 'existing'], ['name' => 'updated']);
+        $this->assertTrue($updated->is($existing));
+        $this->assertSame('updated', $existing->fresh()->name);
+        $created = $user->posts()->updateOrCreate(['name' => 'update-or-create']);
+        $this->assertTrue($created->exists);
+        $this->assertSame(7, $created->user_id);
+    }
+
+    public function testHasOneCreatingMethodsFillTheForeignKey()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->post()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->user_id);
+        $this->assertSame(0, EloquentTestPost::count());
+
+        $user->post()->create(['name' => 'created']);
+        $user->post()->forceCreate(['name' => 'forced']);
+        $user->post()->save(new EloquentTestPost(['name' => 'saved']));
+
+        $this->assertSame([7, 7, 7], EloquentTestPost::pluck('user_id')->all());
+    }
+
+    public function testHasOneWithDynamicDefaultReceivesTheParent()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $post = $user->post()->withDefault(function ($newPost, $parent) {
+            $newPost->name = $parent->email;
+        })->getResults();
+
+        $this->assertSame('taylorotwell@gmail.com', $post->name);
+    }
+
+    public function testMorphManyCreatingMethodsFillTheMorphColumns()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+
+        $made = $user->photos()->make(['name' => 'made']);
+        $this->assertFalse($made->exists);
+        $this->assertSame(7, $made->imageable_id);
+        $this->assertSame(EloquentTestUser::class, $made->imageable_type);
+
+        $user->photos()->create(['name' => 'created']);
+        $user->photos()->forceCreate(['name' => 'forced']);
+        $user->photos()->createMany([['name' => 'many']]);
+
+        $photos = EloquentTestPhoto::orderBy('id')->get();
+        $this->assertSame(['created', 'forced', 'many'], $photos->pluck('name')->all());
+        $this->assertSame([7, 7, 7], $photos->pluck('imageable_id')->all());
+        $this->assertSame(array_fill(0, 3, EloquentTestUser::class), $photos->pluck('imageable_type')->all());
+    }
+
+    public function testMorphManyUsesTheMorphMapAlias()
+    {
+        Relation::morphMap(['user' => EloquentTestUser::class]);
+
+        try {
+            $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+            $photo = $user->photos()->create(['name' => 'created']);
+
+            $this->assertSame('user', $photo->imageable_type);
+            $this->assertTrue($photo->imageable->is($user));
+        } finally {
+            Relation::morphMap([], false);
+        }
+    }
+
+    public function testMorphManyFindingOrCreatingMethodsFillTheMorphColumns()
+    {
+        $user = EloquentTestUser::create(['id' => 7, 'email' => 'taylorotwell@gmail.com']);
+        $existing = $user->photos()->create(['name' => 'existing']);
+
+        $this->assertTrue($user->photos()->findOrNew($existing->id)->is($existing));
+        $this->assertTrue($user->photos()->firstOrNew(['name' => 'existing'])->is($existing));
+        $this->assertTrue($user->photos()->firstOrCreate(['name' => 'existing'])->is($existing));
+        $this->assertTrue($user->photos()->updateOrCreate(['name' => 'existing'], ['name' => 'updated'])->is($existing));
+        $this->assertSame('updated', $existing->fresh()->name);
+
+        foreach ([
+            $user->photos()->findOrNew(999),
+            $user->photos()->firstOrNew(['name' => 'a']),
+        ] as $new) {
+            $this->assertFalse($new->exists);
+            $this->assertSame(7, $new->imageable_id);
+            $this->assertSame(EloquentTestUser::class, $new->imageable_type);
+        }
+
+        foreach ([
+            $user->photos()->firstOrCreate(['name' => 'b']),
+            $user->photos()->createOrFirst(['name' => 'c']),
+            $user->photos()->updateOrCreate(['name' => 'd']),
+        ] as $created) {
+            $this->assertTrue($created->exists);
+            $this->assertSame(7, $created->imageable_id);
+            $this->assertSame(EloquentTestUser::class, $created->imageable_type);
+        }
+    }
+
+    public function testFindOrReturnsTheModelOrTheCallbackResult()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);
+
+        $this->assertTrue($user->is(EloquentTestUser::findOr(1, fn () => 'callback result')));
+        $this->assertSame('first@example.com', EloquentTestUser::findOr(1, ['email'], fn () => 'callback result')->email);
+        $this->assertNull(EloquentTestUser::findOr(1, ['email'], fn () => 'callback result')->name);
+        $this->assertSame('callback result', EloquentTestUser::findOr(2, fn () => 'callback result'));
+        $this->assertSame('callback result', EloquentTestUser::findOr(2, ['email'], fn () => 'callback result'));
+    }
+
+    public function testFindOrWithManyIdentifiersReturnsACollection()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'first@example.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'second@example.com']);
+
+        $found = EloquentTestUser::findOr([1, 2], fn () => 'callback result');
+
+        $this->assertInstanceOf(Collection::class, $found);
+        $this->assertSame([1, 2], $found->modelKeys());
+
+        $found = EloquentTestUser::findOr(new Collection([EloquentTestUser::find(1), EloquentTestUser::find(2)]), ['email'], fn () => 'callback result');
+
+        $this->assertInstanceOf(Collection::class, $found);
+        $this->assertSame(['first@example.com', 'second@example.com'], $found->pluck('email')->all());
+        $this->assertNull($found->first()->name);
+    }
+
+    public function testDestroyAcceptsVariousIdentifierShapes()
+    {
+        foreach ([1, 2, 3, 4, 5, 6, 7, 8] as $id) {
+            EloquentTestUser::create(['id' => $id, 'email' => "user{$id}@example.com"]);
+        }
+
+        $this->assertSame(3, EloquentTestUser::destroy(1, 2, 3));
+        $this->assertSame(1, EloquentTestUser::destroy([4]));
+        $this->assertSame(1, EloquentTestUser::destroy(new \Illuminate\Support\Collection([5])));
+        $this->assertSame(2, EloquentTestUser::destroy(new Collection([
+            EloquentTestUser::find(6),
+            EloquentTestUser::find(7),
+        ])));
+
+        $this->assertSame([8], EloquentTestUser::pluck('id')->all());
+    }
+
+    public function testDestroyWithNoIdentifiersDeletesNothing()
+    {
+        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame(0, EloquentTestUser::destroy([]));
+        $this->assertSame(1, EloquentTestUser::count());
+    }
+
+    public function testOnWriteConnectionFindsRecordsTheReplicaHasNotSeenYet()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'read' => ['database' => ':memory:'],
+            'write' => ['database' => ':memory:'],
+        ], 'replicated');
+
+        $connection = $this->connection('replicated');
+
+        foreach ([$connection->getPdo(), $connection->getReadPdo()] as $pdo) {
+            $pdo->exec('create table "users" ("id" integer primary key autoincrement not null, "email" varchar not null, "created_at" datetime null, "updated_at" datetime null)');
+        }
+
+        $connection->table('users')->insert(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertNull(EloquentTestReplicatedUser::find(1));
+        $this->assertSame('taylorotwell@gmail.com', EloquentTestReplicatedUser::onWriteConnection()->find(1)->email);
+    }
+
+    public function testIncrementAndDecrementAreScopedToTheModelKey()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 2]);
+        $other = EloquentTestCounter::create(['foo' => 2]);
+
+        $counter->increment('foo', 3);
+
+        $this->assertSame(5, $counter->foo);
+        $this->assertFalse($counter->isDirty());
+        $this->assertSame(5, $counter->fresh()->foo);
+        $this->assertSame(2, $other->fresh()->foo);
+
+        $counter->decrement('foo', 1);
+
+        $this->assertSame(4, $counter->foo);
+        $this->assertSame(4, $counter->fresh()->foo);
+        $this->assertSame(2, $other->fresh()->foo);
+    }
+
+    public function testIncrementAndDecrementEachAreScopedToTheModelKey()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 2, 'bar' => 5]);
+        $other = EloquentTestCounter::create(['foo' => 2, 'bar' => 5]);
+
+        $this->assertSame(1, $counter->incrementEach(['foo' => 1, 'bar' => 2]));
+
+        $this->assertSame(3, $counter->foo);
+        $this->assertSame(7, $counter->bar);
+        $this->assertFalse($counter->isDirty());
+        $this->assertSame(3, $counter->fresh()->foo);
+        $this->assertSame(7, $counter->fresh()->bar);
+
+        $this->assertSame(1, $counter->decrementEach(['foo' => 3, 'bar' => 2]));
+
+        $this->assertSame(0, $counter->foo);
+        $this->assertSame(5, $counter->bar);
+        $this->assertSame(0, $counter->fresh()->foo);
+        $this->assertSame(5, $counter->fresh()->bar);
+
+        $this->assertSame(2, $other->fresh()->foo);
+        $this->assertSame(5, $other->fresh()->bar);
+    }
+
+    public function testIncrementEachWithExtraColumns()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 2]);
+
+        $this->assertSame(1, $counter->incrementEach(['foo' => 5], ['name' => 'test']));
+
+        $this->assertSame(7, $counter->foo);
+        $this->assertSame('test', $counter->name);
+        $this->assertSame('test', $counter->fresh()->name);
+        $this->assertSame(7, $counter->fresh()->foo);
+    }
+
+    public function testIncrementEachOnANonExistingModelUpdatesEveryRow()
+    {
+        EloquentTestCounter::create(['foo' => 1]);
+        EloquentTestCounter::create(['foo' => 2]);
+
+        $this->assertSame(2, (new EloquentTestCounter)->incrementEach(['foo' => 1]));
+
+        $this->assertSame([2, 3], EloquentTestCounter::orderBy('id')->pluck('foo')->all());
+    }
+
+    public function testIncrementAndDecrementFireModelEvents()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+        $events = $this->recordEvents();
+
+        $counter->increment('foo');
+        $counter->decrement('foo');
+        $counter->incrementEach(['foo' => 1]);
+        $counter->decrementEach(['foo' => 1]);
+
+        $this->assertSame([
+            'eloquent.updating', 'eloquent.updated',
+            'eloquent.updating', 'eloquent.updated',
+            'eloquent.updating', 'eloquent.updated',
+            'eloquent.updating', 'eloquent.updated',
+        ], $events->getArrayCopy());
+    }
+
+    public function testQuietIncrementAndDecrementDoNotFireModelEvents()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 4, 'bar' => 4]);
+        $events = $this->recordEvents();
+
+        $counter->incrementQuietly('foo', 1);
+        $counter->decrementQuietly('foo', 2);
+        $counter->incrementEachQuietly(['bar' => 1]);
+        $counter->decrementEachQuietly(['bar' => 3]);
+
+        $this->assertSame([], $events->getArrayCopy());
+        $this->assertSame(3, $counter->foo);
+        $this->assertSame(2, $counter->bar);
+        $this->assertSame(3, $counter->fresh()->foo);
+        $this->assertSame(2, $counter->fresh()->bar);
+        $this->assertFalse($counter->isDirty());
+    }
+
+    public function testQuietIncrementAndDecrementWithExtraColumnsLeaveTheExtraColumnsDirty()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 4, 'bar' => 4]);
+        $events = $this->recordEvents();
+
+        $counter->incrementQuietly('foo', 1, ['category' => 1]);
+
+        $this->assertSame(5, $counter->foo);
+        $this->assertSame(1, $counter->category);
+        $this->assertTrue($counter->isDirty('category'));
+        $this->assertFalse($counter->isDirty('foo'));
+
+        $counter->decrementEachQuietly(['bar' => 1], ['category' => 2]);
+
+        $this->assertSame(3, $counter->bar);
+        $this->assertSame(2, $counter->category);
+        $this->assertTrue($counter->isDirty('category'));
+        $this->assertSame([], $events->getArrayCopy());
+    }
+
+    public function testIncrementEachReturnsFalseWhenTheUpdatingEventIsCancelled()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+
+        $events = new Dispatcher;
+        $events->listen('eloquent.updating: '.EloquentTestCounter::class, fn () => false);
+        Eloquent::setEventDispatcher($events);
+
+        $this->assertFalse($counter->incrementEach(['foo' => 1]));
+
+        // Attributes are set before the event fires, matching increment() behavior.
+        // The in-memory value changes but the database is not updated.
+        $this->assertSame(2, $counter->foo);
+        Eloquent::unsetEventDispatcher();
+        $this->assertSame(1, $counter->fresh()->foo);
+    }
+
+    public function testUpdateOnlyWritesDirtyAttributesAndFiresEvents()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1, 'name' => 'taylor']);
+        $events = $this->recordEvents();
+
+        // Another process changes a column this model never touched...
+        $this->connection()->table('counters')->where('id', $counter->id)->update(['foo' => 99]);
+
+        $counter->name = 'abigail';
+
+        $this->assertTrue($counter->save());
+        $this->assertSame(['eloquent.saving', 'eloquent.updating', 'eloquent.updated', 'eloquent.saved'], $events->getArrayCopy());
+        $this->assertSame('abigail', $counter->fresh()->name);
+        $this->assertSame(99, $counter->fresh()->foo);
+    }
+
+    public function testUpdateUsesTheOriginalPrimaryKey()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+        $originalKey = $counter->id;
+
+        $counter->id = 100;
+        $counter->foo = 2;
+
+        $this->assertTrue($counter->save());
+        $this->assertNull(EloquentTestCounter::find($originalKey));
+        $this->assertSame(2, EloquentTestCounter::find(100)->foo);
+    }
+
+    public function testUpdateDoesNotOverrideExplicitTimestamps()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+
+        $counter->created_at = '2020-01-01 00:00:00';
+        $counter->updated_at = '2020-01-02 00:00:00';
+        $counter->save();
+
+        $counter = $counter->fresh();
+
+        $this->assertSame('2020-01-01 00:00:00', $counter->created_at->toDateTimeString());
+        $this->assertSame('2020-01-02 00:00:00', $counter->updated_at->toDateTimeString());
+    }
+
+    public function testUpdateWithoutTimestampsLeavesTheUpdatedAtColumnAlone()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+        $counter->newQuery()->toBase()->update(['updated_at' => '2020-01-02 00:00:00']);
+        $counter = $counter->fresh();
+
+        $counter->timestamps = false;
+        $counter->name = 'taylor';
+        $counter->save();
+
+        $this->assertSame('2020-01-02 00:00:00', $counter->fresh()->updated_at->toDateTimeString());
+        $this->assertSame('taylor', $counter->fresh()->name);
+    }
+
+    public function testDeleteRemovesTheModelOnly()
+    {
+        $counter = EloquentTestCounter::create(['foo' => 1]);
+        $other = EloquentTestCounter::create(['foo' => 2]);
+
+        $counter->delete();
+
+        $this->assertFalse($counter->exists);
+        $this->assertNull(EloquentTestCounter::find($counter->id));
+        $this->assertNotNull(EloquentTestCounter::find($other->id));
+    }
+
+    protected function recordEvents(): \ArrayObject
+    {
+        $log = new \ArrayObject;
+        $events = new Dispatcher;
+        $events->listen('eloquent.*', function ($event) use ($log) {
+            $name = strstr($event, ':', true);
+
+            if (! in_array($name, ['eloquent.booting', 'eloquent.booted'])) {
+                $log[] = $name;
+            }
+        });
+        Eloquent::setEventDispatcher($events);
+
+        return $log;
     }
 
     public function testConfiguredAttributesAreExcludedWhenReplicating()
@@ -2485,6 +3091,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
     }
 
+    public function testTouchingIsSkippedWhenTheOwnerDoesNotExist()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        // The comment points at a post that doesn't exist, so there is nothing to touch up the chain.
+        $comment = EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 99]);
+
+        $this->assertTrue($comment->exists);
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at));
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at));
+        $this->assertFalse($future->isSameDay($post->fresh()->updated_at));
+    }
+
     public function testDeletingChildModelTouchesParentTimestamps()
     {
         $before = Carbon::now();
@@ -3223,6 +3847,30 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+class EloquentTestReplicatedUser extends EloquentTestUser
+{
+    protected $connection = 'replicated';
+}
+
+class EloquentTestStringableKey implements \Stringable
+{
+    public function __construct(protected string $value)
+    {
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+}
+
+class EloquentTestCounter extends Eloquent
+{
+    protected $table = 'counters';
+
+    protected $guarded = [];
 }
 
 #[Refreshes('name')]

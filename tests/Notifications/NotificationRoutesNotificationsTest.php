@@ -7,12 +7,15 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -21,7 +24,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = Double::for(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -34,7 +37,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeSentNow()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = Double::for(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;

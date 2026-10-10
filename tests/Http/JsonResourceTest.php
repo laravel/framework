@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class JsonResourceTest extends TestCase
@@ -51,22 +50,25 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $resource = Mockery::mock(JsonResource::class)
-            ->makePartial()
-            ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
-            ->getMock();
+        Container::getInstance()->instance('request', Request::create('/'));
 
-        $results = $resource->toPrettyJson();
-        $expected = $resource->toJson(JSON_PRETTY_PRINT);
+        try {
+            $resource = new JsonResource(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
 
-        $this->assertJsonStringEqualsJsonString($expected, $results);
-        $this->assertSame($expected, $results);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
+            $results = $resource->toPrettyJson();
+            $expected = $resource->toJson(JSON_PRETTY_PRINT);
 
-        $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
-        $this->assertStringContainsString('"number": 123', $results);
+            $this->assertJsonStringEqualsJsonString($expected, $results);
+            $this->assertSame($expected, $results);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
+
+            $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
+            $this->assertStringContainsString('"number": 123', $results);
+        } finally {
+            Container::getInstance()->forgetInstance('request');
+        }
     }
 }

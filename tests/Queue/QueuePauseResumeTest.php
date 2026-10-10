@@ -12,12 +12,15 @@ use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\Events\QueuesPaused;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class QueuePauseResumeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $manager;
     protected $cache;
 
@@ -31,8 +34,8 @@ class QueuePauseResumeTest extends TestCase
     protected function createManager($cache)
     {
         // Mock the cache facade to return our cache repository
-        $cacheMock = Mockery::mock(CacheFactory::class);
-        $cacheMock->shouldReceive('store')->andReturn($cache);
+        $cacheMock = Double::for(CacheFactory::class);
+        $cacheMock->allows('store')->returns($cache);
 
         $app = [
             'config' => [

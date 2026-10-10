@@ -12,13 +12,16 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class SupportTestingBusFakeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /** @var \Illuminate\Support\Testing\Fakes\BusFake */
     protected $fake;
 
@@ -616,15 +619,15 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreClass()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->expects('dispatch')->with($job);
         $dispatcher->expects('dispatchNow')->with($job, null);
 
         $otherJob = new OtherBusJobStub;
-        $dispatcher->shouldReceive('dispatch')->never()->with($otherJob);
-        $dispatcher->shouldReceive('dispatchNow')->never()->with($otherJob, null);
+        $dispatcher->expects('dispatch')->never()->with($otherJob);
+        $dispatcher->expects('dispatchNow')->never()->with($otherJob, null);
 
         $fake = new BusFake($dispatcher, OtherBusJobStub::class);
 
@@ -640,19 +643,19 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchedFakingOnlyGivenJobs()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->shouldReceive('dispatch')->never()->with($job);
-        $dispatcher->shouldReceive('dispatchNow')->never()->with($job, null);
+        $dispatcher->expects('dispatch')->never()->with($job);
+        $dispatcher->expects('dispatchNow')->never()->with($job, null);
 
         $otherJob = new OtherBusJobStub;
         $dispatcher->expects('dispatch')->with($otherJob);
         $dispatcher->expects('dispatchNow')->with($otherJob, null);
 
         $thirdJob = new ThirdJob;
-        $dispatcher->shouldReceive('dispatch')->never()->with($thirdJob);
-        $dispatcher->shouldReceive('dispatchNow')->never()->with($thirdJob, null);
+        $dispatcher->expects('dispatch')->never()->with($thirdJob);
+        $dispatcher->expects('dispatchNow')->never()->with($thirdJob, null);
 
         $fake = (new BusFake($dispatcher))->except(OtherBusJobStub::class);
 
@@ -672,19 +675,19 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreCallback()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->expects('dispatch')->with($job);
-        $dispatcher->expects('dispatchNow')->with($job, null);
-
         $otherJob = new OtherBusJobStub;
-        $dispatcher->expects('dispatch')->with($otherJob);
-        $dispatcher->expects('dispatchNow')->with($otherJob, null);
-
         $anotherJob = new OtherBusJobStub(1);
-        $dispatcher->shouldReceive('dispatch')->never()->with($anotherJob);
-        $dispatcher->shouldReceive('dispatchNow')->never()->with($anotherJob, null);
+
+        $dispatched = [];
+        $dispatcher->expects('dispatch')->times(2)->resolves(function ($command) use (&$dispatched) {
+            $dispatched[] = $command;
+        });
+        $dispatcher->expects('dispatchNow')->times(2)->resolves(function ($command) use (&$dispatched) {
+            $dispatched[] = $command;
+        });
 
         $fake = new BusFake($dispatcher, [
             function ($command) {
@@ -709,6 +712,8 @@ class SupportTestingBusFakeTest extends TestCase
         $fake->assertDispatched(OtherBusJobStub::class, function ($job) {
             return $job->id === 1;
         });
+
+        $this->assertSame([$job, $job, $otherJob, $otherJob], $dispatched);
     }
 
     public function testAssertNothingBatched()

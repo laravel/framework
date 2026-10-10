@@ -11,7 +11,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Illuminate\Tests\Queue\Fixtures\JobToTestWithSchedule;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Schedule::class)]
 final class ScheduleTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private Container $container;
 
     protected function setUp(): void
@@ -26,7 +29,7 @@ final class ScheduleTest extends TestCase
         $this->container = new Container;
         Container::setInstance($this->container);
         $this->container->instance(EventMutex::class, new FakeEventMutex);
-        $schedulingMutex = Mockery::mock(SchedulingMutex::class);
+        $schedulingMutex = Double::for(SchedulingMutex::class);
         $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }
 
