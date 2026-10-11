@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use PDOException;
 
 class DatabaseTransactionsTest extends DatabaseTestCase
 {
@@ -129,6 +132,60 @@ class DatabaseTransactionsTest extends DatabaseTestCase
 
         $this->assertFalse($afterCommitRan);
         $this->assertTrue($afterRollbackRan);
+    }
+
+    public function testAfterCommitCallbacksOfFailedCommitAttemptAreDiscarded()
+    {
+        $failOnce = true;
+
+        Event::listen(TransactionCommitting::class, function () use (&$failOnce) {
+            if ($failOnce) {
+                $failOnce = false;
+
+                throw new PDOException('deadlock detected');
+            }
+        });
+
+        $attempt = 0;
+        $ran = [];
+
+        DB::transaction(function () use (&$attempt, &$ran) {
+            $currentAttempt = ++$attempt;
+
+            DB::afterCommit(function () use (&$ran, $currentAttempt) {
+                $ran[] = $currentAttempt;
+            });
+        }, 2);
+
+        $this->assertSame([2], $ran);
+    }
+
+    public function testAfterRollbackCallbacksAreExecutedWhenCommitFails()
+    {
+        Event::listen(TransactionCommitting::class, function () {
+            throw new PDOException('commit failed');
+        });
+
+        $afterRollbackRan = false;
+
+        try {
+            DB::transaction(function () use (&$afterRollbackRan) {
+                DB::afterRollBack(function () use (&$afterRollbackRan) {
+                    $afterRollbackRan = true;
+                });
+            });
+        } catch (PDOException) {
+            // Ignore the expected commit exception.
+        }
+
+        $afterCommitRan = false;
+
+        DB::afterCommit(function () use (&$afterCommitRan) {
+            $afterCommitRan = true;
+        });
+
+        $this->assertTrue($afterRollbackRan);
+        $this->assertTrue($afterCommitRan);
     }
 }
 
