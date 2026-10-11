@@ -94,6 +94,24 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertStringContainsString('bonjour', $messages[1]->toString());
     }
 
+    public function testFacadeSelectedLocaleIsNotUsedForLaterNotifications()
+    {
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
+        NotificationFacade::send($user, new GreetingMailNotification);
+        $user->notify(new GreetingMailNotification);
+
+        $messages = app('mailer')->getSymfonyTransport()->messages();
+
+        $this->assertStringContainsString('bonjour', $messages[0]->toString());
+        $this->assertStringNotContainsString('bonjour', $messages[1]->toString());
+        $this->assertStringNotContainsString('bonjour', $messages[2]->toString());
+    }
+
     public function testMailIsSentWithNotificationSelectedLocale()
     {
         $users = [
