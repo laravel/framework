@@ -16,8 +16,8 @@ class ListFailedCommand extends Command
      * @var string
      */
     protected $signature = 'queue:failed
-                            {--json : Output the failed jobs as JSON}
-                            {--queue= : Only list the failed jobs for the specified queue}';
+                            {--queue= : Only list the failed jobs for the specified queue}
+                            {--json : Output the failed jobs as JSON}';
 
     /**
      * The console command description.
