@@ -64,6 +64,7 @@ class OptimizeClearCommand extends Command
             'compiled' => 'clear-compiled',
             'events' => 'event:clear',
             'routes' => 'route:clear',
+            'translations' => 'lang:clear',
             'views' => 'view:clear',
             ...ServiceProvider::$optimizeClearCommands,
         ];

@@ -2426,6 +2426,12 @@ return [
             ],
         ],
     ],
+    \Illuminate\Foundation\Console\LangCacheCommand::class => [
+        'name' => 'lang:cache',
+    ],
+    \Illuminate\Foundation\Console\LangClearCommand::class => [
+        'name' => 'lang:clear',
+    ],
     \Illuminate\Foundation\Console\LangPublishCommand::class => [
         'name' => 'lang:publish',
         'options' => [

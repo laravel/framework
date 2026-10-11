@@ -1378,6 +1378,32 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application translations are cached.
+     *
+     * @return bool
+     */
+    public function translationsAreCached()
+    {
+        if ($this->bound('translations.cached')) {
+            return (bool) $this->make('translations.cached');
+        }
+
+        return $this->instance(
+            'translations.cached', $this['files']->exists($this->getCachedTranslationsPath())
+        );
+    }
+
+    /**
+     * Get the path to the translations cache file.
+     *
+     * @return string
+     */
+    public function getCachedTranslationsPath()
+    {
+        return $this->normalizeCachePath('APP_TRANSLATIONS_CACHE', 'cache/translations.php');
+    }
+
+    /**
      * Normalize a relative or absolute path to a cache file.
      *
      * @param  string  $key

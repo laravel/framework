@@ -15,6 +15,7 @@ class OptimizeCommandTest extends TestCase
         'bootstrap/cache/config.php',
         'bootstrap/cache/events.php',
         'bootstrap/cache/routes-v7.php',
+        'bootstrap/cache/translations.php',
     ];
 
     protected function getPackageProviders($app): array

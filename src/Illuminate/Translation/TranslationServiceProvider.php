@@ -40,7 +40,13 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
     protected function registerLoader()
     {
         $this->app->singleton('translation.loader', function ($app) {
-            return new FileLoader($app['files'], [__DIR__.'/lang', $app['path.lang']]);
+            $paths = [__DIR__.'/lang', $app['path.lang']];
+
+            if (method_exists($app, 'translationsAreCached') && $app->translationsAreCached()) {
+                return new CachedFileLoader($app['files'], $paths, require $app->getCachedTranslationsPath());
+            }
+
+            return new FileLoader($app['files'], $paths);
         });
     }
 

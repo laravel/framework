@@ -62,6 +62,7 @@ class OptimizeCommand extends Command
             'config' => 'config:cache',
             'events' => 'event:cache',
             'routes' => 'route:cache',
+            'translations' => 'lang:cache',
             'views' => 'view:cache',
             ...ServiceProvider::$optimizeCommands,
         ];

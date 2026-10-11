@@ -63,6 +63,8 @@ use Illuminate\Foundation\Console\InterfaceMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\JobMiddlewareMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\LangCacheCommand;
+use Illuminate\Foundation\Console\LangClearCommand;
 use Illuminate\Foundation\Console\LangPublishCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
@@ -148,6 +150,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventList' => EventListCommand::class,
         'InvokeSerializedClosure' => InvokeSerializedClosureCommand::class,
         'KeyGenerate' => KeyGenerateCommand::class,
+        'LangCache' => LangCacheCommand::class,
+        'LangClear' => LangClearCommand::class,
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
         'PackageDiscover' => PackageDiscoverCommand::class,
@@ -519,6 +523,30 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(EventClearCommand::class, function ($app) {
             return new EventClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerLangCacheCommand()
+    {
+        $this->app->singleton(LangCacheCommand::class, function ($app) {
+            return new LangCacheCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerLangClearCommand()
+    {
+        $this->app->singleton(LangClearCommand::class, function ($app) {
+            return new LangClearCommand($app['files']);
         });
     }
 
