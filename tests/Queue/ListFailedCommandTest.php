@@ -60,11 +60,34 @@ class ListFailedCommandTest extends TestCase
         ]);
 
         $output = $this->runCommandWithFailedJobs([
-            (object) ['id' => 'one', 'connection' => 'redis', 'queue' => 'default', 'payload' => $payload, 'exception' => '', 'failed_at' => '2026-05-18 12:00:00'],
-            (object) ['id' => 'two', 'connection' => 'redis', 'queue' => 'emails', 'payload' => $payload, 'exception' => '', 'failed_at' => '2026-05-18 12:00:00'],
+            (object) [
+                'id' => 'default-job-id',
+                'connection' => 'redis',
+                'queue' => 'default',
+                'payload' => $payload,
+                'exception' => 'Exception stack trace',
+                'failed_at' => '2026-05-18 12:00:00',
+            ],
+            (object) [
+                'id' => 'emails-job-id',
+                'connection' => 'redis',
+                'queue' => 'emails',
+                'payload' => $payload,
+                'exception' => 'Exception stack trace',
+                'failed_at' => '2026-05-18 12:05:00',
+            ],
         ], ['--json' => true, '--queue' => 'emails']);
 
-        $this->assertSame(['two'], array_column(json_decode($output, true), 'id'));
+        $this->assertJson($output);
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            [
+                'id' => 'emails-job-id',
+                'connection' => 'redis',
+                'queue' => 'emails',
+                'class' => 'Illuminate\Tests\Queue\ExampleJob',
+                'failed_at' => '2026-05-18 12:05:00',
+            ],
+        ]), $output);
     }
 
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
