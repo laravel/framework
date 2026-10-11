@@ -2633,6 +2633,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $field ??= $this->getRouteKeyName();
 
         if ($this->getKeyType() === 'int' &&
+            $this->getIncrementing() &&
             Str::afterLast($field, '.') === $this->getKeyName() &&
             ! $this->isValidIntegerRouteKey($value)) {
             $this->handleInvalidRouteKey($value, $field);

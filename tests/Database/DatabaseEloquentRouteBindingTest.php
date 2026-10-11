@@ -98,6 +98,14 @@ class DatabaseEloquentRouteBindingTest extends TestCase
         (new RouteBindingStringKeyModel)->resolveRouteBindingQuery($query, 'abc');
     }
 
+    public function testItDoesNotValidateNonIncrementingModelsWithTheDefaultKeyType()
+    {
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', 'US')->andReturnSelf();
+
+        (new RouteBindingNonIncrementingKeyModel)->resolveRouteBindingQuery($query, 'US');
+    }
+
     public function testItDoesNotValidateNullValuesForModelsWithStringKeys()
     {
         $query = m::mock(Builder::class);
@@ -142,6 +150,11 @@ class RouteBindingIntKeyModel extends Model
 class RouteBindingStringKeyModel extends Model
 {
     protected $keyType = 'string';
+}
+
+class RouteBindingNonIncrementingKeyModel extends Model
+{
+    public $incrementing = false;
 }
 
 class RouteBindingCustomExceptionModel extends Model
