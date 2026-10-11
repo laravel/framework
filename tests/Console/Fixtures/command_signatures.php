@@ -3565,6 +3565,17 @@ return [
                 'default' => false,
                 'description' => 'Output the failed jobs as JSON',
             ],
+            [
+                'name' => 'queue',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'Only list the failed jobs for the specified queue',
+            ],
         ],
     ],
     \Illuminate\Queue\Console\ListenCommand::class => [

@@ -50,6 +50,23 @@ class ListFailedCommandTest extends TestCase
         ]), $output);
     }
 
+    public function testItFiltersFailedJobsByQueue()
+    {
+        $payload = json_encode([
+            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+            'data' => [
+                'command' => 'O:32:"Illuminate\Tests\Queue\ExampleJob":0:{}',
+            ],
+        ]);
+
+        $output = $this->runCommandWithFailedJobs([
+            (object) ['id' => 'one', 'connection' => 'redis', 'queue' => 'default', 'payload' => $payload, 'exception' => '', 'failed_at' => '2026-05-18 12:00:00'],
+            (object) ['id' => 'two', 'connection' => 'redis', 'queue' => 'emails', 'payload' => $payload, 'exception' => '', 'failed_at' => '2026-05-18 12:00:00'],
+        ], ['--json' => true, '--queue' => 'emails']);
+
+        $this->assertSame(['two'], array_column(json_decode($output, true), 'id'));
+    }
+
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
     {
         $container = new Application;
