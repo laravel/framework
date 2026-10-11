@@ -211,7 +211,11 @@ class ScheduleRunCommand extends Command
                     throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
                 }
             } catch (Throwable $e) {
-                $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
+                $this->dispatcher->dispatch(new ScheduledTaskFailed(
+                    $event,
+                    $e,
+                    round(microtime(true) - $start, 2)
+                ));
 
                 $this->handler->report($e);
             }

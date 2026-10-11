@@ -12,10 +12,12 @@ class ScheduledTaskFailed
      *
      * @param  \Illuminate\Console\Scheduling\Event  $task  The scheduled event that failed.
      * @param  \Throwable  $exception  The exception that was thrown.
+     * @param  float|null  $runtime  The runtime of the scheduled event.
      */
     public function __construct(
         public Event $task,
         public Throwable $exception,
+        public ?float $runtime = null,
     ) {
     }
 }
