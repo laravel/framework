@@ -385,7 +385,7 @@ class Builder
     }
 
     /**
-     *  Get the column for a given table.
+     * Get the column for a given table.
      *
      * @param  string  $table
      * @param  string  $column
