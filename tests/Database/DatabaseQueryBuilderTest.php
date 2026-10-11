@@ -3099,6 +3099,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $count);
     }
 
+    public function testGetCountForPaginationWithGroupsAndTimeoutOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->from('users')->groupBy('role')->timeout(10);
+
+        $builder->getConnection()->expects('select')->with('set statement max_statement_time=10 for select count(*) as `aggregate` from (select * from `users` group by `role`) as `aggregate_table`', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+    }
+
     public function testWhereShortcut()
     {
         $builder = $this->getBuilder();
