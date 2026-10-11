@@ -9,6 +9,56 @@ use RuntimeException;
 class MariaDbGrammar extends MySqlGrammar
 {
     /**
+     * Compile a select query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileSelect(Builder $query)
+    {
+        if ($query->timeout === null) {
+            return parent::compileSelect($query);
+        }
+
+        $timeout = $query->timeout;
+
+        $query->timeout = null;
+
+        try {
+            $sql = parent::compileSelect($query);
+        } finally {
+            $query->timeout = $timeout;
+        }
+
+        return 'set statement max_statement_time='.$timeout.' for '.$sql;
+    }
+
+    /**
+     * Compile an exists statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileExists(Builder $query)
+    {
+        if ($query->timeout === null) {
+            return parent::compileExists($query);
+        }
+
+        $timeout = $query->timeout;
+
+        $query->timeout = null;
+
+        try {
+            $sql = parent::compileExists($query);
+        } finally {
+            $query->timeout = $timeout;
+        }
+
+        return 'set statement max_statement_time='.$timeout.' for '.$sql;
+    }
+
+    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join

@@ -3798,7 +3798,7 @@ class Builder implements BuilderContract
     protected function runPaginationCountQuery($columns = ['*'])
     {
         if ($this->groups || $this->havings) {
-            $clone = $this->cloneForPaginationCount();
+            $clone = $this->cloneForPaginationCount()->timeout(null);
 
             if (is_null($clone->columns) && ! empty($this->joins)) {
                 $clone->select($this->from.'.*');
@@ -3806,6 +3806,7 @@ class Builder implements BuilderContract
 
             return $this->newQuery()
                 ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                ->timeout($this->timeout)
                 ->mergeBindings($clone)
                 ->setAggregate('count', $this->withoutSelectAliases($columns))
                 ->get()->all();
