@@ -22,6 +22,7 @@ use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Once;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
 
@@ -267,6 +268,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->forgetScopedInstances();
 
                 Facade::clearResolvedInstances();
+
+                Once::flush();
 
                 memory_reset_peak_usage();
             };
