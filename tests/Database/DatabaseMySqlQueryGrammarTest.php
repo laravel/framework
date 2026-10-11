@@ -58,6 +58,16 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
         );
     }
 
+    public function testTimeoutWithUnion()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->timeout(10)->union($this->getBuilder()->select('*')->from('admins'));
+        $this->assertSame(
+            '(select /*+ MAX_EXECUTION_TIME(10000) */ * from `users`) union (select * from `admins`)',
+            $builder->toSql()
+        );
+    }
+
     public function testTimeoutNullRemovesTimeout()
     {
         $builder = $this->getBuilder();
