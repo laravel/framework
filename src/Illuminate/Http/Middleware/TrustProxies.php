@@ -70,7 +70,7 @@ class TrustProxies
 
         $host = $request->host();
 
-        $onForgeOrVapor = str_ends_with($host, '.on-forge.com') || 
+        $onForgeOrVapor = str_ends_with($host, '.on-forge.com') ||
             str_ends_with($host, '.on-vapor.com');
 
         if (is_null($trustedIps) && (laravel_cloud() || $onForgeOrVapor)) {
