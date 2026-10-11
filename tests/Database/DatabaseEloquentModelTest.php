@@ -1758,6 +1758,29 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['foo' => 'baz', 'bar' => 'qux'], $model->asFluentAttribute->toArray());
     }
 
+    public function testFillingJSONAttributesRefreshesObjectsCachedByAttributeAccessors()
+    {
+        $model = new class extends Model
+        {
+            protected function settings(): Attribute
+            {
+                return Attribute::make(
+                    get: fn ($value) => new Fluent(json_decode($value, true)),
+                    set: fn ($value) => json_encode($value),
+                );
+            }
+        };
+
+        $model->setRawAttributes(['settings' => '{"theme":"light"}'], true);
+
+        $this->assertSame('light', $model->settings->theme);
+
+        $model->forceFill(['settings->theme' => 'dark']);
+
+        $this->assertSame('dark', $model->settings->theme);
+        $this->assertSame(['settings' => '{"theme":"dark"}'], $model->getDirty());
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
