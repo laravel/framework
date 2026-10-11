@@ -34,8 +34,8 @@ class MySqlGrammar extends Grammar
         $milliseconds = $query->timeout * 1000;
 
         return preg_replace(
-            '/^select\b/i',
-            'select /*+ MAX_EXECUTION_TIME('.$milliseconds.') */',
+            '/^(\(?)select\b/i',
+            '$1select /*+ MAX_EXECUTION_TIME('.$milliseconds.') */',
             $sql,
             1
         );
