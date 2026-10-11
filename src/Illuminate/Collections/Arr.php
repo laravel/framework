@@ -308,6 +308,16 @@ class Arr
             return value($default);
         }
 
+        if ($array instanceof Traversable) {
+            foreach ($array as $key => $value) {
+                if ($callback($value, $key)) {
+                    return $value;
+                }
+            }
+
+            return value($default);
+        }
+
         $array = static::from($array);
 
         $key = array_find_key($array, $callback);
