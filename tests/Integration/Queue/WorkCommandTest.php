@@ -31,6 +31,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
+            OnceJob::$values = [];
             Worker::$flushStickyConnections = false;
         });
 
@@ -135,6 +136,19 @@ class WorkCommandTest extends QueueTestCase
         ])->assertExitCode(0);
 
         $this->assertFalse(DB::connection()->hasModifiedRecords());
+    }
+
+    public function testWorkerFlushesOnceValuesBetweenJobs()
+    {
+        Queue::push(new OnceJob('first'));
+        Queue::push(new OnceJob('second'));
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertSame(['first', 'second'], OnceJob::$values);
     }
 
     public function testMemoryExceeded()
@@ -384,6 +398,32 @@ class WritingJob implements ShouldQueue
             'email' => 'bigt@laravel.com',
             'password' => 'secret',
         ]);
+    }
+}
+
+class OnceJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $values = [];
+
+    public static $current;
+
+    public function __construct(public $value)
+    {
+        //
+    }
+
+    public function handle()
+    {
+        static::$current = $this->value;
+
+        static::$values[] = static::value();
+    }
+
+    public static function value()
+    {
+        return once(fn () => static::$current);
     }
 }
 
