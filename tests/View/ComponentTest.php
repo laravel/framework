@@ -435,14 +435,6 @@ class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
     }
 }
 
-class TestInlineViewComponentWithoutDependencies extends Component
-{
-    public function render()
-    {
-        return 'alert';
-    }
-}
-
 class TestInlineViewComponentWhereRenderDependsOnProps extends Component
 {
     public $content;
