@@ -13,6 +13,8 @@ use Symfony\Component\Mercure\Jwt\Grant;
 use Symfony\Component\Mercure\Jwt\WebTokenFactory;
 use Symfony\Component\Mercure\ProtocolVersion;
 
+use function Illuminate\Support\enum_value;
+
 trait CreatesMercureDrivers
 {
     /**
@@ -27,6 +29,10 @@ trait CreatesMercureDrivers
 
         if ($expiration <= 0) {
             throw new InvalidArgumentException('The Mercure "subscribe_expiration" configuration value must be a positive number of minutes.');
+        }
+
+        if (! empty($config['async']) && empty($config['url'])) {
+            throw new InvalidArgumentException('The Mercure "async" configuration value requires a "url" configuration value, as queue workers publish over HTTP. FrankenPHP\'s built-in hub may be used through its URL.');
         }
 
         $hub = $this->mercure($config);
@@ -102,6 +108,29 @@ trait CreatesMercureDrivers
             ($config['cookie_name'] ?? null) ?: null,
             ProtocolVersion::V1,
         );
+    }
+
+    /**
+     * Determine if the given event only targets Mercure connections publishing synchronously.
+     *
+     * @param  mixed  $event
+     * @return bool
+     */
+    protected function broadcastsToSynchronousMercureConnections($event)
+    {
+        $connections = method_exists($event, 'broadcastConnections')
+            ? $event->broadcastConnections()
+            : [null];
+
+        foreach ($connections as $connection) {
+            $config = $this->getConfig(enum_value($connection) ?: $this->getDefaultDriver());
+
+            if (($config['driver'] ?? null) !== 'mercure' || ! empty($config['async'])) {
+                return false;
+            }
+        }
+
+        return $connections !== [];
     }
 
     /**
