@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Config\Repository;
@@ -307,12 +308,20 @@ class BroadcastManagerTest extends TestCase
         $this->assertNotSame($instance1, $instance2);
     }
 
-    public function testMercureRequiresAUrl()
+    public function testMercureWithoutAUrlResolvesOutsideFrankenPhp()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => ['driver' => 'mercure', 'secret' => str_repeat('s', 32)]]],
+        ]));
+
+        $broadcaster = $manager->connection('mercure');
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $broadcaster);
+
+        $this->expectException(BroadcastException::class);
         $this->expectExceptionMessage('"url"');
 
-        (new BroadcastManager($this->getApp([])))->mercure(['secret' => str_repeat('s', 32)]);
+        $broadcaster->broadcast(['chat'], 'message');
     }
 
     public function testMercureRequiresASecret()

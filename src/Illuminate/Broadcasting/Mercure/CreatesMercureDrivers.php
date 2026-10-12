@@ -96,10 +96,6 @@ trait CreatesMercureDrivers
      */
     protected function frankenPhpMercure(array $config)
     {
-        if (! function_exists('mercure_publish')) {
-            throw new InvalidArgumentException('The Mercure broadcasting connection requires a "url" configuration value, unless the application is served by FrankenPHP with its built-in Mercure hub enabled.');
-        }
-
         return new FrankenPhpHub(
             ($config['public_url'] ?? null) ?: '/.well-known/mercure',
             $this->mercureSubscribeFactory($config),
