@@ -18,14 +18,14 @@ class HtmlDumper extends BaseHtmlDumper
      *
      * @var string
      */
-    const EXPANDED_SEPARATOR = 'class=sf-dump-expanded>';
+    public const EXPANDED_SEPARATOR = 'class=sf-dump-expanded>';
 
     /**
      * Where the source should be placed on "non expanded" kind of dumps.
      *
      * @var string
      */
-    const NON_EXPANDED_SEPARATOR = "\n</pre><script>";
+    public const NON_EXPANDED_SEPARATOR = "\n</pre><script>";
 
     /**
      * The base path of the application.

@@ -72,6 +72,7 @@
         "ext-gmp": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.322.9",
+        "boundwize/structarmed": "^0.19",
         "fakerphp/faker": "^1.24",
         "intervention/image": "^4.0",
         "laravel/pint": "^1.18",

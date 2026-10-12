@@ -34,9 +34,9 @@ class Worker
 {
     use DetectsLostConnections;
 
-    const EXIT_SUCCESS = 0;
-    const EXIT_ERROR = 1;
-    const EXIT_MEMORY_LIMIT = 12;
+    public const EXIT_SUCCESS = 0;
+    public const EXIT_ERROR = 1;
+    public const EXIT_MEMORY_LIMIT = 12;
 
     /**
      * The name of the worker.

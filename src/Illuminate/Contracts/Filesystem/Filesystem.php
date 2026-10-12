@@ -9,14 +9,14 @@ interface Filesystem
      *
      * @var string
      */
-    const VISIBILITY_PUBLIC = 'public';
+    public const VISIBILITY_PUBLIC = 'public';
 
     /**
      * The private visibility setting.
      *
      * @var string
      */
-    const VISIBILITY_PRIVATE = 'private';
+    public const VISIBILITY_PRIVATE = 'private';
 
     /**
      * Get the full path to the file that exists at the given relative path.

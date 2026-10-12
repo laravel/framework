@@ -33,3 +33,21 @@ jobs:
 
       - name: Execute type checking
         run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist" --no-progress
+
+  architecture:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: Architecture
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+
+      - name: Execute architecture analysis
+        run: vendor/bin/structarmed analyse --no-progress

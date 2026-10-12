@@ -27,3 +27,4 @@ phpunit.xml.dist export-ignore
 pint.json export-ignore
 rector.php export-ignore
 RELEASE.md export-ignore
+structarmed.php export-ignore

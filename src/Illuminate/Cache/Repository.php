@@ -52,7 +52,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @var string
      */
-    const FLEXIBLE_CREATED_KEY_PREFIX = 'illuminate:cache:flexible:created:';
+    public const FLEXIBLE_CREATED_KEY_PREFIX = 'illuminate:cache:flexible:created:';
 
     /**
      * The cache store implementation.

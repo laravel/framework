@@ -41,7 +41,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesUseStatements,
         ReflectsClosures;
 
-    const DEFAULT_ECHO_FORMAT = 'e(%s)';
+    public const DEFAULT_ECHO_FORMAT = 'e(%s)';
 
     /**
      * All of the registered extensions.
