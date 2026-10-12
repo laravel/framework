@@ -70,6 +70,20 @@ class ViewTest extends TestCase
         }));
     }
 
+    public function testFragmentsRendersTheViewOnce()
+    {
+        $view = $this->getView();
+        $view->getFactory()->expects('incrementRender')->once();
+        $view->getFactory()->expects('callComposer')->once();
+        $view->getFactory()->expects('getShared')->once()->andReturn([]);
+        $view->getEngine()->expects('get')->once()->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->once();
+        $view->getFactory()->expects('getFragments')->once()->andReturn(['foo' => 'Foo', 'bar' => 'Bar']);
+        $view->getFactory()->expects('flushStateIfDoneRendering')->once();
+
+        $this->assertSame('BarFoo', $view->fragments(['bar', 'foo']));
+    }
+
     public function testRenderSectionsReturnsEnvironmentSections()
     {
         $view = Mockery::mock(View::class.'[render]', [
