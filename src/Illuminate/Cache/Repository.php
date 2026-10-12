@@ -988,6 +988,17 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get a new repository that buffers the most recently used values of this repository in memory.
+     *
+     * @param  int  $size
+     * @return \Illuminate\Cache\Repository
+     */
+    public function buffered($size = 1000)
+    {
+        return new Repository(new BufferedStore($this->getName(), $this, $size), ['store' => $this->getName()]);
+    }
+
+    /**
      * Fire an event for this cache instance.
      *
      * @param  object|string  $event
