@@ -64,7 +64,7 @@ class UniqueLock
      * @param  mixed  $job
      * @return void
      */
-    public function release($job)
+    public function release($job, bool $onlyOwned = false)
     {
         $cache = method_exists($job, 'uniqueVia')
             ? ($job->uniqueVia() ?? $this->cache)
@@ -82,7 +82,9 @@ class UniqueLock
             return;
         }
 
-        $cache->lock(self::getKey($job))->forceRelease();
+        if (! $onlyOwned) {
+            $cache->lock(self::getKey($job))->forceRelease();
+        }
     }
 
     /**
