@@ -89,7 +89,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     {
         $messages = (array) $this->messages;
 
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+        return ! isset($messages[$key]) || ! in_array($message, $messages[$key], true);
     }
 
     /**
