@@ -99,9 +99,15 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      */
     public function fragments(?array $fragments = null)
     {
-        return is_null($fragments)
-            ? $this->allFragments()
-            : (new Collection($fragments))->map(fn ($f) => $this->fragment($f))->implode('');
+        if (is_null($fragments)) {
+            return $this->allFragments();
+        }
+
+        return $this->render(function ($view, $contents) use ($fragments) {
+            $rendered = $this->factory->getFragments();
+
+            return implode('', array_map(fn ($fragment) => $rendered[$fragment] ?? $contents, $fragments));
+        });
     }
 
     /**
