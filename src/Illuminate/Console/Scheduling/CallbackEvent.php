@@ -112,6 +112,8 @@ class CallbackEvent extends Event
      */
     protected function execute($container)
     {
+        $this->exception = null;
+
         try {
             $this->result = is_object($this->callback)
                 ? $container->call([$this->callback, '__invoke'], $this->parameters)
