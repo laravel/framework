@@ -1523,6 +1523,15 @@ class SupportStringableTest extends TestCase
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
 
+    public function testDecodeHtml()
+    {
+        $this->assertSame('Fish & Chips', (string) $this->stringable('Fish &amp; Chips')->decodeHtml());
+        $this->assertSame('<p>"Hello" \'world\'</p>', (string) $this->stringable('&lt;p&gt;&quot;Hello&quot; &#039;world&#039;&lt;/p&gt;')->decodeHtml());
+        $this->assertSame("before\u{00A0}after", (string) $this->stringable('before&nbsp;after')->decodeHtml());
+        $this->assertSame('&quot;Fish&quot; & Chips', (string) $this->stringable('&quot;Fish&quot; &amp; Chips')->decodeHtml(ENT_NOQUOTES));
+        $this->assertSame('hello-world', (string) $this->stringable('<span>Hello&nbsp;<em>world</em></span>')->stripTags()->decodeHtml()->slug());
+    }
+
     public function testReplaceMatches()
     {
         $stringable = $this->stringable('Hello world!');

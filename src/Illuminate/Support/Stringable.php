@@ -873,6 +873,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert HTML entities in the string to their corresponding characters.
+     *
+     * @param  int  $flags
+     * @param  string|null  $encoding
+     * @return static
+     */
+    public function decodeHtml(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, ?string $encoding = null)
+    {
+        return new static(html_entity_decode($this->value, $flags, $encoding));
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @return static
