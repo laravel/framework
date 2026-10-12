@@ -13,6 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Attributes\UniqueFor;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -132,6 +133,33 @@ class BroadcastManagerTest extends TestCase
 
         $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueWithIdMethod::class).':unique-id-method';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testUniqueEventsUseInheritedUniqueForAttribute()
+    {
+        Queue::fake();
+
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+
+        Queue::assertPushed(UniqueBroadcastEvent::class, 1);
+
+        $this->travel(60)->seconds();
+
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+
+        Queue::assertPushed(UniqueBroadcastEvent::class, 2);
+    }
+
+    public function testUniqueForAttributeDoesNotMakeEventsUniqueWithoutTheContract()
+    {
+        Queue::fake();
+
+        Broadcast::queue(new TestEventWithUniqueForAttribute);
+        Broadcast::queue(new TestEventWithUniqueForAttribute);
+
+        Queue::assertPushed(BroadcastEvent::class, 2);
+        Queue::assertNotPushed(UniqueBroadcastEvent::class);
     }
 
     public function testThrowExceptionWhenUnknownStoreIsUsed()
@@ -587,6 +615,15 @@ class TestEventUniqueWithIdProperty extends TestEventUnique
 class TestEventUniqueWithIdMethod extends TestEventUnique
 {
     public string $uniqueId = 'unique-id-method';
+}
+
+#[UniqueFor(60)]
+class TestEventWithUniqueForAttribute extends TestEvent
+{
+}
+
+class TestEventUniqueWithInheritedUniqueFor extends TestEventWithUniqueForAttribute implements ShouldBeUnique
+{
 }
 
 class TestEventRescue implements ShouldBroadcast, ShouldRescue
