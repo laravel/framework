@@ -13,6 +13,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
@@ -436,7 +437,8 @@ abstract class Queue
      */
     protected function registerRollbackCallbacksForJobsThatDispatchAfterCommit($job)
     {
-        if ($job instanceof ShouldBeUnique) {
+        if ($job instanceof ShouldBeUnique ||
+            ($job instanceof CallQueuedListener && $job->shouldBeUnique())) {
             $owner = isset(class_uses_recursive($job)[Queueable::class])
                 ? ($job->uniqueLockOwner ?? '')
                 : null;
