@@ -1348,6 +1348,21 @@ class ProcessTest extends TestCase
         ]);
     }
 
+    public function testFakeAssertionsWhenPendingProcessIsReused()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $process = $factory->path(__DIR__)->timeout(30);
+
+        $process->run('git add .');
+        $process->run('git commit');
+
+        $factory->assertRanTimes('git add .', 1);
+        $factory->assertRanTimes('git commit', 1);
+        $factory->assertRanInOrder(['git add .', 'git commit']);
+    }
+
     public function testAssertingProcessesRanInOrderFailsWhenOutOfOrder()
     {
         $this->expectException(AssertionFailedError::class);

@@ -146,7 +146,7 @@ class Factory
      */
     public function record(PendingProcess $process, ProcessResultContract $result)
     {
-        $this->recorded[] = [$process, $result];
+        $this->recorded[] = [clone $process, $result];
 
         return $this;
     }
