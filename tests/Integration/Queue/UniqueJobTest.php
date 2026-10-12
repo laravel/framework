@@ -10,6 +10,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -318,6 +319,29 @@ class UniqueJobTest extends QueueTestCase
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testRolledBackQueuedListenerReleasesItsUniqueLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        $this->app['config']->set('cache.default', 'array');
+
+        Event::listen(UniqueTestEvent::class, UniqueTestAfterCommitListener::class);
+
+        try {
+            DB::transaction(function () {
+                event(new UniqueTestEvent);
+
+                throw new Exception('Rollback.');
+            });
+        } catch (Exception) {
+            //
+        }
+
+        event(new UniqueTestEvent);
+
+        $this->assertSame(1, Queue::size());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -520,6 +544,19 @@ class UniqueTestAfterCommitJob implements ShouldQueue, ShouldBeUnique
     }
 
     public function handle()
+    {
+        //
+    }
+}
+
+class UniqueTestEvent
+{
+    //
+}
+
+class UniqueTestAfterCommitListener implements ShouldQueueAfterCommit, ShouldBeUnique
+{
+    public function handle(UniqueTestEvent $event)
     {
         //
     }

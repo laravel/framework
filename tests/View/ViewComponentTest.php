@@ -243,16 +243,3 @@ class TestHelloPropertyHelloMethodComponent extends Component
         return $string;
     }
 }
-
-class TestDefaultAttributesComponent extends Component
-{
-    public function __construct()
-    {
-        $this->withAttributes(['class' => 'text-red-500']);
-    }
-
-    public function render()
-    {
-        return $this->attributes->get('id');
-    }
-}

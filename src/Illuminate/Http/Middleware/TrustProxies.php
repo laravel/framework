@@ -68,15 +68,16 @@ class TrustProxies
     {
         $trustedIps = $this->proxies() ?: config('trustedproxy.proxies');
 
-        if (is_null($trustedIps) &&
-            (laravel_cloud() ||
-             str_ends_with($request->host(), '.on-forge.com') ||
-             str_ends_with($request->host(), '.on-vapor.com'))) {
+        $host = $request->host();
+
+        $onForgeOrVapor = str_ends_with($host, '.on-forge.com') ||
+            str_ends_with($host, '.on-vapor.com');
+
+        if (is_null($trustedIps) && (laravel_cloud() || $onForgeOrVapor)) {
             $trustedIps = '*';
         }
 
-        if (str_ends_with($request->host(), '.on-forge.com') ||
-            str_ends_with($request->host(), '.on-vapor.com')) {
+        if ($onForgeOrVapor) {
             $request->headers->remove('X-Forwarded-Host');
         }
 
