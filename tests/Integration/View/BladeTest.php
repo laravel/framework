@@ -230,6 +230,17 @@ class BladeTest extends TestCase
         $this->assertSame('<a href="#">default slot</a>', trim($content));
     }
 
+    public function test_content_directly_after_a_closing_slot_tag_is_rendered()
+    {
+        $content = Blade::render('<x-link href="#"><x-slot:icon>*</x-slot:icon>Save</x-link>');
+
+        $this->assertSame('<a href="#">Save</a>', trim($content));
+
+        $content = Blade::render('<x-link href="#"><x-slot name="icon">*</x-slot>Save</x-link>');
+
+        $this->assertSame('<a href="#">Save</a>', trim($content));
+    }
+
     public function testViewCacheCommandHandlesConfiguredBladeExtensions()
     {
         View::addExtension('sh', 'blade');
