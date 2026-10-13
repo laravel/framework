@@ -14,6 +14,8 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class DevCommandTest extends TestCase
 {
+    protected ?string $environmentPath = null;
+
     protected function setUp(): void
     {
         $ref = new ReflectionClass(DevCommands::class);
@@ -36,6 +38,15 @@ class DevCommandTest extends TestCase
     protected function tearDown(): void
     {
         Application::setInstance(null);
+
+        foreach (['DEV_COMMAND_TEST_FROM_FILE', 'DEV_COMMAND_TEST_OVERRIDDEN', 'DEV_COMMAND_TEST_NOT_LOADED'] as $key) {
+            putenv($key);
+        }
+
+        if ($this->environmentPath !== null) {
+            @unlink($this->environmentPath.'/.env');
+            @rmdir($this->environmentPath);
+        }
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
@@ -189,6 +200,42 @@ class DevCommandTest extends TestCase
         );
     }
 
+    public function testEnvironmentFileVariablesOnlyIncludesValuesLoadedFromTheFile()
+    {
+        $path = $this->environmentFile(implode("\n", [
+            'DEV_COMMAND_TEST_FROM_FILE=file',
+            'DEV_COMMAND_TEST_OVERRIDDEN=file',
+            'DEV_COMMAND_TEST_NOT_LOADED=file',
+        ]));
+
+        putenv('DEV_COMMAND_TEST_FROM_FILE=file');
+        putenv('DEV_COMMAND_TEST_OVERRIDDEN=shell');
+
+        $this->assertSame(
+            ['DEV_COMMAND_TEST_FROM_FILE'],
+            $this->command()->environmentFileVariablesForTesting(new Application($path))
+        );
+    }
+
+    public function testEnvironmentFileVariablesIsEmptyWithoutEnvironmentFile()
+    {
+        putenv('DEV_COMMAND_TEST_FROM_FILE=file');
+
+        $path = sys_get_temp_dir().'/'.uniqid('dev-command-test-');
+
+        $this->assertSame([], $this->command()->environmentFileVariablesForTesting(new Application($path)));
+    }
+
+    protected function environmentFile(string $contents): string
+    {
+        $path = sys_get_temp_dir().'/'.uniqid('dev-command-test-');
+
+        mkdir($path);
+        file_put_contents($path.'/.env', $contents);
+
+        return $this->environmentPath = $path;
+    }
+
     protected function command(array $options = [])
     {
         $command = new class extends DevCommand
@@ -201,6 +248,13 @@ class DevCommandTest extends TestCase
             public function buildConcurrentlyCommandForTesting(array $devCommands): string
             {
                 return $this->buildConcurrentlyCommand($devCommands);
+            }
+
+            public function environmentFileVariablesForTesting(Application $app): array
+            {
+                $this->setLaravel($app);
+
+                return $this->environmentFileVariables();
             }
         };
 

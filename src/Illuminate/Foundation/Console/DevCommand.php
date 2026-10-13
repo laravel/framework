@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Dotenv\Dotenv;
 use Illuminate\Console\Command;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommandMode;
@@ -76,6 +77,10 @@ class DevCommand extends Command
 
         $command = $packageManager->getExecCommand($multiplexCommand);
 
+        foreach ($this->environmentFileVariables() as $key) {
+            putenv($key);
+        }
+
         if (extension_loaded('pcntl')) {
             pcntl_exec('/usr/bin/env', ['sh', '-c', $command]);
         }
@@ -83,6 +88,30 @@ class DevCommand extends Command
         passthru($command, $exitCode);
 
         return $exitCode;
+    }
+
+    /**
+     * Get the names of the variables loaded from the environment file.
+     *
+     * @return string[]
+     */
+    protected function environmentFileVariables(): array
+    {
+        $path = $this->laravel->environmentFilePath();
+
+        if (! is_file($path)) {
+            return [];
+        }
+
+        $environment = getenv();
+
+        $variables = array_filter(
+            Dotenv::parse(file_get_contents($path)),
+            fn ($value, $key) => array_key_exists($key, $environment) && $environment[$key] === $value,
+            ARRAY_FILTER_USE_BOTH,
+        );
+
+        return array_keys($variables);
     }
 
     /**
@@ -171,6 +200,7 @@ class DevCommand extends Command
         $this->line('');
 
         $process = Process::forever()
+            ->env(array_fill_keys($this->environmentFileVariables(), false))
             ->options(['create_process_group' => true])
             ->start($command, fn ($type, $output) => $this->output->write($output));
 
