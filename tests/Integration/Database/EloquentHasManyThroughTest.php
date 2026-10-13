@@ -44,6 +44,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $table->id();
             $table->foreignId('user_id');
             $table->string('title')->unique();
+            $table->integer('views')->default(0);
             $table->timestamps();
         });
     }
@@ -380,6 +381,23 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('john-doe', $john->fresh()->slug);
         // $jane should not be updated, because it belongs to a different user altogether.
         $this->assertSame('jane-slug', $jane->fresh()->slug);
+    }
+
+    public function testIncrementOrCreateIncrementsTheRelatedModel()
+    {
+        $team = Team::create();
+
+        $jane = User::create(['name' => 'Jane']);
+        $john = User::create(['name' => 'John', 'team_id' => $team->id]);
+
+        $johnsArticle = Article::create(['user_id' => $john->id, 'title' => 'foo']);
+        $janesArticle = Article::create(['user_id' => $jane->id, 'title' => 'bar']);
+
+        $article = $team->articles()->incrementOrCreate(['title' => 'foo'], 'views');
+
+        $this->assertTrue($article->is($johnsArticle));
+        $this->assertSame(1, $johnsArticle->fresh()->views);
+        $this->assertSame(0, $janesArticle->fresh()->views);
     }
 
     public function testCanReplicateModelLoadedThroughHasManyThrough()
