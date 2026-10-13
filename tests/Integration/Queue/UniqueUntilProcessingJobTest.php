@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
+use RuntimeException;
 
 #[WithMigration]
 #[WithMigration('cache')]
@@ -64,6 +65,38 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
 
         $this->assertTrue(UniqueUntilProcessingJobThatReleasesOnce::$handled);
         $this->assertNull(DB::table('cache_locks')->first());
+    }
+
+    public function testShouldBeUniqueUntilProcessingReleasesLockWhenAttemptsAreExhaustedBeforeProcessing()
+    {
+        UniqueUntilProcessingJobThatExhaustsAttempts::dispatch();
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertDatabaseCount('jobs', 0);
+        $this->assertNull(DB::table('cache_locks')->first());
+
+        UniqueUntilProcessingJobThatExhaustsAttempts::dispatch();
+
+        $this->assertDatabaseCount('jobs', 1);
+    }
+
+    public function testFailedUniqueUntilProcessingJobDoesNotReleaseReplacementJobLock()
+    {
+        UniqueUntilProcessingJobThatDispatchesReplacementAndFails::dispatch();
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertDatabaseCount('jobs', 1);
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        UniqueUntilProcessingJobThatDispatchesReplacementAndFails::dispatch();
+
+        $this->assertDatabaseCount('jobs', 1);
     }
 }
 
@@ -125,5 +158,22 @@ class UniqueUntilProcessingJobThatReleasesOnce extends UniqueTestJobThatDoesNotR
     public function uniqueId()
     {
         return 200;
+    }
+}
+
+class UniqueUntilProcessingJobThatExhaustsAttempts extends UniqueUntilProcessingJobThatReleasesOnce
+{
+    public $tries = 1;
+}
+
+class UniqueUntilProcessingJobThatDispatchesReplacementAndFails extends UniqueTestJobThatDoesNotRelease
+{
+    public $tries = 1;
+
+    public function handle()
+    {
+        static::dispatch();
+
+        throw new RuntimeException('Failed after dispatching a replacement job.');
     }
 }

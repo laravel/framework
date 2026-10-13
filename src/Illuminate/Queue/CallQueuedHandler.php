@@ -249,10 +249,10 @@ class CallQueuedHandler
      * @param  mixed  $command
      * @return void
      */
-    protected function ensureUniqueJobLockIsReleased($command)
+    protected function ensureUniqueJobLockIsReleased($command, bool $onlyOwned = false)
     {
         if ($this->commandShouldBeUnique($command)) {
-            (new UniqueLock($this->container->make(Cache::class)))->release($command);
+            (new UniqueLock($this->container->make(Cache::class)))->release($command, $onlyOwned);
         }
     }
 
@@ -419,9 +419,9 @@ class CallQueuedHandler
             $command = $this->setJobInstanceIfNecessary($job, $command);
         }
 
-        if (! $this->commandShouldBeUniqueUntilProcessing($command)) {
-            $this->ensureUniqueJobLockIsReleased($command);
-        }
+        $this->ensureUniqueJobLockIsReleased(
+            $command, onlyOwned: $this->commandShouldBeUniqueUntilProcessing($command)
+        );
 
         if ($command instanceof \__PHP_Incomplete_Class) {
             return;
