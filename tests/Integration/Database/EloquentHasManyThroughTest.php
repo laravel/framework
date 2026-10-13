@@ -396,8 +396,8 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $article = $team->articles()->incrementOrCreate(['title' => 'foo'], 'views');
 
         $this->assertTrue($article->is($johnsArticle));
-        $this->assertSame(1, $johnsArticle->fresh()->views);
-        $this->assertSame(0, $janesArticle->fresh()->views);
+        $this->assertEquals(1, $johnsArticle->fresh()->views);
+        $this->assertEquals(0, $janesArticle->fresh()->views);
     }
 
     public function testCanReplicateModelLoadedThroughHasManyThrough()
