@@ -327,6 +327,8 @@ class UniqueJobTest extends QueueTestCase
 
         Event::listen(UniqueTestEvent::class, UniqueTestAfterCommitListener::class);
 
+        $size = Queue::size();
+
         try {
             DB::transaction(function () {
                 event(new UniqueTestEvent);
@@ -339,7 +341,7 @@ class UniqueJobTest extends QueueTestCase
 
         event(new UniqueTestEvent);
 
-        $this->assertSame(1, Queue::size());
+        $this->assertSame($size + 1, Queue::size());
     }
 
     protected function getLockKey($job)
