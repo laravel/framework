@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.69.3...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.70.0...12.x)
+
+## [v12.70.0](https://github.com/laravel/framework/compare/v12.69.3...v12.70.0) - 2026-10-13
+
+* [12.x] Address query issues by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61838
+* [12.x] Backport EncodedParameter from #61610 by [@mahdyaralipor](https://github.com/mahdyaralipor) in https://github.com/laravel/framework/pull/61871
+* [12.x] Generate different cache file based on configured `$echoFormat` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61822
 
 ## [v12.69.3](https://github.com/laravel/framework/compare/v12.69.2...v12.69.3) - 2026-09-29
 
