@@ -270,6 +270,15 @@ class BladeTest extends TestCase
         $this->artisan('view:cache');
     }
 
+    public function test_view_cache_command_compiles_namespaced_views_at_the_path_they_render_from()
+    {
+        View::addNamespace('relative', join_paths(__DIR__, 'Fixtures', 'templates', 'components', '..', 'components'));
+
+        $this->artisan('view:cache');
+
+        $this->assertFileExists(Blade::getCompiledPath(View::getFinder()->find('relative::panel')));
+    }
+
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)
