@@ -62,6 +62,10 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = $this->find($key);
 
+        if ($key instanceof Model) {
+            $key = $key->getKey();
+        }
+
         $key = $key instanceof Arrayable ? $key->toArray() : $key;
 
         if (is_array($key) && count($result) === count(array_unique($key))) {
