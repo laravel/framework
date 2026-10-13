@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Config\Repository;
@@ -335,12 +336,81 @@ class BroadcastManagerTest extends TestCase
         $this->assertNotSame($instance1, $instance2);
     }
 
-    public function testMercureRequiresAUrl()
+    public function testMercureWithoutAUrlResolvesOutsideFrankenPhp()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => ['driver' => 'mercure', 'secret' => str_repeat('s', 32)]]],
+        ]));
+
+        $broadcaster = $manager->connection('mercure');
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $broadcaster);
+
+        $this->expectException(BroadcastException::class);
         $this->expectExceptionMessage('"url"');
 
-        (new BroadcastManager($this->getApp([])))->mercure(['secret' => str_repeat('s', 32)]);
+        $broadcaster->broadcast(['chat'], 'message');
+    }
+
+    public function testAsyncMercureRequiresAUrl()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => ['driver' => 'mercure', 'secret' => str_repeat('s', 32), 'async' => true]]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"async"');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureEventsAreBroadcastNow()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure']),
+        ]);
+
+        Broadcast::queue(new TestEvent);
+
+        Bus::assertDispatched(BroadcastEvent::class);
+        Queue::assertNotPushed(BroadcastEvent::class);
+    }
+
+    public function testAsyncMercureEventsAreQueued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure', 'async' => true]),
+        ]);
+
+        Broadcast::queue(new TestEvent);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
+    }
+
+    public function testEventsBroadcastToMercureAndOtherConnectionsAreQueued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure']),
+            'broadcasting.connections.log' => ['driver' => 'log'],
+        ]);
+
+        Broadcast::queue(new TestEventOnMercureAndLog);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
     }
 
     public function testMercureRequiresASecret()
@@ -578,6 +648,14 @@ class TestForwardedEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         //
+    }
+}
+
+class TestEventOnMercureAndLog extends TestEvent
+{
+    public function broadcastConnections()
+    {
+        return ['mercure', 'log'];
     }
 }
 

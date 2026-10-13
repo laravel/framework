@@ -81,6 +81,7 @@ return [
             ],
             'cookie_name' => env('MERCURE_COOKIE_NAME'),
             'subscribe_expiration' => (int) env('MERCURE_SUBSCRIBE_EXPIRATION', 5),
+            'async' => (bool) env('MERCURE_ASYNC', false),
         ],
 
         'log' => [
