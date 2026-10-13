@@ -58,13 +58,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $jobs = [];
 
     /**
-     * All of the jobs that have been pushed with a delay.
-     *
-     * @var array
-     */
-    protected $delayed = [];
-
-    /**
      * All of the payloads that have been raw pushed.
      *
      * @var list<RawPushType>
@@ -478,7 +471,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function pendingSize($queue = null)
     {
-        return $this->size($queue);
+        return $this->pendingJobs($queue)->count();
     }
 
     /**
@@ -510,7 +503,9 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function totalSize()
     {
-        return $this->allPendingJobs()->count() + $this->allReservedJobs()->count();
+        return $this->allPendingJobs()->count()
+            + $this->allDelayedJobs()->count()
+            + $this->allReservedJobs()->count();
     }
 
     /**
@@ -583,7 +578,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function allPendingJobs(): Collection
     {
-        return $this->inspectJobs($this->jobs);
+        return $this->inspectJobs($this->jobs, delayed: false);
     }
 
     /**
@@ -593,19 +588,22 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function allDelayedJobs(): Collection
     {
-        return $this->inspectJobs($this->delayed);
+        return $this->inspectJobs($this->jobs, delayed: true);
     }
 
     /**
      * Map an array of jobs to a collection of inspected jobs.
      *
      * @param  array  $jobs
+     * @param  bool|null  $delayed
      * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
-    protected function inspectJobs(array $jobs): Collection
+    protected function inspectJobs(array $jobs, ?bool $delayed = null): Collection
     {
         return (new Collection($jobs))
             ->flatten(1)
+            ->when(! is_null($delayed), fn ($jobs) => $jobs->where('delayed', $delayed))
+            ->values()
             ->map(fn ($data) => new InspectedJob(
                 uuid: $data['uuid'] ?? null,
                 queue: $data['queue'],
@@ -636,10 +634,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function creationTimeOfOldestPendingJob($queue = null)
     {
-        return (new Collection($this->jobs))
-            ->flatten(1)
-            ->whereStrict('queue', enum_value($queue))
-            ->min('createdAt');
+        return $this->pendingJobs($queue)->min(fn ($job) => $job->createdAt->getTimestamp());
     }
 
     /**
@@ -651,6 +646,20 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
+    {
+        $this->pushJob($job, $data, $queue);
+    }
+
+    /**
+     * Push a new job onto the fake queue.
+     *
+     * @param  string|object  $job
+     * @param  mixed  $data
+     * @param  \UnitEnum|string|null  $queue
+     * @param  bool  $delayed
+     * @return void
+     */
+    protected function pushJob($job, $data = '', $queue = null, $delayed = false)
     {
         $queue = enum_value($queue);
 
@@ -668,6 +677,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
+                'delayed' => $delayed,
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
@@ -753,16 +763,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        if ($this->shouldFakeJob($job)) {
-            $this->delayed[is_object($job) ? get_class($job) : $job][] = [
-                'uuid' => (string) Str::uuid(),
-                'job' => $job,
-                'queue' => enum_value($queue),
-                'createdAt' => Carbon::now()->getTimestamp(),
-            ];
-        }
-
-        return $this->push($job, $data, $queue);
+        $this->pushJob($job, $data, $queue, delayed: true);
     }
 
     /**
