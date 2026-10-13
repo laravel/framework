@@ -274,11 +274,11 @@ class BladeTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function test_view_cache_command_compiles_namespaced_views_at_the_path_they_render_from()
     {
-        View::addNamespace('relative', join_paths(__DIR__, 'Fixtures', 'templates', 'components', '..', 'components'));
+        View::addNamespace('components', join_paths(__DIR__, 'Fixtures', 'templates', 'components', '..', 'components'));
 
         $this->artisan('view:cache');
 
-        $this->assertFileExists(Blade::getCompiledPath(View::getFinder()->find('relative::panel')));
+        $this->assertFileExists(Blade::getCompiledPath(View::getFinder()->find('components::panel')));
     }
 
     /** {@inheritdoc} */
