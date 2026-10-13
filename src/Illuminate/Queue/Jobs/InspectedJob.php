@@ -44,7 +44,7 @@ class InspectedJob
             name: $decoded['displayName'] ?? null,
             attempts: $attempts ?? $decoded['attempts'] ?? 0,
             payload: $decoded,
-            createdAt: isset($decoded['createdAt']) ? Carbon::createFromTimestamp($decoded['createdAt']) : null,
+            createdAt: isset($decoded['createdAt']) ? Carbon::createFromTimestamp($decoded['createdAt'], date_default_timezone_get()) : null,
         );
     }
 }

@@ -634,6 +634,23 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
 
+    public function testAllPendingJobsCreatedAtUsesDefaultTimezone()
+    {
+        $originalTimezone = date_default_timezone_get();
+
+        try {
+            date_default_timezone_set('Europe/Warsaw');
+
+            $this->fake->push($this->job, '', 'foo');
+
+            $createdAt = $this->fake->allPendingJobs()->first()->createdAt;
+
+            $this->assertSame('Europe/Warsaw', $createdAt->getTimezone()->getName());
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
+    }
+
     public function testTotalSize()
     {
         $this->fake->push($this->job, '', 'foo');
