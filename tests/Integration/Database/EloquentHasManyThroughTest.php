@@ -38,6 +38,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
+            $table->softDeletes();
         });
 
         Schema::create('articles', function (Blueprint $table) {
@@ -397,6 +398,21 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $newArticle->save();
     }
 
+    public function testRestoreWithSoftDeletingThroughParent()
+    {
+        $category = Category::create();
+        $subCategory = Category::create(['parent_id' => $category->id]);
+        $product = Product::create(['category_id' => $subCategory->id]);
+
+        $category->subProducts()->delete();
+
+        $this->assertTrue($product->fresh()->trashed());
+
+        $category->subProducts()->onlyTrashed()->restore();
+
+        $this->assertFalse($product->fresh()->trashed());
+    }
+
     public function testOne(): void
     {
         $team = Team::create();
@@ -523,6 +539,8 @@ class Category extends Model
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
     protected $guarded = [];
 }
