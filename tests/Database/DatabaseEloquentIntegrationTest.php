@@ -342,6 +342,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->save();
     }
 
+    public function testRefreshingConfiguredAttributesDoesNotEagerLoadRelationships()
+    {
+        $user = EloquentTestGeneratedUserWithPosts::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        DB::enableQueryLog();
+
+        $user->update(['first_name' => 'Abigail']);
+
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertCount(2, DB::getQueryLog());
+    }
+
     public function testConfiguredAttributesAreExcludedWhenReplicating()
     {
         $user = EloquentTestGeneratedUser::create([
@@ -3247,6 +3262,16 @@ class EloquentTestGeneratedUser extends Eloquent
         }
 
         return parent::fireModelEvent($event, $halt);
+    }
+}
+
+class EloquentTestGeneratedUserWithPosts extends EloquentTestGeneratedUser
+{
+    protected $with = ['posts'];
+
+    public function posts()
+    {
+        return $this->hasMany(EloquentTestPost::class, 'user_id');
     }
 }
 

@@ -1733,10 +1733,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $attributes = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
             ->useWritePdo()
-            ->firstOrFail($this->refreshes)
-            ->getAttributes();
+            ->toBase()
+            ->first($this->refreshes);
 
-        $this->setRawAttributes(array_replace($this->getAttributes(), $attributes));
+        if (is_null($attributes)) {
+            throw (new ModelNotFoundException)->setModel(static::class);
+        }
+
+        $this->setRawAttributes(array_replace($this->getAttributes(), (array) $attributes));
     }
 
     /**
