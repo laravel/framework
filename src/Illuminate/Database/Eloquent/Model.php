@@ -1143,6 +1143,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->forceFill($extra);
 
+        $extra = array_merge($extra, array_intersect_key($this->getAttributes(), $extra));
+
         if ($this->fireModelEvent('updating') === false) {
             return false;
         }
@@ -1318,6 +1320,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $this->forceFill($extra);
+
+        $extra = array_merge($extra, array_intersect_key($this->getAttributes(), $extra));
 
         if ($this->fireModelEvent('updating') === false) {
             return false;
