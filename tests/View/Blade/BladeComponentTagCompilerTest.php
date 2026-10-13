@@ -23,7 +23,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, []) \n".' @endslot',
+            "@slot('foo', null, []) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -35,7 +35,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, []) \n".' @endslot',
+            "@slot('foo', null, []) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -47,7 +47,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot(\$foo, null, []) \n".' @endslot',
+            "@slot(\$foo, null, []) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -59,7 +59,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot(\$foo->name, null, []) \n".' @endslot',
+            "@slot(\$foo->name, null, []) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -71,7 +71,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -83,7 +83,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -95,7 +95,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot',
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -107,7 +107,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot',
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }
@@ -119,7 +119,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-slot>');
 
         $this->assertSame(
-            "@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot',
+            "@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot##END-COMPONENT-CLASS##',
             str_replace("\r\n", "\n", trim($result))
         );
     }

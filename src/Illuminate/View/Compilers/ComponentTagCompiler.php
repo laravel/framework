@@ -585,7 +585,7 @@ class ComponentTagCompiler
             return " @slot({$name}, null, [".$this->attributesToString($attributes).']) ';
         }, $value);
 
-        return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);
+        return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot##END-COMPONENT-CLASS##', $value);
     }
 
     /**
