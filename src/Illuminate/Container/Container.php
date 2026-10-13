@@ -1076,6 +1076,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getContextualConcrete($abstract)
     {
+        if ($this->contextual === []) {
+            return null;
+        }
+
         if (! is_null($binding = $this->findInContextualBindings($abstract))) {
             return $binding;
         }
