@@ -106,6 +106,13 @@ class Connection implements ConnectionInterface
     protected $reconnector;
 
     /**
+     * Indicates if the connection is reconnecting after a lost connection.
+     *
+     * @var bool
+     */
+    protected $reconnecting = false;
+
+    /**
      * The query grammar implementation.
      *
      * @var \Illuminate\Database\Query\Grammars\Grammar
@@ -1032,8 +1039,15 @@ class Connection implements ConnectionInterface
      */
     protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
     {
-        if ($this->causedByLostConnection($e->getPrevious())) {
-            $this->reconnect();
+        // Queries run while reconnecting (e.g. from ConnectionEstablished listeners) must not reconnect again...
+        if (! $this->reconnecting && $this->causedByLostConnection($e->getPrevious())) {
+            $this->reconnecting = true;
+
+            try {
+                $this->reconnect();
+            } finally {
+                $this->reconnecting = false;
+            }
 
             return $this->runQueryCallback($query, $bindings, $callback);
         }

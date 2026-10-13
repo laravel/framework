@@ -511,6 +511,37 @@ class DatabaseConnectionTest extends TestCase
         $this->assertTrue($called);
     }
 
+    public function testQueriesRunWhileReconnectingDoNotReconnectAgain()
+    {
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->shouldReceive('execute')->andThrow(
+            new PDOException('SQLSTATE[08006] [7] connection to server at "127.0.0.1", port 5432 failed: Connection refused')
+        );
+
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->shouldReceive('prepare')->andReturn($statement);
+
+        $connection = new Connection($pdo);
+
+        $reconnects = 0;
+
+        $connection->setReconnector(function ($connection) use (&$reconnects) {
+            if (++$reconnects > 1) {
+                $this->fail('The connection reconnected while it was already reconnecting.');
+            }
+
+            $connection->statement('bar');
+        });
+
+        try {
+            $connection->statement('foo');
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertSame(1, $reconnects);
+        }
+    }
+
     public function testRunMethodRetriesOnFailure()
     {
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
