@@ -616,7 +616,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     : $data['job'],
                 attempts: 0,
                 payload: [],
-                createdAt: isset($data['createdAt']) ? Carbon::createFromTimestamp($data['createdAt']) : null,
+                createdAt: isset($data['createdAt']) ? Carbon::createFromTimestamp($data['createdAt'], date_default_timezone_get()) : null,
             ));
     }
 
