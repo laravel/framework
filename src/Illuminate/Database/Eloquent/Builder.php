@@ -10,6 +10,7 @@ use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Attributes\QualifiedScope;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough;
@@ -22,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use SortDirection;
@@ -1701,8 +1703,68 @@ class Builder implements BuilderContract
     protected function callNamedScope($scope, array $parameters = [])
     {
         return $this->callScope(function (...$parameters) use ($scope) {
-            return $this->model->callNamedScope($scope, $parameters);
+            if (! $this->isQualifiedScope($scope)) {
+                return $this->model->callNamedScope($scope, $parameters);
+            }
+
+            $originalWhereCount = count($this->query->wheres);
+
+            $result = $this->model->callNamedScope($scope, $parameters);
+
+            $this->query->wheres = array_merge(
+                array_slice($this->query->wheres, 0, $originalWhereCount),
+                $this->qualifyWhereColumns(array_slice($this->query->wheres, $originalWhereCount))
+            );
+
+            return $result;
         }, $parameters);
+    }
+
+    /**
+     * Determine if the given named scope should qualify the columns of its where clauses.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    protected function isQualifiedScope($scope)
+    {
+        return method_exists($this->model, $scope) &&
+            (new ReflectionMethod($this->model, $scope))->getAttributes(QualifiedScope::class, ReflectionAttribute::IS_INSTANCEOF) !== [];
+    }
+
+    /**
+     * Qualify the columns referenced by the given where clauses with the model's table.
+     *
+     * @param  array  $wheres
+     * @return array
+     */
+    protected function qualifyWhereColumns(array $wheres)
+    {
+        $qualify = fn ($column) => is_string($column) ? $this->qualifyColumn($column) : $column;
+
+        return array_map(function ($where) use ($qualify) {
+            if ($where['type'] === 'Nested') {
+                $where['query']->wheres = $this->qualifyWhereColumns($where['query']->wheres);
+
+                return $where;
+            }
+
+            foreach (['column', 'first', 'second'] as $key) {
+                if (isset($where[$key])) {
+                    $where[$key] = $qualify($where[$key]);
+                }
+            }
+
+            if (isset($where['columns'])) {
+                $where['columns'] = array_map($qualify, $where['columns']);
+            }
+
+            if ($where['type'] === 'betweenColumns') {
+                $where['values'] = array_map($qualify, $where['values']);
+            }
+
+            return $where;
+        }, $wheres);
     }
 
     /**

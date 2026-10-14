@@ -36,6 +36,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Stringable;
@@ -2064,7 +2065,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (method_exists(static::class, $method)) {
             $reflectionClass = new ReflectionMethod(static::class, $method);
 
-            return ! $reflectionClass->isPrivate() && $reflectionClass->getAttributes(LocalScope::class) !== [];
+            return ! $reflectionClass->isPrivate() && $reflectionClass->getAttributes(LocalScope::class, ReflectionAttribute::IS_INSTANCEOF) !== [];
         }
 
         return false;
