@@ -298,7 +298,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $user = TestUser::create(['name' => 'Taylor']);
 
         for ($i = 1; $i <= 3; $i++) {
-            TestPost::create(['title' => 'Title '.$i, 'user_id' => $user->id, 'created_at' => now()->addMinutes($i)]);
+            TestPost::create(['title' => 'Title '.$i, 'user_id' => $user->id, 'created_at' => now()->startOfSecond()->addMinutes($i)]);
         }
 
         $query = fn () => TestPost::query()
