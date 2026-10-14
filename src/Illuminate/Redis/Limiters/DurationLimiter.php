@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Sleep;
 
 class DurationLimiter
@@ -77,10 +78,10 @@ class DurationLimiter
      */
     public function block($timeout, $callback = null, $sleep = 750)
     {
-        $starting = time();
+        $starting = Carbon::now()->getTimestamp();
 
         while (! $this->acquire()) {
-            if (time() - $timeout >= $starting) {
+            if (Carbon::now()->getTimestamp() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 
