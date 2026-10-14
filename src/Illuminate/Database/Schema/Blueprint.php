@@ -866,7 +866,7 @@ class Blueprint
     }
 
     /**
-     * Create a new tiny text column on the table (up to 255 characters).
+     * Create a new tiny text column on the table (up to 255 bytes, ~63 utf8mb4 characters).
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -877,7 +877,7 @@ class Blueprint
     }
 
     /**
-     * Create a new text column on the table (up to 65,535 characters / ~64 KB).
+     * Create a new text column on the table (up to 65,535 bytes / ~64 KB, ~16,383 utf8mb4 characters).
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -888,7 +888,7 @@ class Blueprint
     }
 
     /**
-     * Create a new medium text column on the table (up to 16,777,215 characters / ~16 MB).
+     * Create a new medium text column on the table (up to 16,777,215 bytes / ~16 MB, ~4,194,303 utf8mb4 characters).
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -899,7 +899,7 @@ class Blueprint
     }
 
     /**
-     * Create a new long text column on the table (up to 4,294,967,295 characters / ~4 GB).
+     * Create a new long text column on the table (up to 4,294,967,295 bytes / ~4 GB, ~1,073,741,823 utf8mb4 characters).
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
