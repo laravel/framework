@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostResource;
@@ -494,6 +495,31 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonCount(2, 'included');
 
         $this->assertSame(2, Comment::count());
+    }
+
+    public function testItEagerLoadsNestedIncludesForAllRelatedModelsAtOnce()
+    {
+        $user = User::factory()->create();
+
+        $posts = Post::factory()->count(3)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        foreach ($posts as $post) {
+            Comment::factory()->create([
+                'post_id' => $post->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
+        }
+
+        DB::enableQueryLog();
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertOk()
+            ->assertJsonCount(6, 'included');
+
+        // One query for the user, one for the posts and one for the comments of all posts...
+        $this->assertCount(3, DB::getQueryLog());
     }
 
     public function testItResolvesEachRelationshipClosureOnceWhenIncludingNestedRelationships()
