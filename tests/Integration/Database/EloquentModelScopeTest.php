@@ -101,6 +101,29 @@ class EloquentModelScopeTest extends DatabaseTestCase
         );
     }
 
+    public function testQualifiedScopeLeavesAlreadyQualifiedColumns()
+    {
+        $this->assertSame(
+            TestScopePost::where('posts.published', true)->toSql(),
+            TestScopePost::publishedAlreadyQualified()->toSql()
+        );
+
+        $this->assertSame(
+            TestScopePost::from('posts as p')->where('p.published', true)->toSql(),
+            TestScopePost::from('posts as p')->publishedAlreadyQualified()->toSql()
+        );
+
+        $this->assertSame(
+            TestScopePost::where('posts.published', true)->toSql(),
+            TestScopePost::publishedQualifiedByBuilder()->toSql()
+        );
+
+        $this->assertSame(
+            TestScopePost::from('posts as p')->where('p.published', true)->toSql(),
+            TestScopePost::from('posts as p')->publishedQualifiedByBuilder()->toSql()
+        );
+    }
+
     public function testQualifiedScopeQualifiesWhereColumnsThroughRelation()
     {
         $user = TestScopeUser::create();
@@ -179,6 +202,18 @@ class TestScopePost extends Model
     private function publishedAsPrivate(Builder $builder)
     {
         $builder->where('published', true);
+    }
+
+    #[QualifiedScope]
+    protected function publishedAlreadyQualified(Builder $builder)
+    {
+        $builder->where('posts.published', true);
+    }
+
+    #[QualifiedScope]
+    protected function publishedQualifiedByBuilder(Builder $builder)
+    {
+        $builder->where($builder->qualifyColumn('published'), true);
     }
 
     #[QualifiedScope]
