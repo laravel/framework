@@ -3555,6 +3555,17 @@ return [
         'name' => 'queue:failed',
         'options' => [
             [
+                'name' => 'queue',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'Only list the failed jobs for the specified queue',
+            ],
+            [
                 'name' => 'json',
                 'shortcut' => null,
                 'negatable' => false,
