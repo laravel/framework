@@ -56,6 +56,11 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
             $table->dateTime('published_at');
             $table->foreignId('user_id');
         });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->foreignId('parent_id')->nullable();
+        });
     }
 
     /**
@@ -70,6 +75,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
+        $this->schema()->drop('comments');
     }
 
     public function testItGuessesRelationName()
@@ -294,6 +300,18 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         })->exists();
 
         $this->assertFalse($found);
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelation()
+    {
+        $first = HasOneOfManyTestComment::create();
+        $second = HasOneOfManyTestComment::create();
+        $first->replies()->create();
+        $second->replies()->create();
+
+        $this->assertEquals([$first->id, $second->id], HasOneOfManyTestComment::has('latestReply')->pluck('id')->all());
+        $this->assertEquals([1, 1, 0, 0], HasOneOfManyTestComment::withCount('latestReply')->pluck('latest_reply_count')->all());
+        $this->assertEquals([3, 4], HasOneOfManyTestComment::doesntHave('latestReply')->pluck('id')->all());
     }
 
     public function testHasCount()
@@ -699,4 +717,21 @@ class HasOneOfManyTestPrice extends Eloquent
     public $timestamps = false;
     protected $fillable = ['published_at'];
     protected $casts = ['published_at' => 'datetime'];
+}
+
+class HasOneOfManyTestComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function replies()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function latestReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->latestOfMany();
+    }
 }
