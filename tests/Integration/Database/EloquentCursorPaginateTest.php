@@ -292,6 +292,31 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertCount(5, $query->cursorPaginate()->items());
     }
+
+    public function testLatestAndOldestPaginationWithJoin()
+    {
+        $user = TestUser::create(['name' => 'Taylor']);
+
+        for ($i = 1; $i <= 3; $i++) {
+            TestPost::create(['title' => 'Title '.$i, 'user_id' => $user->id, 'created_at' => now()->addMinutes($i)]);
+        }
+
+        $query = fn () => TestPost::query()
+            ->join('test_users', 'test_users.id', '=', 'test_posts.user_id')
+            ->select('test_posts.*');
+
+        $firstPage = $query()->latest()->cursorPaginate(2);
+        $secondPage = $query()->latest()->cursorPaginate(2, ['*'], 'cursor', $firstPage->nextCursor());
+
+        $this->assertSame(['Title 3', 'Title 2'], $firstPage->pluck('title')->all());
+        $this->assertSame(['Title 1'], $secondPage->pluck('title')->all());
+
+        $firstPage = $query()->oldest()->cursorPaginate(2);
+        $secondPage = $query()->oldest()->cursorPaginate(2, ['*'], 'cursor', $firstPage->nextCursor());
+
+        $this->assertSame(['Title 1', 'Title 2'], $firstPage->pluck('title')->all());
+        $this->assertSame(['Title 3'], $secondPage->pluck('title')->all());
+    }
 }
 
 class TestPost extends Model
