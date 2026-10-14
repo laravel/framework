@@ -15,6 +15,7 @@ use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Traits\Conditionable;
 use LogicException;
+use Throwable;
 
 class PendingDispatch
 {
@@ -300,14 +301,22 @@ class PendingDispatch
 
         $this->addUniqueJobInformationToContext($this->job);
 
-        $this->acquireDebounceLock();
+        try {
+            $this->acquireDebounceLock();
 
-        if ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
-        } else {
-            app(Dispatcher::class)->dispatch($this->job);
+            if ($this->afterResponse) {
+                app(Dispatcher::class)->dispatchAfterResponse($this->job);
+            } else {
+                app(Dispatcher::class)->dispatch($this->job);
+            }
+        } catch (Throwable $e) {
+            if ($this->job instanceof ShouldBeUnique) {
+                (new UniqueLock(Container::getInstance()->make(Cache::class)))->release($this->job);
+            }
+
+            throw $e;
+        } finally {
+            $this->removeUniqueJobInformationFromContext($this->job);
         }
-
-        $this->removeUniqueJobInformationFromContext($this->job);
     }
 }
