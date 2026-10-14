@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Config\Repository;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Attributes\UniqueFor;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -132,6 +134,33 @@ class BroadcastManagerTest extends TestCase
 
         $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueWithIdMethod::class).':unique-id-method';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testUniqueEventsUseInheritedUniqueForAttribute()
+    {
+        Queue::fake();
+
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+
+        Queue::assertPushed(UniqueBroadcastEvent::class, 1);
+
+        $this->travel(60)->seconds();
+
+        Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
+
+        Queue::assertPushed(UniqueBroadcastEvent::class, 2);
+    }
+
+    public function testUniqueForAttributeDoesNotMakeEventsUniqueWithoutTheContract()
+    {
+        Queue::fake();
+
+        Broadcast::queue(new TestEventWithUniqueForAttribute);
+        Broadcast::queue(new TestEventWithUniqueForAttribute);
+
+        Queue::assertPushed(BroadcastEvent::class, 2);
+        Queue::assertNotPushed(UniqueBroadcastEvent::class);
     }
 
     public function testThrowExceptionWhenUnknownStoreIsUsed()
@@ -307,12 +336,81 @@ class BroadcastManagerTest extends TestCase
         $this->assertNotSame($instance1, $instance2);
     }
 
-    public function testMercureRequiresAUrl()
+    public function testMercureWithoutAUrlResolvesOutsideFrankenPhp()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => ['driver' => 'mercure', 'secret' => str_repeat('s', 32)]]],
+        ]));
+
+        $broadcaster = $manager->connection('mercure');
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $broadcaster);
+
+        $this->expectException(BroadcastException::class);
         $this->expectExceptionMessage('"url"');
 
-        (new BroadcastManager($this->getApp([])))->mercure(['secret' => str_repeat('s', 32)]);
+        $broadcaster->broadcast(['chat'], 'message');
+    }
+
+    public function testAsyncMercureRequiresAUrl()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => ['driver' => 'mercure', 'secret' => str_repeat('s', 32), 'async' => true]]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"async"');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureEventsAreBroadcastNow()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure']),
+        ]);
+
+        Broadcast::queue(new TestEvent);
+
+        Bus::assertDispatched(BroadcastEvent::class);
+        Queue::assertNotPushed(BroadcastEvent::class);
+    }
+
+    public function testAsyncMercureEventsAreQueued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure', 'async' => true]),
+        ]);
+
+        Broadcast::queue(new TestEvent);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
+    }
+
+    public function testEventsBroadcastToMercureAndOtherConnectionsAreQueued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        config([
+            'broadcasting.default' => 'mercure',
+            'broadcasting.connections.mercure' => $this->mercureConfig(['driver' => 'mercure']),
+            'broadcasting.connections.log' => ['driver' => 'log'],
+        ]);
+
+        Broadcast::queue(new TestEventOnMercureAndLog);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
     }
 
     public function testMercureRequiresASecret()
@@ -553,6 +651,14 @@ class TestForwardedEvent implements ShouldBroadcast
     }
 }
 
+class TestEventOnMercureAndLog extends TestEvent
+{
+    public function broadcastConnections()
+    {
+        return ['mercure', 'log'];
+    }
+}
+
 class TestEventNow implements ShouldBroadcastNow
 {
     /**
@@ -587,6 +693,15 @@ class TestEventUniqueWithIdProperty extends TestEventUnique
 class TestEventUniqueWithIdMethod extends TestEventUnique
 {
     public string $uniqueId = 'unique-id-method';
+}
+
+#[UniqueFor(60)]
+class TestEventWithUniqueForAttribute extends TestEvent
+{
+}
+
+class TestEventUniqueWithInheritedUniqueFor extends TestEventWithUniqueForAttribute implements ShouldBeUnique
+{
 }
 
 class TestEventRescue implements ShouldBroadcast, ShouldRescue

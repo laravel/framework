@@ -191,7 +191,8 @@ class BroadcastManager implements FactoryContract
         if ($event instanceof ShouldBroadcastNow ||
             (is_object($event) &&
              method_exists($event, 'shouldBroadcastNow') &&
-             $event->shouldBroadcastNow())) {
+             $event->shouldBroadcastNow()) ||
+            $this->broadcastsToSynchronousMercureConnections($event)) {
             $dispatch = fn () => $this->app->make(BusDispatcherContract::class)
                 ->dispatchNow(new BroadcastEvent(clone $event));
 
