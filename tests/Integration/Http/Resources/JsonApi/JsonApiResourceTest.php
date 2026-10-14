@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostResource;
@@ -800,6 +803,36 @@ class JsonApiResourceTest extends TestCase
                 ],
             ])
             ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
+    public function testAttributesCanBeConditionallyMerged()
+    {
+        Route::get('things-with-merged-attributes/{id}', function ($id) {
+            return new class(['id' => (int) $id, 'name' => 'test', 'secret' => 'hidden', 'notes' => 'internal']) extends ArrayBackedJsonApiResource
+            {
+                public function toAttributes(Request $request)
+                {
+                    return [
+                        'name' => $this->resource['name'],
+                        $this->mergeWhen(false, ['secret' => $this->resource['secret']]),
+                        $this->mergeWhen(true, ['notes' => $this->resource['notes']]),
+                    ];
+                }
+            };
+        });
+
+        $this->getJson('/things-with-merged-attributes/99')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => '99',
+                    'type' => 'things',
+                    'attributes' => [
+                        'name' => 'test',
+                        'notes' => 'internal',
+                    ],
+                ],
+            ]);
     }
 
     public function testSameModelWithTheSameResourceTypeIsDeduplicated()
