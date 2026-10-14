@@ -571,6 +571,10 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
+        if ($this->excludeAttributes === []) {
+            return false;
+        }
+
         $prefix = '';
 
         foreach (explode('.', $attribute) as $segment) {
