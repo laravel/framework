@@ -181,15 +181,21 @@ class BlueprintState
                 }
 
                 if ($this->primaryKey) {
-                    $this->primaryKey->columns = str_replace($command->from, $command->to, $this->primaryKey->columns);
+                    $this->primaryKey->columns = array_map(
+                        fn ($column) => $column === $command->from ? $command->to : $column, $this->primaryKey->columns
+                    );
                 }
 
                 foreach ($this->indexes as $index) {
-                    $index->columns = str_replace($command->from, $command->to, $index->columns);
+                    $index->columns = array_map(
+                        fn ($column) => $column === $command->from ? $command->to : $column, $index->columns
+                    );
                 }
 
                 foreach ($this->foreignKeys as $foreignKey) {
-                    $foreignKey->columns = str_replace($command->from, $command->to, $foreignKey->columns);
+                    $foreignKey->columns = array_map(
+                        fn ($column) => $column === $command->from ? $command->to : $column, $foreignKey->columns
+                    );
                 }
 
                 break;

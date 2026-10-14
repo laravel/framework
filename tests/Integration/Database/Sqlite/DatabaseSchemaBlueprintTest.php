@@ -64,6 +64,48 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
     }
 
+    public function testRenamingColumnDoesNotAffectIndexesOnColumnsContainingItsName()
+    {
+        $schema = DB::connection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->string('name');
+            $table->string('username');
+            $table->string('age');
+            $table->unique(['name', 'username']);
+        });
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'full_name');
+            $table->integer('age')->change();
+        });
+
+        $this->assertTrue($schema->hasColumns('users', ['full_name', 'username']));
+        $this->assertTrue($schema->hasIndex('users', ['full_name', 'username'], 'unique'));
+    }
+
+    public function testRenamingColumnDoesNotAffectForeignKeysOnColumnsContainingItsName()
+    {
+        $schema = DB::connection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $schema->create('posts', function (Blueprint $table) {
+            $table->integer('id');
+            $table->foreignId('user_id')->constrained();
+            $table->string('title');
+        });
+
+        $schema->table('posts', function (Blueprint $table) {
+            $table->renameColumn('id', 'post_id');
+            $table->text('title')->change();
+        });
+
+        $this->assertSame(['user_id'], $schema->getForeignKeys('posts')[0]['columns']);
+    }
+
     public function testNativeColumnModifyingOnPostgreSql()
     {
         $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
