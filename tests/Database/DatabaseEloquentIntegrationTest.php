@@ -1781,6 +1781,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($friend->id, $results->first()->pivot->friend_id);
     }
 
+    public function testCursorDoesNotCreateExtraModelInstancesForEachRecord()
+    {
+        EloquentTestUser::insert([
+            ['email' => 'taylorotwell@gmail.com'],
+            ['email' => 'abigailotwell@gmail.com'],
+            ['email' => 'foo@gmail.com'],
+        ]);
+
+        $query = EloquentTestUserWithInstanceCount::query();
+
+        EloquentTestUserWithInstanceCount::$instances = 0;
+
+        $models = $query->cursor()->all();
+
+        $this->assertCount(3, $models);
+        $this->assertSame(4, EloquentTestUserWithInstanceCount::$instances);
+    }
+
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverCursorRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -3037,6 +3055,18 @@ class EloquentTestUser extends Eloquent
     public function eloquentTestAchievements()
     {
         return $this->belongsToMany(EloquentTestAchievement::class);
+    }
+}
+
+class EloquentTestUserWithInstanceCount extends EloquentTestUser
+{
+    public static $instances = 0;
+
+    public function __construct(array $attributes = [])
+    {
+        static::$instances++;
+
+        parent::__construct($attributes);
     }
 }
 
