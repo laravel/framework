@@ -79,7 +79,7 @@ class EloquentModelScopeTest extends DatabaseTestCase
             ->where(new Expression('lower(title)'), 'foo')
             ->whereExists(fn ($query) => $query->from('users')->where('id', 1));
 
-        $query = TestScopePost::filtered();
+        $query = TestScopePost::query()->filtered();
 
         $this->assertSame($expected->toSql(), $query->toSql());
         $this->assertSame($expected->getBindings(), $query->getBindings());
@@ -88,8 +88,8 @@ class EloquentModelScopeTest extends DatabaseTestCase
     public function testScopeDoesNotQualifyWhereColumns()
     {
         $this->assertSame(
-            TestScopePost::where('published', true)->toSql(),
-            TestScopePost::publishedWithoutQualifying()->toSql()
+            TestScopePost::query()->where('published', true)->toSql(),
+            TestScopePost::query()->publishedWithoutQualifying()->toSql()
         );
     }
 
@@ -104,8 +104,8 @@ class EloquentModelScopeTest extends DatabaseTestCase
     public function testQualifiedScopeLeavesAlreadyQualifiedColumns()
     {
         $this->assertSame(
-            TestScopePost::where('posts.published', true)->toSql(),
-            TestScopePost::publishedAlreadyQualified()->toSql()
+            TestScopePost::query()->where('posts.published', true)->toSql(),
+            TestScopePost::query()->publishedAlreadyQualified()->toSql()
         );
 
         $this->assertSame(
@@ -114,8 +114,8 @@ class EloquentModelScopeTest extends DatabaseTestCase
         );
 
         $this->assertSame(
-            TestScopePost::where('posts.published', true)->toSql(),
-            TestScopePost::publishedQualifiedByBuilder()->toSql()
+            TestScopePost::query()->where('posts.published', true)->toSql(),
+            TestScopePost::query()->publishedQualifiedByBuilder()->toSql()
         );
 
         $this->assertSame(
