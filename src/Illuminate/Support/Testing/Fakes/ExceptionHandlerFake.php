@@ -192,6 +192,17 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
+     * Determine if the exception should stop job retries.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldStopRetries(Throwable $e)
+    {
+        return method_exists($this->handler, 'shouldStopRetries') && $this->handler->shouldStopRetries($e);
+    }
+
+    /**
      * Determine if the handler is running without exception handling.
      *
      * @return bool

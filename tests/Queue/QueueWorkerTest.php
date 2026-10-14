@@ -299,6 +299,25 @@ class QueueWorkerTest extends TestCase
         $this->events->assertNotDispatched(JobReleasedAfterException::class);
     }
 
+    public function testJobIsFailedIfFakedExceptionHandlerSaysItShouldntRetry()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        $this->exceptionHandler->handler()->dontRetry(RuntimeException::class);
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertEquals($e, $job->failedWith);
+        $this->events->assertNotDispatched(JobReleasedAfterException::class);
+    }
+
     public function testExceptionIsNotReportedIfReportJobExceptionsIsDisabled()
     {
         $e = new RuntimeException;
