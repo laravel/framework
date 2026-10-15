@@ -887,9 +887,9 @@ class Rule
      *
      * @return \Illuminate\Validation\Rules\Numeric
      */
-    public static function numeric()
+    public static function numeric(bool $strict = false)
     {
-        return new Numeric;
+        return new Numeric(strict: $strict);
     }
 
     /**
