@@ -314,6 +314,14 @@ class Image implements Responsable, Stringable
     }
 
     /**
+     * Convert the image to JPEG XL format.
+     */
+    public function toJxl(): static
+    {
+        return $this->toFormat('jxl');
+    }
+
+    /**
      * Convert the image to BMP format.
      */
     public function toBmp(): static
@@ -328,7 +336,7 @@ class Image implements Responsable, Stringable
      */
     public function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'bmp'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'jxl', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
@@ -458,6 +466,7 @@ class Image implements Responsable, Stringable
             'image/webp' => 'webp',
             'image/avif', 'image/x-avif' => 'avif',
             'image/heic', 'image/x-heic', 'image/heif' => 'heic',
+            'image/jxl', 'image/x-jxl' => 'jxl',
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',

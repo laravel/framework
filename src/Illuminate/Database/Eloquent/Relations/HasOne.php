@@ -50,11 +50,13 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
     /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
+        $query = parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+
         if ($this->isOneOfMany()) {
             $this->mergeOneOfManyJoinsTo($query);
         }
 
-        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+        return $query;
     }
 
     /**
@@ -88,7 +90,7 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
      */
     public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)
     {
-        $join->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+        $join->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->getForeignKeyName()));
     }
 
     /**

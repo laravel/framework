@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -273,6 +274,23 @@ class FilesystemManagerTest extends TestCase
         ]);
 
         $this->assertDirectoryExists($root);
+    }
+
+    #[TestWith(['sftp'])]
+    #[TestWith(['ftp'])]
+    public function testCanBuildRemoteDisksThatDetectMimeTypesUsingThePath(string $driver)
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $disk = $filesystem->build([
+            'driver' => $driver,
+            'host' => 'localhost',
+            'username' => 'laravel',
+            'password' => 'secret',
+            'detect_mime_type_using_path' => true,
+        ]);
+
+        $this->assertSame('text/csv', $disk->mimeType('export.csv'));
     }
 
     public function testCanBuildReadOnlyDisks()

@@ -298,7 +298,7 @@ abstract class Component
      * Create an invokable, toStringable variable for the given component method.
      *
      * @param  string  $method
-     * @return \Illuminate\View\InvokableComponentVariable
+     * @return \Illuminate\View\InvokableComponentVariable<mixed>
      */
     protected function createInvokableVariable(string $method)
     {

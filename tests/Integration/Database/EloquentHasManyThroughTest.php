@@ -38,12 +38,14 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
+            $table->softDeletes();
         });
 
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
             $table->string('title')->unique();
+            $table->integer('views')->default(0);
             $table->timestamps();
         });
     }
@@ -382,6 +384,23 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('jane-slug', $jane->fresh()->slug);
     }
 
+    public function testIncrementOrCreateIncrementsTheRelatedModel()
+    {
+        $team = Team::create();
+
+        $jane = User::create(['name' => 'Jane']);
+        $john = User::create(['name' => 'John', 'team_id' => $team->id]);
+
+        $johnsArticle = Article::create(['user_id' => $john->id, 'title' => 'foo']);
+        $janesArticle = Article::create(['user_id' => $jane->id, 'title' => 'bar']);
+
+        $article = $team->articles()->incrementOrCreate(['title' => 'foo'], 'views');
+
+        $this->assertTrue($article->is($johnsArticle));
+        $this->assertEquals(1, $johnsArticle->fresh()->views);
+        $this->assertEquals(0, $janesArticle->fresh()->views);
+    }
+
     public function testCanReplicateModelLoadedThroughHasManyThrough()
     {
         $team = Team::create();
@@ -395,6 +414,21 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $newArticle = $article->replicate();
         $newArticle->title .= ' v2';
         $newArticle->save();
+    }
+
+    public function testRestoreWithSoftDeletingThroughParent()
+    {
+        $category = Category::create();
+        $subCategory = Category::create(['parent_id' => $category->id]);
+        $product = Product::create(['category_id' => $subCategory->id]);
+
+        $category->subProducts()->delete();
+
+        $this->assertTrue($product->fresh()->trashed());
+
+        $category->subProducts()->onlyTrashed()->restore();
+
+        $this->assertFalse($product->fresh()->trashed());
     }
 
     public function testOne(): void
@@ -523,6 +557,8 @@ class Category extends Model
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
     protected $guarded = [];
 }

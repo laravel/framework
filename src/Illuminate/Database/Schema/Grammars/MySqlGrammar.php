@@ -183,6 +183,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileForeignKeys($schema, $table)
     {
+        $schema = $schema ? $this->quoteString($schema) : 'schema()';
+        $table = $this->quoteString($table);
+
         return sprintf(
             'select kc.constraint_name as `name`, '
             .'group_concat(kc.column_name order by kc.ordinal_position) as `columns`, '
@@ -194,9 +197,12 @@ class MySqlGrammar extends Grammar
             .'from information_schema.key_column_usage kc join information_schema.referential_constraints rc '
             .'on kc.constraint_schema = rc.constraint_schema and kc.constraint_name = rc.constraint_name '
             .'where kc.table_schema = %s and kc.table_name = %s and kc.referenced_table_name is not null '
+            .'and rc.constraint_schema = %s and rc.table_name = %s '
             .'group by kc.constraint_name, kc.referenced_table_schema, kc.referenced_table_name, rc.update_rule, rc.delete_rule',
-            $schema ? $this->quoteString($schema) : 'schema()',
-            $this->quoteString($table)
+            $schema,
+            $table,
+            $schema,
+            $table
         );
     }
 

@@ -46,7 +46,8 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertDispatched(ScheduledTaskFailed::class, function ($event) use ($task) {
             return $event->task === $task &&
-                   $event->exception->getMessage() === 'Scheduled command [exit 1] failed with exit code [1].';
+                   $event->exception->getMessage() === 'Scheduled command [exit 1] failed with exit code [1].' &&
+                   is_float($event->runtime);
         });
     }
 
