@@ -1009,6 +1009,50 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
+    public function testDisconnectIgnoresErrorsRaisedWhileFreeingPdoConnections()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $connection->setReadPdo(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
+
+        set_error_handler(static fn ($level, $message) => throw new ErrorException($message));
+
+        try {
+            $connection->disconnect();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertNull($connection->getRawReadPdo());
+    }
+
+    public function testLostConnectionIsRetriedWhenFreeingThePdoConnectionsErrors()
+    {
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $statement->expects('execute')->andReturn(true);
+
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->expects('prepare')->times(2)->andReturn($statement);
+
+        $connection = new Connection($pdo);
+
+        $connection->setReadPdo(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
+
+        $connection->setReconnector(function ($connection) use ($pdo) {
+            $connection->disconnect();
+            $connection->setPdo($pdo);
+        });
+
+        set_error_handler(static fn ($level, $message) => throw new ErrorException($message));
+
+        try {
+            $this->assertTrue($connection->statement('foo'));
+        } finally {
+            restore_error_handler();
+        }
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
@@ -1025,6 +1069,14 @@ class DatabaseConnectionTestMockPDO extends PDO
     public function __construct()
     {
         //
+    }
+}
+
+class DatabaseConnectionTestPdoThatErrorsWhenFreed
+{
+    public function __destruct()
+    {
+        trigger_error('SSL: Broken pipe', E_USER_WARNING);
     }
 }
 
