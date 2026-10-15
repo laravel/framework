@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use DateTime;
 use ErrorException;
 use Exception;
@@ -1011,21 +1012,16 @@ class DatabaseConnectionTest extends TestCase
 
     public function testDisconnectIgnoresErrorsRaisedWhileFreeingPdoConnections()
     {
-        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+        $connection = new Connection(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
 
         $connection->setReadPdo(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
+        $connection->setDirectPdo(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
 
-        set_error_handler(static fn ($level, $message) => error_reporting() & $level
-            ? throw new ErrorException($message)
-            : true);
+        $this->withErrorsThrownAsExceptions(fn () => $connection->disconnect());
 
-        try {
-            $connection->disconnect();
-        } finally {
-            restore_error_handler();
-        }
-
+        $this->assertNull($connection->getRawPdo());
         $this->assertNull($connection->getRawReadPdo());
+        $this->assertNull($connection->getRawDirectPdo());
     }
 
     public function testLostConnectionIsRetriedWhenFreeingThePdoConnectionsErrors()
@@ -1046,14 +1042,24 @@ class DatabaseConnectionTest extends TestCase
             $connection->setPdo($pdo);
         });
 
-        set_error_handler(static fn ($level, $message) => error_reporting() & $level
-            ? throw new ErrorException($message)
+        $this->withErrorsThrownAsExceptions(function () use ($connection) {
+            $this->assertTrue($connection->statement('foo'));
+        });
+    }
+
+    protected function withErrorsThrownAsExceptions(Closure $callback)
+    {
+        $level = error_reporting(E_ALL);
+
+        set_error_handler(static fn ($type, $message, $file = '', $line = 0) => error_reporting() & $type
+            ? throw new ErrorException($message, 0, $type, $file, $line)
             : true);
 
         try {
-            $this->assertTrue($connection->statement('foo'));
+            $callback();
         } finally {
             restore_error_handler();
+            error_reporting($level);
         }
     }
 
