@@ -679,7 +679,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = $this->related->where($this->qualifyRelatedAttributes($attributes))->first())) {
             $instance = $this->related->newInstance(array_merge($attributes, value($values)));
         }
 
@@ -697,8 +697,8 @@ class BelongsToMany extends Relation
      */
     public function firstOrCreate(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = (clone $this)->where($attributes)->first())) {
-            if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = (clone $this)->where($this->qualifyRelatedAttributes($attributes))->first())) {
+            if (is_null($instance = $this->related->where($this->qualifyRelatedAttributes($attributes))->first())) {
                 $instance = $this->createOrFirst($attributes, $values, $joining, $touch);
             } else {
                 try {
@@ -732,11 +732,11 @@ class BelongsToMany extends Relation
         }
 
         try {
-            return tap($this->related->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
+            return tap($this->related->where($this->qualifyRelatedAttributes($attributes))->first() ?? throw $e, function ($instance) use ($joining, $touch) {
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
         } catch (UniqueConstraintViolationException $e) {
-            return (clone $this)->useWritePdo()->where($attributes)->first() ?? throw $e;
+            return (clone $this)->useWritePdo()->where($this->qualifyRelatedAttributes($attributes))->first() ?? throw $e;
         }
     }
 
@@ -758,6 +758,19 @@ class BelongsToMany extends Relation
                 $instance->save(['touch' => false]);
             }
         });
+    }
+
+    /**
+     * Qualify the given attribute keys with the related model's table.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function qualifyRelatedAttributes(array $attributes)
+    {
+        return (new BaseCollection($attributes))
+            ->mapWithKeys(fn ($value, $key) => [$this->related->qualifyColumn($key) => $value])
+            ->all();
     }
 
     /**

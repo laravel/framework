@@ -647,6 +647,26 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotNull($new->id);
     }
 
+    public function testFirstOrCreateWithColumnThatAlsoExistsOnPivotTable()
+    {
+        $user = User::create(['name' => 'Taylor']);
+        $post = Post::create(['title' => 'Laravel']);
+        $user->posts()->attach($post);
+
+        $this->assertTrue($post->is($user->posts()->firstOrNew(['id' => $post->id])));
+        $this->assertTrue($post->is($user->posts()->firstOrCreate(['id' => $post->id])));
+
+        $updated = $user->posts()->updateOrCreate(['id' => $post->id], ['title' => 'Laravel Framework']);
+
+        $this->assertTrue($post->is($updated));
+        $this->assertSame('Laravel Framework', $post->fresh()->title);
+
+        $created = $user->posts()->firstOrCreate(['title' => 'Eloquent']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertSame('Eloquent', $created->fresh()->title);
+    }
+
     public function testFirstOrCreateUnrelatedExisting()
     {
         $post = Post::create(['title' => Str::random()]);
