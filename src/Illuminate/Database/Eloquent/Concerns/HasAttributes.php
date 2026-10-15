@@ -1136,6 +1136,8 @@ trait HasAttributes
 
         $this->attributes[$key] = $value;
 
+        unset($this->attributeCastCache[$key]);
+
         return $this;
     }
 

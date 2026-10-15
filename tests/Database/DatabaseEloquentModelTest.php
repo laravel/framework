@@ -1781,6 +1781,25 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['settings' => '{"theme":"dark"}'], $model->getDirty());
     }
 
+    public function testSettingAttributesRefreshesObjectsCachedByGetOnlyAttributeAccessors()
+    {
+        $model = new class extends Model
+        {
+            protected function settings(): Attribute
+            {
+                return Attribute::get(fn ($value) => new Fluent(json_decode($value, true)));
+            }
+        };
+
+        $model->setRawAttributes(['settings' => '{"theme":"light"}'], true);
+
+        $this->assertSame('light', $model->settings->theme);
+
+        $model->settings = '{"theme":"dark"}';
+
+        $this->assertSame('dark', $model->settings->theme);
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
