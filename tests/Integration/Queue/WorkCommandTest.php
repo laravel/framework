@@ -333,6 +333,17 @@ class WorkCommandTest extends QueueTestCase
 
         $this->assertTrue(FirstJob::$ran);
     }
+
+    public function testReleasedAfterExceptionStatusIsWrittenAsJsonWithException()
+    {
+        Queue::push(new JobWillFail);
+
+        $this->artisan('queue:work', [
+            '--once' => true,
+            '--tries' => 2,
+            '--json' => true,
+        ])->expectsOutputToContain('"status":"released_after_exception","result":"released","attempts":1,"exception":"RuntimeException"');
+    }
 }
 
 class FirstJob implements ShouldQueue

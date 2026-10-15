@@ -197,7 +197,7 @@ class WorkCommand extends Command
         });
 
         $this->laravel['events']->listen(JobReleasedAfterException::class, function ($event) {
-            $this->writeOutput($event->job, 'released_after_exception');
+            $this->writeOutput($event->job, 'released_after_exception', $event->exception);
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
