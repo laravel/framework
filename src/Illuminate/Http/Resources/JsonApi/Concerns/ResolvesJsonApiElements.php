@@ -156,7 +156,7 @@ trait ResolvesJsonApiElements
 
         $sparseFieldset = $usesSparseFieldset ? $request->sparseFields($resourceType) : [];
 
-        $data = (new Collection($data))
+        $data = (new Collection($this->filter($data)))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->when($usesSparseFieldset, fn ($attributes) => $attributes->only($sparseFieldset))
             ->transform(fn ($value) => value($value, $request))
