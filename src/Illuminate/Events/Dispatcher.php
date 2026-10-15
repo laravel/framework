@@ -39,6 +39,7 @@ use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
 use LogicException;
 use ReflectionClass;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -671,39 +672,47 @@ class Dispatcher implements DispatcherContract
             return;
         }
 
-        $connectionName = method_exists($listener, 'viaConnection')
-            ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
-            : $this->getAttributeValue($listener, Connection::class, 'connection');
+        try {
+            $connectionName = method_exists($listener, 'viaConnection')
+                ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
+                : $this->getAttributeValue($listener, Connection::class, 'connection');
 
-        $connection = $this->resolveQueue()->connection(
-            $connectionName ?? $this->resolveConnectionFromQueueRoute($listener) ?? null
-        );
-
-        $queue = method_exists($listener, 'viaQueue')
-            ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
-            : $this->getAttributeValue($listener, QueueAttribute::class, 'queue');
-
-        $delay = method_exists($listener, 'withDelay')
-            ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
-            : $this->getAttributeValue($listener, Delay::class, 'delay');
-
-        if (is_null($queue)) {
-            $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
-        }
-
-        if (! is_null($debounceFor)) {
-            $debounce = (new DebounceLock($this->container->make(Cache::class)))->acquire(
-                $job, $debounceFor, $this->getAttributeInstance($listener, DebounceFor::class)?->maxWait
+            $connection = $this->resolveQueue()->connection(
+                $connectionName ?? $this->resolveConnectionFromQueueRoute($listener) ?? null
             );
 
-            $job->debounceOwner = $debounce['owner'];
+            $queue = method_exists($listener, 'viaQueue')
+                ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
+                : $this->getAttributeValue($listener, QueueAttribute::class, 'queue');
 
-            $delay ??= $debounce['maxWaitExceeded'] ? 0 : $debounceFor;
+            $delay = method_exists($listener, 'withDelay')
+                ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
+                : $this->getAttributeValue($listener, Delay::class, 'delay');
+
+            if (is_null($queue)) {
+                $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
+            }
+
+            if (! is_null($debounceFor)) {
+                $debounce = (new DebounceLock($this->container->make(Cache::class)))->acquire(
+                    $job, $debounceFor, $this->getAttributeInstance($listener, DebounceFor::class)?->maxWait
+                );
+
+                $job->debounceOwner = $debounce['owner'];
+
+                $delay ??= $debounce['maxWaitExceeded'] ? 0 : $debounceFor;
+            }
+
+            is_null($delay)
+                ? $connection->pushOn(enum_value($queue), $job)
+                : $connection->laterOn(enum_value($queue), $delay, $job);
+        } catch (Throwable $e) {
+            if ($job->shouldBeUnique) {
+                (new UniqueLock($this->container->make(Cache::class)))->release($job);
+            }
+
+            throw $e;
         }
-
-        is_null($delay)
-            ? $connection->pushOn(enum_value($queue), $job)
-            : $connection->laterOn(enum_value($queue), $delay, $job);
     }
 
     /**
