@@ -117,8 +117,6 @@ class StatusCommand extends BaseCommand
             ->map(function ($migration) use ($ran, $batches, &$hasPending) {
                 $migrationName = $this->migrator->getMigrationName($migration);
 
-                // Once we hit a migration that will actually run, any later "shouldRun" checks
-                // might depend on it, so we'll just mark everything after it as pending.
                 if (in_array($migrationName, $ran)) {
                     $status = '['.$batches[$migrationName].'] <fg=green;options=bold>Ran</>';
                 } elseif (! $hasPending && $this->migrator->shouldSkip($migration)) {
