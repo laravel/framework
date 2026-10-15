@@ -13,7 +13,12 @@ class Numeric implements Stringable
     /**
      * The constraints for the number rule.
      */
-    protected array $constraints = ['numeric'];
+    protected array $constraints = [];
+
+    public function __construct(bool $strict = false)
+    {
+        $this->addRule($strict ? 'numeric:strict' : 'numeric');
+    }
 
     /**
      * The field under validation must have a size between the given min and max (inclusive).
