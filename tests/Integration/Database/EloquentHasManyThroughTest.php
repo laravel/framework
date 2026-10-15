@@ -45,6 +45,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $table->id();
             $table->foreignId('user_id');
             $table->string('title')->unique();
+            $table->string('slug')->nullable();
             $table->integer('views')->default(0);
             $table->timestamps();
         });
@@ -229,6 +230,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertTrue($team->is($mate->team));
         $this->assertSame('Adam Wathan', $mate->name);
         $this->assertSame('adam', $mate->slug);
+    }
+
+    public function testFirstOrCreateWithColumnThatAlsoExistsOnIntermediateTable()
+    {
+        $team = Team::create();
+        $user = $team->members()->create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $article = Article::create(['user_id' => $user->id, 'title' => 'Laravel', 'slug' => 'laravel']);
+
+        $this->assertTrue($article->is($team->articles()->firstOrNew(['slug' => 'laravel'])));
+        $this->assertTrue($article->is($team->articles()->firstOrCreate(['slug' => 'laravel'])));
+
+        $updated = $team->articles()->updateOrCreate(['slug' => 'laravel'], ['views' => 5]);
+
+        $this->assertTrue($article->is($updated));
+        $this->assertEquals(5, $article->fresh()->views);
+
+        $created = $team->articles()->firstOrCreate(['slug' => 'eloquent'], ['user_id' => $user->id, 'title' => 'Eloquent']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertSame('eloquent', $created->fresh()->slug);
     }
 
     public function testFirstOrCreateRegressionIssue()
