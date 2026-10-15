@@ -38,6 +38,44 @@ class EloquentModelEncryptedDirtyTest extends TestCase
         $this->assertTrue($model->isDirty('secret_array_object'));
     }
 
+    public function testEncryptedObjectAndCollectionAttributesAreNotDirtyWhenSetToTheSameValue()
+    {
+        config(['app.key' => str_repeat('a', 32)]);
+        Model::$encrypter = null;
+
+        $model = new EncryptedDirtyAttributeCast([
+            'secret_object' => ['name' => 'Taylor'],
+            'secret_collection' => [1, 2, 3],
+        ]);
+
+        $model->syncOriginal();
+
+        $model->secret_object = ['name' => 'Taylor'];
+        $model->secret_collection = [1, 2, 3];
+
+        $this->assertFalse($model->isDirty('secret_object'));
+        $this->assertFalse($model->isDirty('secret_collection'));
+
+        $model->secret_object = ['name' => 'Otwell'];
+        $model->secret_collection = [4, 5, 6];
+
+        $this->assertTrue($model->isDirty('secret_object'));
+        $this->assertTrue($model->isDirty('secret_collection'));
+
+        $model = new EncryptedDirtyAttributeCast([
+            'secret_object' => null,
+            'secret_collection' => null,
+        ]);
+
+        $model->syncOriginal();
+
+        $model->secret_object = ['name' => 'Taylor'];
+        $model->secret_collection = [1, 2, 3];
+
+        $this->assertTrue($model->isDirty('secret_object'));
+        $this->assertTrue($model->isDirty('secret_collection'));
+    }
+
     public function testDirtyAttributeBehaviorWithPreviousKeys()
     {
         config(['app.key' => str_repeat('a', 32)]);

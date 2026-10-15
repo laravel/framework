@@ -2412,6 +2412,9 @@ trait HasAttributes
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
         } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
             return false;
+        } elseif ($original !== null && $this->hasCast($key, ['encrypted:object', 'encrypted:collection'])) {
+            return $this->fromJson($this->fromEncryptedString($attribute)) ===
+                $this->fromJson($this->fromEncryptedString($original));
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
