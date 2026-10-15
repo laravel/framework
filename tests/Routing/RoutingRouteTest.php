@@ -2110,6 +2110,21 @@ class RoutingRouteTest extends TestCase
         $this->assertNotInstanceOf(JsonResponse::class, $response);
     }
 
+    public function testRedirectResponseCanBeReturnedAsResponsable(): void
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function (): Responsable {
+            return new RedirectResponse('/destination', 303, ['X-Test' => 'value']);
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(303, $response->getStatusCode());
+        $this->assertSame('/destination', $response->headers->get('Location'));
+        $this->assertSame('value', $response->headers->get('X-Test'));
+    }
+
     public function testJsonResponseIsReturned()
     {
         $router = $this->getRouter();
