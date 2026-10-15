@@ -1237,6 +1237,28 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertSame('2024', $post->tagsWithExtraPivot()->find($tag1->id)->pivot->flag);
     }
 
+    public function testWherePivotIsAppliedToPivotTableOperationsUsingCustomPivotClass()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'bar'],
+        ]);
+
+        $post->tagsWithCustomPivot()->wherePivot('flag', 'foo')->updateExistingPivot($tag->id, ['tag_name' => 'updated']);
+
+        $this->assertEquals(
+            ['bar' => '', 'foo' => 'updated'],
+            DB::table('posts_tags')->orderBy('flag')->pluck('tag_name', 'flag')->all()
+        );
+
+        $post->tagsWithCustomPivot()->wherePivot('flag', 'foo')->detach($tag->id);
+
+        $this->assertEquals(['bar'], DB::table('posts_tags')->pluck('flag')->all());
+    }
+
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
