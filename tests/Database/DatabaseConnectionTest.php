@@ -1015,7 +1015,9 @@ class DatabaseConnectionTest extends TestCase
 
         $connection->setReadPdo(new DatabaseConnectionTestPdoThatErrorsWhenFreed);
 
-        set_error_handler(static fn ($level, $message) => throw new ErrorException($message));
+        set_error_handler(static fn ($level, $message) => error_reporting() & $level
+            ? throw new ErrorException($message)
+            : true);
 
         try {
             $connection->disconnect();
@@ -1044,7 +1046,9 @@ class DatabaseConnectionTest extends TestCase
             $connection->setPdo($pdo);
         });
 
-        set_error_handler(static fn ($level, $message) => throw new ErrorException($message));
+        set_error_handler(static fn ($level, $message) => error_reporting() & $level
+            ? throw new ErrorException($message)
+            : true);
 
         try {
             $this->assertTrue($connection->statement('foo'));
