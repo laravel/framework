@@ -37,6 +37,13 @@ trait AsPivot
     protected $relatedKey;
 
     /**
+     * The pivot columns the relationship is constrained by.
+     *
+     * @var array<int, string>
+     */
+    protected $pivotConstraintColumns = [];
+
+    /**
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -107,6 +114,10 @@ trait AsPivot
             $this->foreignKey, $this->getAttribute($this->foreignKey)
         ));
 
+        foreach ($this->pivotConstraintColumns as $column) {
+            $query->where($column, $this->getRawOriginal($column));
+        }
+
         return $query->where($this->relatedKey, $this->getOriginal(
             $this->relatedKey, $this->getAttribute($this->relatedKey)
         ));
@@ -154,10 +165,16 @@ trait AsPivot
      */
     protected function getDeleteQuery()
     {
-        return $this->newQueryWithoutRelationships()->where([
+        $query = $this->newQueryWithoutRelationships()->where([
             $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
             $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
         ]);
+
+        foreach ($this->pivotConstraintColumns as $column) {
+            $query->where($column, $this->getRawOriginal($column));
+        }
+
+        return $query;
     }
 
     /**
@@ -218,6 +235,19 @@ trait AsPivot
         $this->foreignKey = $foreignKey;
 
         $this->relatedKey = $relatedKey;
+
+        return $this;
+    }
+
+    /**
+     * Set the pivot columns the relationship is constrained by.
+     *
+     * @param  array<int, string>  $columns
+     * @return $this
+     */
+    public function setPivotConstraintColumns(array $columns)
+    {
+        $this->pivotConstraintColumns = $columns;
 
         return $this;
     }

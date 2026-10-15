@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Str;
 
 use function Illuminate\Support\enum_value;
 
@@ -605,8 +606,29 @@ trait InteractsWithPivotTable
 
                 return $pivot
                     ->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)
+                    ->setPivotConstraintColumns($this->getPivotConstraintColumns())
                     ->setRelatedModel($this->related);
             });
+    }
+
+    /**
+     * Get the pivot columns the relationship is constrained by.
+     *
+     * @return array<int, string>
+     */
+    protected function getPivotConstraintColumns()
+    {
+        return (new BaseCollection([
+            ...$this->pivotWheres,
+            ...$this->pivotWhereIns,
+            ...$this->pivotWhereBetweens,
+            ...$this->pivotWhereNulls,
+        ]))->pluck(0)
+            ->filter(fn ($column) => is_string($column))
+            ->map(fn ($column) => Str::afterLast($column, '.'))
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
