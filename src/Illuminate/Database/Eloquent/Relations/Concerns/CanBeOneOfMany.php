@@ -329,4 +329,24 @@ trait CanBeOneOfMany
     {
         return $this->relationName;
     }
+
+    /**
+     * Handle dynamic method calls to the relationship.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        $query = $this->isOneOfMany() && (str_starts_with($method, 'where') || str_starts_with($method, 'orWhere'))
+            ? $this->getOneOfManySubQuery()
+            : $this->query;
+
+        return $this->forwardDecoratedCallTo($query, $method, $parameters);
+    }
 }
