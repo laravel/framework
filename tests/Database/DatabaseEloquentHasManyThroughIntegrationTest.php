@@ -607,6 +607,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertEquals([1, 2], $country->posts()->allRelatedIds()->all());
     }
 
+    public function testPaginationRespectsSelectedColumns()
+    {
+        $this->seedData();
+        $country = HasManyThroughTestCountry::first();
+
+        $paginated = $country->posts()->select('posts.id', 'posts.title')->paginate();
+        $this->assertEquals(['id', 'title', 'laravel_through_key'], array_keys($paginated->first()->getAttributes()));
+
+        $simplePaginated = $country->posts()->select('posts.id', 'posts.title')->simplePaginate();
+        $this->assertEquals(['id', 'title', 'laravel_through_key'], array_keys($simplePaginated->first()->getAttributes()));
+
+        $cursorPaginated = $country->posts()->select('posts.id', 'posts.title')->cursorPaginate();
+        $this->assertEquals(['id', 'title', 'laravel_through_key'], array_keys($cursorPaginated->first()->getAttributes()));
+
+        $paginatedWithColumns = $country->posts()->paginate(15, ['posts.id', 'posts.title']);
+        $this->assertEquals(['id', 'title', 'laravel_through_key'], array_keys($paginatedWithColumns->first()->getAttributes()));
+    }
+
     /**
      * Helpers...
      */

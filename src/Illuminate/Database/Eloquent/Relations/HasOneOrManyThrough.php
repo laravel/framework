@@ -537,7 +537,9 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $this->query->addSelect($this->shouldSelect($columns));
+        $this->query->addSelect(
+            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        );
 
         return $this->query->paginate($perPage, $columns, $pageName, $page);
     }
@@ -553,7 +555,9 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $this->query->addSelect($this->shouldSelect($columns));
+        $this->query->addSelect(
+            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        );
 
         return $this->query->simplePaginate($perPage, $columns, $pageName, $page);
     }
@@ -569,7 +573,9 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        $this->query->addSelect($this->shouldSelect($columns));
+        $this->query->addSelect(
+            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        );
 
         return $this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor);
     }
