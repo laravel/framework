@@ -1092,7 +1092,9 @@ class Connection implements ConnectionInterface
     {
         $this->transactionsManager?->rollback($this->getName(), 0);
 
-        $this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
+        // Freeing a PDO whose socket was already reset can raise "SSL: Broken pipe". We are
+        // discarding these connections, so we ignore the warning rather than abort a reconnect.
+        @$this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
     }
 
     /**
