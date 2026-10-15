@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -61,6 +62,10 @@ class Response extends SymfonyResponse
     public function setContent(mixed $content): static
     {
         $this->original = $content;
+
+        if ($content instanceof Stringable) {
+            $content = $content->toString();
+        }
 
         // If the content is "JSONable" we will set the appropriate header and convert
         // the content to JSON. This is useful when returning something like models
