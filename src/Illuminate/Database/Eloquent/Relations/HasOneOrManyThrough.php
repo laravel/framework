@@ -228,7 +228,7 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = $this->where($this->qualifyRelatedAttributes($attributes))->first())) {
             return $instance;
         }
 
@@ -244,7 +244,7 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function firstOrCreate(array $attributes = [], Closure|array $values = [])
     {
-        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
+        if (! is_null($instance = (clone $this)->where($this->qualifyRelatedAttributes($attributes))->first())) {
             return $instance;
         }
 
@@ -265,7 +265,7 @@ abstract class HasOneOrManyThrough extends Relation
         try {
             return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values))));
         } catch (UniqueConstraintViolationException $exception) {
-            return $this->where($attributes)->first() ?? throw $exception;
+            return $this->where($this->qualifyRelatedAttributes($attributes))->first() ?? throw $exception;
         }
     }
 
@@ -283,6 +283,19 @@ abstract class HasOneOrManyThrough extends Relation
                 $instance->fill($values)->save();
             }
         });
+    }
+
+    /**
+     * Qualify the given attribute keys with the related model's table.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function qualifyRelatedAttributes(array $attributes)
+    {
+        return (new BaseCollection($attributes))
+            ->mapWithKeys(fn ($value, $key) => [$this->related->qualifyColumn($key) => $value])
+            ->all();
     }
 
     /**
