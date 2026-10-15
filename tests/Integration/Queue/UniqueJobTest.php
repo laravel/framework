@@ -279,6 +279,36 @@ class UniqueJobTest extends QueueTestCase
         );
     }
 
+    public function testQueueFakeReleasesUniqueListenerLocksBetweenFakes()
+    {
+        Event::listen(UniqueTestEvent::class, UniqueTestListener::class);
+
+        Queue::fake();
+
+        event(new UniqueTestEvent);
+        $this->assertCount(1, Queue::listenersPushed(UniqueTestListener::class));
+
+        Queue::fake();
+
+        event(new UniqueTestEvent);
+        $this->assertCount(1, Queue::listenersPushed(UniqueTestListener::class));
+    }
+
+    public function testQueueFakeForReleasesUniqueListenerLocks()
+    {
+        Event::listen(UniqueTestEvent::class, UniqueTestListener::class);
+
+        Queue::fakeFor(function () {
+            event(new UniqueTestEvent);
+            $this->assertCount(1, Queue::listenersPushed(UniqueTestListener::class));
+        });
+
+        Queue::fake();
+
+        event(new UniqueTestEvent);
+        $this->assertCount(1, Queue::listenersPushed(UniqueTestListener::class));
+    }
+
     public function testQueueFakeExceptForReleasesUniqueJobLocks()
     {
         Queue::fakeExceptFor(function () {
@@ -584,6 +614,19 @@ class UniqueTestAfterCommitJob implements ShouldQueue, ShouldBeUnique
 class UniqueTestEvent
 {
     //
+}
+
+class UniqueTestListener implements ShouldQueue, ShouldBeUnique
+{
+    public function uniqueId(): string
+    {
+        return 'unique-id-1';
+    }
+
+    public function handle(UniqueTestEvent $event)
+    {
+        //
+    }
 }
 
 class UniqueTestAfterCommitListener implements ShouldQueueAfterCommit, ShouldBeUnique
