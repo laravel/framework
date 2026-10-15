@@ -60,6 +60,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->create('comments', function ($table) {
             $table->increments('id');
             $table->foreignId('parent_id')->nullable();
+            $table->integer('score')->default(0);
+        });
+
+        $this->schema()->create('soft_deleting_comments', function ($table) {
+            $table->increments('id');
+            $table->foreignId('parent_id')->nullable();
+            $table->softDeletes();
         });
     }
 
@@ -76,6 +83,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
         $this->schema()->drop('comments');
+        $this->schema()->drop('soft_deleting_comments');
     }
 
     public function testItGuessesRelationName()
@@ -312,6 +320,29 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertEquals([$first->id, $second->id], HasOneOfManyTestComment::has('latestReply')->pluck('id')->all());
         $this->assertEquals([1, 1, 0, 0], HasOneOfManyTestComment::withCount('latestReply')->pluck('latest_reply_count')->all());
         $this->assertEquals([3, 4], HasOneOfManyTestComment::doesntHave('latestReply')->pluck('id')->all());
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelationWithAggregateColumn()
+    {
+        $first = HasOneOfManyTestComment::create();
+        $second = HasOneOfManyTestComment::create();
+        $first->replies()->create(['score' => 5]);
+        $first->replies()->create(['score' => 3]);
+        $second->replies()->create(['score' => 1]);
+
+        $this->assertEquals([$first->id], HasOneOfManyTestComment::whereHas('topReply', fn ($query) => $query->where('score', 5))->pluck('id')->all());
+        $this->assertEquals([1, 1, 0, 0, 0], HasOneOfManyTestComment::withCount('topReply')->pluck('top_reply_count')->all());
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelationWithSoftDeletes()
+    {
+        $first = HasOneOfManyTestSoftDeletingComment::create();
+        $second = HasOneOfManyTestSoftDeletingComment::create();
+        $first->replies()->create();
+        $second->replies()->create()->delete();
+
+        $this->assertEquals([$first->id], HasOneOfManyTestSoftDeletingComment::has('latestReply')->pluck('id')->all());
+        $this->assertEquals([1, 0, 0], HasOneOfManyTestSoftDeletingComment::withCount('latestReply')->pluck('latest_reply_count')->all());
     }
 
     public function testHasCount()
@@ -722,6 +753,30 @@ class HasOneOfManyTestPrice extends Eloquent
 class HasOneOfManyTestComment extends Eloquent
 {
     protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function replies()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function latestReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->latestOfMany();
+    }
+
+    public function topReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->ofMany('score', 'max');
+    }
+}
+
+class HasOneOfManyTestSoftDeletingComment extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $table = 'soft_deleting_comments';
     protected $guarded = [];
     public $timestamps = false;
 
