@@ -118,6 +118,7 @@ class ExceptionReportingTest extends TestCase
 
         // This config existing will activate exception reporting
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode([]);
+        Cloud::configureExceptions($this->app);
         Cloud::registerExceptionReporting($this->app);
 
         report(new RuntimeException('Whoops!'));
@@ -189,6 +190,61 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJsonContains([
             'message' => 'Whoops!',
         ]);
+    }
+
+    public function testItDoesNotReportTwiceWhenTheResolvedExceptionHandlerIsWrapped(): void
+    {
+        $streams = $this->fakeEventsStreams();
+
+        unset($this->app[ExceptionHandler::class]);
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
+
+        $this->setupExceptionReporting(['stop' => false]);
+
+        // Mirror a service provider, such as Collision's, that resolves the
+        // handler and then rebinds it as a wrapper forwarding to the original.
+        $inner = $this->app->make(ExceptionHandler::class);
+
+        $this->app->forgetInstance(ExceptionHandler::class);
+        $this->app->singleton(ExceptionHandler::class, fn () => new class($inner) implements ExceptionHandler
+        {
+            public function __construct(protected $inner)
+            {
+            }
+
+            public function reportable($callback)
+            {
+                return $this->inner->reportable($callback);
+            }
+
+            public function report(Throwable $e)
+            {
+                $this->inner->report($e);
+            }
+
+            public function shouldReport(Throwable $e)
+            {
+                return $this->inner->shouldReport($e);
+            }
+
+            public function render($request, Throwable $e)
+            {
+                return $this->inner->render($request, $e);
+            }
+
+            public function renderForConsole($output, Throwable $e)
+            {
+                $this->inner->renderForConsole($output, $e);
+            }
+        });
+
+        $this->app->make(ExceptionHandler::class);
+
+        report(new RuntimeException('Whoops!'));
+
+        $writes = $streams->flatMap(fn ($stream) => array_filter(explode("\n", $stream->stream)));
+
+        $this->assertCount(1, $writes);
     }
 
     public function testItIgnoresExceptionHandlersThatCannotRegisterReportables(): void
@@ -4020,6 +4076,7 @@ class ExceptionReportingTest extends TestCase
     {
         $_SERVER['LARAVEL_CLOUD'] = '1';
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode($config);
+        Cloud::configureExceptions($this->app);
         Cloud::registerEvents($this->app);
         Cloud::registerExceptionReporting($this->app);
     }

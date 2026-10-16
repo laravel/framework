@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -18,6 +19,17 @@ class CloudBootstrapperTest extends TestCase
             'username' => 'test-username',
             'password' => 'test-password',
         ], $this->app['config']->get('database.connections.pgsql-unpooled'));
+    }
+
+    public function test_it_stores_the_exceptions_config_after_configuration_is_loaded()
+    {
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
+
+        CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
+
+        $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
+
+        unset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS']);
     }
 
     public function test_it_can_configure_disks()
