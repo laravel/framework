@@ -2,12 +2,26 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskSkipped;
+use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\Events;
+use Illuminate\Foundation\Cloud\ExceptionReporter;
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Queue\Events\JobPopped;
+use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Queue\Queue;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
+use Throwable;
 
 class Cloud
 {
@@ -29,9 +43,12 @@ class Cloud
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
+                static::configureExceptions($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
+                static::registerEvents($app);
+                static::registerExceptionReporting($app);
             },
             default => fn () => true,
         })();
@@ -129,12 +146,124 @@ class Cloud
                 'includeStacktraces' => true,
             ],
             'with' => [
-                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      'unix:///tmp/cloud-init.sock',
+                'connectionString' => Cloud::socket(),
                 'persistent' => true,
                 'timeout' => 2.0,
             ],
         ]);
+    }
+
+    /**
+     * Register the events system for Laravel Cloud.
+     */
+    public static function registerEvents(Application $app): void
+    {
+        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
+    }
+
+    /**
+     * Configure the Laravel Cloud exception reporting if applicable.
+     *
+     * @throws \JsonException
+     */
+    public static function configureExceptions(Application $app): void
+    {
+        if (! isset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'])) {
+            return;
+        }
+
+        $app['config']->set('_cloud.exceptions', json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Register the Laravel Cloud exception reporter if applicable.
+     */
+    public static function registerExceptionReporting(Application $app): void
+    {
+        try {
+            if (! is_array($config = $app['config']->get('_cloud.exceptions'))) {
+                return;
+            }
+
+            $config = [
+                'stop' => true,
+                'capture_request_payload' => false,
+                'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
+                'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
+                ...$config,
+            ];
+
+            $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
+                $app[Events::class],
+                $app->basePath().DIRECTORY_SEPARATOR,
+                $config,
+            ));
+
+            // Defer registration of the reporter until exception handler is resolved...
+            $reportableRegistered = false;
+            $registerReporter = function ($handler) use ($exceptionReporter, &$reportableRegistered) {
+                if ($reportableRegistered) {
+                    return;
+                }
+
+                try {
+                    $handler->reportable($exceptionReporter);
+
+                    $reportableRegistered = true;
+                } catch (Throwable) {
+                    //
+                }
+            };
+
+            $app->resolved(ExceptionHandlerContract::class)
+                ? $registerReporter($app[ExceptionHandlerContract::class])
+                : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
+
+            Queue::createPayloadUsing(fn () => $exceptionReporter->jobPayload());
+
+            if (! $app->runningInConsole()) {
+                $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
+                    if ($event->user !== null) {
+                        $exceptionReporter->rememberUser($event->user);
+                    }
+                });
+
+                $app['events']->listen(fn (RequestHandled $event) => $exceptionReporter->forgetLoggedOutUser());
+            } else {
+                $preparedForCommand = false;
+
+                $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
+                    if (! $preparedForCommand) {
+                        $exceptionReporter->prepareForCommand($event->command);
+
+                        $preparedForCommand = true;
+                    }
+                });
+
+                $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
+                    if ($event->job !== null) {
+                        $exceptionReporter->prepareForJob($event->job);
+                    }
+                });
+
+                $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
+                $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
+                $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
+                $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
+                $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
+            }
+        } catch (Throwable) {
+            return;
+        }
+    }
+
+    /**
+     * The cloud socket address.
+     */
+    protected static function socket(): string
+    {
+        return $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
+            $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
+                'unix:///tmp/cloud-init.sock';
     }
 }
