@@ -185,8 +185,14 @@ trait QueriesRelationships
      */
     public function withWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
-        return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
-            ->with($callback ? [$relation => static fn ($query) => $callback($query)] : $relation);
+        if (! $callback) {
+            return $this->whereHas(Str::before($relation, ':'), null, $operator, $count)->with($relation);
+        }
+
+        [$name, $select] = $this->parseNameAndAttributeSelectionConstraint($relation);
+
+        return $this->whereHas($name, $callback, $operator, $count)
+            ->with([$name => $this->combineConstraints([$select, static fn ($query) => $callback($query)])]);
     }
 
     /**

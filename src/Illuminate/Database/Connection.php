@@ -1092,7 +1092,7 @@ class Connection implements ConnectionInterface
     {
         $this->transactionsManager?->rollback($this->getName(), 0);
 
-        $this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
+        @$this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
     }
 
     /**

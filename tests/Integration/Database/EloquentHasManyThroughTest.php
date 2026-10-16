@@ -45,6 +45,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $table->id();
             $table->foreignId('user_id');
             $table->string('title')->unique();
+            $table->string('slug')->nullable();
             $table->integer('views')->default(0);
             $table->timestamps();
         });
@@ -165,6 +166,22 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
 
+    public function testHasOneOfManySameParentAndThroughParentTable()
+    {
+        Category::create();
+        Category::create();
+        Category::create(['parent_id' => 1]);
+        Category::create(['parent_id' => 2]);
+
+        $oldest = Product::create(['category_id' => 3]);
+        $latest = Product::create(['category_id' => 3]);
+
+        $this->assertEquals([1], Category::has('latestSubProduct')->pluck('id')->all());
+        $this->assertEquals([1], Category::whereHas('latestSubProduct', fn ($query) => $query->whereKey($latest->id))->pluck('id')->all());
+        $this->assertEquals([], Category::whereHas('latestSubProduct', fn ($query) => $query->whereKey($oldest->id))->pluck('id')->all());
+        $this->assertEquals([1 => 1, 2 => 0, 3 => 0, 4 => 0], Category::withCount('latestSubProduct')->pluck('latest_sub_product_count', 'id')->all());
+    }
+
     public function testFirstOrNewOnMissingRecord()
     {
         $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
@@ -229,6 +246,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertTrue($team->is($mate->team));
         $this->assertSame('Adam Wathan', $mate->name);
         $this->assertSame('adam', $mate->slug);
+    }
+
+    public function testFirstOrCreateWithColumnThatAlsoExistsOnIntermediateTable()
+    {
+        $team = Team::create();
+        $user = $team->members()->create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $article = Article::create(['user_id' => $user->id, 'title' => 'Laravel', 'slug' => 'laravel']);
+
+        $this->assertTrue($article->is($team->articles()->firstOrNew(['slug' => 'laravel'])));
+        $this->assertTrue($article->is($team->articles()->firstOrCreate(['slug' => 'laravel'])));
+
+        $updated = $team->articles()->updateOrCreate(['slug' => 'laravel'], ['views' => 5]);
+
+        $this->assertTrue($article->is($updated));
+        $this->assertEquals(5, $article->fresh()->views);
+
+        $created = $team->articles()->firstOrCreate(['slug' => 'eloquent'], ['user_id' => $user->id, 'title' => 'Eloquent']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertSame('eloquent', $created->fresh()->slug);
     }
 
     public function testFirstOrCreateRegressionIssue()
@@ -552,6 +589,11 @@ class Category extends Model
     public function subProducts()
     {
         return $this->hasManyThrough(Product::class, self::class, 'parent_id');
+    }
+
+    public function latestSubProduct()
+    {
+        return $this->hasOneThrough(Product::class, self::class, 'parent_id')->latestOfMany();
     }
 }
 

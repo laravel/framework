@@ -404,6 +404,39 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get());
     }
 
+    public function testListenerLockIsReleasedWhenPushingToTheQueueFails()
+    {
+        Queue::extend('failing', fn () => new class implements ConnectorInterface
+        {
+            public function connect(array $config)
+            {
+                return new class extends NullQueue
+                {
+                    public function push($job, $data = '', $queue = null)
+                    {
+                        throw new RuntimeException('Queue unavailable.');
+                    }
+                };
+            }
+        });
+
+        $this->app['config']->set('queue.connections.failing', ['driver' => 'failing']);
+
+        Event::listen(UniqueTestEvent::class, UniqueTestFailingPushListener::class);
+
+        try {
+            event(new UniqueTestEvent);
+
+            $this->fail('Expected pushing the listener to fail.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Queue unavailable.', $e->getMessage());
+        }
+
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', UniqueTestFailingPushListener::class).':';
+
+        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -631,6 +664,16 @@ class UniqueTestListener implements ShouldQueue, ShouldBeUnique
 
 class UniqueTestAfterCommitListener implements ShouldQueueAfterCommit, ShouldBeUnique
 {
+    public function handle(UniqueTestEvent $event)
+    {
+        //
+    }
+}
+
+class UniqueTestFailingPushListener implements ShouldQueue, ShouldBeUnique
+{
+    public $connection = 'failing';
+
     public function handle(UniqueTestEvent $event)
     {
         //

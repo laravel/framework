@@ -84,6 +84,12 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
 
+    public function testShouldSkip()
+    {
+        $this->assertFalse($this->subject->shouldSkip(__DIR__.'/Fixtures/2014_10_12_000000_create_people_table.php'));
+        $this->assertTrue($this->subject->shouldSkip(__DIR__.'/Fixtures/2017_10_04_000000_add_age_to_people.php'));
+    }
+
     public function testRollback()
     {
         $this->getConnection()->statement('CREATE TABLE people(id INT, first_name VARCHAR, last_name VARCHAR);');

@@ -19,6 +19,13 @@ class HttpRedirectResponseTest extends TestCase
 {
     use VerifiesDoubles;
 
+    public function testToResponseReturnsTheSameInstance(): void
+    {
+        $response = new RedirectResponse('foo.bar');
+
+        $this->assertSame($response, $response->toResponse(Request::create('/')));
+    }
+
     public function testHeaderOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');

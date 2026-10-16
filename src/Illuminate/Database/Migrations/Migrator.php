@@ -559,6 +559,19 @@ class Migrator
     }
 
     /**
+     * Determine if the migration at the given path should be skipped.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function shouldSkip($path)
+    {
+        $migration = $this->resolvePath($path);
+
+        return $migration instanceof Migration && ! $migration->shouldRun();
+    }
+
+    /**
      * Generate a migration class name based on the migration file name.
      *
      * @param  string  $migrationName
