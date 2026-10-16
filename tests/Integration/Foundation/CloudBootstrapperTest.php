@@ -31,6 +31,17 @@ class CloudBootstrapperTest extends TestCase
         unset($_SERVER['DB_READ_HOST']);
     }
 
+    public function test_it_stores_the_exceptions_config_after_configuration_is_loaded()
+    {
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
+
+        CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
+
+        $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
+
+        unset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS']);
+    }
+
     public function test_it_does_not_configure_a_read_replica_connection_without_a_read_host()
     {
         unset($_SERVER['DB_READ_HOST']);

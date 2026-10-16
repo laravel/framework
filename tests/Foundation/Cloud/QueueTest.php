@@ -670,6 +670,7 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode([]);
+        CloudBootstrapper::configureExceptions($this->app);
         CloudBootstrapper::registerExceptionReporting($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
