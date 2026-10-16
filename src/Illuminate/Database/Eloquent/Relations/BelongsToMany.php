@@ -763,8 +763,8 @@ class BelongsToMany extends Relation
     /**
      * Qualify the given attribute keys with the related model's table.
      *
-     * @param  array  $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
      */
     protected function qualifyRelatedAttributes(array $attributes)
     {
