@@ -268,6 +268,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('eloquent', $created->fresh()->slug);
     }
 
+    public function testWhereRelationWithColumnThatAlsoExistsOnIntermediateTable()
+    {
+        $team = Team::create();
+        $user = $team->members()->create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $article = Article::create(['user_id' => $user->id, 'title' => 'Laravel', 'slug' => 'laravel']);
+
+        $teams = Team::whereRelation('articles', 'slug', 'laravel')->get();
+        $this->assertTrue($teams->first()->is($team));
+
+        $teams = Team::where('id', 999)->orWhereRelation('articles', 'slug', 'laravel')->get();
+        $this->assertTrue($teams->first()->is($team));
+
+        $teams = Team::whereDoesntHaveRelation('articles', 'slug', 'vue')->get();
+        $this->assertTrue($teams->first()->is($team));
+
+        $teams = Team::withWhereRelation('articles', 'slug', 'laravel')->get();
+        $this->assertTrue($teams->first()->is($team));
+        $this->assertTrue($teams->first()->articles->first()->is($article));
+    }
+
     public function testFirstOrCreateRegressionIssue()
     {
         $team1 = Team::create();

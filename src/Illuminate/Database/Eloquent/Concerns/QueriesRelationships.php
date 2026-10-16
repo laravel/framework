@@ -451,6 +451,8 @@ trait QueriesRelationships
             if ($column instanceof Closure) {
                 $column($query);
             } else {
+                $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
                 $query->where($column, $operator, $value);
             }
         });
@@ -469,9 +471,15 @@ trait QueriesRelationships
     {
         return $this->whereRelation($relation, $column, $operator, $value)
             ->with([
-                $relation => static fn ($query) => $column instanceof Closure
-                    ? $column($query)
-                    : $query->where($column, $operator, $value),
+                $relation => static function ($query) use ($column, $operator, $value) {
+                    if ($column instanceof Closure) {
+                        $column($query);
+                    } else {
+                        $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
+                        $query->where($column, $operator, $value);
+                    }
+                },
             ]);
     }
 
@@ -492,6 +500,8 @@ trait QueriesRelationships
             if ($column instanceof Closure) {
                 $column($query);
             } else {
+                $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
                 $query->where($column, $operator, $value);
             }
         });
@@ -514,6 +524,8 @@ trait QueriesRelationships
             if ($column instanceof Closure) {
                 $column($query);
             } else {
+                $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
                 $query->where($column, $operator, $value);
             }
         });
@@ -536,6 +548,8 @@ trait QueriesRelationships
             if ($column instanceof Closure) {
                 $column($query);
             } else {
+                $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
                 $query->where($column, $operator, $value);
             }
         });
@@ -556,6 +570,8 @@ trait QueriesRelationships
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
             $query->where($column, $operator, $value);
         });
     }
@@ -575,6 +591,8 @@ trait QueriesRelationships
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $column = is_string($column) ? $query->qualifyColumn($column) : $column;
+
             $query->where($column, $operator, $value);
         });
     }
