@@ -1006,7 +1006,7 @@ class ExceptionReportingTest extends TestCase
             report($e);
         }
 
-        $compiledComponent = $this->reportedCompiledViewPath(__DIR__.'/components/profile.blade.php');
+        $compiledComponent = $this->reportedCompiledViewPath(realpath(__DIR__.'/components').'/profile.blade.php');
         $compiledView = $this->reportedCompiledViewPath(__DIR__.'/foo.blade.php');
 
         $this->assertCount(1, $streams);
