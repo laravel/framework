@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Events\DiagnosingHealth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -67,5 +68,19 @@ class RouteServiceProviderHealthTest extends TestCase
         $this->get('/up')
             ->assertStatus(500)
             ->assertSee('experiencing problems');
+    }
+
+    public function test_health_route_can_be_cached_without_absolute_paths()
+    {
+        $route = $this->app['router']->getRoutes()->match(Request::create('/up'));
+
+        $route->prepareForSerialization();
+
+        $this->assertStringNotContainsString(
+            realpath(__DIR__.'/../../../../../src'),
+            $route->getAction('uses')
+        );
+
+        $this->get('/up')->assertOk();
     }
 }
