@@ -9,11 +9,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = new Application;
@@ -108,9 +111,9 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
 
-        $files = Mockery::mock(Filesystem::class);
-        $files->shouldReceive('replace')->never();
-        $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
+        $files = Double::for(Filesystem::class);
+        $files->expects('replace')->never();
+        $repo = new ProviderRepository(Double::for(ApplicationContract::class, override: true)->instance(), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);
     }

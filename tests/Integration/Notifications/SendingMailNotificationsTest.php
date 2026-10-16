@@ -18,13 +18,17 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
 class SendingMailNotificationsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('mail.default', 'array');
@@ -243,19 +247,19 @@ class SendingMailNotificationsTest extends TestCase
 
     private function expectMailerSend(callable $viewAssertion, callable $messageExpectations): void
     {
-        $mailer = Mockery::mock(Mailer::class);
-        $mailer->expects('send')->withArgs(function ($view, $data, $callback) use ($viewAssertion, $messageExpectations) {
+        $mailer = Double::for(Mailer::class);
+        $mailer->expects('send')->with(Argument::all(function ($view, $data, $callback) use ($viewAssertion, $messageExpectations) {
             $viewAssertion($view);
 
-            $message = Mockery::mock(Message::class);
+            $message = Double::for(Message::class);
             $messageExpectations($message);
             $callback($message);
 
             return true;
-        });
+        }));
 
-        $factory = Mockery::mock(MailFactory::class);
-        $factory->expects('mailer')->andReturn($mailer);
+        $factory = Double::for(MailFactory::class);
+        $factory->expects('mailer')->returns($mailer);
 
         $this->app->instance(MailFactory::class, $factory);
     }

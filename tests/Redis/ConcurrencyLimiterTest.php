@@ -7,31 +7,33 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class ConcurrencyLimiterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        // release() also calls eval → command('eval', ...) with the release script
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 3
                 && $args[1][0] === '{test-limiter}1'
                 && $args[1][1] === '{test-limiter}2'
                 && $args[1][2] === '{test-limiter}3'
                 && $args[1][3] === '{test-limiter}'; // ARGV[1] = hash-tagged prefix
-        }))->andReturn('{test-limiter}1');
-
-        // release() also calls eval → command('eval', ...) with the release script
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        }, '{test-limiter}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{test-limiter}1'; // released key matches acquired key
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'test-limiter', 3, 60);
         $result = $limiter->block(0, function () {
@@ -43,21 +45,19 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnNonClusterConnection()
     {
-        $connection = Mockery::mock(PhpRedisConnection::class);
-        $connection->expects('isCluster')->andReturn(false);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(false);
 
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 2
                 && $args[1][0] === 'mylock1'
                 && $args[1][1] === 'mylock2'
                 && $args[1][2] === 'mylock'; // ARGV[1] = plain name
-        }))->andReturn('mylock1');
-
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        }, 'mylock1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === 'mylock1';
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'mylock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -69,21 +69,21 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesHashTagsOnPredisClusterConnection()
     {
-        $connection = Mockery::mock(PredisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PredisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
-        $connection->expects('eval')->with(
-            Mockery::on(fn ($s) => str_contains($s, 'mget')),
-            2,
-            '{limiter}1', '{limiter}2',
-            '{limiter}', Mockery::any(), Mockery::any()
-        )->andReturn('{limiter}1');
-
-        $connection->expects('eval')->with(
-            Mockery::on(fn ($s) => str_contains($s, 'del')),
-            1,
-            '{limiter}1', Mockery::any()
-        )->andReturn(1);
+        // Predis forwards eval() through __call() into command('eval', [script, numkeys, ...keys, ...argv]).
+        $this->expectsEval($connection, function ($args) {
+            return str_contains($args[0], 'mget')
+                && $args[1] === 2
+                && $args[2] === '{limiter}1'
+                && $args[3] === '{limiter}2'
+                && $args[4] === '{limiter}';
+        }, '{limiter}1', function ($args) {
+            return str_contains($args[0], 'del')
+                && $args[1] === 1
+                && $args[2] === '{limiter}1';
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'limiter', 2, 60);
         $result = $limiter->block(0, function () {
@@ -95,19 +95,17 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testReleaseKeyMatchesAcquireKeyOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
         // Acquire returns the slot key
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
-            return str_contains($args[0], 'mget');
-        }))->andReturn('{mykey}2');
-
         // Release should be called with the exact same key
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $this->expectsEval($connection, function ($args) {
+            return str_contains($args[0], 'mget');
+        }, '{mykey}2', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mykey}2';
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'mykey', 3, 60);
         $limiter->block(0, function () {
@@ -117,21 +115,19 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireDoesNotDoubleWrapPreExistingHashTags()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
         // Name already has hash tags — should NOT be double-wrapped
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{mylock}1'
                 && $args[1][1] === '{mylock}2'
                 && $args[1][2] === '{mylock}'; // ARGV[1] = unchanged name with existing tags
-        }))->andReturn('{mylock}1');
-
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        }, '{mylock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mylock}1';
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, '{mylock}', 2, 60);
         $result = $limiter->block(0, function () {
@@ -143,21 +139,19 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsUnmatchedBraceOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{lock}1'
                 && $args[1][1] === '{my{lock}2'
                 && $args[1][2] === '{my{lock}'; // ARGV[1] = wrapped prefix
-        }))->andReturn('{my{lock}1');
-
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        }, '{my{lock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{lock}1';
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'my{lock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -169,21 +163,19 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsEmptyBracesOnCluster()
     {
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $connection->expects('isCluster')->andReturn(true);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $this->expectsEval($connection, function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{}lock}1'
                 && $args[1][1] === '{my{}lock}2'
                 && $args[1][2] === '{my{}lock}'; // ARGV[1] = wrapped prefix
-        }))->andReturn('{my{}lock}1');
-
-        $connection->expects('command')->with('eval', Mockery::on(function ($args) {
+        }, '{my{}lock}1', function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{}lock}1';
-        }))->andReturn(1);
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'my{}lock', 2, 60);
         $result = $limiter->block(0, function () {
@@ -195,27 +187,44 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnPredisNonClusterConnection()
     {
-        $connection = Mockery::mock(PredisConnection::class);
-        $connection->expects('isCluster')->andReturn(false);
+        $connection = Double::for(PredisConnection::class)->passthru();
+        $connection->expects('isCluster')->returns(false);
 
-        $connection->expects('eval')->with(
-            Mockery::on(fn ($s) => str_contains($s, 'mget')),
-            2,
-            'lock1', 'lock2',
-            'lock', Mockery::any(), Mockery::any()
-        )->andReturn('lock1');
-
-        $connection->expects('eval')->with(
-            Mockery::on(fn ($s) => str_contains($s, 'del')),
-            1,
-            'lock1', Mockery::any()
-        )->andReturn(1);
+        $this->expectsEval($connection, function ($args) {
+            return str_contains($args[0], 'mget')
+                && $args[1] === 2
+                && $args[2] === 'lock1'
+                && $args[3] === 'lock2'
+                && $args[4] === 'lock';
+        }, 'lock1', function ($args) {
+            return str_contains($args[0], 'del')
+                && $args[1] === 1
+                && $args[2] === 'lock1';
+        });
 
         $limiter = new ConcurrencyLimiter($connection, 'lock', 2, 60);
         $result = $limiter->block(0, function () {
-            return 'success';
+            return 'ok';
         });
 
-        $this->assertSame('success', $result);
+        $this->assertSame('ok', $result);
+    }
+
+    /**
+     * Expect the acquire (mget) and release (del) eval commands, in either order.
+     */
+    protected function expectsEval($connection, callable $acquire, string $acquiredKey, callable $release): void
+    {
+        $connection->expects('command')->with('eval', Argument::any())->times(2)->resolves(function ($command, $args) use ($acquire, $acquiredKey, $release) {
+            if (str_contains($args[0], 'mget')) {
+                $this->assertTrue($acquire($args));
+
+                return $acquiredKey;
+            }
+
+            $this->assertTrue($release($args));
+
+            return 1;
+        });
     }
 }

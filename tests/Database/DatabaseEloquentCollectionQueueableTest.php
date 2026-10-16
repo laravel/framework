@@ -5,35 +5,35 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSerializesPivotsEntitiesId()
     {
-        $spy = Mockery::spy(Pivot::class);
+        $spy = Double::for(Pivot::class);
 
         $c = new Collection([$spy]);
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived()
-            ->getQueueableId()
-            ->once();
+        $spy->received('getQueueableId')->with(Argument::none())->times(1);
     }
 
     public function testSerializesModelEntitiesById()
     {
-        $spy = Mockery::spy(Model::class);
+        $spy = Double::for(Model::class);
 
         $c = new Collection([$spy]);
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived()
-            ->getQueueableId()
-            ->once();
+        $spy->received('getQueueableId')->with(Argument::none())->times(1);
     }
 
     /**
@@ -44,10 +44,9 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
         // When the ID of a Model is binary instead of int or string, the Collection
         // serialization + JSON encoding breaks because of UTF-8 issues. Encoding
         // of a QueueableCollection must favor QueueableEntity::queueableId().
-        $mock = Mockery::mock(Model::class, [
-            'getKey' => random_bytes(10),
-            'getQueueableId' => 'mocked',
-        ]);
+        $mock = Double::for(Model::class);
+        $mock->expects('getKey')->never();
+        $mock->expects('getQueueableId')->returns('mocked');
 
         $c = new Collection([$mock]);
 

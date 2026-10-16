@@ -7,23 +7,25 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\RetryBatchCommand;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class RetryBatchCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        Mockery::close();
     }
 
     public function testItFailsWhenTheBatchCannotBeFound()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
-        $repository->shouldReceive('find')->with('missing-batch-id')->andReturnNull();
+        $repository = Double::for(BatchRepository::class);
+        $repository->expects('find')->with('missing-batch-id')->returns(null);
         $container->instance(BatchRepository::class, $repository);
 
         $command = new RetryBatchCommand;
@@ -38,8 +40,8 @@ class RetryBatchCommandTest extends TestCase
     public function testItFailsWhenTheBatchHasNoFailedJobs()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
-        $repository->shouldReceive('find')->with('batch-id')->andReturn(new class
+        $repository = Double::for(BatchRepository::class);
+        $repository->expects('find')->with('batch-id')->returns(new class
         {
             public $failedJobIds = [];
         });
@@ -61,13 +63,13 @@ class RetryBatchCommandTest extends TestCase
     public function testItCanBeRunInIsolation()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
-        $repository->shouldReceive('find')->with('batch-id')->andReturnNull();
+        $repository = Double::for(BatchRepository::class);
+        $repository->expects('find')->with('batch-id')->returns(null);
         $container->instance(BatchRepository::class, $repository);
 
-        $mutex = Mockery::mock(CommandMutex::class);
-        $mutex->shouldReceive('create')->andReturnTrue();
-        $mutex->shouldReceive('forget')->andReturnTrue();
+        $mutex = Double::for(CommandMutex::class);
+        $mutex->expects('create')->returns(true);
+        $mutex->expects('forget')->returns(true);
         $container->instance(CommandMutex::class, $mutex);
 
         $command = new RetryBatchCommand;

@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use Mockery;
 
 class BladeComponentsTest extends AbstractBladeTestCase
 {
@@ -62,9 +61,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = Mockery::mock(Component::class);
-        $component->shouldReceive('withName', 'test');
-        $component->expects('shouldRender')->andReturn(false);
+        $component = new BladeComponentsTestComponent;
 
         Component::resolveComponentsUsing(fn () => $component);
 
@@ -81,5 +78,23 @@ class ComponentStub extends Component
     public function render()
     {
         return '';
+    }
+}
+
+class BladeComponentsTestComponent extends Component
+{
+    public function render()
+    {
+        return '';
+    }
+
+    public function shouldRender()
+    {
+        return false;
+    }
+
+    public function test()
+    {
+        //
     }
 }

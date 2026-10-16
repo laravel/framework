@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Testing;
 
 use Exception;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -24,8 +23,10 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
+use Illuminate\View\View;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
-use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -37,6 +38,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Container::setInstance(new Container);
@@ -3303,8 +3306,14 @@ EOT
 
     private function makeMockResponse($content)
     {
-        $baseResponse = tap(new Response, function ($response) use ($content) {
-            $response->setContent(Mockery::mock(View::class, $content));
+        $view = Double::for(View::class);
+
+        foreach ($content as $method => $value) {
+            $view->allows($method)->returns($value);
+        }
+
+        $baseResponse = tap(new Response, function ($response) use ($view) {
+            $response->setContent($view);
         });
 
         return TestResponse::fromBaseResponse($baseResponse);

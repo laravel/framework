@@ -29,7 +29,9 @@ use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +48,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FoundationExceptionsHandlerTest extends TestCase
 {
     use InteractsWithExceptionHandling;
+    use VerifiesDoubles;
 
     protected $config;
 
@@ -57,13 +60,17 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected $request;
 
+    protected $requestDouble;
+
     protected function setUp(): void
     {
-        $this->config = Mockery::mock(Config::class);
+        $this->config = Double::for(Config::class);
 
-        $this->viewFactory = Mockery::mock(ViewFactory::class);
+        $this->viewFactory = Double::for(ViewFactory::class);
 
-        $this->request = Mockery::mock(Request::class);
+        $this->requestDouble = Double::for(Request::class, override: true);
+
+        $this->request = $this->requestDouble->instance();
 
         $this->container = Container::setInstance(new Container);
 
@@ -73,7 +80,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
             $this->viewFactory,
-            Mockery::mock(Redirector::class)
+            Double::for(Redirector::class)
         ));
 
         $this->handler = new Handler($this->container);
@@ -150,9 +157,9 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testHandlerIgnoresNotReportableExceptions()
     {
-        $logger = Mockery::mock(LoggerInterface::class);
+        $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->ignore(RuntimeException::class);
 
@@ -161,25 +168,25 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testHandlerCallsReportMethodWithDependencies()
     {
-        $reporter = Mockery::mock(ReportingService::class);
+        $reporter = Double::for(ReportingService::class);
         $this->container->instance(ReportingService::class, $reporter);
-        $reporter->expects('send')->withArgs(['Exception message']);
+        $reporter->expects('send')->with('Exception message');
 
-        $logger = Mockery::mock(LoggerInterface::class);
+        $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new ReportableException('Exception message'));
     }
 
     public function testHandlerReportsExceptionUsingCallableClass()
     {
-        $reporter = Mockery::mock(ReportingService::class);
-        $reporter->expects('send')->withArgs(['Exception message']);
+        $reporter = Double::for(ReportingService::class);
+        $reporter->expects('send')->with('Exception message');
 
-        $logger = Mockery::mock(LoggerInterface::class);
+        $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->reportable(new CustomReporter($reporter));
 
@@ -203,7 +210,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testShouldReturnJsonWhen()
     {
-        $this->request->shouldReceive('expectsJson')->never();
+        $this->requestDouble->expects('expectsJson')->never();
         $exception = new Exception('My custom error message');
 
         $request = $this->request;
@@ -375,21 +382,18 @@ class FoundationExceptionsHandlerTest extends TestCase
         $argumentActual = null;
 
         $this->container->singleton('redirect', function () use (&$argumentActual) {
-            $redirector = Mockery::mock(Redirector::class);
+            $redirector = Double::for(Redirector::class);
 
-            $responder = Mockery::mock(RedirectResponse::class);
-            $redirector->expects('to')
-                ->andReturn($responder);
+            $responder = Double::for(RedirectResponse::class);
+            $redirector->expects('to')->returns($responder);
 
-            $responder->expects('withInput')->with(Mockery::on(
-                function ($argument) use (&$argumentActual) {
-                    $argumentActual = $argument;
+            $responder->expects('withInput')->with(Argument::satisfies(function ($argument) use (&$argumentActual) {
+                $argumentActual = $argument;
 
-                    return true;
-                }))->andReturn($responder);
+                return true;
+            }))->returns($responder);
 
-            $responder->expects('withErrors')
-                ->andReturn($responder);
+            $responder->expects('withErrors')->returns($responder);
 
             return $redirector;
         });
@@ -398,8 +402,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
-        $validator = Mockery::mock(Validator::class);
-        $validator->expects('errors')->times(2)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+        $validator = Double::for(Validator::class);
+        $validator->expects('errors')->times(2)->returns(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
@@ -411,34 +415,34 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testSuspiciousOperationReturns400WithoutReporting()
     {
-        $this->config->expects('get')->with('app.debug', null)->andReturn(true);
-        $this->request->expects('expectsJson')->andReturn(true);
+        $this->config->expects('get')->with('app.debug', null)->returns(true);
+        $this->requestDouble->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Bad request."', $response->getContent());
 
-        $logger = Mockery::mock(LoggerInterface::class);
+        $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
     }
 
     public function testRecordsNotFoundReturns404WithoutReporting()
     {
-        $this->config->expects('get')->with('app.debug', null)->andReturn(true);
-        $this->request->expects('expectsJson')->andReturn(true);
+        $this->config->expects('get')->with('app.debug', null)->returns(true);
+        $this->requestDouble->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Not found."', $response->getContent());
 
-        $logger = Mockery::mock(LoggerInterface::class);
+        $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new RecordsNotFoundException);
     }
@@ -507,7 +511,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->container->instance(ViewFactory::class, $viewFactory);
         $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
-            $viewFactory, Mockery::mock(Redirector::class)
+            $viewFactory, Double::for(Redirector::class)
         ));
         $this->container->instance(LoggerInterface::class, new LoggerSpy);
 

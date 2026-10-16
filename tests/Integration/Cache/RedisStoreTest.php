@@ -6,9 +6,12 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -18,6 +21,7 @@ use RuntimeException;
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -278,11 +282,9 @@ class RedisStoreTest extends TestCase
 
     public function testPutManyCallsPutWhenClustered()
     {
-        $store = Mockery::mock(RedisStore::class)->makePartial();
-        $store->expects('connection')->andReturn(Mockery::mock(PhpRedisClusterConnection::class));
-        $store->expects('put')
-            ->twice()
-            ->andReturn(true);
+        $store = Double::for(RedisStore::class)->passthru();
+        $store->expects('connection')->returns(Double::for(PhpRedisClusterConnection::class));
+        $store->expects('put')->times(2)->returns(true);
 
         $store->putMany([
             'foo' => 'bar',
@@ -330,6 +332,113 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    public function testItStoresAndRetrievesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertNull($store->get('foo'));
+
+        $this->assertTrue($store->put('foo', 'bar', 60));
+        $this->assertTrue($store->put('number', 5, 60));
+        $this->assertTrue($store->put('float', 1.5, 60));
+
+        $this->assertSame('bar', $store->get('foo'));
+        $this->assertEquals(5, $store->get('number'));
+        $this->assertEquals(1.5, $store->get('float'));
+    }
+
+    public function testItStoresAndRetrievesManyValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz'], 60));
+
+        $this->assertSame(
+            ['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz', 'missing' => null],
+            $store->many(['foo', 'fizz', 'norf', 'missing'])
+        );
+    }
+
+    public function testItIncrementsAndDecrementsValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('count', 1, 60);
+
+        $this->assertSame(6, $store->increment('count', 5));
+        $this->assertEquals(6, $store->get('count'));
+        $this->assertSame(4, $store->decrement('count', 2));
+        $this->assertEquals(4, $store->get('count'));
+    }
+
+    public function testItStoresValuesForeverAndCanTouchThem(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+        $connection = $store->connection();
+
+        $this->assertTrue($store->forever('forever', 'value'));
+        $this->assertSame('value', $store->get('forever'));
+        $this->assertSame(-1, $connection->ttl($store->getPrefix().'forever'));
+
+        $store->put('touched', 'value', 10);
+
+        $this->assertTrue($store->touch('touched', 100));
+        $this->assertGreaterThan(10, $connection->ttl($store->getPrefix().'touched'));
+        $this->assertSame('value', $store->get('touched'));
+    }
+
+    public function testFlushStaleTagsRemovesExpiredEntriesAndStopsScanning(): void
+    {
+        $store = Cache::store('redis');
+
+        if ($store->connection() instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Predis cannot SCAN a cluster, so the current tags cannot be listed.');
+        }
+
+        $store->clear();
+
+        // An entry that expired five minutes ago, and one that is still fresh...
+        Carbon::setTestNow(Carbon::now()->subMinutes(5));
+
+        try {
+            $store->tags(['foo'])->put('expired', 'value', 60);
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $store->tags(['foo'])->put('fresh', 'value', 3600);
+
+        $tagSet = $store->getPrefix().'tag:foo:entries';
+
+        $this->assertSame(2, $store->connection()->zcard($tagSet));
+
+        // The scan has to recognise it is back at its starting cursor, or this never returns...
+        $store->flushStaleTags();
+
+        $this->assertSame(1, $store->connection()->zcard($tagSet));
+        $this->assertSame('value', $store->tags(['foo'])->get('fresh'));
+    }
+
+    public function testItForgetsAndFlushesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('foo', 'bar', 60);
+        $store->put('fizz', 'buzz', 60);
+
+        $this->assertTrue($store->forget('foo'));
+        $this->assertNull($store->get('foo'));
+        $this->assertSame('buzz', $store->get('fizz'));
+
+        $this->assertTrue($store->flush());
+        $this->assertNull($store->get('fizz'));
     }
 
     public function testLocksCanBeFlushed()

@@ -17,14 +17,17 @@ use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableSent(): void
     {
@@ -321,7 +324,7 @@ class MailableQueuedTest extends TestCase
 
     protected function getMocks()
     {
-        return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
+        return ['smtp', Double::for(Factory::class), Double::for(TransportInterface::class)];
     }
 }
 

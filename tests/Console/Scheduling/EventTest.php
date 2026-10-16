@@ -9,7 +9,8 @@ use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,8 @@ use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {
@@ -295,7 +298,7 @@ class EventTest extends TestCase
     public function testRunResetsSkippedBecauseOverlapping()
     {
         $container = new Container;
-        $mutex = Mockery::mock(EventMutex::class);
+        $mutex = Double::for(EventMutex::class);
         $event = new class($mutex, 'php -i') extends Event
         {
             public $executions = 0;
@@ -310,7 +313,7 @@ class EventTest extends TestCase
 
         $event->withoutOverlapping();
 
-        $mutex->expects('create')->times(2)->with($event)->andReturn(false, true);
+        $mutex->expects('create')->times(2)->with($event)->returns(false, true);
         $mutex->expects('forget')->with($event);
 
         $event->run($container);

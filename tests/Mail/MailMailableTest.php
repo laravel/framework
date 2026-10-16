@@ -11,13 +11,16 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
 class MailMailableTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testMailableSetsRecipientsCorrectly(): void
     {
         $this->stubMailer();
@@ -578,7 +581,7 @@ class MailMailableTest extends TestCase
 
     public function testMailablePriorityGetsSent(): void
     {
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -597,7 +600,7 @@ class MailMailableTest extends TestCase
 
     public function testMailableIsReleasedWithoutGarbageCollectionAfterSettingPriority(): void
     {
-        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+        $mailer = new Mailer('array', Double::for(Factory::class), new ArrayTransport);
 
         gc_disable();
 
@@ -623,7 +626,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -680,7 +683,7 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasMetadata('total', 1670));
 
         $this->stubMailer();
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->send($mailable);
@@ -697,7 +700,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1196,7 +1199,7 @@ class MailMailableTest extends TestCase
 
     public function testMailableHeadersGetSent(): void
     {
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1220,7 +1223,7 @@ class MailMailableTest extends TestCase
 
     public function testMailableIsReleasedWithoutGarbageCollectionAfterSendingWithHeaders(): void
     {
-        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+        $mailer = new Mailer('array', Double::for(Factory::class), new ArrayTransport);
 
         gc_disable();
 

@@ -9,10 +9,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
-use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\NullQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -66,15 +65,14 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Mockery::mock(QueueManager::class);
-        $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
-            return $passedJob === $job;
-        });
+        $queue = new QueueFakeTestRecordingQueue;
 
-        $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
+        $fake = new QueueFake(new Application, JobToFakeStub::class, $queue);
 
         $fake->push($job);
         $fake->push(new JobToFakeStub());
+
+        $this->assertSame([[$job, '', null]], $queue->pushed);
 
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
@@ -442,15 +440,14 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Mockery::mock(QueueManager::class);
-        $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
-            return $passedJob === $job;
-        });
+        $queue = new QueueFakeTestRecordingQueue;
 
-        $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
+        $fake = (new QueueFake(new Application, [], $queue))->except(JobStub::class);
 
         $fake->push($job);
         $fake->push(new JobToFakeStub());
+
+        $this->assertSame([[$job, '', null]], $queue->pushed);
 
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
@@ -509,12 +506,9 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
         $steps = [];
 
-        $manager = Mockery::mock(QueueManager::class);
-        $manager->expects('push')->withArgs(function ($passedJob, $passedData, $passedQueue) use ($job) {
-            return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
-        });
+        $queue = new QueueFakeTestRecordingQueue;
 
-        $fake = (new QueueFake(new Application, [], $manager))
+        $fake = (new QueueFake(new Application, [], $queue))
             ->except(JobStub::class)
             ->beforePushing(function ($job, $data, $queue) use (&$steps) {
                 $steps[] = ['before', is_object($job) ? get_class($job) : $job, $data, $queue];
@@ -531,6 +525,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $fake->push($job, ['foo' => 'bar'], 'redis');
 
+        $this->assertSame([[$job, ['foo' => 'bar'], 'redis']], $queue->pushed);
         $this->assertSame([
             ['before', JobStub::class, ['foo' => 'bar'], 'redis'],
             ['before again', JobStub::class, ['foo' => 'bar'], 'redis'],
@@ -965,5 +960,15 @@ class JobWithSerialization
     public function __unserialize(array $data): void
     {
         $this->value = $data['value'].'-unserialized';
+    }
+}
+
+class QueueFakeTestRecordingQueue extends NullQueue
+{
+    public array $pushed = [];
+
+    public function push($job, $data = '', $queue = null)
+    {
+        $this->pushed[] = [$job, $data, $queue];
     }
 }

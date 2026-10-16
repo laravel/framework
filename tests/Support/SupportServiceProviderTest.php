@@ -6,11 +6,14 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SupportServiceProviderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $app;
     protected string $tempFile;
 
@@ -19,7 +22,7 @@ class SupportServiceProviderTest extends TestCase
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
-        $this->app = $app = Mockery::mock(Application::class)->makePartial();
+        $this->app = $app = new Application;
         $config = new Config();
 
         $app->instance('config', $config);
@@ -165,14 +168,10 @@ class SupportServiceProviderTest extends TestCase
 
     public function testLoadTranslationsFromWithoutNamespace()
     {
-        $translator = Mockery::mock(Translator::class);
+        $translator = Double::for(Translator::class);
         $translator->expects('addPath')->with(__DIR__.'/translations');
 
-        $this->app->expects('afterResolving')->with('translator', Mockery::on(function ($callback) use ($translator) {
-            $callback($translator);
-
-            return true;
-        }));
+        $this->app->instance('translator', $translator);
 
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadTranslationsFrom(__DIR__.'/translations');
@@ -180,14 +179,10 @@ class SupportServiceProviderTest extends TestCase
 
     public function testLoadTranslationsFromWithNamespace()
     {
-        $translator = Mockery::mock(Translator::class);
+        $translator = Double::for(Translator::class);
         $translator->expects('addNamespace')->with('namespace', __DIR__.'/translations');
 
-        $this->app->expects('afterResolving')->with('translator', Mockery::on(function ($callback) use ($translator) {
-            $callback($translator);
-
-            return true;
-        }));
+        $this->app->instance('translator', $translator);
 
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadTranslationsFrom(__DIR__.'/translations', 'namespace');

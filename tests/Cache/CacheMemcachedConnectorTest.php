@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\MemcachedConnector;
+use JMac\Testing\Double;
 use Memcached;
-use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class CacheMemcachedConnectorTest extends TestCase
         ];
 
         $memcached = $this->memcachedMockWithAddServer();
-        $memcached->expects('setOptions')->andReturn(true);
+        $memcached->expects('setOptions')->returns(true);
 
         $connector = $this->connectorMock();
         $connector->expects($this->once())
@@ -65,13 +65,15 @@ class CacheMemcachedConnectorTest extends TestCase
     #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
+        if (! method_exists(Memcached::class, 'setSaslAuthData')) {
+            $this->markTestSkipped('The memcached extension was built without SASL support.');
+        }
+
         $saslCredentials = ['foo', 'bar'];
 
         $memcached = $this->memcachedMockWithAddServer();
-        $memcached->expects('setOption')->with(Memcached::OPT_BINARY_PROTOCOL, true)->andReturn(true);
-        $memcached->expects('setSaslAuthData')
-            ->with($saslCredentials[0], $saslCredentials[1])
-            ->andReturn(true);
+        $memcached->expects('setOption')->with(Memcached::OPT_BINARY_PROTOCOL, true)->returns(true);
+        $memcached->expects('setSaslAuthData')->with($saslCredentials[0], $saslCredentials[1])->returns(true);
 
         $connector = $this->connectorMock();
         $connector->expects($this->once())->method('createMemcachedInstance')->willReturn($memcached);
@@ -83,9 +85,9 @@ class CacheMemcachedConnectorTest extends TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = Mockery::mock(Memcached::class);
+        $memcached = Double::for(Memcached::class);
         $memcached->expects('addServer')->with($this->getHost(), $this->getPort(), $this->getWeight());
-        $memcached->expects('getServerList')->andReturn([]);
+        $memcached->expects('getServerList')->returns([]);
 
         return $memcached;
     }

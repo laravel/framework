@@ -5,12 +5,15 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class DatabaseTransactionsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * Setup the database schema.
      *
@@ -60,7 +63,7 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testTransactionIsRecordedAndCommitted()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('commit')->with('default', 1, 0);
 
@@ -79,7 +82,7 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testTransactionIsRecordedAndCommittedUsingTheSeparateMethods()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('commit')->with('default', 1, 0);
 
@@ -98,7 +101,7 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testNestedTransactionIsRecordedAndCommitted()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('begin')->with('default', 2);
         $transactionManager->expects('commit')->with('default', 2, 1);
@@ -125,7 +128,7 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testNestedTransactionIsRecordeForDifferentConnectionsdAndCommitted()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('begin')->with('second_connection', 1);
         $transactionManager->expects('begin')->with('second_connection', 2);
@@ -161,10 +164,10 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testTransactionIsRolledBack()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('rollback')->with('default', 0);
-        $transactionManager->shouldNotReceive('commit');
+        $transactionManager->expects('commit')->never();
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -186,10 +189,10 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testTransactionIsRolledBackUsingSeparateMethods()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('rollback')->with('default', 0);
-        $transactionManager->shouldNotReceive('commit', 1, 0);
+        $transactionManager->expects('commit')->never();
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -208,12 +211,12 @@ class DatabaseTransactionsTest extends TestCase
 
     public function testNestedTransactionsAreRolledBack()
     {
-        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('begin')->with('default', 2);
         $transactionManager->expects('rollback')->with('default', 1);
         $transactionManager->expects('rollback')->with('default', 0);
-        $transactionManager->shouldNotReceive('commit');
+        $transactionManager->expects('commit')->never();
 
         $this->connection()->setTransactionManager($transactionManager);
 
