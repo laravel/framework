@@ -365,6 +365,7 @@ class CloudBootstrapper
 
             // Defer registration of the reporter until exception handler is resolved...
             $reportableRegistered = false;
+
             $registerReporter = function ($handler) use ($exceptionReporter, &$reportableRegistered) {
                 if ($reportableRegistered) {
                     return;
