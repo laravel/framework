@@ -309,7 +309,7 @@ trait CanBeOneOfMany
     {
         $relation = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
 
-        return str_starts_with($relation, '{closure') ? $this->query->getModel()->getTable() : $relation;
+        return str_contains($relation, '{closure') ? $this->query->getModel()->getTable() : $relation;
     }
 
     /**
