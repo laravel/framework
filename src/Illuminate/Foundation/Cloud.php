@@ -43,6 +43,7 @@ class Cloud
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
+                static::configureExceptions($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -161,12 +162,26 @@ class Cloud
     }
 
     /**
+     * Configure the Laravel Cloud exception reporting if applicable.
+     *
+     * @throws \JsonException
+     */
+    public static function configureExceptions(Application $app): void
+    {
+        if (! isset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'])) {
+            return;
+        }
+
+        $app['config']->set('_cloud.exceptions', json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Register the Laravel Cloud exception reporter if applicable.
      */
     public static function registerExceptionReporting(Application $app): void
     {
         try {
-            if (! isset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'])) {
+            if (! is_array($config = $app['config']->get('_cloud.exceptions'))) {
                 return;
             }
 
@@ -175,7 +190,7 @@ class Cloud
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
                 'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
-                ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
+                ...$config,
             ];
 
             $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
@@ -185,9 +200,16 @@ class Cloud
             ));
 
             // Defer registration of the reporter until exception handler is resolved...
-            $registerReporter = function ($handler) use ($exceptionReporter) {
+            $reportableRegistered = false;
+            $registerReporter = function ($handler) use ($exceptionReporter, &$reportableRegistered) {
+                if ($reportableRegistered) {
+                    return;
+                }
+
                 try {
                     $handler->reportable($exceptionReporter);
+
+                    $reportableRegistered = true;
                 } catch (Throwable) {
                     //
                 }
