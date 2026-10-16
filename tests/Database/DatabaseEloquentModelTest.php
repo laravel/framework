@@ -349,6 +349,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asFluentAttribute'));
     }
 
+    public function testDirtyOnCastedFluentWithFormattedJson()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asFluentAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Fluent::class, $model->asFluentAttribute);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $model->asFluentAttribute = new Fluent(['foo' => 'bar']);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $model->asFluentAttribute = new Fluent(['foo' => 'baz']);
+        $this->assertTrue($model->isDirty('asFluentAttribute'));
+    }
+
     // public function testDirtyOnCastedEncryptedCollection()
     // {
     //     $this->encrypter = Mockery::mock(Encrypter::class);
