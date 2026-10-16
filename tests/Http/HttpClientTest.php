@@ -1400,6 +1400,22 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testWithQueryParametersCanBeOverriddenByLaterCalls()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'baz',
+        ])->withQueryParameters([
+            'baz' => 'qux',
+        ])->get('https://laravel.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo=bar&baz=qux';
+        });
+    }
+
     public function testWithStringableQueryParameters()
     {
         $this->factory->fake();

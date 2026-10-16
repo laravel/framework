@@ -405,9 +405,10 @@ class PendingRequest
      */
     public function withQueryParameters(array $parameters)
     {
-        $this->options = array_merge_recursive($this->options, [
-            'query' => $parameters,
-        ]);
+        $this->options['query'] = array_replace_recursive(
+            is_array($this->options['query'] ?? null) ? $this->options['query'] : [],
+            $parameters,
+        );
 
         return $this;
     }
