@@ -1031,12 +1031,18 @@ class DatabaseConnectionTest extends TestCase
 
     public function testLostConnectionIsRetriedWhenReleasingADeadReadPdoRaisesAWarning()
     {
-        $statement = Mockery::mock(PDOStatement::class);
-        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
-        $statement->expects('execute')->andReturn(true);
+        $statement = Double::for(PDOStatement::class);
+        $executions = 0;
+        $statement->expects('execute')->times(2)->resolves(function () use (&$executions) {
+            if ($executions++ === 0) {
+                throw new PDOException('server has gone away');
+            }
 
-        $pdo = Mockery::mock(PDO::class);
-        $pdo->expects('prepare')->times(2)->andReturn($statement);
+            return true;
+        });
+
+        $pdo = Double::for(PDO::class);
+        $pdo->expects('prepare')->times(2)->returns($statement);
 
         $connection = new Connection(fn () => $pdo);
         $connection->setReadPdo(new DatabaseConnectionTestPdoThatWarnsWhenReleased);
