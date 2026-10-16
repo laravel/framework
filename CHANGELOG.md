@@ -1,6 +1,42 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.36.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.37.0...13.x)
+
+## [v13.37.0](https://github.com/laravel/framework/compare/v13.36.0...v13.37.0) - 2026-10-16
+
+* [13.x] Fix race condition with jobs using both `onOneServer()` and `withoutOverlapping()` by [@tanerkay](https://github.com/tanerkay) in https://github.com/laravel/framework/pull/62007
+* [13.x] Respect faked Sleep in limiter block() timeout by [@grzegorczykp](https://github.com/grzegorczykp) in https://github.com/laravel/framework/pull/62017
+* [13.x] Improve getForeignKeys performance on MariaDB/MySQL on servers with many databases by [@RMJTromp](https://github.com/RMJTromp) in https://github.com/laravel/framework/pull/62014
+* [13.x] Release the unique lock when pushing a job to the queue fails by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/62010
+* [13.x] Fix `has()` and `withCount()` on self-referencing one-of-many relations by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/62009
+* [13.x] Fix `whereBelongsTo()` and `whereAttachedTo()` collection types by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62002
+* [13.x] Add `--queue` option in queue:failed by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61971
+* [13.x] Add runtime to ScheduledTaskFailed by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61970
+* [13.x] Avoid creating extra model instances in Eloquent `cursor()` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62001
+* [13.x] Fix N+1 queries when including nested JSON:API relationships by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62000
+* [13.x] Fix incrementOrCreate() on through relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61997
+* [13.x] Fix `restore()` failing on soft delete queries with joins by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61998
+* [13.x] Fix Eloquent Collection `findOrFail()` with a model instance by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61999
+* [13.x] Add generic return type to `InvokableComponentVariable` by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/62018
+* [13.x] Add detect_mime_type_using_path option to SFTP and FTP disks by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61972
+* [13.x] Allow queue:forget to accept multiple IDs by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61901
+* [13.x] Fix mergeWhen() in JSON:API resource attributes by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62023
+* [13.x] Qualify the default `latest()` and `oldest()` column on queries with joins by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62024
+* [13.x] Release unique queued listener locks in Queue::fake() by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/62025
+* [13.x] Add JPEG XL (JXL) support to the Image API by [@rjsamra](https://github.com/rjsamra) in https://github.com/laravel/framework/pull/62019
+* [13.x] Use the intermediate table alias in self-referencing `HasOneThrough` one-of-many existence queries by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62040
+* [13.x] Support selecting columns in withWhereHas() with a callback by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62039
+* [13.x] Qualify attribute columns in through relation firstOrNew(), firstOrCreate() and createOrFirst() by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62038
+* [13.x] Allow RedirectResponse to implement Responsable by [@finagin](https://github.com/finagin) in https://github.com/laravel/framework/pull/62036
+* [13.x] Fix `encrypted:object` and `encrypted:collection` casts always being dirty by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/62032
+* [13.x] Add strict option to Rule::numeric() by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/62031
+* [13.x] Fix `DynamoDbStore::many()` returning values under the wrong keys for numeric keys by [@sajjadhossainshohag](https://github.com/sajjadhossainshohag) in https://github.com/laravel/framework/pull/62029
+* [13.x] Add Stringable to the parameter types in Rule::when() and Rule::unless() by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/62030
+* [13.x] Fix cached `Attribute` accessors returning stale values after setting the attribute by [@sajjadhossainshohag](https://github.com/sajjadhossainshohag) in https://github.com/laravel/framework/pull/62035
+* [13.x] Don't report skipped migrations as pending in migrate:status by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61989
+* [13.x] Suppress teardown warnings when disconnecting dead connections by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/62042
+* [13.x] Release the unique lock when pushing a queued listener fails by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/62045
+* [13.x] Improve exception reporting by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/62047
 
 ## [v13.36.0](https://github.com/laravel/framework/compare/v13.35.0...v13.36.0) - 2026-10-13
 
