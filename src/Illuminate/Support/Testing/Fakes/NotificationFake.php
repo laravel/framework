@@ -335,6 +335,10 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             $notifiables = [$notifiables];
         }
 
+        $locale = $this->locale;
+
+        $this->locale = null;
+
         foreach ($notifiables as $notifiable) {
             if (! $notification->id) {
                 $notification->id = (string) Str::uuid();
@@ -359,7 +363,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                     : $notification,
                 'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
-                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+                'locale' => $notification->locale ?? $locale ?? value(function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
                         return $notifiable->preferredLocale();
                     }

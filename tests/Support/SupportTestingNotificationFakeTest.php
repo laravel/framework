@@ -254,6 +254,22 @@ class SupportTestingNotificationFakeTest extends TestCase
         });
     }
 
+    public function testLocaleDoesNotLeakToSubsequentNotifications()
+    {
+        $user = new LocalizedUserStub;
+
+        $this->fake->locale('fr')->send($user, new NotificationStub);
+        $this->fake->send($user, new NotificationStub);
+
+        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
+            return $notifiable === $user && $locale === 'fr';
+        });
+
+        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
+            return $notifiable === $user && $locale === 'au';
+        });
+    }
+
     public function testAssertSentToWhenNotifiableHasFalsyShouldSend()
     {
         $user = new LocalizedUserStub;
