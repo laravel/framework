@@ -369,6 +369,13 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => 5], $repo->getMultiple($keys, $default));
     }
 
+    public function testGettingMultipleValuesFromCacheWithNumericKeys()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('many')->with(['0', '1', '2'])->andReturn([0 => 'a', 1 => null, 2 => 'c']);
+        $this->assertEquals([0 => 'a', 1 => 'default', 2 => 'c'], $repo->getMultiple(['0', '1', '2'], 'default'));
+    }
+
     public function testRemovingMultipleKeys()
     {
         $repo = $this->getRepository();
