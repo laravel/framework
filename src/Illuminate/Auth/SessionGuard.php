@@ -233,14 +233,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         $userPassword = $user->getAuthPassword();
 
-        if (! is_string($userPassword)) {
-            return;
-        }
-
         $recallerHash = $recaller->hash();
 
         return (hash_equals($this->hashPasswordForCookie($userPassword), $recallerHash)
-                || hash_equals($userPassword, $recallerHash))
+                || (is_string($userPassword) && hash_equals($userPassword, $recallerHash)))
             ? $user : null;
     }
 

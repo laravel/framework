@@ -727,6 +727,21 @@ class AuthGuardTest extends TestCase
         $this->assertNull($guard->user());
     }
 
+    public function testUserUsesRememberCookieWhenUserHasNullPassword()
+    {
+        [$guard, $provider, $session] = $this->getRealGuard();
+        $guard->setRequest(Request::create('/', 'GET', [], [
+            $guard->getRecallerName() => 'id|recaller|'.$guard->hashPasswordForCookie(null),
+        ]));
+        $user = Mockery::mock(Authenticatable::class);
+        $provider->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
+        $user->expects('getAuthIdentifier')->andReturn('bar');
+        $user->expects('getAuthPassword')->andReturn(null);
+
+        $this->assertSame($user, $guard->user());
+        $this->assertTrue($guard->viaRemember());
+    }
+
     public function testHashPasswordForCookieAcceptsNullPassword()
     {
         $guard = $this->getGuard();
