@@ -3,14 +3,23 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection as BaseAnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class AnonymousResourceCollection extends BaseAnonymousResourceCollection
 {
     use Concerns\ResolvesJsonApiRequest;
+
+    /**
+     * Determine whether the requested relationships have been eager loaded for the collection.
+     */
+    protected bool $requestedRelationshipsEagerLoaded = false;
 
     /**
      * Get any additional data that should be returned with the resource array.
@@ -21,6 +30,8 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function with($request)
     {
+        $this->eagerLoadRequestedRelationships($this->resolveJsonApiRequestFrom($request));
+
         return array_filter([
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResourceObjects($request))
@@ -44,9 +55,57 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function toAttributes(Request $request)
     {
+        $this->eagerLoadRequestedRelationships($this->resolveJsonApiRequestFrom($request));
+
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))
             ->all();
+    }
+
+    /**
+     * Eager load the relationships requested for the entire collection in a single query.
+     *
+     * Only the relationship keys declared by the resource are eager loaded; the
+     * relationships themselves are still resolved per resource, so closure based
+     * relationships keep their per resource behavior. Relationships that were
+     * already loaded are left untouched.
+     */
+    protected function eagerLoadRequestedRelationships(JsonApiRequest $request): void
+    {
+        if ($this->requestedRelationshipsEagerLoaded) {
+            return;
+        }
+
+        $this->requestedRelationshipsEagerLoaded = true;
+
+        $relationships = $request->sparseIncluded();
+
+        if (empty($relationships)) {
+            return;
+        }
+
+        $models = $this->collection
+            ->map(fn ($resource) => $resource instanceof JsonResource ? $resource->resource : $resource)
+            ->filter(fn ($model) => $model instanceof Model)
+            ->values();
+
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        $resource = rescue(fn () => $models->first()->toResource(), report: false);
+
+        if (! $resource instanceof JsonApiResource) {
+            return;
+        }
+
+        $relationNames = (new Collection($resource->toRelationships($request)))
+            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
+            ->only($relationships)
+            ->keys();
+
+        (new EloquentCollection($models->all()))->loadMissing($relationNames->all());
     }
 
     /**

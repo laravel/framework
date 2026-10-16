@@ -525,6 +525,26 @@ class JsonApiResourceTest extends TestCase
         $this->assertCount(3, DB::getQueryLog());
     }
 
+    public function testItEagerLoadsIncludedRelationshipsForEveryModelInACollectionAtOnce()
+    {
+        $posts = Post::factory()->count(5)->create();
+
+        foreach ($posts as $post) {
+            Comment::factory()->create([
+                'post_id' => $post->getKey(),
+            ]);
+        }
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'comments']))
+            ->assertOk()
+            ->assertJsonCount(5, 'included');
+
+        // One query for the count, one for the posts and one for the comments of all posts...
+        $this->assertCount(3, DB::getQueryLog());
+    }
+
     public function testItResolvesEachRelationshipClosureOnceWhenIncludingNestedRelationships()
     {
         $user = User::factory()->create();
