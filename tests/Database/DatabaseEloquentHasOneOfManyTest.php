@@ -90,6 +90,22 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame('logins_of_many', $model->logins()->getRelationName());
     }
 
+    public function testItUsesTheTableNameWhenOfManyIsCalledInsideAClosure()
+    {
+        HasOneOfManyTestUser::resolveRelationUsing('first_login_from_closure', function ($user) {
+            return $user->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'min');
+        });
+
+        $user = HasOneOfManyTestUser::create();
+        $first = $user->logins()->create();
+        $user->logins()->create();
+
+        $this->assertTrue($first->is($user->first_login_from_closure));
+        $this->assertTrue($first->is(HasOneOfManyTestUser::with('first_login_from_closure')->first()->first_login_from_closure));
+        $this->assertCount(1, HasOneOfManyTestUser::has('first_login_from_closure')->get());
+        $this->assertSame('logins_of_many', $user->first_login_from_closure()->getRelationName());
+    }
+
     public function testRelationNameCanBeSet()
     {
         $user = HasOneOfManyTestUser::create();
