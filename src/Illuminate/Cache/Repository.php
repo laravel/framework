@@ -180,9 +180,13 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function getMultiple($keys, $default = null): iterable
     {
-        $values = $this->many(
-            (new Collection($keys))->map(fn ($key) => enum_value($key))->values()->all()
-        );
+        $normalized = [];
+
+        foreach ($keys as $key) {
+            $normalized[] = enum_value($key);
+        }
+
+        $values = $this->many(array_values(array_unique($normalized)));
 
         return (new Collection($values))
             ->map(fn ($value) => is_null($value) ? value($default) : $value)
