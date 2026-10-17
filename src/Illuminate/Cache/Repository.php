@@ -811,6 +811,16 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function flush()
+    {
+        return $this->clear();
+    }
+
+    /**
      * Flush all locks from the cache store.
      *
      * @throws \BadMethodCallException

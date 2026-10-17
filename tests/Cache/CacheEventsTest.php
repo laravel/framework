@@ -254,6 +254,12 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheFlushed::class, ['storeName' => 'array']);
 
         $this->assertSame([], $this->dispatchedEvents);
+
+        $this->assertTrue($repository->flush());
+        $this->assertEventDispatched(CacheFlushing::class, ['storeName' => 'array']);
+        $this->assertEventDispatched(CacheFlushed::class, ['storeName' => 'array']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testFlushLocksTriggersEvents()
