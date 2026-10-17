@@ -221,6 +221,8 @@ class BroadcastManager implements FactoryContract
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
 
             if ($this->mustBeUniqueAndCannotAcquireLock($broadcastEvent)) {
+                $this->app->make('events')->dispatch(new UniqueJobSkipped($broadcastEvent));
+
                 return;
             }
         }
