@@ -22,6 +22,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
