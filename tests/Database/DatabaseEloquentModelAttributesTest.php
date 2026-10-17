@@ -315,6 +315,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame([], (new ModelWithEmptyGuardedPropertyAndAttribute)->getGuarded());
     }
 
+    public function test_child_guarded_attribute_overrides_parent_unguarded_attribute(): void
+    {
+        $model = new ChildModelWithGuardedAttribute;
+
+        $this->assertSame(['is_admin'], $model->getGuarded());
+    }
+
+    public function test_child_unguarded_attribute_overrides_parent_guarded_attribute(): void
+    {
+        $model = new ChildModelWithUnguardedAttribute;
+
+        $this->assertSame([], $model->getGuarded());
+    }
+
+    public function test_child_inherits_parent_unguarded_attribute(): void
+    {
+        $model = new ChildModelWithNoGuardedAttribute;
+
+        $this->assertSame([], $model->getGuarded());
+    }
+
     public function test_hidden_attribute(): void
     {
         $model = new ModelWithHiddenAttribute;
@@ -763,6 +784,35 @@ class PivotWithGuardedAttributeAndProperty extends Pivot
 }
 
 class PivotWithoutGuardedAttribute extends Pivot
+{
+    //
+}
+
+#[Unguarded]
+class ParentModelWithUnguardedAttribute extends Model
+{
+    //
+}
+
+#[Guarded(['is_admin'])]
+class ChildModelWithGuardedAttribute extends ParentModelWithUnguardedAttribute
+{
+    //
+}
+
+class ChildModelWithNoGuardedAttribute extends ParentModelWithUnguardedAttribute
+{
+    //
+}
+
+#[Guarded(['is_admin'])]
+class ParentModelWithGuardedAttribute extends Model
+{
+    //
+}
+
+#[Unguarded]
+class ChildModelWithUnguardedAttribute extends ParentModelWithGuardedAttribute
 {
     //
 }

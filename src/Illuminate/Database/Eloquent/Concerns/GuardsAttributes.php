@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use ReflectionClass;
 
 trait GuardsAttributes
 {
@@ -51,12 +52,38 @@ trait GuardsAttributes
         $default = $this instanceof Pivot ? [] : ['*'];
 
         if ($this->guarded === $default) {
-            if (static::resolveClassAttribute(Unguarded::class) !== null) {
-                $this->guarded = [];
-            } else {
-                $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? $default;
-            }
+            $this->guarded = static::resolveGuardedAttribute() ?? $default;
         }
+    }
+
+    /**
+     * Resolve the guarded columns from the closest "Guarded" or "Unguarded" attribute.
+     *
+     * @return array<string>|null
+     */
+    protected static function resolveGuardedAttribute()
+    {
+        $cacheKey = static::class.'@guarded';
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        $reflection = new ReflectionClass(static::class);
+
+        do {
+            foreach ([$reflection, ...$reflection->getTraits()] as $target) {
+                if ($target->getAttributes(Unguarded::class) !== []) {
+                    return static::$classAttributes[$cacheKey] = [];
+                }
+
+                if (($attributes = $target->getAttributes(Guarded::class)) !== []) {
+                    return static::$classAttributes[$cacheKey] = $attributes[0]->newInstance()->columns;
+                }
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return static::$classAttributes[$cacheKey] = null;
     }
 
     /**
