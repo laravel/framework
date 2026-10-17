@@ -280,7 +280,8 @@ class BusBatchTest extends TestCase
 
         $events->assertDispatchedOnce(BatchStarted::class);
         $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
-            return $event->batch === $batch;
+            return $event->batch->id === $batch->id
+                && $event->batch->processedJobs() === 1;
         });
         $events->assertDispatchedOnce(BatchFinished::class);
         $events->assertDispatched(BatchFinished::class, function ($event) use ($batch) {
@@ -315,7 +316,10 @@ class BusBatchTest extends TestCase
 
         $events->assertDispatchedOnce(BatchStarted::class);
         $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
-            return $event->batch === $batch;
+            return $event->batch->id === $batch->id
+                && $event->batch->pendingJobs === 1
+                && $event->batch->processedJobs() === 1
+                && $event->batch->progress() === 50;
         });
         $events->assertDispatchedOnce(BatchFinished::class);
     }
@@ -345,7 +349,9 @@ class BusBatchTest extends TestCase
 
         $events->assertDispatchedOnce(BatchStarted::class);
         $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
-            return $event->batch === $batch;
+            return $event->batch->id === $batch->id
+                && $event->batch->failedJobs === 1
+                && $event->batch->hasFailures();
         });
     }
 

@@ -242,7 +242,7 @@ class Batch implements Arrayable, JsonSerializable
             $container = Container::getInstance();
 
             if ($container->bound(Dispatcher::class)) {
-                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this->fresh() ?? $this));
             }
         }
 
@@ -355,7 +355,7 @@ class Batch implements Arrayable, JsonSerializable
             $container = Container::getInstance();
 
             if ($container->bound(Dispatcher::class)) {
-                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this->fresh() ?? $this));
             }
         }
 
