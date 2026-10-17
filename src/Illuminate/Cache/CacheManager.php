@@ -106,6 +106,32 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Get a buffered cache driver instance.
+     *
+     * @param  \UnitEnum|string|null  $driver
+     * @param  int  $size
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function buffered($driver = null, $size = 1000)
+    {
+        $driver = enum_value($driver) ?? $this->getDefaultDriver();
+
+        $bindingKey = "cache.__buffered:{$driver}";
+
+        $isSpy = isset($this->app['cache']) && $this->app['cache'] instanceof LegacyMockInterface;
+
+        $this->app->scopedIf($bindingKey, function () use ($driver, $size, $isSpy) {
+            $repository = $this->repository(
+                new BufferedStore($driver, $this->store($driver), $size), ['events' => false]
+            );
+
+            return $isSpy ? Mockery::spy($repository) : $repository;
+        });
+
+        return $this->app->make($bindingKey);
+    }
+
+    /**
      * Resolve the given store.
      *
      * @param  string  $name
