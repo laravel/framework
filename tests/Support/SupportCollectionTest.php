@@ -5375,6 +5375,20 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithFloats($collection)
+    {
+        $data = new $collection([1.5, 1.5, 2.5]);
+        $this->assertSame([1.5], $data->mode());
+
+        $data = new $collection([
+            (object) ['foo' => 0.5],
+            (object) ['foo' => 0.7],
+            (object) ['foo' => 0.7],
+        ]);
+        $this->assertSame([0.7], $data->mode('foo'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSliceOffset($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8]);
