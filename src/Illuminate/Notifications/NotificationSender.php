@@ -166,6 +166,8 @@ class NotificationSender
             return;
         }
 
+        $this->failedEventWasDispatched = false;
+
         try {
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
         } catch (Throwable $exception) {
