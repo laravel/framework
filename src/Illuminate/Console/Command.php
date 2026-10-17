@@ -275,6 +275,10 @@ class Command extends SymfonyCommand
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (isset(class_uses_recursive($this)[AutomaticallyProhibitable::class]) && $this->isProhibited()) {
+            return static::FAILURE;
+        }
+
         if ($this instanceof Isolatable && $this->option('isolated') !== false &&
             ! $this->commandIsolationMutex()->create($this)) {
             $this->comment(sprintf(
