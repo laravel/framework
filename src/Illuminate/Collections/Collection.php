@@ -1653,6 +1653,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 if (! is_string($prop) && is_callable($prop)) {
                     $result = $prop($a, $b);
+
+                    if ($direction === SortDirection::Descending) {
+                        $result = -$result;
+                    }
                 } else {
                     $values = [data_get($a, $prop), data_get($b, $prop)];
 
