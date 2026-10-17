@@ -123,6 +123,13 @@ class CallQueuedListener implements ShouldQueue
     public mixed $debounceId = null;
 
     /**
+     * The listener instance handling the event.
+     *
+     * @var object|null
+     */
+    protected $listener;
+
+    /**
      * Create a new job instance.
      *
      * @param  class-string  $class
@@ -146,11 +153,21 @@ class CallQueuedListener implements ShouldQueue
     {
         $this->prepareData();
 
-        $handler = $this->setJobInstanceIfNecessary(
+        $this->listener = $this->setJobInstanceIfNecessary(
             $this->job, $container->make($this->class)
         );
 
-        $handler->{$this->method}(...array_values($this->data));
+        $this->listener->{$this->method}(...array_values($this->data));
+    }
+
+    /**
+     * Get the listener instance handling the event.
+     *
+     * @return object|null
+     */
+    public function getListener()
+    {
+        return $this->listener;
     }
 
     /**

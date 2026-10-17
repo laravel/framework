@@ -10,6 +10,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Queue\CallQueuedHandler;
@@ -826,6 +827,46 @@ class QueueWorkerTest extends TestCase
         });
     }
 
+    public function testInterruptibleQueuedListenerIsNotifiedOnSignal()
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->connectionName = 'default';
+
+        $listener = new CallQueuedListener(InterruptibleWorkerTestListener::class, 'handle', []);
+        $listener->setJob($job);
+        $listener->handle(new Container);
+
+        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->andReturn($listener);
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+        $worker->notifyJobOfSignal(15);
+
+        $this->assertSame(15, $listener->getListener()->receivedSignal);
+        $this->events->assertDispatchedOnce(JobInterrupted::class);
+    }
+
+    public function testJobInterruptedEventIsNotDispatchedForNonInterruptibleQueuedListeners()
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+
+        $listener = new CallQueuedListener(NonInterruptibleWorkerTestListener::class, 'handle', []);
+        $listener->setJob($job);
+        $listener->handle(new Container);
+
+        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->andReturn($listener);
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+        $worker->notifyJobOfSignal(15);
+
+        $this->events->assertNotDispatched(JobInterrupted::class);
+    }
+
     #[RequiresPhpExtension('pcntl')]
     public function testInterruptibleJobIsNotifiedWhenTheJobTimesOut()
     {
@@ -1238,4 +1279,27 @@ class WorkerFakeJob implements QueueJobContract
 class LoopBreakerException extends RuntimeException
 {
     //
+}
+
+class InterruptibleWorkerTestListener implements Interruptible
+{
+    public ?int $receivedSignal = null;
+
+    public function handle()
+    {
+        //
+    }
+
+    public function interrupted(int $signal): void
+    {
+        $this->receivedSignal = $signal;
+    }
+}
+
+class NonInterruptibleWorkerTestListener
+{
+    public function handle()
+    {
+        //
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobInterrupted;
@@ -1053,6 +1054,10 @@ class Worker
         }
 
         $job = $handler->getRunningCommand();
+
+        if ($job instanceof CallQueuedListener) {
+            $job = $job->getListener();
+        }
 
         if ($job instanceof Interruptible) {
             $job->interrupted($signal);
