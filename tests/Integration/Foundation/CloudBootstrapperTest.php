@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Database\Connectors\ConnectorInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\JsonFormatter;
 use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
@@ -543,6 +544,13 @@ class CloudBootstrapperTest extends TestCase
         CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
+
+    public function test_it_configures_the_cloud_logging_formatter()
+    {
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
     }
 
     public function test_it_aliases_cloud_logging_channel()
