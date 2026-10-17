@@ -165,6 +165,19 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(AuthedTest::class);
     }
 
+    public function testNullableDependencyIsNullWhenAttributeResolvesToNull()
+    {
+        $container = new Container;
+        $container->singleton('auth', function () {
+            $manager = Mockery::mock(AuthManager::class);
+            $manager->expects('userResolver')->andReturn(fn ($guard = null) => null);
+
+            return $manager;
+        });
+
+        $this->assertNull($container->make(GuestTest::class)->user);
+    }
+
     public function testCacheAttribute()
     {
         $container = new Container;
@@ -568,6 +581,19 @@ final readonly class AuthedTest
         #[CurrentUser('bar')] AuthenticatableContract $bar,
         #[Authenticated(AuthGuardUnitEnum::unit)] AuthenticatableContract $unit,
         #[CurrentUser(AuthGuardBackedEnum::Backed)] AuthenticatableContract $backed,
+    ) {
+    }
+}
+
+final class ContainerTestUser
+{
+    //
+}
+
+final readonly class GuestTest
+{
+    public function __construct(
+        #[CurrentUser] public ?ContainerTestUser $user,
     ) {
     }
 }
