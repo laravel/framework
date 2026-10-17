@@ -159,6 +159,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('secondary', $model->getConnectionName());
     }
 
+    public function test_child_connection_attribute_overrides_inherited_connection_property(): void
+    {
+        $model = new ChildModelWithConnectionAttribute;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_child_inherits_parent_connection_attribute(): void
+    {
+        $model = new ChildModelWithNoConnection;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_child_connection_property_overrides_parent_connection_attribute(): void
+    {
+        $model = new ChildModelWithConnectionProperty;
+
+        $this->assertSame('default', $model->getConnectionName());
+    }
+
     public function test_timestamps_attribute(): void
     {
         $model = new ModelWithTimestampsFalseAttribute;
@@ -642,6 +663,33 @@ class ModelWithUnitEnumConnectionAttribute extends Model
 class ModelWithBackedEnumConnectionAttribute extends Model
 {
     //
+}
+
+class ParentModelWithConnectionProperty extends Model
+{
+    protected $connection = 'default';
+}
+
+#[Connection('secondary')]
+class ChildModelWithConnectionAttribute extends ParentModelWithConnectionProperty
+{
+    //
+}
+
+#[Connection('secondary')]
+class ParentModelWithConnectionAttribute extends Model
+{
+    //
+}
+
+class ChildModelWithNoConnection extends ParentModelWithConnectionAttribute
+{
+    //
+}
+
+class ChildModelWithConnectionProperty extends ParentModelWithConnectionAttribute
+{
+    protected $connection = 'default';
 }
 
 #[Table(timestamps: false)]
