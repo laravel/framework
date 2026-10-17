@@ -357,7 +357,11 @@ class MemoizedTaggedCacheTest extends TestCase
         Cache::memo()->flush();
 
         $this->assertNull($cache->get('name'));
-        $this->assertSame([], $events);
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(CacheFlushing::class, $events[0]);
+        $this->assertSame([], $events[0]->tags);
+        $this->assertInstanceOf(CacheFlushed::class, $events[1]);
+        $this->assertSame([], $events[1]->tags);
     }
 
     public function test_it_dispatches_decorated_driver_events_only()
