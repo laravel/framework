@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('memcached')]
-class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
+class MemcachedCacheLockTest extends MemcachedIntegrationTestCase
 {
     public function testMemcachedLocksCanBeAcquiredAndReleased()
     {
