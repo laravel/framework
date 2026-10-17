@@ -79,6 +79,13 @@ trait ManagesAttributes
     public $onOneServer = false;
 
     /**
+     * Indicates if the command should run on every server, even when events always run on one server.
+     *
+     * @var bool
+     */
+    public $onEachServer = false;
+
+    /**
      * The number of minutes the mutex should be valid.
      *
      * @var int
@@ -202,6 +209,20 @@ trait ManagesAttributes
     public function onOneServer()
     {
         $this->onOneServer = true;
+        $this->onEachServer = false;
+
+        return $this;
+    }
+
+    /**
+     * Allow the event to run on every server, even when events always run on one server.
+     *
+     * @return $this
+     */
+    public function onEachServer()
+    {
+        $this->onOneServer = false;
+        $this->onEachServer = true;
 
         return $this;
     }

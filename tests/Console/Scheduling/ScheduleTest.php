@@ -146,4 +146,27 @@ final class ScheduleTest extends TestCase
             Schedule::alwaysOnOneServer(false);
         }
     }
+
+    public function testEventsMayRunOnEachServer(): void
+    {
+        Schedule::alwaysOnOneServer();
+
+        try {
+            $schedule = new Schedule();
+
+            $schedule->command('inspire')->everyMinute();
+            $schedule->command('tmp:cleanup')->hourly()->onEachServer();
+            $schedule->onEachServer()->group(function ($schedule) {
+                $schedule->command('heartbeat')->everyMinute();
+            });
+
+            [$command, $cleanup, $heartbeat] = $schedule->events();
+
+            $this->assertTrue($command->onOneServer);
+            $this->assertFalse($cleanup->onOneServer);
+            $this->assertFalse($heartbeat->onOneServer);
+        } finally {
+            Schedule::alwaysOnOneServer(false);
+        }
+    }
 }

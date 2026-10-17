@@ -452,7 +452,7 @@ class Schedule
     {
         if (static::$alwaysOnOneServer) {
             foreach ($this->events as $event) {
-                if ($event instanceof CallbackEvent && is_null($event->description)) {
+                if ($event->onEachServer || ($event instanceof CallbackEvent && is_null($event->description))) {
                     continue;
                 }
 
