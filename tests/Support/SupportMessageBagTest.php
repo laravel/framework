@@ -367,4 +367,25 @@ class SupportMessageBagTest extends TestCase
         $messages = $messageBag->getMessages();
         $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
     }
+
+    public function testDistinctNumericStringMessagesArePreserved()
+    {
+        $bag = new MessageBag;
+
+        $bag->add('code', '0');
+        $bag->add('code', '00');
+        $bag->add('code', '0');
+
+        $this->assertSame(
+            ['0', '00'],
+            $bag->getMessages()['code']
+        );
+
+        $this->assertSame(
+            (new MessageBag([
+                'code' => ['0', '00'],
+            ]))->getMessages(),
+            $bag->getMessages()
+        );
+    }
 }
