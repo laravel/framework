@@ -2125,6 +2125,106 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
+    public function testWhereLikeAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLikeAll(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where ("first_name" like ? and "last_name" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Taylor%'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereLikeAll(['first_name', 'last_name'], 'Taylor%', true);
+        $this->assertSame('select * from "users" where ("first_name" glob ? and "last_name" glob ?)', $builder->toSql());
+        $this->assertEquals(['Taylor*', 'Taylor*'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAll(['first_name', 'last_name'], 'Taylor%', true);
+        $this->assertSame('select * from `users` where (`first_name` like binary ? and `last_name` like binary ?)', $builder->toSql());
+        $this->assertEquals(['Taylor%', 'Taylor%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLikeAll([
+            fn (Builder $query) => $query->whereLike('first_name', '%Taylor%'),
+            fn (Builder $query) => $query->whereLike('last_name', '%Otwell%'),
+        ]);
+        $this->assertSame('select * from "users" where (("first_name" like ?) and ("last_name" like ?))', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%'], $builder->getBindings());
+    }
+
+    public function testOrWhereLikeAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereLikeAll(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where "id" = ? or ("first_name" like ? and "last_name" like ?)', $builder->toSql());
+        $this->assertEquals([1, '%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLikeAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotLikeAll(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where ("first_name" not like ? and "last_name" not like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereNotLikeAll(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where "id" = ? or ("first_name" not like ? and "last_name" not like ?)', $builder->toSql());
+        $this->assertEquals([1, '%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLikeAny(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where ("first_name" like ? or "last_name" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Taylor%'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereLikeAny(['first_name', 'last_name'], 'Taylor%', true);
+        $this->assertSame('select * from "users" where ("first_name" glob ? or "last_name" glob ?)', $builder->toSql());
+        $this->assertEquals(['Taylor*', 'Taylor*'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAny(['first_name', 'last_name'], 'Taylor%', true);
+        $this->assertSame('select * from `users` where (`first_name` like binary ? or `last_name` like binary ?)', $builder->toSql());
+        $this->assertEquals(['Taylor%', 'Taylor%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLikeAny([
+            fn (Builder $query) => $query->whereLike('first_name', '%Taylor%'),
+            fn (Builder $query) => $query->whereLike('last_name', '%Otwell%'),
+        ]);
+        $this->assertSame('select * from "users" where (("first_name" like ?) or ("last_name" like ?))', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%'], $builder->getBindings());
+    }
+
+    public function testOrWhereLikeAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereLikeAny(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where "id" = ? or ("first_name" like ? or "last_name" like ?)', $builder->toSql());
+        $this->assertEquals([1, '%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLikeAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotLikeAny(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where ("first_name" not like ? or "last_name" not like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereNotLikeAny(['first_name', 'last_name'], '%Taylor%');
+        $this->assertSame('select * from "users" where "id" = ? or ("first_name" not like ? or "last_name" not like ?)', $builder->toSql());
+        $this->assertEquals([1, '%Taylor%', '%Taylor%'], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();

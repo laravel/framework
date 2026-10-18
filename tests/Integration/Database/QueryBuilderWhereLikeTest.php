@@ -107,4 +107,26 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
         $this->assertSame('Earl.Smith@example.com', $users[0]->email);
         $this->assertSame('tim.smith@example.com', $users[1]->email);
     }
+
+    public function testWhereLikeAny()
+    {
+        $users = DB::table('users')->whereLikeAny(['name', 'email'], '%John%')->get();
+        $this->assertCount(1, $users);
+        $this->assertSame('John Doe', $users[0]->name);
+
+        $users = DB::table('users')->whereLikeAny(['name', 'email'], '%Doe%')->get();
+        $this->assertCount(3, $users);
+
+        $this->assertSame(4, DB::table('users')->where('name', 'tim smith')->orWhereLikeAny(['name', 'email'], '%Doe%')->count());
+    }
+
+    public function testWhereLikeAll()
+    {
+        $users = DB::table('users')->whereLikeAll(['name', 'email'], '%John%')->get();
+        $this->assertCount(1, $users);
+        $this->assertSame('John Doe', $users[0]->name);
+
+        $users = DB::table('users')->whereLikeAll(['name', 'email'], '%Doe%')->get();
+        $this->assertCount(3, $users);
+    }
 }
