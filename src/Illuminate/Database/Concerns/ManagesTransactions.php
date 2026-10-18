@@ -233,6 +233,16 @@ trait ManagesTransactions
     {
         $this->transactions = max(0, $this->transactions - 1);
 
+        if ($this->causedByLostConnection($e)) {
+            $this->transactions = 0;
+        }
+
+        $this->transactionsManager?->rollback(
+            $this->getName(), $this->transactions
+        );
+
+        $this->fireConnectionEvent('rollingBack');
+
         if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             $pdo = $this->getPdo();
 
@@ -241,10 +251,6 @@ trait ManagesTransactions
             }
 
             return;
-        }
-
-        if ($this->causedByLostConnection($e)) {
-            $this->transactions = 0;
         }
 
         throw $e;

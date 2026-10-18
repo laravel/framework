@@ -5,7 +5,11 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Database\Events\TransactionRolledBack;
+use Illuminate\Events\Dispatcher;
 use Mockery;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -237,6 +241,110 @@ class DatabaseTransactionsTest extends TestCase
             });
         } catch (Throwable) {
         }
+    }
+
+    public function testTransactionManagerIsRolledBackWhenCommitFails()
+    {
+        $transactionManager = Mockery::mock(new DatabaseTransactionsManager);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('rollback')->with('default', 0);
+        $transactionManager->shouldNotReceive('commit');
+
+        $this->connection()->setTransactionManager($transactionManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $events = [];
+        $dispatcher->listen(TransactionRolledBack::class, function ($event) use (&$events) {
+            $events[] = $event;
+        });
+
+        $dispatcher->listen(TransactionCommitting::class, function () {
+            throw new Exception('Commit failed');
+        });
+
+        try {
+            $this->connection()->transaction(function () {
+                $this->connection()->table('users')->insert([
+                    'name' => 'zain', 'value' => 1,
+                ]);
+            });
+        } catch (Throwable) {
+        }
+
+        $this->assertCount(1, $events);
+        $this->assertSame(0, $this->connection()->transactionLevel());
+    }
+
+    public function testCallbacksAreDiscardedWhenCommitFailsAndRetries()
+    {
+        $this->connection()->setTransactionManager(new DatabaseTransactionsManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $failOnce = true;
+        $dispatcher->listen(TransactionCommitting::class, function () use (&$failOnce) {
+            if ($failOnce) {
+                $failOnce = false;
+                throw new PDOException('deadlock detected');
+            }
+        });
+
+        $attempt = 0;
+        $ran = [];
+
+        $this->connection()->transaction(function () use (&$attempt, &$ran) {
+            $n = ++$attempt;
+            $this->connection()->afterCommit(function () use (&$ran, $n) {
+                $ran[] = "attempt {$n}";
+            });
+        }, 2);
+
+        $this->assertSame(['attempt 2'], $ran);
+    }
+
+    public function testAfterRollBackCallbacksRunWhenCommitFails()
+    {
+        $this->connection()->setTransactionManager(new DatabaseTransactionsManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $dispatcher->listen(TransactionCommitting::class, function () {
+            throw new Exception('Commit failed');
+        });
+
+        $rollbackRan = false;
+
+        try {
+            $this->connection()->transaction(function () use (&$rollbackRan) {
+                $this->connection()->afterRollBack(function () use (&$rollbackRan) {
+                    $rollbackRan = true;
+                });
+            });
+        } catch (Throwable) {
+        }
+
+        $this->assertTrue($rollbackRan);
+    }
+
+    public function testAfterCommitOutsideTransactionRunsImmediatelyAfterFailedCommit()
+    {
+        $this->connection()->setTransactionManager(new DatabaseTransactionsManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $dispatcher->listen(TransactionCommitting::class, function () {
+            throw new Exception('Commit failed');
+        });
+
+        try {
+            $this->connection()->transaction(function () {
+            });
+        } catch (Throwable) {
+        }
+
+        $ran = false;
+        $this->connection()->afterCommit(function () use (&$ran) {
+            $ran = true;
+        });
+
+        $this->assertTrue($ran);
     }
 
     /**
