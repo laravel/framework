@@ -20,6 +20,7 @@ use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -292,9 +293,15 @@ class Schedule
             return;
         }
 
-        $this->getDispatcher()->dispatch(
-            $job->onConnection($connection)->onQueue($queue)
-        );
+        try {
+            $this->getDispatcher()->dispatch(
+                $job->onConnection($connection)->onQueue($queue)
+            );
+        } catch (Throwable $e) {
+            (new UniqueLock(Container::getInstance()->make(Cache::class)))->release($job);
+
+            throw $e;
+        }
     }
 
     /**
