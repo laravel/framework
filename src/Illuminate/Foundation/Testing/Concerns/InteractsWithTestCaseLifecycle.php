@@ -41,6 +41,7 @@ use Illuminate\Support\Lottery;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
 use Laravel\Prompts\Prompt;
@@ -130,6 +131,10 @@ trait InteractsWithTestCaseLifecycle
             $this->callBeforeApplicationDestroyedCallbacks();
 
             ParallelTesting::callTearDownTestCaseCallbacks($this);
+
+            if ($this->app->resolved('queue') && $this->app['queue'] instanceof QueueFake) {
+                rescue(fn () => $this->app['queue']->releaseUniqueJobLocks(), report: false);
+            }
 
             $this->app->flush();
 
