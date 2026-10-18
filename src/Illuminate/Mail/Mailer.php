@@ -6,6 +6,7 @@ use BackedEnum;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
@@ -615,7 +616,11 @@ class Mailer implements MailerContract, MailQueueContract
     {
         $container = Container::getInstance();
 
-        return method_exists($container, 'getLocale') ? $container->getLocale() : null;
+        if (! $container instanceof ApplicationContract || ! $container->bound('translator')) {
+            return null;
+        }
+
+        return $container->make('translator')->getLocale();
     }
 
     /**

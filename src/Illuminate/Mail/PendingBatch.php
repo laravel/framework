@@ -52,6 +52,10 @@ class PendingBatch
             $this->interval((int) $config['interval']);
         }
 
+        if (isset($config['per_second'])) {
+            $this->perSecond((int) $config['per_second']);
+        }
+
         if (isset($config['retry'])) {
             $this->retry((int) $config['retry'], $config['retry_sleep'] ?? 0);
         }

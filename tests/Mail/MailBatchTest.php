@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Events\Dispatcher;
@@ -26,8 +27,17 @@ use Symfony\Component\Mime\MessageConverter;
 
 class MailBatchTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Container::setInstance(new Container);
+    }
+
     protected function tearDown(): void
     {
+        Container::setInstance(null);
+
         Sleep::fake(false);
 
         Mockery::close();
@@ -130,6 +140,18 @@ class MailBatchTest extends TestCase
         $this->assertSame([['m0', 'm1'], ['m2', 'm3']], $transport->batches);
 
         Sleep::assertSequence([Sleep::for(100)->milliseconds()]);
+    }
+
+    public function testRequestsPerSecondCanBeConfiguredPerMailer(): void
+    {
+        Sleep::fake();
+
+        $this->mailer(new BatchRecordingTransport(max: 1))
+            ->setBatchConfig(['per_second' => 5])
+            ->batch()
+            ->capture(fn ($mailer) => $this->sendMessages($mailer, 2));
+
+        Sleep::assertSequence([Sleep::for(200)->milliseconds()]);
     }
 
     public function testMessagesTheTransportCannotBatchAreSentIndividually(): void
