@@ -15,6 +15,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\UniqueFor;
+use Illuminate\Queue\Connectors\ConnectorInterface;
+use Illuminate\Queue\NullQueue;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -161,6 +163,94 @@ class BroadcastManagerTest extends TestCase
 
         Queue::assertPushed(BroadcastEvent::class, 2);
         Queue::assertNotPushed(UniqueBroadcastEvent::class);
+    }
+
+    public function testUniqueEventLockIsReleasedWhenPushingToTheQueueFails()
+    {
+        Queue::extend('failing', fn () => new class implements ConnectorInterface
+        {
+            public function connect(array $config)
+            {
+                return new class extends NullQueue
+                {
+                    public function push($job, $data = '', $queue = null)
+                    {
+                        throw new RuntimeException('Queue unavailable.');
+                    }
+                };
+            }
+        });
+
+        $this->app['config']->set('queue.connections.failing', ['driver' => 'failing']);
+
+        try {
+            Broadcast::queue(new TestEventUniqueOnFailingConnection);
+
+            $this->fail('Expected pushing the broadcast event to fail.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Queue unavailable.', $e->getMessage());
+        }
+
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueOnFailingConnection::class).':';
+
+        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testRescuedUniqueEventLockIsReleasedWhenPushingToTheQueueFails()
+    {
+        Queue::extend('failing', fn () => new class implements ConnectorInterface
+        {
+            public function connect(array $config)
+            {
+                return new class extends NullQueue
+                {
+                    public function push($job, $data = '', $queue = null)
+                    {
+                        throw new RuntimeException('Queue unavailable.');
+                    }
+                };
+            }
+        });
+
+        $this->app['config']->set('queue.connections.failing', ['driver' => 'failing']);
+
+        Broadcast::queue(new TestEventUniqueRescuedOnFailingConnection);
+
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueRescuedOnFailingConnection::class).':';
+
+        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testUniqueEventLockIsReleasedFromCustomCacheWhenPushingToTheQueueFails()
+    {
+        Queue::extend('failing', fn () => new class implements ConnectorInterface
+        {
+            public function connect(array $config)
+            {
+                return new class extends NullQueue
+                {
+                    public function push($job, $data = '', $queue = null)
+                    {
+                        throw new RuntimeException('Queue unavailable.');
+                    }
+                };
+            }
+        });
+
+        $this->app['config']->set('queue.connections.failing', ['driver' => 'failing']);
+        $this->app['config']->set('cache.stores.unique', ['driver' => 'array']);
+
+        try {
+            Broadcast::queue(new TestEventUniqueWithCustomCacheOnFailingConnection);
+
+            $this->fail('Expected pushing the broadcast event to fail.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Queue unavailable.', $e->getMessage());
+        }
+
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueWithCustomCacheOnFailingConnection::class).':';
+
+        $this->assertTrue($this->app['cache']->store('unique')->lock($lockKey, 10)->get());
     }
 
     public function testThrowExceptionWhenUnknownStoreIsUsed()
@@ -702,6 +792,23 @@ class TestEventWithUniqueForAttribute extends TestEvent
 
 class TestEventUniqueWithInheritedUniqueFor extends TestEventWithUniqueForAttribute implements ShouldBeUnique
 {
+}
+
+class TestEventUniqueOnFailingConnection extends TestEventUnique
+{
+    public $connection = 'failing';
+}
+
+class TestEventUniqueRescuedOnFailingConnection extends TestEventUniqueOnFailingConnection implements ShouldRescue
+{
+}
+
+class TestEventUniqueWithCustomCacheOnFailingConnection extends TestEventUniqueOnFailingConnection
+{
+    public function uniqueVia(): Cache
+    {
+        return Container::getInstance()->make('cache')->store('unique');
+    }
 }
 
 class TestEventRescue implements ShouldBroadcast, ShouldRescue
