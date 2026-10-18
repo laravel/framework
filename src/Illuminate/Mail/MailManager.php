@@ -153,6 +153,10 @@ class MailManager implements FactoryContract
             $mailer->setQueue($this->app['queue']);
         }
 
+        if (isset($config['batch']) && is_array($config['batch'])) {
+            $mailer->setBatchConfig($config['batch']);
+        }
+
         return $mailer;
     }
 
@@ -321,6 +325,7 @@ class MailManager implements FactoryContract
     {
         return new ResendTransport(
             Resend::client($config['key'] ?? $this->app['config']->get('services.resend.key')),
+            $config['batch_validation'] ?? 'permissive',
         );
     }
 

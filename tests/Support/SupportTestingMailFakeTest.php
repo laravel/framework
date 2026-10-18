@@ -530,6 +530,53 @@ class SupportTestingMailFakeTest extends TestCase
 enum MailTestQueueEnum: string
 {
     case Emails = 'emails';
+
+    public function testAssertBatched()
+    {
+        try {
+            $this->fake->assertBatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not sent.', $e->getMessage());
+        }
+
+        $this->fake->mailer('resend')->batch([new MailableStub, new QueueableMailableStub]);
+
+        $this->fake->assertBatched();
+        $this->fake->assertBatchCount(1);
+        $this->fake->assertSentCount(2);
+        $this->fake->assertNothingQueued();
+        $this->fake->assertBatched(fn ($mailables, $mailer) => $mailables->count() === 2 && $mailer === 'resend');
+        $this->fake->assertSent(QueueableMailableStub::class, fn ($mailable) => $mailable->mailer === 'resend');
+    }
+
+    public function testAssertBatchedWithCapture()
+    {
+        $this->fake->batch()->size(10)->capture(function ($mailer) {
+            $mailer->to('taylor@laravel.com')->send(new MailableStub);
+        });
+
+        $this->fake->send(new MailableStub);
+
+        $this->fake->assertBatched(fn ($mailables) => $mailables->count() === 1);
+        $this->fake->assertSentCount(2);
+    }
+
+    public function testAssertNotBatched()
+    {
+        $this->fake->send(new MailableStub);
+
+        $this->fake->assertNotBatched();
+
+        $this->fake->batch([new MailableStub]);
+
+        try {
+            $this->fake->assertNotBatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('1 unexpected batches were sent.', $e->getMessage());
+        }
+    }
 }
 
 class MailableStub extends Mailable

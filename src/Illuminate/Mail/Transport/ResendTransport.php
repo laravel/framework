@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
+use Throwable;
 
 /*
 MIT License
@@ -36,12 +37,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-class ResendTransport extends AbstractTransport
+class ResendTransport extends AbstractTransport implements BatchTransport
 {
     /**
      * Create a new Resend transport instance.
+     *
+     * @param  \Resend\Contracts\Client  $resend
+     * @param  string  $batchValidation  "strict" or "permissive"
      */
-    public function __construct(protected Client $resend)
+    public function __construct(protected Client $resend, protected string $batchValidation = 'permissive')
     {
         parent::__construct();
     }
@@ -56,8 +60,100 @@ class ResendTransport extends AbstractTransport
     {
         $email = MessageConverter::toEmail($message->getOriginalMessage());
 
-        $envelope = $message->getEnvelope();
+        try {
+            $result = $this->resend->emails->send(
+                $this->toPayload($email, $message->getEnvelope())
+            );
 
+            if (isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK) {
+                throw new Exception($result['message']);
+            }
+        } catch (Exception $exception) {
+            throw $this->requestFailed($exception);
+        }
+
+        $this->markAsSent($message, $result->id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function maxBatchSize(): int
+    {
+        return 100;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function canBatch(Email $email): bool
+    {
+        // Resend's batch endpoint does not support attachments yet...
+        return $email->getAttachments() === [];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \Symfony\Component\Mailer\Exception\TransportException
+     */
+    public function sendBatch(array $messages): array
+    {
+        $indexes = array_keys($messages);
+
+        $payloads = array_map(function (SentMessage $message) {
+            $payload = $this->toPayload(
+                MessageConverter::toEmail($message->getOriginalMessage()), $message->getEnvelope()
+            );
+
+            unset($payload['attachments']);
+
+            return $payload;
+        }, array_values($messages));
+
+        try {
+            $result = $this->resend->batch->send($payloads, [
+                'batch_validation' => $this->batchValidation,
+            ]);
+        } catch (Exception $exception) {
+            throw $this->requestFailed($exception);
+        }
+
+        // In permissive mode Resend reports the emails that failed validation by their
+        // position in the request, and only returns IDs for the emails it accepted, in
+        // order. We'll map both back onto the keys of the messages we were given...
+        $failures = [];
+
+        foreach ((array) ($result->getAttribute('errors') ?? []) as $error) {
+            $position = $error['index'] ?? null;
+
+            if (is_int($position) && isset($indexes[$position])) {
+                $failures[$indexes[$position]] = new TransportException(
+                    sprintf('Resend rejected the email. Reason: %s.', $error['message'] ?? 'Unknown error')
+                );
+            }
+        }
+
+        $accepted = array_values(array_diff_key($messages, $failures));
+
+        foreach (array_values((array) ($result->getAttribute('data') ?? [])) as $position => $email) {
+            if (isset($accepted[$position])) {
+                $this->markAsSent($accepted[$position], is_array($email) ? $email['id'] : $email->id);
+            }
+        }
+
+        return $failures;
+    }
+
+    /**
+     * Build the Resend API payload for the given email.
+     *
+     * @param  \Symfony\Component\Mime\Email  $email
+     * @param  \Symfony\Component\Mailer\Envelope  $envelope
+     * @return array
+     */
+    protected function toPayload(Email $email, Envelope $envelope): array
+    {
         $headers = [];
 
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type'];
@@ -99,38 +195,49 @@ class ResendTransport extends AbstractTransport
             }
         }
 
-        try {
-            $result = $this->resend->emails->send([
-                'from' => $envelope->getSender()->toString(),
-                'to' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
-                'cc' => $this->stringifyAddresses($email->getCc()),
-                'bcc' => $this->stringifyAddresses($email->getBcc()),
-                'reply_to' => $this->stringifyAddresses($email->getReplyTo()),
-                'headers' => $headers,
-                'subject' => $email->getSubject(),
-                'html' => $email->getHtmlBody(),
-                'text' => $email->getTextBody(),
-                'attachments' => $attachments,
-            ]);
+        return [
+            'from' => $envelope->getSender()->toString(),
+            'to' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
+            'cc' => $this->stringifyAddresses($email->getCc()),
+            'bcc' => $this->stringifyAddresses($email->getBcc()),
+            'reply_to' => $this->stringifyAddresses($email->getReplyTo()),
+            'headers' => $headers,
+            'subject' => $email->getSubject(),
+            'html' => $email->getHtmlBody(),
+            'text' => $email->getTextBody(),
+            'attachments' => $attachments,
+        ];
+    }
 
-            if (isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK) {
-                throw new Exception($result['message']);
-            }
-        } catch (Exception $exception) {
-            throw new TransportException(
-                sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),
-                is_int($exception->getCode()) ? $exception->getCode() : 0,
-                $exception
-            );
-        }
-
-        $messageId = $result->id;
-
+    /**
+     * Record the Resend email ID on the given sent message.
+     *
+     * @param  \Symfony\Component\Mailer\SentMessage  $message
+     * @param  string  $messageId
+     * @return void
+     */
+    protected function markAsSent(SentMessage $message, string $messageId): void
+    {
         $message->setMessageId($messageId);
 
         if ($message->getOriginalMessage() instanceof \Symfony\Component\Mime\Message) {
             $message->getOriginalMessage()->getHeaders()->addHeader('X-Resend-Email-ID', $messageId);
         }
+    }
+
+    /**
+     * Create an exception for a failed request to the Resend API.
+     *
+     * @param  \Throwable  $exception
+     * @return \Symfony\Component\Mailer\Exception\TransportException
+     */
+    protected function requestFailed(Throwable $exception): TransportException
+    {
+        return new TransportException(
+            sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),
+            is_int($exception->getCode()) ? $exception->getCode() : 0,
+            $exception
+        );
     }
 
     /**

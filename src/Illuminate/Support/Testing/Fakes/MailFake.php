@@ -9,12 +9,15 @@ use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\BatchResult;
 use Illuminate\Mail\MailManager;
+use Illuminate\Mail\PendingBatch;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
+use LogicException;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Factory, Fake, Mailer, MailQueue
@@ -48,6 +51,27 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * @var array
      */
     protected $queuedMailables = [];
+
+    /**
+     * All of the batches that have been sent.
+     *
+     * @var array<int, array{mailer: string|null, mailables: array}>
+     */
+    protected $batches = [];
+
+    /**
+     * The mailer the batch in progress is being sent with.
+     *
+     * @var string|null
+     */
+    protected $batchMailer;
+
+    /**
+     * Indicates if a batch is in progress.
+     *
+     * @var bool
+     */
+    protected $batching = false;
 
     /**
      * Create a new mail fake.
@@ -357,6 +381,52 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Assert if a batch was sent based on a truth-test callback.
+     *
+     * @param  (\Closure(\Illuminate\Support\Collection, string|null): bool)|null  $callback
+     * @return void
+     */
+    public function assertBatched(?Closure $callback = null)
+    {
+        $batches = (new Collection($this->batches))->filter(
+            fn ($batch) => is_null($callback) || $callback(new Collection($batch['mailables']), $batch['mailer'])
+        );
+
+        PHPUnit::assertTrue(
+            $batches->isNotEmpty(),
+            'The expected batch was not sent.'
+        );
+    }
+
+    /**
+     * Assert that no batches were sent.
+     *
+     * @return void
+     */
+    public function assertNotBatched()
+    {
+        PHPUnit::assertEmpty(
+            $this->batches,
+            sprintf('%d unexpected batches were sent.', count($this->batches))
+        );
+    }
+
+    /**
+     * Assert the total number of batches that were sent.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertBatchCount($count)
+    {
+        PHPUnit::assertCount(
+            $count,
+            $this->batches,
+            sprintf('The number of batches sent was %d instead of %d.', count($this->batches), $count)
+        );
+    }
+
+    /**
      * Get all of the mailables matching a truth-test callback.
      *
      * @param  string|\Closure  $mailable
@@ -536,6 +606,56 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Begin a batch of messages, or send the given mailables as a batch.
+     *
+     * @param  iterable<\Illuminate\Contracts\Mail\Mailable>|null  $mailables
+     * @return \Illuminate\Mail\PendingBatch|\Illuminate\Mail\BatchResult
+     */
+    public function batch($mailables = null)
+    {
+        $batch = new PendingBatch($this);
+
+        return is_null($mailables) ? $batch : $batch->send($mailables);
+    }
+
+    /**
+     * Record the mailables sent within the given callback as a batch.
+     *
+     * @internal
+     *
+     * @param  \Illuminate\Mail\PendingBatch  $batch
+     * @param  \Closure  $callback
+     * @return \Illuminate\Mail\BatchResult
+     *
+     * @throws \LogicException
+     */
+    public function runBatch(PendingBatch $batch, Closure $callback)
+    {
+        if ($this->batching) {
+            throw new LogicException('A batch is already in progress on this mailer.');
+        }
+
+        $this->batching = true;
+        $this->batchMailer = $this->currentMailer;
+
+        $sent = count($this->mailables);
+
+        try {
+            $callback($this);
+
+            $this->batches[] = [
+                'mailer' => $this->batchMailer,
+                'mailables' => array_slice($this->mailables, $sent),
+            ];
+        } finally {
+            $this->batching = false;
+            $this->batchMailer = null;
+        }
+
+        return new BatchResult;
+    }
+
+    /**
      * Send a new message using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
@@ -548,7 +668,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return;
         }
 
-        $view->mailer($this->currentMailer);
+        $view->mailer($this->currentMailer ?? $this->batchMailer);
 
         if ($shouldQueue) {
             return $this->queue($view);
