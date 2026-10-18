@@ -134,12 +134,12 @@ class MailBatchTest extends TestCase
 
     public function testMessagesTheTransportCannotBatchAreSentIndividually(): void
     {
-        $transport = new BatchRecordingTransport(max: 10, unbatchable: ['m1']);
+        $transport = new BatchRecordingTransport(max: 10, unbatchable: ['m2']);
 
         $result = $this->mailer($transport)->batch()->capture(fn ($mailer) => $this->sendMessages($mailer, 3));
 
-        $this->assertSame([['m0', 'm2']], $transport->batches);
-        $this->assertSame(['m1'], $transport->singles);
+        $this->assertSame([['m0', 'm1']], $transport->batches);
+        $this->assertSame(['m2'], $transport->singles);
         $this->assertCount(3, $result->sent());
     }
 
@@ -278,6 +278,74 @@ class MailBatchTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $this->mailer(new ArrayTransport)->batch(['not a mailable']);
+    }
+
+    public function testCaptureOrderIsKeptAroundMessagesThatCannotBeBatched(): void
+    {
+        $events = new Dispatcher;
+        $order = [];
+
+        $events->listen(MessageSent::class, function (MessageSent $event) use (&$order) {
+            $order[] = $event->message->getSubject();
+        });
+
+        $transport = new BatchRecordingTransport(max: 10, unbatchable: ['m2']);
+
+        $this->mailer($transport, $events)->batch()->capture(fn ($mailer) => $this->sendMessages($mailer, 5));
+
+        $this->assertSame([['m0', 'm1'], ['m3', 'm4']], $transport->batches);
+        $this->assertSame(['m2'], $transport->singles);
+        $this->assertSame(['m0', 'm1', 'm2', 'm3', 'm4'], $order);
+    }
+
+    public function testRequestsIncludeRetryAttempts(): void
+    {
+        Sleep::fake();
+
+        $result = $this->mailer(new BatchRecordingTransport(max: 10, failures: 1))
+            ->batch()
+            ->retry(2)
+            ->capture(fn ($mailer) => $this->sendMessages($mailer, 2));
+
+        $this->assertSame(2, $result->requests());
+    }
+
+    public function testMessagesTheTransportDoesNotSendAreReportedAsFailed(): void
+    {
+        $transport = Mockery::mock(\Symfony\Component\Mailer\Transport\TransportInterface::class);
+        $transport->expects('send')->andReturnNull();
+
+        $result = $this->mailer($transport)->batch()->capture(fn ($mailer) => $this->sendMessages($mailer, 1));
+
+        $this->assertCount(1, $result);
+        $this->assertSame([0], array_keys($result->failures()));
+    }
+
+    public function testEverySentEventInARequestIsDispatchedBeforeAListenerExceptionIsThrown(): void
+    {
+        $events = new Dispatcher;
+        $dispatched = [];
+
+        $events->listen(MessageSent::class, function (MessageSent $event) use (&$dispatched) {
+            $dispatched[] = $subject = $event->message->getSubject();
+
+            if ($subject === 'm0') {
+                throw new RuntimeException('Listener failed.');
+            }
+        });
+
+        $transport = new BatchRecordingTransport(max: 3);
+
+        try {
+            $this->mailer($transport, $events)->batch()->capture(fn ($mailer) => $this->sendMessages($mailer, 5));
+
+            $this->fail('The listener exception was not thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Listener failed.', $e->getMessage());
+        }
+
+        $this->assertSame(['m0', 'm1', 'm2'], $dispatched);
+        $this->assertSame([['m0', 'm1', 'm2']], $transport->batches);
     }
 
     protected function mailer($transport, $events = null): Mailer

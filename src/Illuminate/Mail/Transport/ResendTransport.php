@@ -99,8 +99,6 @@ class ResendTransport extends AbstractTransport implements BatchTransport
      */
     public function sendBatch(array $messages): array
     {
-        $indexes = array_keys($messages);
-
         $payloads = array_map(function (SentMessage $message) {
             $payload = $this->toPayload(
                 MessageConverter::toEmail($message->getOriginalMessage()), $message->getEnvelope()
@@ -119,30 +117,76 @@ class ResendTransport extends AbstractTransport implements BatchTransport
             throw $this->requestFailed($exception);
         }
 
-        // In permissive mode Resend reports the emails that failed validation by their
-        // position in the request, and only returns IDs for the emails it accepted, in
-        // order. We'll map both back onto the keys of the messages we were given...
+        return $this->mapBatchResponse($messages, $result);
+    }
+
+    /**
+     * Map the Resend batch response onto the given messages, returning the failures.
+     *
+     * In permissive mode, Resend reports the emails that failed validation by their position
+     * in the request, and returns the IDs of the emails it accepted in order. A response we
+     * can't match up reliably fails every message, since we can't tell which were sent.
+     *
+     * @param  array<int, \Symfony\Component\Mailer\SentMessage>  $messages
+     * @param  \Resend\Collection  $result
+     * @return array<int, \Throwable>
+     */
+    protected function mapBatchResponse(array $messages, $result): array
+    {
+        $indexes = array_keys($messages);
+
         $failures = [];
 
         foreach ((array) ($result->getAttribute('errors') ?? []) as $error) {
             $position = $error['index'] ?? null;
 
-            if (is_int($position) && isset($indexes[$position])) {
-                $failures[$indexes[$position]] = new TransportException(
-                    sprintf('Resend rejected the email. Reason: %s.', $error['message'] ?? 'Unknown error')
-                );
+            if (! is_int($position) || ! isset($indexes[$position]) || isset($failures[$indexes[$position]])) {
+                return $this->unreadableBatchResponse($messages);
             }
+
+            $failures[$indexes[$position]] = new TransportException(
+                sprintf('Resend rejected the email. Reason: %s.', $error['message'] ?? 'Unknown error')
+            );
         }
 
-        $accepted = array_values(array_diff_key($messages, $failures));
+        $accepted = array_keys(array_diff_key($messages, $failures));
 
-        foreach (array_values((array) ($result->getAttribute('data') ?? [])) as $position => $email) {
-            if (isset($accepted[$position])) {
-                $this->markAsSent($accepted[$position], is_array($email) ? $email['id'] : $email->id);
+        $emails = array_values((array) ($result->getAttribute('data') ?? []));
+
+        if (count($emails) !== count($accepted)) {
+            $failures += $this->unreadableBatchResponse(array_diff_key($messages, $failures));
+
+            ksort($failures);
+
+            return $failures;
+        }
+
+        foreach ($accepted as $position => $index) {
+            $messageId = is_array($emails[$position]) ? ($emails[$position]['id'] ?? null) : ($emails[$position]->id ?? null);
+
+            if (! is_string($messageId) || $messageId === '') {
+                $failures[$index] = new TransportException('Resend did not return an ID for the email.');
+
+                continue;
             }
+
+            $this->markAsSent($messages[$index], $messageId);
         }
 
         return $failures;
+    }
+
+    /**
+     * Fail every given message because the Resend batch response could not be read.
+     *
+     * @param  array<int, \Symfony\Component\Mailer\SentMessage>  $messages
+     * @return array<int, \Throwable>
+     */
+    protected function unreadableBatchResponse(array $messages): array
+    {
+        return array_map(fn () => new TransportException(
+            'Unable to match the Resend API response to the email. It may or may not have been sent.'
+        ), $messages);
     }
 
     /**
@@ -156,7 +200,7 @@ class ResendTransport extends AbstractTransport implements BatchTransport
     {
         $headers = [];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type'];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type', 'x-resend-email-id'];
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (in_array($name, $headersToBypass, true)) {
@@ -221,7 +265,10 @@ class ResendTransport extends AbstractTransport implements BatchTransport
         $message->setMessageId($messageId);
 
         if ($message->getOriginalMessage() instanceof \Symfony\Component\Mime\Message) {
-            $message->getOriginalMessage()->getHeaders()->addHeader('X-Resend-Email-ID', $messageId);
+            $headers = $message->getOriginalMessage()->getHeaders();
+
+            $headers->remove('X-Resend-Email-ID');
+            $headers->addHeader('X-Resend-Email-ID', $messageId);
         }
     }
 

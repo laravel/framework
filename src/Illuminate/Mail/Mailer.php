@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use BackedEnum;
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -18,10 +19,12 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Transport\BatchTransport;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage as SymfonySentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
@@ -29,7 +32,7 @@ use Throwable;
 
 class Mailer implements MailerContract, MailQueueContract
 {
-    use Macroable;
+    use Localizable, Macroable;
 
     /**
      * The name that is configured for the mailer.
@@ -104,7 +107,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * The messages captured by the batch in progress.
      *
-     * @var array<int, array{0: \Symfony\Component\Mime\Email, 1: array}>|null
+     * @var array<int, array{0: \Symfony\Component\Mime\Email, 1: array, 2: string|null}>|null
      */
     protected $batch;
 
@@ -352,7 +355,7 @@ class Mailer implements MailerContract, MailQueueContract
             // right away. It is sent with the rest of the batch once the batch's done
             // capturing, and the sent event is dispatched for it at that same time.
             if (! is_null($this->batch)) {
-                $this->batch[] = [$symfonyMessage, $data];
+                $this->batch[] = [$symfonyMessage, $data, $this->currentLocale()];
 
                 return null;
             }
@@ -444,16 +447,18 @@ class Mailer implements MailerContract, MailQueueContract
      * Send the captured messages, pacing the requests made to the transport.
      *
      * @param  \Illuminate\Mail\PendingBatch  $batch
-     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array}>  $messages
+     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array, 2: string|null}>  $messages
      * @return \Illuminate\Mail\BatchResult
+     *
+     * @throws \Throwable
      */
     protected function flushBatch(PendingBatch $batch, array $messages)
     {
         $sent = $failures = [];
 
-        $requests = $this->batchRequests($batch, $messages);
+        $requests = 0;
 
-        foreach ($requests as $i => $indexes) {
+        foreach ($this->batchRequests($batch, $messages) as $i => $indexes) {
             if ($i > 0 && $batch->getInterval() > 0) {
                 Sleep::usleep($batch->getInterval() * 1000);
             }
@@ -463,7 +468,9 @@ class Mailer implements MailerContract, MailQueueContract
             try {
                 $results = retry(
                     $batch->getAttempts(),
-                    fn () => $this->sendBatchRequest($chunk),
+                    function () use ($chunk, &$requests) {
+                        return $this->sendBatchRequest($chunk, $requests);
+                    },
                     $batch->getRetrySleep(),
                 );
             } catch (Throwable $e) {
@@ -474,30 +481,50 @@ class Mailer implements MailerContract, MailQueueContract
                 continue;
             }
 
+            // Every message in the request has been settled at this point, so we will record
+            // the results before dispatching any events. A listener that throws must not
+            // leave delivered messages without their sent event or out of the results.
+            $sentInRequest = [];
+
             foreach ($results as $index => $result) {
                 if ($result instanceof Throwable) {
                     $failures[$index] = $result;
-
-                    continue;
+                } else {
+                    $sent[$index] = $sentInRequest[$index] = new SentMessage($result);
                 }
+            }
 
-                $this->dispatchSentEvent(
-                    $sent[$index] = new SentMessage($result), $messages[$index][1]
-                );
+            $listenerException = null;
+
+            foreach ($sentInRequest as $index => $sentMessage) {
+                try {
+                    $this->withLocale($messages[$index][2], fn () => $this->dispatchSentEvent(
+                        $sentMessage, $messages[$index][1]
+                    ));
+                } catch (Throwable $e) {
+                    $listenerException ??= $e;
+                }
+            }
+
+            if ($listenerException) {
+                throw $listenerException;
             }
         }
 
         ksort($sent);
         ksort($failures);
 
-        return new BatchResult($sent, $failures, count($requests));
+        return new BatchResult($sent, $failures, $requests);
     }
 
     /**
      * Group the captured messages into the requests that will be made to the transport.
      *
+     * Messages are kept in the order they were captured in. Messages the transport is not
+     * able to batch are sent on their own, between the batches that surround them.
+     *
      * @param  \Illuminate\Mail\PendingBatch  $batch
-     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array}>  $messages
+     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array, 2: string|null}>  $messages
      * @return array<int, array<int, int>>
      */
     protected function batchRequests(PendingBatch $batch, array $messages)
@@ -510,50 +537,85 @@ class Mailer implements MailerContract, MailQueueContract
 
         $size = min($batch->getSize() ?? $max, $max);
 
-        $batchable = $individual = [];
+        $requests = $current = [];
 
         foreach ($messages as $index => [$message]) {
-            if ($this->transport->canBatch($message)) {
-                $batchable[] = $index;
-            } else {
-                $individual[] = [$index];
+            if (! $this->transport->canBatch($message)) {
+                if ($current !== []) {
+                    $requests[] = $current;
+                    $current = [];
+                }
+
+                $requests[] = [$index];
+
+                continue;
+            }
+
+            $current[] = $index;
+
+            if (count($current) === $size) {
+                $requests[] = $current;
+                $current = [];
             }
         }
 
-        return [...array_chunk($batchable, $size), ...$individual];
+        if ($current !== []) {
+            $requests[] = $current;
+        }
+
+        return $requests;
     }
 
     /**
      * Send a single request to the transport.
      *
-     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array}>  $messages
+     * @param  array<int, array{0: \Symfony\Component\Mime\Email, 1: array, 2: string|null}>  $messages
+     * @param  int  $requests
      * @return array<int, \Symfony\Component\Mailer\SentMessage|\Throwable>
      */
-    protected function sendBatchRequest(array $messages)
+    protected function sendBatchRequest(array $messages, int &$requests)
     {
         if (count($messages) === 1) {
             $index = array_key_first($messages);
 
-            $symfonySentMessage = $this->sendSymfonyMessage($messages[$index][0]);
+            $requests++;
 
-            return $symfonySentMessage ? [$index => $symfonySentMessage] : [];
+            return [$index => $this->sendSymfonyMessage($messages[$index][0])
+                ?? new TransportException('The message was not sent by the transport.')];
         }
 
         $pending = $failures = [];
 
+        // Like the transport's own "send" method, each message is cloned so that changes
+        // made by the transport, such as adding the provider's ID as a header, are kept
+        // on the copy that is handed to the sent event and returned in the results.
         foreach ($messages as $index => [$message]) {
             try {
-                $pending[$index] = new SymfonySentMessage($message, Envelope::create($message));
+                $pending[$index] = new SymfonySentMessage(clone $message, Envelope::create($message));
             } catch (Throwable $e) {
                 $failures[$index] = $e;
             }
         }
 
         if ($pending !== []) {
+            $requests++;
+
             $failures += $this->transport->sendBatch($pending);
         }
 
         return array_replace($pending, $failures);
+    }
+
+    /**
+     * Get the application's current locale.
+     *
+     * @return string|null
+     */
+    protected function currentLocale()
+    {
+        $container = Container::getInstance();
+
+        return method_exists($container, 'getLocale') ? $container->getLocale() : null;
     }
 
     /**

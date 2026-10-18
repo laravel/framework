@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -45,6 +46,24 @@ class SendingBatchMailTest extends TestCase
         $this->assertSame([BatchTestNotification::class, BatchTestNotification::class], $sent);
         $this->assertCount(2, Mail::mailer('array')->getSymfonyTransport()->messages());
     }
+
+    public function testSentEventsAreDispatchedInTheLocaleTheMessageWasRenderedIn()
+    {
+        $locales = [];
+
+        Event::listen(MessageSent::class, function () use (&$locales) {
+            $locales[] = $this->app->getLocale();
+        });
+
+        Mail::batch([
+            (new BatchTestMailable)->locale('fr'),
+            (new BatchTestMailable)->locale('es'),
+            new BatchTestMailable,
+        ]);
+
+        $this->assertSame(['fr', 'es', 'en'], $locales);
+        $this->assertSame('en', $this->app->getLocale());
+    }
 }
 
 class BatchTestNotification extends Notification
@@ -57,5 +76,13 @@ class BatchTestNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)->subject('Weekly summary')->line('Hello!');
+    }
+}
+
+class BatchTestMailable extends Mailable
+{
+    public function build()
+    {
+        return $this->to('taylor@laravel.com')->subject('Hello')->html('<p>Hello</p>');
     }
 }

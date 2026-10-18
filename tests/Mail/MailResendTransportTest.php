@@ -168,6 +168,88 @@ class MailResendTransportTest extends TestCase
         ]);
     }
 
+    public function testSendBatchFailsEveryAcceptedMessageWhenTheResponseCannotBeMatched(): void
+    {
+        $client = Mockery::mock(Client::class);
+        $batchService = Mockery::mock(BatchService::class);
+        $client->batch = $batchService;
+
+        $batchService->expects('send')->andReturn(Collection::from([
+            'data' => [ResendEmail::from(['id' => 'resend_id_1'])],
+            'errors' => [['index' => 2, 'message' => 'Invalid `to` field']],
+        ]));
+
+        $failures = (new ResendTransport($client))->sendBatch([
+            $this->sentMessage('first@example.com', 'First'),
+            $this->sentMessage('second@example.com', 'Second'),
+            $this->sentMessage('third@example.com', 'Third'),
+        ]);
+
+        $this->assertSame([0, 1, 2], array_keys($failures));
+        $this->assertStringContainsString('Invalid `to` field', $failures[2]->getMessage());
+        $this->assertStringContainsString('Unable to match', $failures[0]->getMessage());
+    }
+
+    public function testSendBatchFailsEveryMessageWhenAnErrorIndexIsInvalid(): void
+    {
+        $client = Mockery::mock(Client::class);
+        $batchService = Mockery::mock(BatchService::class);
+        $client->batch = $batchService;
+
+        $batchService->expects('send')->andReturn(Collection::from([
+            'data' => [ResendEmail::from(['id' => 'resend_id_1'])],
+            'errors' => [['index' => 7, 'message' => 'Invalid']],
+        ]));
+
+        $failures = (new ResendTransport($client))->sendBatch([
+            $this->sentMessage('first@example.com', 'First'),
+            $this->sentMessage('second@example.com', 'Second'),
+        ]);
+
+        $this->assertSame([0, 1], array_keys($failures));
+    }
+
+    public function testSendBatchFailsMessagesWithoutAnId(): void
+    {
+        $client = Mockery::mock(Client::class);
+        $batchService = Mockery::mock(BatchService::class);
+        $client->batch = $batchService;
+
+        $batchService->expects('send')->andReturn(Collection::from([
+            'data' => [ResendEmail::from(['id' => 'resend_id_1']), ResendEmail::from([])],
+        ]));
+
+        $messages = [
+            $this->sentMessage('first@example.com', 'First'),
+            $this->sentMessage('second@example.com', 'Second'),
+        ];
+
+        $failures = (new ResendTransport($client))->sendBatch($messages);
+
+        $this->assertSame([1], array_keys($failures));
+        $this->assertSame('resend_id_1', $messages[0]->getMessageId());
+    }
+
+    public function testStaleResendIdHeadersAreNotSentAndAreReplaced(): void
+    {
+        $email = (new Email)->from('myself@example.com')->to('me@example.com')->subject('Foo')->text('Bar');
+        $email->getHeaders()->addTextHeader('X-Resend-Email-ID', 'stale_id');
+
+        $client = Mockery::mock(Client::class);
+        $emailService = Mockery::mock(EmailService::class);
+        $client->emails = $emailService;
+
+        $emailService->expects('send')
+            ->withArgs(fn ($payload) => ! array_key_exists('X-Resend-Email-ID', $payload['headers']))
+            ->andReturn(ResendEmail::from(['id' => 'fresh_id']));
+
+        $sentMessage = (new ResendTransport($client))->send($email);
+
+        $headers = $sentMessage->getOriginalMessage()->getHeaders()->all('X-Resend-Email-ID');
+
+        $this->assertSame(['fresh_id'], array_map(fn ($header) => $header->getBodyAsString(), iterator_to_array($headers, false)));
+    }
+
     protected function sentMessage(string $to, string $subject): SentMessage
     {
         $email = (new Email)->from('myself@example.com')->to($to)->subject($subject)->text('Body');

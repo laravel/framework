@@ -562,6 +562,17 @@ enum MailTestQueueEnum: string
         $this->fake->assertSentCount(2);
     }
 
+    public function testMailablesSentWithAnotherMailerAreNotPartOfTheBatch()
+    {
+        $this->fake->mailer('resend')->batch()->capture(function ($mailer) {
+            $mailer->send(new MailableStub);
+            $mailer->mailer('smtp')->send(new MailableStub);
+        });
+
+        $this->fake->assertSentCount(2);
+        $this->fake->assertBatched(fn ($mailables, $mailer) => $mailables->count() === 1 && $mailer === 'resend');
+    }
+
     public function testAssertNotBatched()
     {
         $this->fake->send(new MailableStub);

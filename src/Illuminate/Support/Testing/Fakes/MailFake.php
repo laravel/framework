@@ -643,9 +643,14 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         try {
             $callback($this);
 
+            // Like the real mailer, only the mailables sent with the batch's mailer are part
+            // of the batch. Those sent with another mailer are recorded as ordinary sends.
             $this->batches[] = [
                 'mailer' => $this->batchMailer,
-                'mailables' => array_slice($this->mailables, $sent),
+                'mailables' => array_values(array_filter(
+                    array_slice($this->mailables, $sent),
+                    fn ($mailable) => $mailable->mailer === $this->batchMailer,
+                )),
             ];
         } finally {
             $this->batching = false;
