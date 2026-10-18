@@ -9,20 +9,11 @@ use Illuminate\Support\Facades\Date;
 class PreventStaleDatabaseReads
 {
     /**
-     * The database manager.
-     *
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $manager;
-
-    /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Database\DatabaseManager  $manager
      */
-    public function __construct(DatabaseManager $manager)
+    public function __construct(protected DatabaseManager $manager)
     {
-        $this->manager = $manager;
+        //
     }
 
     /**
