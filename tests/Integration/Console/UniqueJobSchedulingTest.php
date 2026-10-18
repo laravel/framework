@@ -7,9 +7,12 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\NullQueue;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class UniqueJobSchedulingTest extends TestCase
 {
@@ -35,6 +38,38 @@ class UniqueJobSchedulingTest extends TestCase
             UniqueTestJob::class,
             UniqueTestJob::class
         );
+
+        Queue::assertPushed(UniqueTestJob::class, 1);
+    }
+
+    public function testUniqueLockIsReleasedWhenPushingToTheQueueFails(): void
+    {
+        Queue::extend('failing', fn () => new class implements ConnectorInterface
+        {
+            public function connect(array $config)
+            {
+                return new class extends NullQueue
+                {
+                    public function push($job, $data = '', $queue = null)
+                    {
+                        throw new RuntimeException('Queue unavailable.');
+                    }
+                };
+            }
+        });
+
+        $this->app['config']->set('queue.connections.failing', ['driver' => 'failing']);
+
+        $event = $this->app->make(Schedule::class)->job(UniqueTestJob::class, null, 'failing')->name('')->everyMinute();
+
+        try {
+            $event->run($this->app);
+        } catch (RuntimeException) {
+            //
+        }
+
+        Queue::fake();
+        $this->dispatch(UniqueTestJob::class);
 
         Queue::assertPushed(UniqueTestJob::class, 1);
     }
