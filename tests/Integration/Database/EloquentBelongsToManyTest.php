@@ -294,6 +294,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($tag8->name, $post->tags[7]->name);
     }
 
+    public function testCloneKeepsTheRelationQuery()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $other = User::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+        $otherPost = Post::create(['title' => Str::random()]);
+
+        $other->posts()->attach($otherPost);
+        $user->posts()->attach($post);
+
+        $this->assertEquals([$post->id], $user->posts()->clone()->get()->modelKeys());
+    }
+
     public function testDetachMethod()
     {
         $post = Post::create(['title' => Str::random()]);

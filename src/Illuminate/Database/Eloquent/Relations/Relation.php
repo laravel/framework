@@ -610,6 +610,16 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Clone the relationship.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
