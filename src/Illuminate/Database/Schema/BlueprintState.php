@@ -98,7 +98,7 @@ class BlueprintState
 
         $this->foreignKeys = (new Collection($schema->getForeignKeys($table)))->map(fn ($foreignKey) => new ForeignKeyDefinition([
             'columns' => $foreignKey['columns'],
-            'on' => new Expression($foreignKey['foreign_table']),
+            'on' => new Expression($connection->getSchemaGrammar()->wrap($foreignKey['foreign_table'])),
             'references' => $foreignKey['foreign_columns'],
             'onUpdate' => $foreignKey['on_update'],
             'onDelete' => $foreignKey['on_delete'],
