@@ -1433,6 +1433,136 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where like" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLikeAll($columns, $value = null, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        $this->whereNested(function ($query) use ($columns, $value, $caseSensitive, $not) {
+            foreach ($columns as $column) {
+                if ($column instanceof Closure) {
+                    $query->whereNested($column, 'and');
+                } else {
+                    $query->whereLike($column, $value, $caseSensitive, 'and', $not);
+                }
+            }
+        }, $boolean);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where like" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereLikeAll($columns, $value = null, $caseSensitive = false)
+    {
+        return $this->whereLikeAll($columns, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where not like" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLikeAll($columns, $value = null, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->whereLikeAll($columns, $value, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereNotLikeAll($columns, $value = null, $caseSensitive = false)
+    {
+        return $this->whereNotLikeAll($columns, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLikeAny($columns, $value = null, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        $this->whereNested(function ($query) use ($columns, $value, $caseSensitive, $not) {
+            foreach ($columns as $column) {
+                if ($column instanceof Closure) {
+                    $query->whereNested($column, 'or');
+                } else {
+                    $query->whereLike($column, $value, $caseSensitive, 'or', $not);
+                }
+            }
+        }, $boolean);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereLikeAny($columns, $value = null, $caseSensitive = false)
+    {
+        return $this->whereLikeAny($columns, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where not like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLikeAny($columns, $value = null, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->whereLikeAny($columns, $value, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string|null  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereNotLikeAny($columns, $value = null, $caseSensitive = false)
+    {
+        return $this->whereNotLikeAny($columns, $value, $caseSensitive, 'or');
+    }
+
+    /**
      * Add a "where null safe equals" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
