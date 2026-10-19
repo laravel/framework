@@ -102,15 +102,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: linux-logs-${{ matrix.php }}-${{ matrix.stability }}
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
 
   windows_tests:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     strategy:
       fail-fast: true
@@ -175,9 +175,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: windows-logs-${{ matrix.php }}-${{ matrix.stability }}
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
