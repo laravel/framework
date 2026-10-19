@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Cloud;
 
 use Closure;
+use Composer\InstalledVersions;
 use Exception;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Bus\Queueable;
@@ -2384,6 +2385,10 @@ class ExceptionReportingTest extends TestCase
 
     public function testItHandlesExceptionsThrownFromTheInvokedCommandsConstructor(): void
     {
+        if (version_compare(InstalledVersions::getVersion('symfony/console'), '6.2.2', '<')) {
+            $this->markTestSkipped('Symfony Console versions before 6.2.2 discard exceptions thrown while resolving a command.');
+        }
+
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
         ThrowingConstructorTestCommand::$constructionAttempts = 0;
