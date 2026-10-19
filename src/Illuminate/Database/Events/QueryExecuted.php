@@ -21,7 +21,7 @@ class QueryExecuted
     /**
      * The number of milliseconds it took to execute the query.
      *
-     * @var float
+     * @var float|null
      */
     public $time;
 
