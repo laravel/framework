@@ -755,9 +755,11 @@ class ExceptionReporter
      */
     protected function scheduledTaskCallback(): mixed
     {
-        return (new ReflectionClass($this->currentlyRunningScheduledTask))
-            ->getProperty('callback')
-            ->getValue($this->currentlyRunningScheduledTask);
+        $property = (new ReflectionClass($this->currentlyRunningScheduledTask))->getProperty('callback');
+
+        $property->setAccessible(true);
+
+        return $property->getValue($this->currentlyRunningScheduledTask);
     }
 
     /**

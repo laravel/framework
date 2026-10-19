@@ -79,6 +79,8 @@ class KernelTest extends TestCase
     {
         $method = (new ReflectionClass($kernel))->getMethod('getArtisan');
 
+        $method->setAccessible(true);
+
         return $method->invoke($kernel);
     }
 }
