@@ -15,6 +15,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Attributes\RouteKey;
@@ -463,6 +464,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->connection = static::resolveClassAttribute(Connection::class, 'name');
         } else {
             $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
+        }
+
+        $declaresDateFormat = $reflection->hasProperty('dateFormat')
+            && $reflection->getProperty('dateFormat')->getDeclaringClass()->getName() === static::class;
+
+        if (! $declaresDateFormat && ($reflection->getAttributes(DateFormat::class) !== [] || ($reflection->getAttributes(Table::class) !== [] && $table?->dateFormat !== null))) {
+            $this->dateFormat = static::resolveClassAttribute(DateFormat::class, 'format')
+                ?? $table->dateFormat;
         }
 
         if ($this->primaryKey === 'id' && $table && $table->key !== null) {

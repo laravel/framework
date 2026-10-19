@@ -222,6 +222,34 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('Y-m-d', $model->getDateFormat());
     }
 
+    public function test_child_date_format_attribute_overrides_inherited_date_format_property(): void
+    {
+        $model = new ChildModelWithDateFormatAttribute;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_child_table_date_format_attribute_overrides_inherited_date_format_property(): void
+    {
+        $model = new ChildModelWithTableDateFormatAttribute;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_child_inherits_parent_date_format_attribute(): void
+    {
+        $model = new ChildModelWithNoDateFormat;
+
+        $this->assertSame('U', $model->getDateFormat());
+    }
+
+    public function test_child_date_format_property_overrides_parent_date_format_attribute(): void
+    {
+        $model = new ChildModelWithDateFormatProperty;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
     public function test_dedicated_without_timestamps_attribute(): void
     {
         $model = new ModelWithDedicatedWithoutTimestampsAttribute;
@@ -690,6 +718,39 @@ class ChildModelWithNoConnection extends ParentModelWithConnectionAttribute
 class ChildModelWithConnectionProperty extends ParentModelWithConnectionAttribute
 {
     protected $connection = 'default';
+}
+
+class ParentModelWithDateFormatProperty extends Model
+{
+    protected $dateFormat = 'U';
+}
+
+#[DateFormat('Y-m-d')]
+class ChildModelWithDateFormatAttribute extends ParentModelWithDateFormatProperty
+{
+    //
+}
+
+#[Table(dateFormat: 'Y-m-d')]
+class ChildModelWithTableDateFormatAttribute extends ParentModelWithDateFormatProperty
+{
+    //
+}
+
+#[DateFormat('U')]
+class ParentModelWithDateFormatAttribute extends Model
+{
+    //
+}
+
+class ChildModelWithNoDateFormat extends ParentModelWithDateFormatAttribute
+{
+    //
+}
+
+class ChildModelWithDateFormatProperty extends ParentModelWithDateFormatAttribute
+{
+    protected $dateFormat = 'Y-m-d';
 }
 
 #[Table(timestamps: false)]
