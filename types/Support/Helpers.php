@@ -32,7 +32,7 @@ assertType('int', with(new User(), function ($user): int {
     return 10;
 }));
 
-assertType('mixed', with(new User(), function ($user) {
+assertType('User', with(new User(), function ($user) {
     return $user;
 }));
 assertType('User', with(new User(), function ($user): User {
