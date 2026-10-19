@@ -20,6 +20,12 @@ class EloquentWhereTest extends DatabaseTestCase
             $table->string('email');
             $table->string('address');
         });
+        Schema::create('users-with-null-values', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email');
+            $table->string('address')->nullable();
+        });
     }
 
     public function testWhereAndWhereOrBehavior()
@@ -249,6 +255,26 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testFirstWhereNull()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
+        $firstUser = UserWhereNullTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
+        $secondUser = UserWhereNullTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => null,
+        ]);
+
+        $this->assertTrue($firstUser->is(UserWhereNullTest::firstWhereNotNull('address')));
+        $this->assertTrue($secondUser->is(UserWhereNullTest::firstWhereNull('address')));
+    }
+
     public function testSole()
     {
         $expected = UserWhereTest::create([
@@ -331,6 +357,13 @@ class EloquentWhereTest extends DatabaseTestCase
 class UserWhereTest extends Model
 {
     protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class UserWhereNullTest extends Model
+{
+    protected $table = 'users-with-null-values';
     protected $guarded = [];
     public $timestamps = false;
 }

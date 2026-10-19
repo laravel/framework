@@ -410,6 +410,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where null" clause to the query, and return the first result.
+     *
+     * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return TModel|null
+     */
+    public function firstWhereNull($column, $boolean = 'and')
+    {
+        return $this->whereNull($column, $boolean)->first();
+    }
+
+    /**
+     * Add a "where not null" clause to the query, and return the first result.
+     *
+     * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return TModel|null
+     */
+    public function firstWhereNotNull($column, $boolean = 'and')
+    {
+        return $this->whereNotNull($column, $boolean)->first();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  (\Closure(static): mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
