@@ -191,18 +191,18 @@ class ExceptionReporter
      */
     protected function payload(Throwable $e): array
     {
-        return [
+        return array_merge([
             '_cloud_event' => 'exception',
             'id' => $this->exceptionId($e),
             'timestamp' => $this->timestamp(),
             'exception_context' => $this->exceptionContext($e),
             'laravel_context' => null,
-            ...$this->executionDetails($e),
+        ], $this->executionDetails($e), [
             'user_id' => $this->userId(),
             'handled' => $this->handled($e),
-            ...$this->parseException($e),
+        ], $this->parseException($e), [
             'previous' => $this->previous($e),
-        ];
+        ]);
     }
 
     /**
@@ -638,18 +638,17 @@ class ExceptionReporter
         return [
             'trace_id' => $this->consoleCommandTraceId(),
             'execution_type' => 'scheduled_task',
-            'execution_context' => [
-                ...$this->executionContext['scheduled_task'],
+            'execution_context' => array_merge($this->executionContext['scheduled_task'], [
                 'name' => $this->scheduledTaskName(),
                 'class' => $this->scheduledTaskClass(),
                 'cron' => $this->currentlyRunningScheduledTask->expression,
                 'timezone' => $this->scheduledTaskTimezone(),
-                'repeat_seconds' => $this->currentlyRunningScheduledTask->repeatSeconds,
+                'repeat_seconds' => null,
                 'without_overlapping' => $this->currentlyRunningScheduledTask->withoutOverlapping,
                 'on_one_server' => $this->currentlyRunningScheduledTask->onOneServer,
                 'run_in_background' => $this->currentlyRunningScheduledTask->runInBackground,
                 'even_in_maintenance_mode' => $this->currentlyRunningScheduledTask->evenInMaintenanceMode,
-            ],
+            ]),
         ];
     }
 
@@ -846,14 +845,13 @@ class ExceptionReporter
         return [
             'trace_id' => $this->traceIdFromJob(),
             'execution_type' => 'job',
-            'execution_context' => [
-                ...$this->executionContext['job'],
+            'execution_context' => array_merge($this->executionContext['job'], [
                 'attempt_id' => $this->currentlyProcessingJobAttemptId(),
                 'uuid' => $this->currentlyProcessingJob->uuid(),
                 'name' => $this->currentlyProcessingJob->resolveName(),
                 'connection' => $this->currentlyProcessingJob->getConnectionName(),
                 'queue' => $this->normalizedQueue(),
-            ],
+            ]),
         ];
     }
 
@@ -1040,7 +1038,7 @@ class ExceptionReporter
 
             if (is_array($args = $frame['args'] ?? null)) {
                 $frame['args'] = [
-                    'types' => array_map($this->argType(...), $args, array_keys($args)),
+                    'types' => array_map(fn ($arg, $key) => $this->argType($arg, $key), $args, array_keys($args)),
                 ];
             }
 

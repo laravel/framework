@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Cloud;
 
+use Closure;
 use RuntimeException;
 use Throwable;
 
@@ -140,7 +141,7 @@ class Events
      */
     protected function connect(): void
     {
-        $factory = static::$socketFactory ?? stream_socket_client(...);
+        $factory = static::$socketFactory ?? Closure::fromCallable('stream_socket_client');
 
         $errorCode = null;
         $errorMessage = null;

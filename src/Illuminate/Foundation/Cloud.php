@@ -14,9 +14,10 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Http\Events\RequestHandled;
-use Illuminate\Queue\Events\JobPopped;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\Queue;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
@@ -185,13 +186,12 @@ class Cloud
                 return;
             }
 
-            $config = [
+            $config = array_merge([
                 'stop' => true,
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
                 'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
-                ...$config,
-            ];
+            ], $config);
 
             $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
                 $app[Events::class],
@@ -240,8 +240,8 @@ class Cloud
                     }
                 });
 
-                $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
-                    if ($event->job !== null) {
+                $app['events']->listen(function (JobProcessing $event) use ($exceptionReporter) {
+                    if (! $event->job instanceof SyncJob) {
                         $exceptionReporter->prepareForJob($event->job);
                     }
                 });

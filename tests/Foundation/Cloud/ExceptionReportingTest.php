@@ -19,9 +19,8 @@ use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Foundation\Testing\WithConsoleEvents;
-use Illuminate\Queue\Events\JobPopped;
-use Illuminate\Queue\Events\JobPopping;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Jobs\Job as QueueJob;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Arr;
@@ -38,10 +37,8 @@ use Illuminate\Support\Str;
 use Illuminate\View\ViewException;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use stdClass;
@@ -50,11 +47,12 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
-#[WithMigration]
-#[WithMigration('laravel', 'queue')]
+use function Orchestra\Testbench\default_migration_path;
+use function Orchestra\Testbench\load_migration_paths;
+
 class ExceptionReportingTest extends TestCase
 {
-    use LazilyRefreshDatabase, WithConsoleEvents;
+    use LazilyRefreshDatabase;
 
     protected $serverSettingsToRestore = [];
 
@@ -63,6 +61,11 @@ class ExceptionReportingTest extends TestCase
     protected $reportedScheduledTaskStreams = null;
 
     protected $reportedScheduledTasks = 0;
+
+    protected function defineEnvironment($app)
+    {
+        load_migration_paths($app, [default_migration_path(), default_migration_path('queue')]);
+    }
 
     protected function setUp(): void
     {
@@ -471,7 +474,9 @@ class ExceptionReportingTest extends TestCase
         ];
     }
 
-    #[DataProvider('nonObjectJsonPayloadProvider')]
+    /**
+     * @dataProvider nonObjectJsonPayloadProvider
+     */
     public function testLaravelDoesNotSupportNonObjectJsonPayloads(mixed $value, array $expected): void
     {
         $this->setupExceptionReporting(['capture_request_payload' => true]);
@@ -666,7 +671,9 @@ class ExceptionReportingTest extends TestCase
         ];
     }
 
-    #[DataProvider('redactedRequestPayloadValueProvider')]
+    /**
+     * @dataProvider redactedRequestPayloadValueProvider
+     */
     public function testItRedactsScalarRequestPayloadValues(mixed $value, mixed $expected): void
     {
         $this->setupExceptionReporting(['capture_request_payload' => true]);
@@ -1044,7 +1051,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) use ($line) {
             $this->assertSame('Whoops!', $payload['message']);
-            $this->assertIsList($payload['previous']);
+            $this->assertSame(array_values($payload['previous']), $payload['previous']);
             $this->assertCount(1, $payload['previous']);
 
             $previous = $payload['previous'][0];
@@ -1082,7 +1089,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function ($payload) use ($line) {
             $this->assertSame('Whoops!', $payload['message']);
-            $this->assertIsList($payload['previous']);
+            $this->assertSame(array_values($payload['previous']), $payload['previous']);
             $this->assertCount(2, $payload['previous']);
 
             $previous = $payload['previous'][0];
@@ -1326,7 +1333,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        Event::dispatch(new JobPopped('database', new JobWithPayload(['laravel_cloud_user_id' => 'abc123'])));
+        Event::dispatch(new JobProcessing('database', new JobWithPayload(['laravel_cloud_user_id' => 'abc123'])));
 
         report(new RuntimeException('Whoops before the guards are resolved!'));
 
@@ -2138,7 +2145,7 @@ class ExceptionReportingTest extends TestCase
 
         // Some queue drivers, e.g. Beanstalkd, throw when the job is
         // interacted with after it has been processed.
-        Event::dispatch(new JobPopped('database', new JobThatThrowsWhenInteractedWith));
+        Event::dispatch(new JobProcessing('database', new JobThatThrowsWhenInteractedWith));
 
         report(new RuntimeException('Whoops!'));
 
@@ -2227,7 +2234,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(0, $streams);
 
         $popped = false;
-        Event::listen(function (JobPopping $event) use (&$popped) {
+        Event::listen(function (Looping $event) use (&$popped) {
             if ($popped) {
                 report(new RuntimeException('Whoops!'));
             }
@@ -2466,20 +2473,18 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItCapturesTheCanonicalCommandNameWhenAbbreviated(): void
+    public function testItCapturesTheAbbreviatedCommandNameAsEntered(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
         Artisan::command('test:canonical-command', fn () => report(new RuntimeException('Whoops!')));
 
-        // Artisan resolves the abbreviation to the command above, so the
-        // canonical name is reported rather than the abbreviation.
         $this->runArtisanCommand(['artisan', 'test:can']);
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
-            $this->assertSame('test:canonical-command', $payload['execution_context']['name']);
+            $this->assertSame('test:can', $payload['execution_context']['name']);
             $this->assertNull($payload['execution_context']['command']);
 
             return true;
@@ -2684,31 +2689,6 @@ class ExceptionReportingTest extends TestCase
                 'even_in_maintenance_mode' => false,
             ],
         ]);
-    }
-
-    public function testItCapturesTheRepeatSecondsOfSubMinuteScheduledTasks(): void
-    {
-        $this->setupExceptionReporting();
-        $streams = $this->fakeEventsStreams();
-
-        // The task is started directly, as the scheduler runs a sub-minute
-        // task repeatedly until the minute is over.
-        $task = $this->app->make(Schedule::class)
-            ->call(fn () => null)
-            ->name('test-scheduled-task')
-            ->everyTenSeconds();
-
-        Event::dispatch(new ScheduledTaskStarting($task));
-
-        report(new RuntimeException('Whoops!'));
-
-        $this->assertCount(1, $streams);
-        $streams[0]->assertWrittenJson(function (array $payload) {
-            $this->assertSame(10, $payload['execution_context']['repeat_seconds']);
-            $this->assertSame('* * * * *', $payload['execution_context']['cron']);
-
-            return true;
-        });
     }
 
     public function testItAttributesExceptionsThrownWithinScheduledTasksToTheTask(): void
@@ -3050,18 +3030,20 @@ class ExceptionReportingTest extends TestCase
             (function () use ($closedResource) {
                 (function ($one, $two, ...$rest) {
                     throw new RuntimeException('Whoops!');
-                })(null, false, ...[
-                    'nullArg' => null,
-                    'boolArg' => false,
-                    'intArg' => 1,
-                    'floatArg' => 1.0,
-                    'arrayArg' => [],
-                    'objectArg' => new stdClass,
-                    'stringArg' => 'string',
-                    'resourceArg' => fopen('php://memory', 'r'),
-                    'closedResourceArg' => $closedResource,
-                    'closureArg' => (fn () => null),
-                ]);
+                })(
+                    null,
+                    false,
+                    nullArg: null,
+                    boolArg: false,
+                    intArg: 1,
+                    floatArg: 1.0,
+                    arrayArg: [],
+                    objectArg: new stdClass,
+                    stringArg: 'string',
+                    resourceArg: fopen('php://memory', 'r'),
+                    closedResourceArg: $closedResource,
+                    closureArg: (fn () => null),
+                );
             })(null, true, 1, 1.0, [], new stdClass, 'string', fopen('php://memory', 'r'), $closedResource, 'foo', fn () => null);
         } catch (Throwable $e) {
             report($e);
@@ -3186,7 +3168,9 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    #[DataProvider('stopDataProvider')]
+    /**
+     * @dataProvider stopDataProvider
+     */
     public function testItCanConfigureStoppingExceptionReporting(bool $stopConfig, bool $expectToHaveCalled): void
     {
         $this->setupExceptionReporting(['stop' => $stopConfig]);
@@ -3211,7 +3195,9 @@ class ExceptionReportingTest extends TestCase
         yield  'continue reporting' => [false, true];
     }
 
-    #[DataProvider('stopReturnValueDataProvider')]
+    /**
+     * @dataProvider stopReturnValueDataProvider
+     */
     public function testItReturnsWhetherReportingShouldContinue(bool $stopConfig, bool $expected): void
     {
         $this->setupExceptionReporting();
@@ -3414,13 +3400,12 @@ class ExceptionReportingTest extends TestCase
         return new ExceptionReporter(
             $this->app[Events::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
-            [
+            array_merge([
                 'stop' => true,
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => [],
                 'redact_headers' => [],
-                ...$config,
-            ],
+            ], $config),
         );
     }
 
@@ -3718,12 +3703,11 @@ class JobWithPayload extends QueueJob implements JobContract
 
     public function getRawBody()
     {
-        return json_encode([
+        return json_encode(array_merge([
             'uuid' => '9d3d0e9a-7e3f-4a6d-9a1f-2c0a1f7e8b21',
             'job' => 'MissingJobClass@handle',
             'data' => [],
-            ...$this->payload,
-        ]);
+        ], $this->payload));
     }
 }
 
