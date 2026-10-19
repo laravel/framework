@@ -6963,6 +6963,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testBeforeAndAfterDoNotThrowOnNonDateValues()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date', 'ends' => 'date|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date_format:Y-m-d', 'ends' => 'date_format:Y-m-d|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => new DateTimeImmutable('2000-01-01')], ['x' => 'date_format:Y-m-d|before:2012-01-01']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testWeakBeforeAndAfter()
     {
         $trans = $this->getIlluminateArrayTranslator();
