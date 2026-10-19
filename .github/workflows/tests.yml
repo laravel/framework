@@ -84,6 +84,10 @@ jobs:
           command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
+      - name: Allow packages with security advisories on PHP 8.0
+        run: composer config audit.block-insecure false
+        if: matrix.php == '8.0'
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -160,6 +164,10 @@ jobs:
           max_attempts: 5
           command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
+
+      - name: Allow packages with security advisories on PHP 8.0
+        run: composer config audit.block-insecure false
+        if: matrix.php == '8.0'
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
