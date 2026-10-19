@@ -40,7 +40,7 @@ class PackageManifest
     /**
      * The loaded manifest array.
      *
-     * @var array
+     * @var array|null
      */
     public $manifest;
 
