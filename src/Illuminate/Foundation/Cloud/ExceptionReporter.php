@@ -308,7 +308,7 @@ class ExceptionReporter
     /**
      * Retrieve the request headers.
      *
-     * @return array<string, list<string|null>>
+     * @return array<string, list<string|null>>|null
      */
     protected function requestHeaders(): ?array
     {
