@@ -258,7 +258,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|float  $key
+     * @param  string|int|float|null  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -579,7 +579,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)

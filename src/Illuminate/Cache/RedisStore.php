@@ -44,7 +44,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     /**
      * The name of the connection that should be used for locks.
      *
-     * @var string
+     * @var string|null
      */
     protected $lockConnection;
 

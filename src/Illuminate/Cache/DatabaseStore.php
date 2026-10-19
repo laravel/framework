@@ -31,7 +31,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     /**
      * The database connection instance that should be used to manage locks.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Database\ConnectionInterface|null
      */
     protected $lockConnection;
 
@@ -516,7 +516,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     /**
      * Get the connection used to manage locks.
      *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Database\ConnectionInterface|null
      */
     public function getLockConnection()
     {

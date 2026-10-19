@@ -133,7 +133,7 @@ class PusherBroadcaster extends Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $response
-     * @return array
+     * @return array|\Illuminate\Http\JsonResponse
      */
     protected function decodePusherResponse($request, $response)
     {

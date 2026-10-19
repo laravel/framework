@@ -453,7 +453,7 @@ class BroadcastManager implements FactoryContract
      * Get the connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {
