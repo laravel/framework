@@ -14,7 +14,7 @@ class CallbackEvent extends Event
     /**
      * The callback to call.
      *
-     * @var string
+     * @var string|callable
      */
     protected $callback;
 
