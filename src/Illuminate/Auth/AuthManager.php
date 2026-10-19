@@ -180,7 +180,7 @@ class AuthManager implements FactoryContract
      * Get the guard configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {
