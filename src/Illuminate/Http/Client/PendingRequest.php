@@ -811,7 +811,7 @@ class PendingRequest
     {
         return $this->throwIf(
             is_callable($condition)
-                ? fn ($response) => ! $condition($response)
+                ? static fn ($response) => ! $condition($response)
                 : ! $condition
         );
     }

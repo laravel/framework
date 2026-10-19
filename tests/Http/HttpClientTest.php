@@ -2540,6 +2540,25 @@ class HttpClientTest extends TestCase
         }
     }
 
+    public function testPendingRequestIsReleasedWithoutGarbageCollectionAfterThrowUnless()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory::response(str_repeat('x', 1024))]);
+
+        gc_disable();
+
+        try {
+            $pendingRequest = $this->factory->throwUnless(fn ($response) => true);
+            $pendingRequest->get('https://example.com');
+
+            $reference = WeakReference::create($pendingRequest);
+            unset($pendingRequest);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
+    }
+
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
     {
         $events = new EventFake(new Dispatcher);
