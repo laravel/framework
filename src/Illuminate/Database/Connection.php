@@ -1300,6 +1300,27 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute the given callback using the write PDO connection for reads.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function usingWritePdo(Closure $callback): mixed
+    {
+        $readOnWriteConnection = $this->readOnWriteConnection;
+
+        $this->useWriteConnectionWhenReading();
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->useWriteConnectionWhenReading($readOnWriteConnection);
+        }
+    }
+
+    /**
      * Get the current PDO connection.
      *
      * @return \PDO
