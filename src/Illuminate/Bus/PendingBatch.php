@@ -16,6 +16,9 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
+/**
+ * @phpstan-type TParam (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
+ */
 class PendingBatch
 {
     use Conditionable;
@@ -233,8 +236,6 @@ class PendingBatch
      * Indicate that the batch should not be canceled when a job within the batch fails.
      *
      * Optionally, add callbacks to be executed upon each job failure.
-     *
-     * @phpstan-type TParam (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
      *
      * @param  bool|TParam|array<array-key, TParam>  $param
      * @return $this
