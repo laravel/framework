@@ -1124,7 +1124,7 @@ class Connection implements ConnectionInterface
     /**
      * Register a database query listener with the connection.
      *
-     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted)  $callback
+     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted): mixed  $callback
      * @return void
      */
     public function listen(Closure $callback)

@@ -427,6 +427,7 @@ class Migrator
      *
      * @param  object  $migration
      * @param  string  $method
+     * @param  string|null  $name
      * @return void
      */
     protected function runMigration($migration, $method, $name = null)
