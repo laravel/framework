@@ -13,6 +13,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
@@ -47,9 +48,6 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
-use function Orchestra\Testbench\default_migration_path;
-use function Orchestra\Testbench\load_migration_paths;
-
 class ExceptionReportingTest extends TestCase
 {
     use LazilyRefreshDatabase;
@@ -64,7 +62,25 @@ class ExceptionReportingTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        load_migration_paths($app, [default_migration_path(), default_migration_path('queue')]);
+        $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        $app['db']->connection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
     }
 
     protected function setUp(): void
