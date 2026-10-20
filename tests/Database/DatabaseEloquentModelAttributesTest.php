@@ -85,6 +85,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('custom_id', $model->getKeyName());
     }
 
+    public function test_primary_key_attribute_can_disable_primary_key(): void
+    {
+        $model = new ModelWithoutPrimaryKeyAttribute;
+
+        $this->assertNull($model->getKeyName());
+    }
+
     public function test_primary_key_property_takes_precedence(): void
     {
         $model = new ModelWithPrimaryKeyAttributeAndProperty;
@@ -619,6 +626,12 @@ class ChildModelWithTableProperty extends ParentModelWithTableAttribute
 
 #[Table(key: 'custom_id')]
 class ModelWithPrimaryKeyAttribute extends Model
+{
+    //
+}
+
+#[Table(key: false)]
+class ModelWithoutPrimaryKeyAttribute extends Model
 {
     //
 }
