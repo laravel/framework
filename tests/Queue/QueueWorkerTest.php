@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobInterrupted;
 use Illuminate\Queue\Events\JobPopped;
@@ -272,6 +273,7 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->assertReported(fn (RuntimeException $reported) => $reported === $e);
         $this->events->assertDispatchedOnce(JobExceptionOccurred::class);
         $this->events->assertNotDispatched(JobProcessed::class);
+        $this->events->assertDispatched(fn (JobAttempted $event) => is_float($event->duration));
     }
 
     public function testJobIsFailedIfExceptionHandlerSaysItShouldntRetry()
