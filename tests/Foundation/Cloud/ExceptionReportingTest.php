@@ -14,6 +14,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
@@ -174,6 +175,15 @@ class ExceptionReportingTest extends TestCase
             'message' => 'Whoops!',
             'execution_type' => 'scheduled_task',
         ]);
+    }
+
+    public function testItStoresTheExceptionsConfigAfterConfigurationIsLoaded(): void
+    {
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
+
+        Cloud::bootstrapperBootstrapped($this->app, LoadConfiguration::class);
+
+        $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
     }
 
     public function testItDoesNotResolveTheExceptionHandlerWhileRegisteringExceptionReporting(): void
