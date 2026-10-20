@@ -13,6 +13,28 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase
 {
+    #[DataProvider('middlewareProvider')]
+    public function testUnchangedNestedArraysAreNotCopied($middlewareClass)
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '['.str_repeat('[0],', 19999).'[0]]');
+        $original = $request->json()->all();
+        $middleware = new $middlewareClass;
+        $before = memory_get_usage();
+
+        $middleware->handle($request, fn () => null);
+
+        // Copying the 20,000 unchanged inner arrays would require several MiB.
+        $this->assertLessThan(1024 * 1024, memory_get_usage() - $before);
+        $this->assertSame($original, $request->json()->all());
+    }
+
+    public static function middlewareProvider()
+    {
+        yield [TransformsRequest::class];
+        yield [TrimStrings::class];
+        yield [ConvertEmptyStringsToNull::class];
+    }
+
     #[DataProvider('amplifiedInputProvider')]
     public function testRejectsAmplifiedJsonKeys($middlewareClass, $value)
     {
