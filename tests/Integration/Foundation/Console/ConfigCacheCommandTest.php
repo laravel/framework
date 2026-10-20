@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Foundation\Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Tests\Integration\Generators\TestCase;
 use LogicException;
+use Mockery as m;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class ConfigCacheCommandTest extends TestCase
@@ -53,6 +54,19 @@ class ConfigCacheCommandTest extends TestCase
         $this->artisan('config:cache')
             ->assertSuccessful()
             ->expectsOutputToContain('Configuration cached successfully');
+
+        $this->assertFileExists($this->app->getCachedConfigPath());
+    }
+
+    public function testConfigurationIsCachedAtomically()
+    {
+        $files = m::mock(Filesystem::class)->makePartial();
+        $files->shouldReceive('replace')->once()->with($this->app->getCachedConfigPath(), m::type('string'))->passthru();
+        $files->shouldNotReceive('put');
+
+        $this->app->instance('files', $files);
+
+        $this->artisan('config:cache')->assertSuccessful();
 
         $this->assertFileExists($this->app->getCachedConfigPath());
     }
