@@ -5,7 +5,10 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Events\Dispatcher;
 use Mockery;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -237,6 +240,72 @@ class DatabaseTransactionsTest extends TestCase
             });
         } catch (Throwable) {
         }
+    }
+
+    public function testTransactionManagerIsRolledBackWhenCommitFailsWithConcurrencyErrorAndRetries()
+    {
+        // Use a real manager so rollback() actually discards failed-attempt callbacks.
+        $this->connection()->setTransactionManager(new DatabaseTransactionsManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $failOnce = true;
+        $dispatcher->listen(TransactionCommitting::class, function () use (&$failOnce) {
+            if ($failOnce) {
+                $failOnce = false;
+
+                throw new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock');
+            }
+        });
+
+        $attempt = 0;
+        $ran = [];
+
+        $this->connection()->transaction(function () use (&$attempt, &$ran) {
+            $n = ++$attempt;
+            $this->connection()->afterCommit(function () use (&$ran, $n) {
+                $ran[] = "attempt {$n}";
+            });
+
+            $this->connection()->table('users')->insert([
+                'name' => "user-{$n}", 'value' => $n,
+            ]);
+        }, 2);
+
+        $this->assertSame(['attempt 2'], $ran);
+        $this->assertSame(0, $this->connection()->transactionLevel());
+    }
+
+    public function testTransactionManagerIsRolledBackWhenCommitFailsWithoutRetry()
+    {
+        $this->connection()->setTransactionManager(new DatabaseTransactionsManager);
+        $this->connection()->setEventDispatcher($dispatcher = new Dispatcher);
+
+        $dispatcher->listen(TransactionCommitting::class, function () {
+            throw new Exception('Commit failed');
+        });
+
+        $outsideRan = false;
+
+        try {
+            $this->connection()->transaction(function () {
+                $this->connection()->table('users')->insert([
+                    'name' => 'zain', 'value' => 1,
+                ]);
+            });
+            $this->fail('Expected commit failure to throw.');
+        } catch (Exception $e) {
+            $this->assertSame('Commit failed', $e->getMessage());
+        }
+
+        $this->assertSame(0, $this->connection()->transactionLevel());
+
+        // afterCommit outside any transaction should run immediately once the
+        // manager no longer holds the failed transaction as pending.
+        $this->connection()->afterCommit(function () use (&$outsideRan) {
+            $outsideRan = true;
+        });
+
+        $this->assertTrue($outsideRan);
     }
 
     /**

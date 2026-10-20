@@ -240,12 +240,23 @@ trait ManagesTransactions
                 $pdo->rollBack();
             }
 
+            // Keep the transactions manager in sync with the connection level.
+            // Without this, afterCommit callbacks from the failed attempt remain
+            // pending and run again on a successful retry (see #61964).
+            $this->transactionsManager?->rollback(
+                $this->getName(), $this->transactions
+            );
+
             return;
         }
 
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
         }
+
+        $this->transactionsManager?->rollback(
+            $this->getName(), $this->transactions
+        );
 
         throw $e;
     }
