@@ -1438,7 +1438,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
      * @param  string|null  $value
      * @param  bool  $caseSensitive
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
