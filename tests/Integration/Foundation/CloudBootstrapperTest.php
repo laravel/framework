@@ -371,6 +371,111 @@ class CloudBootstrapperTest extends TestCase
         }
     }
 
+    #[DataProvider('errorHandlingOptions')]
+    public function test_it_preserves_the_error_handling_options_of_an_existing_disk($throw, $report)
+    {
+        $this->app['config']->set('filesystems.disks.test-disk', [
+            'driver' => 'local',
+            'root' => '/tmp/test-disk',
+            'throw' => $throw,
+            'report' => $report,
+        ]);
+
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'test-disk',
+                'access_key_id' => 'test-access-key-id',
+                'access_key_secret' => 'test-access-key-secret',
+                'bucket' => 'test-bucket',
+                'url' => 'test-url',
+                'endpoint' => 'test-endpoint',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.test-disk');
+
+            $this->assertSame('s3', $config['driver']);
+            $this->assertSame($throw, $config['throw']);
+            $this->assertSame($report, $config['report']);
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
+    }
+
+    public static function errorHandlingOptions()
+    {
+        return [
+            'throwing' => [true, false],
+            'reporting' => [false, true],
+        ];
+    }
+
+    public function test_it_only_carries_over_the_error_handling_options_of_an_existing_disk()
+    {
+        $this->app['config']->set('filesystems.disks.test-disk', [
+            'driver' => 'local',
+            'root' => '/tmp/test-disk',
+            'visibility' => 'public',
+            'throw' => true,
+        ]);
+
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'test-disk',
+                'access_key_id' => 'test-access-key-id',
+                'access_key_secret' => 'test-access-key-secret',
+                'bucket' => 'test-bucket',
+                'url' => 'test-url',
+                'endpoint' => 'test-endpoint',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.test-disk');
+
+            $this->assertTrue($config['throw']);
+            $this->assertArrayNotHasKey('root', $config);
+            $this->assertArrayNotHasKey('visibility', $config);
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
+    }
+
+    public function test_it_does_not_throw_or_report_when_an_existing_disk_does_not_set_them()
+    {
+        $this->app['config']->set('filesystems.disks.test-disk', [
+            'driver' => 'local',
+            'root' => '/tmp/test-disk',
+        ]);
+
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'test-disk',
+                'access_key_id' => 'test-access-key-id',
+                'access_key_secret' => 'test-access-key-secret',
+                'bucket' => 'test-bucket',
+                'url' => 'test-url',
+                'endpoint' => 'test-endpoint',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.test-disk');
+
+            $this->assertFalse($config['throw']);
+            $this->assertFalse($config['report']);
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
+    }
+
     public function test_it_does_not_override_a_different_filesystem_disk()
     {
         $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(

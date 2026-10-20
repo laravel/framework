@@ -91,6 +91,8 @@ class CloudBootstrapper
                     'prefix' => $disk['prefix'] ?? '',
                 ]);
             } else {
+                $existing = $app['config']->get('filesystems.disks.'.$disk['disk'], []);
+
                 $app['config']->set('filesystems.disks.'.$disk['disk'], [
                     'driver' => 's3',
                     'key' => $disk['access_key_id'],
@@ -101,8 +103,8 @@ class CloudBootstrapper
                     'region' => $disk['region'] ?? 'auto',
                     'credentials' => $disk['credentials'] ?? null,
                     'use_path_style_endpoint' => false,
-                    'throw' => false,
-                    'report' => false,
+                    'throw' => $existing['throw'] ?? false,
+                    'report' => $existing['report'] ?? false,
                 ]);
             }
 
