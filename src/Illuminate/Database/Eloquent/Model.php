@@ -466,7 +466,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         if ($this->primaryKey === 'id' && $table && $table->key !== null) {
-            $this->primaryKey = $table->key;
+            $this->primaryKey = $table->key === false ? null : $table->key;
         }
 
         if ($this->keyType === 'int' && $table && $table->keyType !== null) {
