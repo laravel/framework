@@ -188,6 +188,12 @@ class CallbackEvent extends Event
      */
     public function mutexName()
     {
+        $mutexNameResolver = $this->mutexNameResolver;
+
+        if (! is_null($mutexNameResolver) && is_callable($mutexNameResolver)) {
+            return $mutexNameResolver($this);
+        }
+
         return 'framework/schedule-'.sha1($this->description ?? '');
     }
 

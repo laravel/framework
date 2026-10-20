@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Orchestra\Testbench\TestCase;
@@ -156,5 +157,23 @@ class CallbackEventTest extends TestCase
 
         $this->assertSame($event, $callbackEvent);
         $this->assertSame('', $outputValue);
+    }
+
+    public function testCustomMutexName()
+    {
+        $event = (new CallbackEvent($this->mutex, function () {
+        }))->name('Fancy callback description');
+
+        $this->assertSame('framework/schedule-'.sha1('Fancy callback description'), $event->mutexName());
+
+        $event->createMutexNameUsing(function (CallbackEvent $event) {
+            return Str::slug($event->description);
+        });
+
+        $this->assertSame('fancy-callback-description', $event->mutexName());
+
+        $event->createMutexNameUsing('shared-lock');
+
+        $this->assertSame('shared-lock', $event->mutexName());
     }
 }

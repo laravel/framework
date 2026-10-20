@@ -113,6 +113,27 @@ class CallbackSchedulingTest extends TestCase
         $this->assertFalse($event->mutex->exists($event));
     }
 
+    public function testCallbacksSharingCustomMutexNameDoNotOverlap(): void
+    {
+        $schedule = $this->app->make(Schedule::class);
+
+        $first = $schedule->call($this->logger('first'))
+            ->name('task-a')
+            ->createMutexNameUsing('shared-lock')
+            ->withoutOverlapping();
+
+        $second = $schedule->call($this->logger('second'))
+            ->name('task-b')
+            ->createMutexNameUsing('shared-lock')
+            ->withoutOverlapping();
+
+        $this->assertTrue($first->mutex->create($first));
+
+        $this->assertTrue($second->shouldSkipDueToOverlapping());
+
+        $first->mutex->forget($first);
+    }
+
     protected function logger($message)
     {
         return function () use ($message) {
