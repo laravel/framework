@@ -84,7 +84,12 @@ class TransformsRequest
                 throw new PostTooLargeException('The cumulative size of the input keys is too large.');
             }
 
-            $data[$key] = $this->cleanValue($keyPrefix.$key, $value);
+            $cleaned = $this->cleanValue($keyPrefix.$key, $value);
+
+            // Avoid copying arrays when none of their values have changed...
+            if ($cleaned !== $value) {
+                $data[$key] = $cleaned;
+            }
         }
 
         return $data;
