@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\Looping;
@@ -196,6 +197,7 @@ class Cloud
 
             $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
                 $app[Events::class],
+                $app->factory(BladeMapper::class),
                 $app->basePath().DIRECTORY_SEPARATOR,
                 $config,
             ));
