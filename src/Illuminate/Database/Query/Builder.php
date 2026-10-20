@@ -1435,7 +1435,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where like" clause to the query for multiple columns with "and" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|(\Closure(\Illuminate\Database\Eloquent\Builder): mixed)[]|string[]  $columns
      * @param  string|null  $value
      * @param  bool  $caseSensitive
      * @param  'and'|'or'  $boolean
