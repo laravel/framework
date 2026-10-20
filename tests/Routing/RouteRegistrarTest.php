@@ -1059,6 +1059,39 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
     }
 
+    public function testUserCanRegisterQueryableResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class);
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.query'));
+
+        $this->router->resource('posts', RouteRegistrarControllerStub::class)->queryable();
+
+        $this->assertCount(15, $this->router->getRoutes());
+
+        $route = $this->router->getRoutes()->getByName('posts.query');
+
+        $this->assertSame(['QUERY'], $route->methods());
+        $this->assertSame('posts', $route->uri());
+        $this->assertSame(RouteRegistrarControllerStub::class.'@query', $route->getActionName());
+    }
+
+    public function testUserCanRegisterQueryableApiResource()
+    {
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class)->queryable();
+
+        $this->assertCount(6, $this->router->getRoutes());
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.query'));
+    }
+
+    public function testUserCanExcludeQueryFromQueryableResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)->queryable()->except('query');
+
+        $this->assertCount(7, $this->router->getRoutes());
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.query'));
+    }
+
     public function testCanNameRoutesOnRegisteredResource()
     {
         $this->router->resource('comments', RouteRegistrarControllerStub::class)

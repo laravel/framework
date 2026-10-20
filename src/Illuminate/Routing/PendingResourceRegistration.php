@@ -87,6 +87,18 @@ class PendingResourceRegistration
     }
 
     /**
+     * Indicate that the resource should have a query route.
+     *
+     * @return $this
+     */
+    public function queryable()
+    {
+        $this->options['queryable'] = true;
+
+        return $this;
+    }
+
+    /**
      * Set the route names for controller actions.
      *
      * @param  array|string  $names

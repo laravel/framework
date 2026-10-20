@@ -136,9 +136,15 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace["use {$rootNamespace}Http\Controllers\Controller;\n"] = '';
         }
 
-        return str_replace(
+        $class = str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)
         );
+
+        if ($this->option('no-query')) {
+            $class = preg_replace('/\n    \/\*\*\n     \* Display a listing of the resource matching the query\.\n.*?\n    }\n/s', '', $class);
+        }
+
+        return $class;
     }
 
     /**
@@ -298,6 +304,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
+            ['no-query', null, InputOption::VALUE_NONE, 'Exclude the query method from the resource controller'],
         ];
     }
 

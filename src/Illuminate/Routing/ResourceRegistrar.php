@@ -98,6 +98,15 @@ class ResourceRegistrar
 
         $defaults = $this->resourceDefaults;
 
+        // The query route is opt-in, so keep it when an "only" list (such as the apiResource defaults) is given.
+        if (isset($options['queryable'])) {
+            $defaults[] = 'query';
+
+            if (isset($options['only'])) {
+                $options['only'] = array_merge((array) $options['only'], ['query']);
+            }
+        }
+
         $collection = new RouteCollection;
 
         $resourceMethods = $this->getResourceMethods($defaults, $options);
@@ -300,6 +309,26 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'index', $options);
 
         return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the query method for a resourceful route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addResourceQuery($name, $base, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name);
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'query', $options);
+
+        return $this->router->query($uri, $action);
     }
 
     /**

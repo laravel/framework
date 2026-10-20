@@ -90,6 +90,7 @@ class ControllerMakeCommandTest extends TestCase
             'namespace App\Http\Controllers;',
             'use App\Models\Foo;',
             'public function index()',
+            'public function query()',
             'public function create()',
             'public function store(Request $request)',
             'public function show(Foo $foo)',
@@ -111,6 +112,7 @@ class ControllerMakeCommandTest extends TestCase
             'use App\Models\Bar;',
             'use App\Models\Foo;',
             'public function index(Foo $foo)',
+            'public function query(Foo $foo)',
             'public function create(Foo $foo)',
             'public function store(Request $request, Foo $foo)',
             'public function show(Foo $foo, Bar $bar)',
@@ -138,6 +140,22 @@ class ControllerMakeCommandTest extends TestCase
         $this->assertFileNotContains([
             'public function create()',
             'public function edit($id)',
+        ], 'app/Http/Controllers/FooController.php');
+    }
+
+    public function testItCanGenerateControllerFileWithNoQueryOption()
+    {
+        $this->artisan('make:controller', ['name' => 'FooController', '--api' => true, '--no-query' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'class FooController',
+            "    public function index()\n    {\n        //\n    }\n\n    /**\n     * Store a newly created resource in storage.",
+        ], 'app/Http/Controllers/FooController.php');
+
+        $this->assertFileNotContains([
+            'public function query()',
+            'matching the query',
         ], 'app/Http/Controllers/FooController.php');
     }
 

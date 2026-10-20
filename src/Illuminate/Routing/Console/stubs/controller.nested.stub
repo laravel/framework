@@ -18,6 +18,14 @@ class {{ class }} extends Controller
     }
 
     /**
+     * Display a listing of the resource matching the query.
+     */
+    public function query({{ parentModel }} ${{ parentModelVariable }})
+    {
+        //
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create({{ parentModel }} ${{ parentModelVariable }})
