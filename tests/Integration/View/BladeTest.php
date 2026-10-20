@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -268,6 +269,16 @@ class BladeTest extends TestCase
         Blade::partialMock()->expects('compile')->with(realpath(__DIR__.'/Fixtures/templates/components/panel.blade.php'));
 
         $this->artisan('view:cache');
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function test_view_cache_command_compiles_namespaced_views_at_the_path_they_render_from()
+    {
+        View::addNamespace('components', join_paths(__DIR__, 'Fixtures', 'templates', 'components', '..', 'components'));
+
+        $this->artisan('view:cache');
+
+        $this->assertFileExists(Blade::getCompiledPath(View::getFinder()->find('components::panel')));
     }
 
     /** {@inheritdoc} */
