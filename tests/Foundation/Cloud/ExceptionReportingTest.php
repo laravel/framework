@@ -2571,6 +2571,15 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItRunsArtisanWithoutACommandName(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        $this->assertSame(0, $this->runArtisanCommand(['artisan']));
+        $this->assertCount(0, $streams);
+    }
+
     public function testItCapturesTheAbbreviatedCommandNameAsEntered(): void
     {
         $this->setupExceptionReporting();

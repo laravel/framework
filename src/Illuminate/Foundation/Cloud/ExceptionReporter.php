@@ -519,7 +519,7 @@ class ExceptionReporter
     /**
      * Prepare to process the given command.
      */
-    public function prepareForCommand(string $name): void
+    public function prepareForCommand(?string $name): void
     {
         $this->currentlyRunningCommandName = $name !== ''
             ? $name
