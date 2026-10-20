@@ -4856,6 +4856,44 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['third'], $catchCallbacks['third']);
     }
 
+    public function testBatchCatchHookIsCalledWhenThrowingRequestExceptions(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $catchCallbacks = [];
+        $thenCalled = false;
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->throw()->get('https://500.com'),
+                $batch->as('third')->retry(2)->get('https://500.com'),
+            ];
+        })->catch(function (Batch $batch, int|string $key, Response|RequestException $response) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $response;
+        })->then(function () use (&$thenCalled) {
+            $thenCalled = true;
+        });
+
+        $responses = $batch->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertInstanceOf(RequestException::class, $responses['second']);
+        $this->assertInstanceOf(RequestException::class, $responses['third']);
+
+        $this->assertSame(2, $batch->failedRequests);
+        $this->assertTrue($batch->hasFailures());
+        $this->assertFalse($thenCalled);
+
+        $this->assertCount(2, $catchCallbacks);
+        $this->assertArrayNotHasKey('first', $catchCallbacks);
+        $this->assertSame($responses['second'], $catchCallbacks['second']);
+        $this->assertSame($responses['third'], $catchCallbacks['third']);
+    }
+
     public function testBatchThenHookIsCalled(): void
     {
         $this->factory->fake([
