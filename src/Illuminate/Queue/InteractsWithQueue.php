@@ -85,6 +85,21 @@ trait InteractsWithQueue
     }
 
     /**
+     * Release the job back into the queue using the job's backoff.
+     *
+     * @return void
+     */
+    public function releaseUsingBackoff()
+    {
+        $backoff = explode(',', $this->job && method_exists($this->job, 'backoff')
+            ? $this->job->backoff() ?? '0'
+            : '0'
+        );
+
+        return $this->release((int) ($backoff[$this->attempts() - 1] ?? last($backoff)));
+    }
+
+    /**
      * Indicate that queue interactions like fail, delete, and release should be faked.
      *
      * @return $this
