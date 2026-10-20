@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobInterrupted;
 use Illuminate\Queue\Events\JobPopped;
@@ -272,6 +273,27 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->assertReported(fn (RuntimeException $reported) => $reported === $e);
         $this->events->assertDispatchedOnce(JobExceptionOccurred::class);
         $this->events->assertNotDispatched(JobProcessed::class);
+    }
+
+    public function testJobAttemptedEventIsDispatched()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->events->assertDispatchedOnce(JobAttempted::class);
+        $this->events->assertDispatched(JobAttempted::class, function ($event) use ($job, $e) {
+            return $event->connectionName === 'default'
+                && $event->job === $job
+                && $event->exception === $e
+                && ! $event->successful()
+                && is_float($event->duration);
+        });
     }
 
     public function testJobIsFailedIfExceptionHandlerSaysItShouldntRetry()
