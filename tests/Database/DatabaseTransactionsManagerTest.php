@@ -368,6 +368,29 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertSame([['default', 3], ['default', 2]], $callbacks);
     }
 
+    public function testRollbackExecutesCallbacksAfterRemovingTheConnectionsTransactions()
+    {
+        $state = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+        $manager->commit('default', 2, 1);
+
+        $manager->addCallbackForRollback(function () use ($manager, &$state) {
+            $state[] = [$manager->getPendingTransactions()->count(), $manager->getCommittedTransactions()->count()];
+
+            $manager->addCallback(function () use (&$state) {
+                $state[] = 'after commit';
+            });
+        });
+
+        $manager->rollback('default', 0);
+
+        $this->assertSame([[0, 0], 'after commit'], $state);
+    }
+
     public function testRollbackExecutesOnlyCallbacksOfTheConnection()
     {
         $callbacks = [];

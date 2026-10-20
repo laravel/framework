@@ -166,10 +166,6 @@ class DatabaseTransactionsManager
             $transactions->push($transaction);
         }
 
-        $transactions
-            ->sortByDesc(fn ($transaction) => $transaction->level)
-            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
-
         $this->currentTransaction[$connection] = null;
 
         $this->pendingTransactions = $this->pendingTransactions->reject(
@@ -179,6 +175,10 @@ class DatabaseTransactionsManager
         $this->committedTransactions = $this->committedTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection
         )->values();
+
+        $transactions
+            ->sortByDesc(fn ($transaction) => $transaction->level)
+            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
     }
 
     /**

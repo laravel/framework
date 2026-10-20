@@ -130,6 +130,99 @@ class DatabaseTransactionsTest extends DatabaseTestCase
         $this->assertFalse($afterCommitRan);
         $this->assertTrue($afterRollbackRan);
     }
+
+    public function testTransactionStartedInAfterRollbackCallbackDoesNotRunCallbacksOfRolledBackTransaction()
+    {
+        $callbacks = [];
+
+        try {
+            DB::transaction(function () use (&$callbacks) {
+                DB::afterCommit(function () use (&$callbacks) {
+                    $callbacks[] = 'rolled back transaction';
+                });
+
+                DB::transaction(function () use (&$callbacks) {
+                    DB::afterCommit(function () use (&$callbacks) {
+                        $callbacks[] = 'committed savepoint of rolled back transaction';
+                    });
+                });
+
+                DB::afterRollBack(function () use (&$callbacks) {
+                    DB::transaction(function () use (&$callbacks) {
+                        DB::afterCommit(function () use (&$callbacks) {
+                            $callbacks[] = 'transaction started in after rollback callback';
+                        });
+                    });
+
+                    $callbacks[] = 'after rollback';
+                });
+
+                throw new \RuntimeException('rollback');
+            });
+        } catch (\RuntimeException) {
+            // Ignore the expected rollback exception.
+        }
+
+        $this->assertSame(['transaction started in after rollback callback', 'after rollback'], $callbacks);
+    }
+
+    public function testAfterCommitCallbackRegisteredInAfterRollbackCallbackIsExecutedImmediately()
+    {
+        $afterCommitRan = false;
+
+        try {
+            DB::transaction(function () use (&$afterCommitRan) {
+                DB::afterRollBack(function () use (&$afterCommitRan) {
+                    DB::afterCommit(function () use (&$afterCommitRan) {
+                        $afterCommitRan = true;
+                    });
+                });
+
+                throw new \RuntimeException('rollback');
+            });
+        } catch (\RuntimeException) {
+            // Ignore the expected rollback exception.
+        }
+
+        $this->assertTrue($afterCommitRan);
+    }
+
+    public function testRollbackCallbackThatThrowsDoesNotLeaveRolledBackTransactionBehind()
+    {
+        $callbacks = [];
+
+        try {
+            DB::transaction(function () use (&$callbacks) {
+                DB::afterCommit(function () use (&$callbacks) {
+                    $callbacks[] = 'after commit of rolled back transaction';
+                });
+
+                DB::afterRollBack(function () use (&$callbacks) {
+                    $callbacks[] = 'after rollback';
+
+                    throw new \LogicException('after rollback failed');
+                });
+
+                throw new \RuntimeException('rollback');
+            });
+        } catch (\LogicException) {
+            // The rollback callback's exception is rethrown.
+        }
+
+        DB::transaction(function () {
+            //
+        });
+
+        try {
+            DB::transaction(function () {
+                throw new \RuntimeException('rollback');
+            });
+        } catch (\RuntimeException|\LogicException) {
+            // Ignore the expected rollback exception.
+        }
+
+        $this->assertSame(['after rollback'], $callbacks);
+    }
 }
 
 class TestObjectForTransactions
