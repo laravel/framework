@@ -20,6 +20,7 @@ use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
@@ -29,6 +30,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -987,6 +989,123 @@ class ExceptionReportingTest extends TestCase
             'class' => ViewException::class,
             'message' => 'Whoops!',
         ]);
+    }
+
+    public function testItResolvesTheBladeMapperWhenAViewExceptionIsReported(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        $resolved = 0;
+
+        // The mapper is given as a closure, as the bootstrapper cannot build
+        // lazy proxies on every supported version of PHP.
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            function () use (&$resolved) {
+                $resolved++;
+
+                return $this->app[BladeMapper::class];
+            },
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+
+        $reporter(new RuntimeException('Whoops!'));
+        $this->assertSame(0, $resolved);
+
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The original!')));
+        $this->assertSame(1, $resolved);
+
+        $this->assertCount(1, $streams);
+    }
+
+    public function testReportingViewExceptionStateIsNotClobberedByANestedReportCall(): void
+    {
+        $this->app->instance(ExceptionHandler::class, new ExceptionHandlerThatReportsWhileBuildingContext($this->app));
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        try {
+            view()->file(__DIR__.'/reentrancy.blade.php')->render();
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWritten(function (string $stream) {
+            $writes = array_map(
+                fn ($line) => json_decode($line, associative: true, flags: JSON_THROW_ON_ERROR),
+                explode("\n", trim($stream))
+            );
+
+            [$nested, $viewException] = $writes;
+
+            $this->assertSame('Nested, unrelated exception', $nested['message']);
+            $this->assertSame('RuntimeException', $viewException['class']);
+
+            // The outer exception is a genuine view exception; its first
+            // trace frame should be mapped back to the original
+            // .blade.php source via the compiled-view lookup, not left
+            // pointing at the compiled cache file.
+            $this->assertArrayHasKey('compiled_view', $viewException['trace'][0]);
+            $this->assertStringEndsWith('reentrancy.blade.php', $viewException['trace'][0]['file']);
+
+            return true;
+        });
+    }
+
+    public function testItNormalizesViewExceptions(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        (fn () => $this->namespace = 'App')->call($this->app);
+        Blade::anonymousComponentPath(__DIR__.'/components', 'tests');
+
+        try {
+            view()->file(__DIR__.'/foo.blade.php')->render();
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        $compiledComponent = $this->reportedCompiledViewPath(__DIR__.'/components/profile.blade.php');
+        $compiledView = $this->reportedCompiledViewPath(__DIR__.'/foo.blade.php');
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWritten(function ($stream) use ($compiledComponent, $compiledView) {
+            $writes = explode("\n", $stream, 2);
+            $this->assertCount(2, $writes);
+
+            [
+                $reportedInView,
+                $thrownInView,
+            ] = array_map(fn ($payload) => json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR), $writes);
+
+            $this->assertSame([
+                'file' => $compiledComponent,
+                'line' => 4,
+            ], $reportedInView['trace'][0]);
+            $this->assertSame([
+                'file' => 'tests/Foundation/Cloud/components/profile.blade.php',
+                'line' => 3,
+                'compiled_view' => $compiledComponent,
+            ], $thrownInView['trace'][0]);
+
+            $this->assertSame([
+                'file' => $compiledView,
+                'line' => 11,
+            ], Arr::except($reportedInView['trace'][9], ['function', 'class', 'type', 'args']));
+            $this->assertSame([
+                'file' => 'tests/Foundation/Cloud/foo.blade.php',
+                'line' => 3,
+                'compiled_view' => $compiledView,
+            ], Arr::except($thrownInView['trace'][9], ['function', 'class', 'type', 'args']));
+
+            unset($reportedInView['trace'][0], $thrownInView['trace'][0], $thrownInView['trace'][9], $reportedInView['trace'][9]);
+
+            $this->assertSame($reportedInView['trace'], $thrownInView['trace']);
+
+            return true;
+        });
     }
 
     public function testItNormalizesSqsQueueNames(): void
@@ -3121,6 +3240,7 @@ class ExceptionReportingTest extends TestCase
         // runs on, so that a file is the same file everywhere.
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
+            $this->app[BladeMapper::class],
             'D:\\a\\framework\\framework\\',
             ['stop' => true],
         );
@@ -3322,6 +3442,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
+            $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => $stopConfig,
@@ -3348,6 +3469,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
+            $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => false,
@@ -3516,6 +3638,7 @@ class ExceptionReportingTest extends TestCase
     {
         return new ExceptionReporter(
             $this->app[Events::class],
+            $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             array_merge([
                 'stop' => true,
@@ -3586,6 +3709,15 @@ class ExceptionReportingTest extends TestCase
         return $this->app[\Illuminate\Contracts\Console\Kernel::class]->handle(
             new \Symfony\Component\Console\Input\ArgvInput($argv),
             new \Symfony\Component\Console\Output\NullOutput,
+        );
+    }
+
+    protected function reportedCompiledViewPath(string $view): string
+    {
+        return str_replace(
+            [$this->app->basePath().DIRECTORY_SEPARATOR, '\\'],
+            ['', '/'],
+            Blade::getCompiledPath($view),
         );
     }
 
@@ -3836,6 +3968,22 @@ class ExceptionThrownOnWindows extends RuntimeException
 
         $this->file = 'D:\\a\\framework\\framework\\tests\\Foundation\\Cloud\\Whoops.php';
         $this->line = 1;
+    }
+}
+
+class ExceptionHandlerThatReportsWhileBuildingContext extends Handler
+{
+    protected bool $reportedWhileBuildingContext = false;
+
+    protected function context()
+    {
+        if (! $this->reportedWhileBuildingContext) {
+            $this->reportedWhileBuildingContext = true;
+
+            report(new RuntimeException('Nested, unrelated exception'));
+        }
+
+        return [];
     }
 }
 

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
@@ -33,6 +34,11 @@ use WeakMap;
 
 class ExceptionReporter
 {
+    /**
+     * Indicates the currently reporting exception is a view exception.
+     */
+    protected bool $reportingViewException = false;
+
     /**
      * The captured identifiers, keyed by exception.
      *
@@ -131,6 +137,7 @@ class ExceptionReporter
      */
     public function __construct(
         protected Events $events,
+        protected Closure|BladeMapper $bladeMapper,
         protected string $basePath,
         protected array $config,
     ) {
@@ -142,7 +149,11 @@ class ExceptionReporter
      */
     public function __invoke(Throwable $e): ?bool
     {
+        $previousReportingViewException = $this->reportingViewException;
+
         try {
+            $this->reportingViewException = $this->isViewException($e);
+
             $e = $this->unwrapViewException($e);
 
             $emitted = $this->events->emit($this->payload($e));
@@ -155,6 +166,8 @@ class ExceptionReporter
         } catch (Throwable) {
             return null;
         } finally {
+            $this->reportingViewException = $previousReportingViewException;
+
             if ($this->scheduledTaskAwaitingFailureReport) {
                 $this->flushScheduledTaskContext();
             }
@@ -1098,9 +1111,51 @@ class ExceptionReporter
             return $frame;
         }
 
+        if ($this->reportingViewException) {
+            $frame = $this->mapCompiledViewFrame($frame);
+
+            if ($frame['compiled_view'] ?? null) {
+                $frame['compiled_view'] = $this->normalizeBasePath($frame['compiled_view']);
+            }
+        }
+
         $frame['file'] = $this->normalizeBasePath($frame['file']);
 
         return $frame;
+    }
+
+    /**
+     * Map compiled views to their original view file paths.
+     *
+     * @param  array<string, mixed>  $frame
+     * @return array<string, mixed>
+     */
+    protected function mapCompiledViewFrame(array $frame): array
+    {
+        $normalizedView = $this->bladeMapper()->findCompiledView($frame['file']);
+
+        if (! $normalizedView) {
+            return $frame;
+        }
+
+        $frame['compiled_view'] = $frame['file'];
+        $frame['file'] = $normalizedView;
+        $frame['line'] = $this->bladeMapper()->detectLineNumber($normalizedView, $frame['line']);
+
+        return $frame;
+    }
+
+    /**
+     * Retrieve the Blade mapper.
+     *
+     * The mapper is only needed while reporting a view exception, and is
+     * resolved when it is first needed.
+     */
+    protected function bladeMapper(): BladeMapper
+    {
+        return $this->bladeMapper instanceof Closure
+            ? $this->bladeMapper = ($this->bladeMapper)()
+            : $this->bladeMapper;
     }
 
     /**
