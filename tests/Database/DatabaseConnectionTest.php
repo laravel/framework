@@ -663,6 +663,57 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame('foo', $connection->olap(fn () => 'foo'));
     }
 
+    public function testUsingWritePdoUsesWritePdoForReadsWithinCallback()
+    {
+        $writePdo = new DatabaseConnectionTestMockPDO;
+        $readPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection = (new MySqlConnection($writePdo))->setReadPdo($readPdo);
+
+        $this->assertSame($readPdo, $connection->getReadPdo());
+
+        $this->assertSame('foo', $connection->usingWritePdo(function ($connection) use ($writePdo) {
+            $this->assertSame($writePdo, $connection->getReadPdo());
+
+            return 'foo';
+        }));
+
+        $this->assertSame($readPdo, $connection->getReadPdo());
+    }
+
+    public function testUsingWritePdoRestoresPreviousStateWhenCallbackThrows()
+    {
+        $writePdo = new DatabaseConnectionTestMockPDO;
+        $readPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection = (new MySqlConnection($writePdo))->setReadPdo($readPdo);
+
+        try {
+            $connection->usingWritePdo(function () {
+                throw new Exception('Whoops!');
+            });
+
+            $this->fail('Exception was not thrown.');
+        } catch (Exception $e) {
+            $this->assertSame('Whoops!', $e->getMessage());
+        }
+
+        $this->assertSame($readPdo, $connection->getReadPdo());
+    }
+
+    public function testUsingWritePdoPreservesAnAlreadyEnabledWriteConnectionPreference()
+    {
+        $writePdo = new DatabaseConnectionTestMockPDO;
+        $readPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection = (new MySqlConnection($writePdo))->setReadPdo($readPdo);
+        $connection->useWriteConnectionWhenReading();
+
+        $connection->usingWritePdo(fn () => null);
+
+        $this->assertSame($writePdo, $connection->getReadPdo());
+    }
+
     #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {
