@@ -19,6 +19,7 @@ use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\Queue;
+use Laravel\Octane\Events\RequestReceived;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
@@ -222,6 +223,8 @@ class Cloud
             Queue::createPayloadUsing(fn () => $exceptionReporter->jobPayload());
 
             if (! $app->runningInConsole()) {
+                $app['events']->listen(fn (RequestReceived $event) => $exceptionReporter->prepareForOctaneRequest());
+
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
                     if ($event->user !== null) {
                         $exceptionReporter->rememberUser($event->user);
