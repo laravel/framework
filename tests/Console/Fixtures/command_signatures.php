@@ -4238,6 +4238,17 @@ return [
                 'default' => false,
                 'description' => 'Indicate that a singleton resource should be creatable',
             ],
+            [
+                'name' => 'no-query',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Exclude the query method from the resource controller',
+            ],
         ],
     ],
     \Illuminate\Routing\Console\MiddlewareMakeCommand::class => [
