@@ -30,7 +30,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The current globally available container (if any).
      *
-     * @var static
+     * @var static|null
      */
     protected static $instance;
 
@@ -100,7 +100,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The stack of concretions currently being built.
      *
-     * @var array[]
+     * @var array<int, string|int>
      */
     protected $buildStack = [];
 
@@ -198,7 +198,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The callback used to determine the container's environment.
      *
-     * @var (callable(array<int, string>|string): bool|string)|null
+     * @var (callable(array<int, string>|string): (bool|string))|null
      */
     protected $environmentResolver = null;
 
@@ -1655,7 +1655,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the name of the binding the container is currently resolving.
      *
-     * @return class-string|string|null
+     * @return class-string|string|int|null
      */
     public function currentlyResolving()
     {
@@ -1772,7 +1772,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Set the callback which determines the current container environment.
      *
-     * @param  (callable(array<int, string>|string): bool|string)|null  $callback
+     * @param  (callable(array<int, string>|string): (bool|string))|null  $callback
      * @return void
      */
     public function resolveEnvironmentUsing(?callable $callback)
@@ -1823,7 +1823,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Set the shared instance of the container.
      *
-     * @return \Illuminate\Contracts\Container\Container|static
+     * @return \Illuminate\Contracts\Container\Container|static|null
      */
     public static function setInstance(?ContainerContract $container = null)
     {

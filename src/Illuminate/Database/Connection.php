@@ -38,14 +38,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $readPdo;
 
@@ -59,7 +59,7 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection used for direct connections.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $directPdo;
 
@@ -122,7 +122,7 @@ class Connection implements ConnectionInterface
     /**
      * The schema grammar implementation.
      *
-     * @var \Illuminate\Database\Schema\Grammars\Grammar
+     * @var \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     protected $schemaGrammar;
 
@@ -1124,7 +1124,7 @@ class Connection implements ConnectionInterface
     /**
      * Register a database query listener with the connection.
      *
-     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted)  $callback
+     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted): mixed  $callback
      * @return void
      */
     public function listen(Closure $callback)

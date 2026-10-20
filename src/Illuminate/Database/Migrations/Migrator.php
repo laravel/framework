@@ -27,7 +27,7 @@ class Migrator
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -83,7 +83,7 @@ class Migrator
     /**
      * The output interface implementation.
      *
-     * @var \Symfony\Component\Console\Output\OutputInterface
+     * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
     protected $output;
 
@@ -427,6 +427,7 @@ class Migrator
      *
      * @param  object  $migration
      * @param  string  $method
+     * @param  string|null  $name
      * @return void
      */
     protected function runMigration($migration, $method, $name = null)

@@ -21,7 +21,7 @@ class DatabaseTransactionRecord
     /**
      * The parent instance of this transaction.
      *
-     * @var \Illuminate\Database\DatabaseTransactionRecord
+     * @var \Illuminate\Database\DatabaseTransactionRecord|null
      */
     public $parent;
 

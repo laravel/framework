@@ -3104,7 +3104,7 @@ class Builder implements BuilderContract
      * Add a vector-distance "order by" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @return $this
      *
      * @throws \JsonException
@@ -3223,7 +3223,7 @@ class Builder implements BuilderContract
     /**
      * Alias to set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  int|null  $value
      * @return $this
      */
     public function take($value)
@@ -3234,7 +3234,7 @@ class Builder implements BuilderContract
     /**
      * Set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  int|null  $value
      * @return $this
      */
     public function limit($value)
@@ -3922,7 +3922,7 @@ class Builder implements BuilderContract
     /**
      * Strip off the table name or alias from a column identifier.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $column
      * @return string|null
      */
     protected function stripTableForPluck($column)
@@ -3945,7 +3945,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $queryResult
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromObjectColumn($queryResult, $column, $key)
@@ -3970,7 +3970,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $queryResult
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromArrayColumn($queryResult, $column, $key)

@@ -28,7 +28,7 @@ class HandleExceptions
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application|null
      */
     protected static $app;
 

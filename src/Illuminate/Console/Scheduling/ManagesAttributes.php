@@ -25,7 +25,7 @@ trait ManagesAttributes
     /**
      * The timezone the date should be evaluated on.
      *
-     * @var \DateTimeZone|string
+     * @var \DateTimeZone|string|null
      */
     public $timezone;
 

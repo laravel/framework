@@ -45,7 +45,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * All of the converted files for the request.
      *
-     * @var array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>
+     * @var array<string, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>|null
      */
     protected $convertedFiles;
 

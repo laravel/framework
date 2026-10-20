@@ -191,7 +191,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The application namespace.
      *
-     * @var string
+     * @var string|null
      */
     protected $namespace;
 
