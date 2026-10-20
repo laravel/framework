@@ -68,4 +68,32 @@ class SeeInHtmlTest extends TestCase
         $this->assertTrue($constraint->matches(['Hello', 'beautiful', 'World']));
         $this->assertFalse($constraint->matches(['World', 'Hello']));
     }
+
+    public function testStringZeroIsNotTreatedAsEmpty()
+    {
+        $constraint = new SeeInHtml('<p>Total: 0</p>');
+
+        $this->assertTrue($constraint->matches(['0']));
+        $this->assertFalse($constraint->matches(['1']));
+
+        $missing = new SeeInHtml('<p>hello</p>');
+
+        $this->assertFalse($missing->matches(['0']));
+    }
+
+    public function testNegatedStringZeroIsNotTreatedAsEmpty()
+    {
+        $constraint = new SeeInHtml('<p>Total: 0</p>', ordered: false, negate: true);
+
+        $this->assertFalse($constraint->matches(['0']));
+        $this->assertTrue($constraint->matches(['1']));
+    }
+
+    public function testNullAndEmptyStringAreStillSkipped()
+    {
+        $constraint = new SeeInHtml('<p>hello</p>');
+
+        $this->assertTrue($constraint->matches([null, '']));
+        $this->assertTrue($constraint->matches(['hello', null, '']));
+    }
 }

@@ -44,7 +44,8 @@ class SeeInOrder extends Constraint
         $position = 0;
 
         foreach ($values as $value) {
-            if (empty($value)) {
+            // Use strict empty checks: PHP's empty('0') is true (#61943).
+            if ($value === null || $value === '') {
                 continue;
             }
 

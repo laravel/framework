@@ -59,7 +59,9 @@ class SeeInHtml extends Constraint
         $position = 0;
 
         foreach ($values as $value) {
-            if (empty($value)) {
+            // Use strict empty checks: PHP's empty('0') is true, which made
+            // assertSeeText('0') / assertDontSeeText('0') silently skip (#61943).
+            if ($value === null || $value === '') {
                 continue;
             }
 
