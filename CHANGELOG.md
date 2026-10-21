@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.70.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.70.1...12.x)
+
+## [v12.70.1](https://github.com/laravel/framework/compare/v12.70.0...v12.70.1) - 2026-10-21
+
+* [12.x] Prevent escaping from bypassing protection by [@valorin](https://github.com/valorin) in https://github.com/laravel/framework/pull/62027
 
 ## [v12.70.0](https://github.com/laravel/framework/compare/v12.69.3...v12.70.0) - 2026-10-13
 
