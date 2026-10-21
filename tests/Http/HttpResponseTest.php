@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\ViewErrorBag;
 use JsonSerializable;
 use Mockery;
@@ -52,6 +53,14 @@ class HttpResponseTest extends TestCase
         $response->setContent('{"foo": "bar"}');
         $this->assertSame('{"foo": "bar"}', $response->getContent());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
+    }
+
+    public function testStringablesAreConvertedToStrings()
+    {
+        $response = new Response(new Stringable("a,b\n1,2"), 200, ['Content-Type' => 'text/csv']);
+
+        $this->assertSame("a,b\n1,2", $response->getContent());
+        $this->assertSame('text/csv', $response->headers->get('Content-Type'));
     }
 
     public function testRenderablesAreRendered()
