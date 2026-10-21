@@ -59,7 +59,7 @@ class SimpleMessage
     /**
      * The action URL.
      *
-     * @var string
+     * @var string|null
      */
     public $actionUrl;
 
