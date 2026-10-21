@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\InvalidValueException;
 use Illuminate\Support\Str;
 
 class RouteBinding
@@ -71,8 +72,14 @@ class RouteBinding
                 ? 'resolveSoftDeletableRouteBinding'
                 : 'resolveRouteBinding';
 
-            if ($model = $instance->{$routeBindingMethod}($value)) {
-                return $model;
+            try {
+                if ($model = $instance->{$routeBindingMethod}($value)) {
+                    return $model;
+                }
+            } catch (InvalidValueException $e) {
+                report_if($instance::reportsRouteModelBindingExceptions(), $e);
+            } catch (ModelNotFoundException) {
+                //
             }
 
             // If a callback was supplied to the method we will call that to determine
