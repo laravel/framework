@@ -1565,6 +1565,7 @@ class BelongsToMany extends Relation
     {
         return Model::withoutEvents(fn () => $this->create($attributes, $joining, $touch));
     }
+
     /**
      * Create an array of new instances of the related models without raising any events and attach them to the parent model.
      *
