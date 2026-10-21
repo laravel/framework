@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Support\Arr;
 
@@ -231,6 +232,8 @@ class MorphTo extends BelongsTo
             if ($ownerKey !== null && isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
                     $model->setRelation($this->relationName, $result);
+
+                    $this->applyInverseRelationToOwner($result, $model);
                 }
             }
         }
@@ -245,6 +248,12 @@ class MorphTo extends BelongsTo
     #[\Override]
     public function associate($model)
     {
+        if ($model instanceof Model && $this->inverseRelationship !== null && ! $model->isRelation($this->inverseRelationship)) {
+            throw RelationNotFoundException::make($model, $this->inverseRelationship);
+        }
+
+        $previousOwner = $this->getLoadedOwner();
+
         if ($model instanceof Model) {
             $foreignKey = $this->ownerKey && $model->{$this->ownerKey}
                 ? $this->ownerKey
@@ -259,7 +268,17 @@ class MorphTo extends BelongsTo
             $this->morphType, $model instanceof Model ? $model->getMorphClass() : null
         );
 
-        return $this->parent->setRelation($this->relationName, $model);
+        $child = $this->parent->setRelation($this->relationName, $model);
+
+        if ($previousOwner && $this->ownerChanged($previousOwner, $model)) {
+            $this->removeInverseRelation($previousOwner, $this->child);
+        }
+
+        if ($model instanceof Model) {
+            $this->applyInverseRelation($model, $this->child);
+        }
+
+        return $child;
     }
 
     /**
@@ -270,11 +289,35 @@ class MorphTo extends BelongsTo
     #[\Override]
     public function dissociate()
     {
+        $previousOwner = $this->getLoadedOwner();
+
         $this->parent->setAttribute($this->foreignKey, null);
 
         $this->parent->setAttribute($this->morphType, null);
 
-        return $this->parent->setRelation($this->relationName, null);
+        $child = $this->parent->setRelation($this->relationName, null);
+
+        $this->removeInverseRelation($previousOwner, $this->child);
+
+        return $child;
+    }
+
+    /**
+     * Instruct Eloquent to keep the owner's inverse relationship in sync with this child.
+     *
+     * The relation name is required and cannot be guessed.
+     *
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    #[\Override]
+    public function chaperone(?string $relation = null): static
+    {
+        $this->inverseRelationship = $relation
+            ?? throw RelationNotFoundException::make($this->getModel(), 'null');
+
+        return $this;
     }
 
     /** @inheritDoc */

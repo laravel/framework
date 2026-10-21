@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsBelongsToInverseRelations;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 use function Illuminate\Support\enum_value;
@@ -21,6 +22,7 @@ class BelongsTo extends Relation
 {
     use ComparesRelatedModels,
         InteractsWithDictionary,
+        SupportsBelongsToInverseRelations,
         SupportsDefaultModels;
 
     /**
@@ -81,7 +83,11 @@ class BelongsTo extends Relation
             return $this->getDefaultFor($this->parent);
         }
 
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        if ($owner = $this->query->first()) {
+            $this->applyInverseRelationToOwner($owner, $this->child);
+        }
+
+        return $owner ?: $this->getDefaultFor($this->parent);
     }
 
     /**
@@ -172,6 +178,8 @@ class BelongsTo extends Relation
 
             if ($attribute !== null && isset($dictionary[$attribute])) {
                 $model->setRelation($relation, $dictionary[$attribute]);
+
+                $this->applyInverseRelationToOwner($dictionary[$attribute], $model);
             }
         }
 
@@ -186,6 +194,8 @@ class BelongsTo extends Relation
      */
     public function associate($model)
     {
+        $previousOwner = $this->getLoadedOwner();
+
         $ownerKey = $model instanceof Model ? $model->getAttribute($this->ownerKey) : $model;
 
         $this->child->setAttribute($this->foreignKey, $ownerKey);
@@ -194,6 +204,14 @@ class BelongsTo extends Relation
             $this->child->setRelation($this->relationName, $model);
         } else {
             $this->child->unsetRelation($this->relationName);
+        }
+
+        if ($previousOwner && $this->ownerChanged($previousOwner, $model)) {
+            $this->removeInverseRelation($previousOwner, $this->child);
+        }
+
+        if ($model instanceof Model) {
+            $this->applyInverseRelation($model, $this->child);
         }
 
         return $this->child;
@@ -206,9 +224,15 @@ class BelongsTo extends Relation
      */
     public function dissociate()
     {
+        $previousOwner = $this->getLoadedOwner();
+
         $this->child->setAttribute($this->foreignKey, null);
 
-        return $this->child->setRelation($this->relationName, null);
+        $child = $this->child->setRelation($this->relationName, null);
+
+        $this->removeInverseRelation($previousOwner, $this->child);
+
+        return $child;
     }
 
     /**
