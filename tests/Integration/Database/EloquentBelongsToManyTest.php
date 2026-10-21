@@ -645,6 +645,32 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     //     $this->assertTrue($tag->is($post->tags()->first()));
     // }
 
+    public function testForceCreateMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreate(['name' => 'wavez', 'type' => 'featured'], ['flag' => 'taylor']);
+
+        $this->assertSame('featured', $tag->type);
+        $this->assertTrue($tag->is($post->tags()->first()));
+        $this->assertSame('featured', $post->tags()->first()->type);
+        $this->assertSame('taylor', $post->tags()->first()->pivot->flag);
+    }
+
+    public function testForceCreateQuietlyMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        GuardedTag::creating(fn () => false);
+
+        $tag = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreateQuietly(['name' => 'wavez', 'type' => 'featured']);
+
+        $this->assertSame('featured', $tag->type);
+        $this->assertTrue($tag->is($post->tags()->first()));
+    }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -1917,6 +1943,13 @@ class Post extends Model
             ->using(ChaperonePartialPivot::class)
             ->chaperone();
     }
+}
+
+class GuardedTag extends Model
+{
+    public $table = 'tags';
+    public $timestamps = true;
+    protected $fillable = ['name'];
 }
 
 class Tag extends Model
