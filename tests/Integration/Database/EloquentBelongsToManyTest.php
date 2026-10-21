@@ -415,6 +415,26 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 
+    public function testPaginateMethodWithTotal()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::create(['name' => Str::random()]);
+        Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        DB::enableQueryLog();
+
+        $paginator = $post->tags()->paginate(1, total: 10);
+
+        $this->assertSame(10, $paginator->total());
+        $this->assertCount(1, $paginator->items());
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertSame(5, $post->tags()->paginate(1, total: fn () => 5)->total());
+    }
+
     public function testFindMethodStringyKey()
     {
         Schema::create('post_string_key', function (Blueprint $table) {

@@ -484,13 +484,14 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  \Closure|int|null  $total
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return $this->query->paginate($perPage, $columns, $pageName, $page);
+        return $this->query->paginate($perPage, $columns, $pageName, $page, $total);
     }
 
     /**

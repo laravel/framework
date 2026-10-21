@@ -90,6 +90,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         );
     }
 
+    public function testPaginateWithTotal()
+    {
+        $user = User::create(['name' => Str::random()]);
+
+        $team = Team::create(['owner_id' => $user->id]);
+
+        User::create(['name' => 'John', 'team_id' => $team->id]);
+        User::create(['name' => 'Jack', 'team_id' => $team->id]);
+
+        DB::enableQueryLog();
+
+        $paginator = $user->teamMates()->paginate(1, total: 10);
+
+        $this->assertSame(10, $paginator->total());
+        $this->assertCount(1, $paginator->items());
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertSame(5, $user->teamMates()->paginate(1, total: fn () => 5)->total());
+    }
+
     public function testGlobalScopeColumns()
     {
         $user = User::create(['name' => Str::random()]);
