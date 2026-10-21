@@ -144,7 +144,8 @@ class MemoizedTaggedCache extends TaggedCache
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  int  $seconds
+     * @param  array  $values
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
     public function putMany(array $values, $ttl = null)
