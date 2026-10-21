@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Events\JobRetryRequested;
@@ -524,6 +525,44 @@ class QueueRetryCommandTest extends TestCase
         $this->assertSame(['job-3'], array_keys($pendingJobs));
     }
 
+    public function testRetriesRemainingJobsWhenAJobsModelNoLongerExists()
+    {
+        $failer = m::mock(FailedJobProviderInterface::class);
+        $queue = m::mock(QueueContract::class);
+
+        $missing = $this->failedJob(id: 'job-1', connection: 'database', queue: 'default', job: new QueueRetryCommandTestJobWithMissingModel);
+
+        $jobs = new Collection([
+            'job-1' => $missing,
+            'job-2' => $this->failedJob(id: 'job-2', connection: 'database', queue: 'default'),
+        ]);
+
+        $failer->shouldReceive('find')->once()->with('batch')->andReturn($jobs);
+
+        $queue->shouldReceive('pushRaw')->once()->with($missing->payload, 'default', []);
+        $failer->shouldReceive('forget')->once()->with('job-1');
+
+        $queue->shouldReceive('pushRaw')->once()->with($this->retriedPayload(id: 'job-2'), 'default', []);
+        $failer->shouldReceive('forget')->once()->with('job-2');
+
+        $this->runRetryCommand(['id' => ['batch']], $failer, ['database' => $queue]);
+    }
+
+    public function testRetriesJobWithoutQueueableOptionsWhenItsModelNoLongerExists()
+    {
+        $failer = m::mock(FailedJobProviderInterface::class);
+        $queue = m::mock(SqsQueue::class);
+
+        $job = $this->failedJob(id: '1', connection: 'sqs', queue: 'default', job: new QueueRetryCommandTestJobWithMissingModel);
+
+        $failer->shouldReceive('find')->once()->with('1')->andReturn($job);
+        $queue->shouldNotReceive('getQueueableOptions');
+        $queue->shouldReceive('pushRaw')->once()->with($job->payload, 'default', []);
+        $failer->shouldReceive('forget')->once()->with('1');
+
+        $this->runRetryCommand(['id' => ['1']], $failer, ['sqs' => $queue]);
+    }
+
     public function testDispatchesTheEventBeforePushingAndForgetsTheJobAfterwards()
     {
         $failer = m::mock(FailedJobProviderInterface::class);
@@ -703,5 +742,13 @@ class QueueRetryCommandTestJobWithRetryUntil
     public function retryUntil()
     {
         return $this->retryUntil;
+    }
+}
+
+class QueueRetryCommandTestJobWithMissingModel
+{
+    public function __unserialize(array $data): void
+    {
+        throw (new ModelNotFoundException)->setModel('App\\Models\\User', [1]);
     }
 }
