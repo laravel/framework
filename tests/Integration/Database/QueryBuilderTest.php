@@ -585,6 +585,15 @@ class QueryBuilderTest extends DatabaseTestCase
         ]);
     }
 
+    public function testGetCountForPaginationWithGroupedUnionAndLimit()
+    {
+        $query = DB::table('posts')->select('title')->groupBy('title')
+            ->unionAll(DB::table('posts')->select('title')->where('title', 'Foo Post'))
+            ->limit(1);
+
+        $this->assertSame(3, $query->getCountForPagination());
+    }
+
     public function testChunkMap()
     {
         DB::enableQueryLog();

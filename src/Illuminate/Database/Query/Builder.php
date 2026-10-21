@@ -3826,8 +3826,8 @@ class Builder implements BuilderContract
      */
     protected function cloneForPaginationCount()
     {
-        return $this->cloneWithout(['orders', 'limit', 'offset'])
-            ->cloneWithoutBindings(['order']);
+        return $this->cloneWithout(['orders', 'limit', 'offset', 'unionOrders', 'unionLimit', 'unionOffset'])
+            ->cloneWithoutBindings(['order', 'unionOrder']);
     }
 
     /**
