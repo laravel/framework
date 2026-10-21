@@ -268,7 +268,7 @@ class PendingProcess
      *
      * @param  array<array-key, string>|string|null  $command
      * @param  callable|null  $output
-     * @return \Illuminate\Process\InvokedProcess
+     * @return \Illuminate\Process\InvokedProcess|\Illuminate\Process\FakeInvokedProcess
      *
      * @throws \RuntimeException
      */
