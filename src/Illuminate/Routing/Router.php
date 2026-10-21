@@ -761,6 +761,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function dispatch(Request $request)
     {
         $this->currentRequest = $request;
+        $this->current = null;
 
         return $this->dispatchToRoute($request);
     }
