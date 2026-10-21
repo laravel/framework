@@ -67,7 +67,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Get the current page for the request.
      *
-     * @param  int  $currentPage
+     * @param  int|null  $currentPage
      * @param  string  $pageName
      * @return int
      */

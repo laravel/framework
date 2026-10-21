@@ -95,7 +95,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * The current cursor resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected static $currentCursorResolver;
 
