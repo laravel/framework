@@ -100,4 +100,15 @@ class PaginatorTest extends TestCase
         $this->assertStringContainsString('    ', $results);
         $this->assertStringContainsString('item/1', $results);
     }
+
+    public function testCurrentPageIsResolvedUsingPageName()
+    {
+        Paginator::currentPageResolver(fn ($pageName) => ['page' => 3, 'comments' => 2][$pageName]);
+
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, null, ['pageName' => 'comments']);
+
+        $this->assertSame(2, $p->currentPage());
+
+        Paginator::currentPageResolver(fn () => 1);
+    }
 }
