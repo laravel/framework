@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Once;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class OnceTest extends TestCase
 {
@@ -115,6 +116,30 @@ class OnceTest extends TestCase
         }
 
         $this->assertSame($results[0], $results[1]);
+    }
+
+    public function testIsNotMemoizedWhenObjectIdIsReused()
+    {
+        $instance = new class()
+        {
+            public function name(object $user)
+            {
+                return once(fn () => $user->name);
+            }
+        };
+
+        $names = array_map(fn ($i) => "user {$i}", range(1, 10));
+
+        $results = [];
+
+        foreach ($names as $name) {
+            $user = new stdClass;
+            $user->name = $name;
+
+            $results[] = $instance->name($user);
+        }
+
+        $this->assertSame($names, $results);
     }
 
     public function testUsageOfThis()
