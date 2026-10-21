@@ -645,6 +645,29 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     //     $this->assertTrue($tag->is($post->tags()->first()));
     // }
 
+    public function testForceCreateMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = $post->tags()->forceCreate(['id' => 50, 'name' => 'wavez'], ['flag' => 'taylor']);
+
+        $this->assertSame(50, $tag->id);
+        $this->assertTrue($tag->is($post->tags()->first()));
+        $this->assertSame('taylor', $post->tags()->first()->pivot->flag);
+    }
+
+    public function testForceCreateQuietlyMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::creating(fn () => false);
+
+        $tag = $post->tags()->forceCreateQuietly(['id' => 50, 'name' => 'wavez']);
+
+        $this->assertSame(50, $tag->id);
+        $this->assertTrue($tag->is($post->tags()->first()));
+    }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
