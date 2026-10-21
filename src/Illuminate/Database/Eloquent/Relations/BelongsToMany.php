@@ -1820,23 +1820,6 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Qualify the given column name by the pivot table.
-     *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @return string|\Illuminate\Contracts\Database\Query\Expression
-     */
-    public function qualifyPivotColumn($column)
-    {
-        if ($this->query->getQuery()->getGrammar()->isExpression($column)) {
-            return $column;
-        }
-
-        return str_contains($column, '.')
-            ? $column
-            : $this->table.'.'.$column;
-    }
-
-    /**
      * Qualify the columns of the given pivot query's where clauses.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1857,5 +1840,22 @@ class BelongsToMany extends Relation
                 }
             }
         }
+    }
+
+    /**
+     * Qualify the given column name by the pivot table.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return string|\Illuminate\Contracts\Database\Query\Expression
+     */
+    public function qualifyPivotColumn($column)
+    {
+        if ($this->query->getQuery()->getGrammar()->isExpression($column)) {
+            return $column;
+        }
+
+        return str_contains($column, '.')
+            ? $column
+            : $this->table.'.'.$column;
     }
 }
