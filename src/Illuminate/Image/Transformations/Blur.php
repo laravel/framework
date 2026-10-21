@@ -7,7 +7,7 @@ use Illuminate\Contracts\Image\Transformation;
 class Blur implements Transformation
 {
     /**
-     * @param  int<0, 100>  $amount
+     * @param  non-negative-int  $amount
      */
     public function __construct(public readonly int $amount)
     {
