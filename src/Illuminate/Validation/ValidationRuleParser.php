@@ -367,6 +367,10 @@ class ValidationRuleParser
                     : array_filter($attributeRules->defaultRules($data)), ];
             }
 
+            if (! Arr::some($attributeRules, fn ($rule) => $rule instanceof ConditionalRules)) {
+                return [$attribute => array_values($attributeRules)];
+            }
+
             return [$attribute => (new Collection($attributeRules))->map(function ($rule) use ($data) {
                 if (! $rule instanceof ConditionalRules) {
                     return [$rule];

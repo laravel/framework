@@ -168,6 +168,38 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testRepeatedRuleStringsResolveParametersForEachAttribute()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'items' => [
+                ['start' => '2026-01-01'],
+                [],
+                ['start' => '2026-01-01', 'end' => '2026-01-02'],
+                ['end' => '2026-01-02'],
+            ],
+        ], [
+            'items.*.start' => 'nullable|date_format:Y-m-d',
+            'items.*.end' => 'required_with:items.*.start|nullable|date_format:Y-m-d|after:items.*.start',
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame(['items.0.end'], $v->errors()->keys());
+    }
+
+    public function testRulesAddedAfterValidationAreApplied()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'abc', 'bar' => 'abcdef'], ['foo' => 'string|max:5']);
+
+        $this->assertTrue($v->passes());
+
+        $v->addRules(['bar' => 'string|max:5']);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame(['bar'], $v->errors()->keys());
+    }
+
     public function testValidateThrowsOnFail()
     {
         $this->expectException(ValidationException::class);

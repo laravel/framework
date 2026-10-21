@@ -90,6 +90,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The cache of parsed string rules.
+     *
+     * @var array
+     */
+    protected $parsedRuleCache = [];
+
+    /**
      * The current rule that is validating.
      *
      * @var string
@@ -571,6 +578,10 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
+        if ($this->excludeAttributes === []) {
+            return false;
+        }
+
         $prefix = '';
 
         foreach (explode('.', $attribute) as $segment) {
@@ -720,7 +731,7 @@ class Validator implements ValidatorContract
     {
         $this->currentRule = $rule;
 
-        [$rule, $parameters] = ValidationRuleParser::parse($rule);
+        [$rule, $parameters] = $this->parseRule($rule);
 
         if ($rule === '') {
             return;
@@ -1022,8 +1033,8 @@ class Validator implements ValidatorContract
         // In case the attribute has any rule that indicates that the field is required
         // and that rule already failed then we should stop validation at this point
         // as now there is no point in calling other rules with this field empty.
-        return $this->hasRule($attribute, $this->implicitRules) &&
-               isset($this->failedRules[$cleanedAttribute]) &&
+        return isset($this->failedRules[$cleanedAttribute]) &&
+               $this->hasRule($attribute, $this->implicitRules) &&
                array_intersect(array_keys($this->failedRules[$cleanedAttribute]), $this->implicitRules);
     }
 
@@ -1199,12 +1210,27 @@ class Validator implements ValidatorContract
         $rules = (array) $rules;
 
         foreach ($this->rules[$attribute] as $rule) {
-            [$rule, $parameters] = ValidationRuleParser::parse($rule);
+            [$rule, $parameters] = $this->parseRule($rule);
 
             if (in_array($rule, $rules)) {
                 return [$rule, $parameters];
             }
         }
+    }
+
+    /**
+     * Extract the rule name and parameters from a rule.
+     *
+     * @param  array|string|object  $rule
+     * @return array
+     */
+    protected function parseRule($rule)
+    {
+        if (is_string($rule)) {
+            return $this->parsedRuleCache[$rule] ??= ValidationRuleParser::parse($rule);
+        }
+
+        return ValidationRuleParser::parse($rule);
     }
 
     /**
