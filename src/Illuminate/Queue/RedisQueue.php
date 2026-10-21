@@ -28,7 +28,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The connection name.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 

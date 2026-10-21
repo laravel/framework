@@ -60,7 +60,7 @@ abstract class Queue
     /**
      * Indicates that jobs should be dispatched after all database transactions have committed.
      *
-     * @var bool
+     * @var bool|null
      */
     protected $dispatchAfterCommit;
 
@@ -466,7 +466,7 @@ abstract class Queue
     /**
      * Raise the job queueing event.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  \Closure|string|object  $job
      * @param  string  $payload
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
