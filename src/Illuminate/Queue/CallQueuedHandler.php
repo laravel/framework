@@ -440,7 +440,7 @@ class CallQueuedHandler
      *
      * @param  string  $uuid
      * @param  mixed  $command
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
      * @return void
      */
     protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
@@ -459,7 +459,7 @@ class CallQueuedHandler
      *
      * @param  string  $uuid
      * @param  mixed  $command
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
      * @return void
      */
     protected function ensureChainCatchCallbacksAreInvoked(string $uuid, $command, $e)

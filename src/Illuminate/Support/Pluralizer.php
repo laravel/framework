@@ -9,7 +9,7 @@ class Pluralizer
     /**
      * The cached inflector instance.
      *
-     * @var static
+     * @var \Doctrine\Inflector\Inflector|null
      */
     protected static $inflector;
 

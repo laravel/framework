@@ -124,7 +124,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * The registered custom implicit binding callback.
      *
-     * @var array
+     * @var callable|null
      */
     protected $implicitBindingCallback;
 

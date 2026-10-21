@@ -133,7 +133,7 @@ class LogManager implements LoggerInterface
     /**
      * Attempt to get the log from the local cache.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  array|null  $config
      * @return \Psr\Log\LoggerInterface
      */
@@ -164,7 +164,7 @@ class LogManager implements LoggerInterface
     /**
      * Apply the configured taps for the logger.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  \Illuminate\Log\Logger  $logger
      * @return \Illuminate\Log\Logger
      */
@@ -213,7 +213,7 @@ class LogManager implements LoggerInterface
     /**
      * Resolve the given log instance by name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  array|null  $config
      * @return \Psr\Log\LoggerInterface
      *
@@ -595,7 +595,7 @@ class LogManager implements LoggerInterface
     /**
      * Get the log connection configuration.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return array|null
      */
     protected function configurationFor($name)

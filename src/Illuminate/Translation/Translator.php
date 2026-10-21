@@ -49,7 +49,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * The message selector.
      *
-     * @var \Illuminate\Translation\MessageSelector
+     * @var \Illuminate\Translation\MessageSelector|null
      */
     protected $selector;
 

@@ -287,7 +287,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the appropriate format based on the given format.
      *
-     * @param  string  $format
+     * @param  string|null  $format
      * @return string
      */
     protected function checkFormat($format)

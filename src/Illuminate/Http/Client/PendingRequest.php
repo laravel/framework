@@ -102,7 +102,7 @@ class PendingRequest
     /**
      * The request cookies.
      *
-     * @var array
+     * @var \GuzzleHttp\Cookie\CookieJar
      */
     protected $cookies;
 

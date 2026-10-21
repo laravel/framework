@@ -33,14 +33,14 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * The minimum size in kilobytes that the file can be.
      *
-     * @var null|int
+     * @var null|int|float
      */
     protected $minimumFileSize = null;
 
     /**
      * The maximum size in kilobytes that the file can be.
      *
-     * @var null|int
+     * @var null|int|float
      */
     protected $maximumFileSize = null;
 
