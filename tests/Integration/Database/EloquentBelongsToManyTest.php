@@ -1133,6 +1133,33 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($tag1->id, $tags->first()->id);
     }
 
+    public function testWherePivotWithClosureQualifiesColumns()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+        $post->tags()->attach($tag, ['flag' => 'foo']);
+
+        Carbon::setTestNow('2017-10-20 10:10:10');
+
+        $post->tags()->attach(Tag::create(['name' => Str::random()]), ['flag' => 'foo']);
+
+        $tags = $post->tags()->wherePivot(function ($query) {
+            $query->where('created_at', '<', '2017-10-15 00:00:00');
+        })->get();
+
+        $this->assertCount(1, $tags);
+        $this->assertEquals($tag->id, $tags->first()->id);
+
+        $post = Post::with(['tags' => function ($query) {
+            $query->wherePivot(fn ($query) => $query->where('created_at', '<', '2017-10-15 00:00:00'));
+        }])->first();
+
+        $this->assertCount(1, $post->tags);
+        $this->assertEquals($tag->id, $post->tags->first()->id);
+    }
+
     public function testOrWherePivotWithClosure()
     {
         $tag1 = Tag::create(['name' => Str::random()])->fresh();

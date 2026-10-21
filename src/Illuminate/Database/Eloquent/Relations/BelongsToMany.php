@@ -411,6 +411,8 @@ class BelongsToMany extends Relation
 
             $column($pivotQuery);
 
+            $this->qualifyPivotWheres($pivotQuery->getQuery());
+
             $this->pivotWheres[] = [
                 fn ($query) => $query->addNestedWhereQuery($pivotQuery->getQuery()),
                 null,
@@ -1832,5 +1834,28 @@ class BelongsToMany extends Relation
         return str_contains($column, '.')
             ? $column
             : $this->table.'.'.$column;
+    }
+
+    /**
+     * Qualify the columns of the given pivot query's where clauses.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return void
+     */
+    protected function qualifyPivotWheres($query)
+    {
+        foreach ($query->wheres as &$where) {
+            if ($where['type'] === 'Nested') {
+                $this->qualifyPivotWheres($where['query']);
+
+                continue;
+            }
+
+            foreach (['column', 'first', 'second'] as $key) {
+                if (isset($where[$key]) && is_string($where[$key])) {
+                    $where[$key] = $this->qualifyPivotColumn($where[$key]);
+                }
+            }
+        }
     }
 }
