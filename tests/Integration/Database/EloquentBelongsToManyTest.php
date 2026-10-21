@@ -649,10 +649,12 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $post = Post::create(['title' => Str::random()]);
 
-        $tag = $post->tags()->forceCreate(['id' => 50, 'name' => 'wavez'], ['flag' => 'taylor']);
+        $tag = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreate(['name' => 'wavez', 'type' => 'featured'], ['flag' => 'taylor']);
 
-        $this->assertSame(50, $tag->id);
+        $this->assertSame('featured', $tag->type);
         $this->assertTrue($tag->is($post->tags()->first()));
+        $this->assertSame('featured', $post->tags()->first()->type);
         $this->assertSame('taylor', $post->tags()->first()->pivot->flag);
     }
 
@@ -660,11 +662,12 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $post = Post::create(['title' => Str::random()]);
 
-        Tag::creating(fn () => false);
+        GuardedTag::creating(fn () => false);
 
-        $tag = $post->tags()->forceCreateQuietly(['id' => 50, 'name' => 'wavez']);
+        $tag = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreateQuietly(['name' => 'wavez', 'type' => 'featured']);
 
-        $this->assertSame(50, $tag->id);
+        $this->assertSame('featured', $tag->type);
         $this->assertTrue($tag->is($post->tags()->first()));
     }
 
@@ -1913,6 +1916,13 @@ class Post extends Model
             ->using(ChaperonePartialPivot::class)
             ->chaperone();
     }
+}
+
+class GuardedTag extends Model
+{
+    public $table = 'tags';
+    public $timestamps = true;
+    protected $fillable = ['name'];
 }
 
 class Tag extends Model
