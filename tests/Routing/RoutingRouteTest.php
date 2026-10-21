@@ -15,6 +15,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\InvalidValueException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -1100,6 +1101,30 @@ class RoutingRouteTest extends TestCase
             return 'missing';
         });
         $this->assertSame('missing', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testModelBindingWithCustomNullReturnForInvalidIntegerKey()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingIntegerKeyStub::class, function ($value) {
+            return "missing {$value}";
+        });
+        $this->assertSame('missing taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testModelBindingWithInvalidValueForTheColumn()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingInvalidValueStub::class);
+        $router->dispatch(Request::create('foo/3000000000', 'GET'))->getContent();
     }
 
     public function testModelBindingWithBindingClosure()
@@ -2553,6 +2578,29 @@ class RouteModelBindingNullStub extends Model
     public function first()
     {
         //
+    }
+}
+
+class RouteModelBindingIntegerKeyStub extends Model
+{
+    public function where($key, $value)
+    {
+        return $this;
+    }
+
+    public function first()
+    {
+        //
+    }
+}
+
+class RouteModelBindingInvalidValueStub extends RouteModelBindingIntegerKeyStub
+{
+    protected static bool $reportRouteModelBindingExceptions = false;
+
+    public function first()
+    {
+        throw new InvalidValueException('pgsql', 'select * from foo where id = ?', [3000000000], new Exception('Out of range value'));
     }
 }
 
