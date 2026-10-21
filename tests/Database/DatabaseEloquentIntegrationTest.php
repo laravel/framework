@@ -1472,6 +1472,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('abigailotwell@gmail.com', $results->first()->friends->first()->email);
     }
 
+    public function testWithWhereRelationWithSpecificColumns()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::withWhereRelation('friends:id,email', 'email', 'abigailotwell@gmail.com')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertCount(1, $results->first()->friends);
+        $this->assertSame(['id', 'email'], array_keys($results->first()->friends->first()->getAttributes()));
+        $this->assertSame('abigailotwell@gmail.com', $results->first()->friends->first()->email);
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

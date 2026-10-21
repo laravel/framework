@@ -467,11 +467,14 @@ trait QueriesRelationships
      */
     public function withWhereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereRelation($relation, $column, $operator, $value)
+        [$name, $select] = $this->parseNameAndAttributeSelectionConstraint($relation);
+
+        return $this->whereRelation($name, $column, $operator, $value)
             ->with([
-                $relation => static fn ($query) => $column instanceof Closure
+                $name => $this->combineConstraints([$select, static fn ($query) => $column instanceof Closure
                     ? $column($query)
                     : $query->where($column, $operator, $value),
+                ]),
             ]);
     }
 
