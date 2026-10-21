@@ -21,7 +21,7 @@ class CommandExecuted
     /**
      * The number of milliseconds it took to execute the command.
      *
-     * @var float
+     * @var float|null
      */
     public $time;
 
@@ -35,7 +35,7 @@ class CommandExecuted
     /**
      * The Redis connection name.
      *
-     * @var string
+     * @var string|null
      */
     public $connectionName;
 
