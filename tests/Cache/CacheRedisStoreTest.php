@@ -175,6 +175,7 @@ class CacheRedisStoreTest extends TestCase
 
         $connection = Mockery::mock(PhpRedisConnection::class);
         $connection->allows('_prefix')->with('')->andReturn('');
+        $connection->allows('client->getOption')->andReturn(\Redis::SCAN_NORETRY);
         $connection->allows('zremrangebyscore');
         $connection->allows('scan')->andReturnUsing(function () use (&$calls) {
             $calls++;
@@ -189,6 +190,26 @@ class CacheRedisStoreTest extends TestCase
         $redis->flushStaleTags();
 
         $this->assertSame(1, $calls);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testFlushStaleTagsDoesNotDoublePrefixTheMatchPattern()
+    {
+        $connection = Mockery::mock(PhpRedisConnection::class);
+        $client = Mockery::mock(\Redis::class);
+
+        $connection->allows('_prefix')->with('')->andReturn('app_');
+        $connection->allows('client')->andReturn($client);
+        $client->allows('getOption')->with(\Redis::OPT_SCAN)->andReturn(\Redis::SCAN_PREFIX);
+        $connection->expects('scan')
+            ->with(Mockery::any(), ['match' => 'prefix:tag:*:entries', 'count' => 1000])
+            ->andReturn([null, ['app_prefix:tag:foo:entries']]);
+        $connection->expects('zremrangebyscore')->with('prefix:tag:foo:entries', 0, Mockery::any());
+
+        $redis = $this->getRedis();
+        $redis->getRedis()->allows('connection')->with('default')->andReturn($connection);
+
+        $redis->flushStaleTags();
     }
 
     protected function getRedis()
