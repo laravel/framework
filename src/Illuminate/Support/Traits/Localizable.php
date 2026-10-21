@@ -11,7 +11,7 @@ trait Localizable
      *
      * @template TReturn
      *
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @param  \Closure(): TReturn  $callback
      * @return TReturn
      */
