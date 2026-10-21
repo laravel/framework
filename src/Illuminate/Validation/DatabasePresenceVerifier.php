@@ -17,7 +17,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
     /**
      * The database connection to use.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
@@ -37,7 +37,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      * @param  string  $collection
      * @param  string  $column
      * @param  string  $value
-     * @param  int|null  $excludeId
+     * @param  int|string|null  $excludeId
      * @param  string|null  $idColumn
      * @param  array  $extra
      * @return int
@@ -126,7 +126,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
     /**
      * Set the connection to be used.
      *
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return void
      */
     public function setConnection($connection)
