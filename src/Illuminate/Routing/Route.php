@@ -1094,6 +1094,8 @@ class Route
             (array) ($this->action['middleware'] ?? []), $middleware
         );
 
+        $this->computedMiddleware = null;
+
         return $this;
     }
 

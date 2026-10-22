@@ -228,6 +228,21 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareAddedAfterRouteWasDispatchedIsApplied()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/bar', function () {
+            return 'hello';
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $route->middleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $this->assertSame('caught ', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testMiddlewareCanBeSkippedFromResources()
     {
         $router = $this->getRouter();
