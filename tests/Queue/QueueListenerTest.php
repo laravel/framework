@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Composer\InstalledVersions;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
 use Mockery as m;
@@ -44,12 +45,16 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+        $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        if (version_compare(InstalledVersions::getVersion('symfony/process'), '6.4.33', '>=') && windows_os()) {
+            $escapeMsys = '"';
+        }
 
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escapeMsys}--name=default{$escapeMsys} {$escapeMsys}--queue=queue{$escapeMsys} {$escapeMsys}--backoff=1{$escapeMsys} {$escapeMsys}--memory=2{$escapeMsys} {$escapeMsys}--sleep=3{$escapeMsys} {$escapeMsys}--tries=1{$escapeMsys}", $process->getCommandLine());
     }
 
     public function testMakeProcessCorrectlyFormatsCommandLineWithAnEnvironmentSpecified()
@@ -60,12 +65,16 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+        $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        if (version_compare(InstalledVersions::getVersion('symfony/process'), '6.4.33', '>=') && windows_os()) {
+            $escapeMsys = '"';
+        }
 
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escapeMsys}--name=default{$escapeMsys} {$escapeMsys}--queue=queue{$escapeMsys} {$escapeMsys}--backoff=1{$escapeMsys} {$escapeMsys}--memory=2{$escapeMsys} {$escapeMsys}--sleep=3{$escapeMsys} {$escapeMsys}--tries=1{$escapeMsys} {$escapeMsys}--env=test{$escapeMsys}", $process->getCommandLine());
     }
 
     public function testMakeProcessCorrectlyFormatsCommandLineWhenTheConnectionIsNotSpecified()
@@ -76,11 +85,15 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess(null, 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+        $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        if (version_compare(InstalledVersions::getVersion('symfony/process'), '6.4.33', '>=') && windows_os()) {
+            $escapeMsys = '"';
+        }
 
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escape}--name=default{$escape} {$escape}--queue=queue{$escape} {$escape}--backoff=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=1{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escapeMsys}--name=default{$escapeMsys} {$escapeMsys}--queue=queue{$escapeMsys} {$escapeMsys}--backoff=1{$escapeMsys} {$escapeMsys}--memory=2{$escapeMsys} {$escapeMsys}--sleep=3{$escapeMsys} {$escapeMsys}--tries=1{$escapeMsys} {$escapeMsys}--env=test{$escapeMsys}", $process->getCommandLine());
     }
 }
