@@ -1111,7 +1111,7 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the identifier of the user that logged out, or that dispatched the current job.
+     * Retrieve the authenticated user's identifier from the context.
      */
     protected function userIdFromContext(): ?string
     {
