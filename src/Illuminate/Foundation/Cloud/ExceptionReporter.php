@@ -26,9 +26,11 @@ use ReflectionClass;
 use ReflectionFunction;
 use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\Input as ConsoleInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
@@ -230,7 +232,7 @@ class ExceptionReporter
             'id' => $this->exceptionId($e),
             'timestamp' => $this->timestamp(),
             'exception_context' => $this->exceptionContext($e),
-            'laravel_context' => null,
+            'laravel_context' => $this->laravelContext(),
             ...$this->executionDetails($e),
             'user_id' => $this->userId(),
             'handled' => $this->handled($e),
@@ -257,6 +259,14 @@ class ExceptionReporter
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /**
+     * Retrieve the current Laravel Context.
+     */
+    protected function laravelContext(): ?object
+    {
+        return null;
     }
 
     /**
@@ -571,7 +581,7 @@ class ExceptionReporter
                 'timestamp' => $this->laravelStartedAtTimestamp(),
                 'name' => $this->consoleCommandName(),
                 'class' => $this->consoleCommandClass(),
-                'command' => null,
+                'command' => $this->consoleCommandLine(),
             ],
         ];
     }
@@ -616,6 +626,122 @@ class ExceptionReporter
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /**
+     * Retrieve the redacted command line.
+     */
+    protected function consoleCommandLine(): ?string
+    {
+        try {
+            // Without the console input we cannot safely redact values, so report nothing...
+            try {
+                $this->currentConsoleInput();
+            } catch (CommandNotFoundException) {
+                return null;
+            }
+
+            if (! $this->currentConsoleInput() instanceof RawInputInterface) {
+                return null;
+            }
+
+            $tokens = Arr::wrap($this->currentConsoleInput()->getFirstArgument());
+
+            foreach ($this->currentConsoleInput()->getRawArguments() as $name => $value) {
+                // Skip the initial argument, which is the command name. We have already captured that above...
+                if ($name === 'command' || is_int($name)) {
+                    continue;
+                }
+
+                $transformer = $this->consoleArgumentTransformer($name);
+
+                $tokens = [
+                    ...$tokens,
+                    ...$this->applyTransformationToConsoleInputValue($value, $transformer),
+                ];
+            }
+
+            foreach ($this->currentConsoleInput()->getRawOptions() as $name => $value) {
+                $transformer = $this->consoleOptionTransformer($name);
+
+                $tokens = [
+                    ...$tokens,
+                    ...$this->applyTransformationToConsoleInputValue($value, $transformer),
+                ];
+            }
+
+            return implode(' ', $tokens);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve a transformer for the given console argument.
+     */
+    protected function consoleArgumentTransformer(string $name): callable
+    {
+        return $this->shouldRedactConsoleInputValue($name)
+            ? $this->redactValue(...)
+            : $this->currentConsoleInput()->escapeToken(...);
+    }
+
+    /**
+     * Retrieve a transformer for the given console option.
+     */
+    protected function consoleOptionTransformer(string $name): callable
+    {
+        return fn ($value) => match (true) {
+            is_bool($value) => $value ? "--{$name}" : "--no-{$name}",
+            is_null($value) => "--{$name}",
+            $this->shouldRedactConsoleInputValue($name) => "--{$name}={$this->redactValue($value)}",
+            default => "--{$name}={$this->currentConsoleInput()->escapeToken($value)}",
+        };
+    }
+
+    /**
+     * Apply the given transformation to each of the given input's values.
+     *
+     * @param  callable(string): string  $transformer
+     * @return list<string>
+     */
+    protected function applyTransformationToConsoleInputValue(null|bool|string|array $value, callable $transformer): array
+    {
+        return array_map($transformer, $value === null ? [null] : Arr::wrap($value));
+    }
+
+    /**
+     * Determine if the given command argument or option should be redacted.
+     */
+    protected function shouldRedactConsoleInputValue(string $name): bool
+    {
+        return in_array($name, $this->config['redact_command_input_fields']);
+    }
+
+    /**
+     * Retrieve the console input of the currently running Artisan command.
+     */
+    protected function currentConsoleInput(): ConsoleInput
+    {
+        if ($this->currentConsoleInput !== null) {
+            return $this->currentConsoleInput;
+        }
+
+        $name = $this->currentFallbackArgvInput()->getFirstArgument();
+
+        $command = $name === null
+            ? null
+            : Artisan::findCommand($name);
+
+        if ($command === null) {
+            throw new CommandNotFoundException("The command [{$name}] does not exist.");
+        }
+
+        $command->mergeApplicationDefinition();
+
+        $this->currentFallbackArgvInput()->bind($command->getDefinition());
+
+        return $this->currentConsoleInput = $this->currentFallbackArgvInput();
     }
 
     /**
@@ -867,7 +993,7 @@ class ExceptionReporter
      */
     protected function traceId(): ?string
     {
-        return $this->traceIdFromJob() ?? (
+        return $this->traceIdFromContext() ?? (
             App::runningInConsole() ? $this->consoleCommandTraceId() : Request::header('Cloud-Request-ID')
         );
     }
@@ -888,7 +1014,7 @@ class ExceptionReporter
     protected function jobExecutionDetails(Throwable $e): array
     {
         return [
-            'trace_id' => $this->traceIdFromJob(),
+            'trace_id' => $this->traceIdFromContext(),
             'execution_type' => 'job',
             'execution_context' => [
                 ...$this->executionContext['job'],
@@ -904,7 +1030,7 @@ class ExceptionReporter
     /**
      * Retrieve the trace identifier the current job belongs to.
      */
-    protected function traceIdFromJob(): ?string
+    protected function traceIdFromContext(): ?string
     {
         return $this->currentlyProcessingJobPayload['laravel_cloud_trace_id'] ?? null;
     }
@@ -988,7 +1114,7 @@ class ExceptionReporter
                 return $this->userIdentifier(Auth::user());
             }
 
-            return $this->rememberedUserId();
+            return $this->userIdFromContext();
         } catch (Throwable) {
             return null;
         }
@@ -997,7 +1123,7 @@ class ExceptionReporter
     /**
      * Retrieve the identifier of the user that logged out, or that dispatched the current job.
      */
-    protected function rememberedUserId(): ?string
+    protected function userIdFromContext(): ?string
     {
         return $this->loggedOutUserId ?? $this->currentlyProcessingJobPayload['laravel_cloud_user_id'] ?? null;
     }
