@@ -27,6 +27,8 @@ use ReflectionFunction;
 use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\Input as ConsoleInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
@@ -65,6 +67,11 @@ class ExceptionReporter
      * The trace ID for the current artisan command execution.
      */
     protected ?string $artisanCommandTraceId = null;
+
+    /**
+     * The console input of the currently running Artisan command.
+     */
+    protected ?ConsoleInput $currentConsoleInput = null;
 
     /**
      * The console input built from the process arguments. Fallback when console input is not yet set.
@@ -541,11 +548,13 @@ class ExceptionReporter
     /**
      * Prepare to process the given command.
      */
-    public function prepareForCommand(?string $name): void
+    public function prepareForCommand(?string $name, InputInterface $input): void
     {
         $this->currentlyRunningCommandName = $name !== ''
             ? $name
             : null;
+
+        $this->currentConsoleInput = $input instanceof ConsoleInput ? $input : null;
     }
 
     /**
@@ -925,6 +934,10 @@ class ExceptionReporter
         }
 
         $this->connectionConfig ??= Config::get("queue.connections.{$connection}") ?? [];
+
+        if (($this->connectionConfig['driver'] ?? null) === 'cloud') {
+            $this->connectionConfig = $this->connectionConfig['connection'];
+        }
 
         if (($this->connectionConfig['driver'] ?? null) !== 'sqs') {
             return $this->normalizedQueues[$key] = $queue;
