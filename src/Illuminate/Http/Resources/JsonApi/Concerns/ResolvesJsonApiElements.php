@@ -316,6 +316,25 @@ trait ResolvesJsonApiElements
     }
 
     /**
+     * Load the requested relationships that are missing on the given models at once.
+     *
+     * @internal
+     */
+    public function loadMissingRequestedRelationshipsOn(JsonApiRequest $request, Collection $models): void
+    {
+        $requestedRelationships = (new Collection($this->requestedResourceRelationships($request)))
+            ->flatMap(fn ($relationship) => [
+                $relationship,
+                ...array_map(fn ($nested) => $relationship.'.'.$nested, $this->requestedResourceRelationships($request, $relationship)),
+            ])
+            ->all();
+
+        if (! empty($requestedRelationships)) {
+            $this->loadMissingRequestedRelationships($request, $models, static::class, $requestedRelationships);
+        }
+    }
+
+    /**
      * Load the requested relationships that are missing on the given related models.
      */
     protected function loadMissingRequestedRelationships(

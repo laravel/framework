@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection as BaseAnonymousResourceCollection;
@@ -44,9 +45,28 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function toAttributes(Request $request)
     {
+        $this->loadMissingRequestedRelationships($request);
+
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))
             ->all();
+    }
+
+    /**
+     * Load the requested relationships for all of the resources at once.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function loadMissingRequestedRelationships(Request $request)
+    {
+        $resource = $this->collection->first();
+
+        if ($resource instanceof JsonApiResource) {
+            $resource->loadMissingRequestedRelationshipsOn(
+                $this->resolveJsonApiRequestFrom($request), $this->collection->pluck('resource')->whereInstanceOf(Model::class)
+            );
+        }
     }
 
     /**

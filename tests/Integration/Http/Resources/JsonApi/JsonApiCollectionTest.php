@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
@@ -204,5 +205,24 @@ class JsonApiCollectionTest extends TestCase
                     ],
                 ]
             );
+    }
+
+    public function testItEagerLoadsIncludesForAllResourcesAtOnce()
+    {
+        $users = User::factory()->times(3)->create();
+
+        foreach ($users as $user) {
+            Profile::factory()->create(['user_id' => $user->getKey()]);
+            Post::factory()->create(['user_id' => $user->getKey()]);
+        }
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'author.profile']))
+            ->assertOk()
+            ->assertJsonCount(6, 'included');
+
+        // One query for the count, one for the posts, one for the authors and one for their profiles...
+        $this->assertCount(4, DB::getQueryLog());
     }
 }
