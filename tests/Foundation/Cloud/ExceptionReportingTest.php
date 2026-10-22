@@ -3730,7 +3730,7 @@ class ExceptionReportingTest extends TestCase
         // runs on, so that a file is the same file everywhere.
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             'D:\\a\\framework\\framework\\',
             ['stop' => true],
         );
@@ -3928,7 +3928,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => $stopConfig,
@@ -3955,7 +3955,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => false,
@@ -4132,7 +4132,7 @@ class ExceptionReportingTest extends TestCase
     {
         return new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => true,
