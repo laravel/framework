@@ -46,7 +46,7 @@ class ExceptionReporter
     /**
      * The Blade mapper resolved for the currently reporting exception.
      */
-    protected ?BladeMapper $resolvedBladeMapper = null;
+    protected ?BladeMapper $bladeMapper = null;
 
     /**
      * The captured identifiers, keyed by exception.
@@ -145,7 +145,7 @@ class ExceptionReporter
      */
     public function __construct(
         protected Events $events,
-        protected Closure|BladeMapper $bladeMapper,
+        protected Closure $bladeMapperResolver,
         protected string $basePath,
         protected array $config,
     ) {
@@ -158,11 +158,11 @@ class ExceptionReporter
     public function __invoke(Throwable $e): ?bool
     {
         $previousReportingViewException = $this->reportingViewException;
-        $previousResolvedBladeMapper = $this->resolvedBladeMapper;
+        $previousBladeMapper = $this->bladeMapper;
 
         try {
             $this->reportingViewException = $this->isViewException($e);
-            $this->resolvedBladeMapper = null;
+            $this->bladeMapper = null;
 
             $e = $this->unwrapViewException($e);
 
@@ -177,7 +177,7 @@ class ExceptionReporter
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
-            $this->resolvedBladeMapper = $previousResolvedBladeMapper;
+            $this->bladeMapper = $previousBladeMapper;
 
             if ($this->scheduledTaskAwaitingFailureReport) {
                 $this->flushScheduledTaskContext();
@@ -1295,9 +1295,7 @@ class ExceptionReporter
      */
     protected function bladeMapper(): BladeMapper
     {
-        return $this->resolvedBladeMapper ??= $this->bladeMapper instanceof Closure
-            ? ($this->bladeMapper)()
-            : $this->bladeMapper;
+        return $this->bladeMapper ??= ($this->bladeMapperResolver)();
     }
 
     /**
