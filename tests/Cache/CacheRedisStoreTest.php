@@ -71,11 +71,16 @@ class CacheRedisStoreTest extends TestCase
     }
 }
 
-// PhpRedisConnection only exposes _prefix() through __call, which a double can't configure.
+// PhpRedisConnection only exposes _prefix() and zremrangebyscore() through __call, which a double can't configure.
 class CacheRedisStoreTestConnection extends PhpRedisConnection
 {
     public function _prefix($value)
     {
         return $value;
+    }
+
+    public function zremrangebyscore($key, $min, $max)
+    {
+        return 0;
     }
 }
