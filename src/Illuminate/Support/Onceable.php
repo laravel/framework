@@ -49,10 +49,15 @@ class Onceable
             return [];
         }
 
-        return array_values(array_filter(
-            (new ReflectionClosure($this->callable))->getClosureUsedVariables(),
-            fn ($argument) => is_object($argument) && ! $argument instanceof HasOnceHash,
-        ));
+        $objects = [];
+
+        foreach ((new ReflectionClosure($this->callable))->getClosureUsedVariables() as $argument) {
+            if (is_object($argument) && ! $argument instanceof HasOnceHash) {
+                $objects[] = $argument;
+            }
+        }
+
+        return $objects;
     }
 
     /**

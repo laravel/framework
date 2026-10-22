@@ -88,7 +88,13 @@ class Once
      */
     protected function usesSameObjects(array $references, array $objects)
     {
-        return array_map(fn ($reference) => $reference->get(), $references) === $objects;
+        foreach ($objects as $key => $object) {
+            if ($references[$key]->get() !== $object) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
