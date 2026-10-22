@@ -16,7 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\CloudBootstrapper as Cloud;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Exceptions\Handler;
@@ -183,7 +183,7 @@ class ExceptionReportingTest extends TestCase
     {
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
 
-        Cloud::bootstrapperBootstrapped($this->app, LoadConfiguration::class);
+        Cloud::bootstrapped($this->app, LoadConfiguration::class);
 
         $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
     }

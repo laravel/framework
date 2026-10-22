@@ -26,12 +26,12 @@ use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
 
-class Cloud
+class CloudBootstrapper
 {
     /**
      * Handle a bootstrapper that is bootstrapping.
      */
-    public static function bootstrapperBootstrapping(Application $app, string $bootstrapper): void
+    public static function bootstrapping(Application $app, string $bootstrapper): void
     {
         //
     }
@@ -39,7 +39,7 @@ class Cloud
     /**
      * Handle a bootstrapper that has bootstrapped.
      */
-    public static function bootstrapperBootstrapped(Application $app, string $bootstrapper): void
+    public static function bootstrapped(Application $app, string $bootstrapper): void
     {
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
@@ -149,7 +149,7 @@ class Cloud
                 'includeStacktraces' => true,
             ],
             'with' => [
-                'connectionString' => Cloud::socket(),
+                'connectionString' => CloudBootstrapper::socket(),
                 'persistent' => true,
                 'timeout' => 2.0,
             ],
@@ -161,7 +161,7 @@ class Cloud
      */
     public static function registerEvents(Application $app): void
     {
-        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
+        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
     }
 
     /**
