@@ -1418,6 +1418,32 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
     }
 
+    public function testItCapturesUserIdInExceptionsReportedWhileTerminatingAfterLogout(): void
+    {
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            Auth::logout();
+
+            $this->app->terminating(fn () => report(new RuntimeException('Whoops!')));
+
+            return 'ok';
+        });
+
+        $this->actingAs(new GenericUser(['id' => 'abc123', 'remember_token' => '']))
+            ->get('/test')
+            ->assertOk();
+
+        // The response has been sent, but the request is still being handled,
+        // so the user that logged out is still reported.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
+    }
+
     public function testItDoesNotRememberTheUserThatLoggedOutInLaterRequests(): void
     {
         $this->setRunningInConsole(false);
@@ -1444,6 +1470,12 @@ class ExceptionReportingTest extends TestCase
         $this->app->forgetScopedInstances();
         Facade::clearResolvedInstances();
         Auth::forgetGuards();
+
+        if (! class_exists(RequestReceived::class)) {
+            class_alias(FakeOctaneRequestReceived::class, RequestReceived::class);
+        }
+
+        Event::dispatch(RequestReceived::class, new RequestReceived);
 
         $this->get('/test')->assertServerError();
 

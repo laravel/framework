@@ -1087,7 +1087,7 @@ class ExceptionReporter
     }
 
     /**
-     * Forget the user that logged out during the current request.
+     * Forget the user that logged out during the previous request.
      */
     public function forgetUser(): void
     {
