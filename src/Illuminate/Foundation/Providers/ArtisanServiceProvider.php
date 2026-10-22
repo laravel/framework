@@ -114,6 +114,7 @@ use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
+use Illuminate\Session\Console\SessionGarbageCollectCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -181,6 +182,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
         'SchedulePause' => SchedulePauseCommand::class,
         'ScheduleResume' => ScheduleResumeCommand::class,
+        'SessionGarbageCollect' => SessionGarbageCollectCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
