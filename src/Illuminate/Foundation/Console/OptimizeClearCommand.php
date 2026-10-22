@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 #[AsCommand(name: 'optimize:clear')]
 class OptimizeClearCommand extends Command
@@ -41,7 +42,7 @@ class OptimizeClearCommand extends Command
             ->flip();
 
         $tasks = Collection::wrap($this->getOptimizeClearTasks())
-            ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
+            ->reject(fn ($command, $key) => $exceptions->hasAny([$this->resolveCommandName($command), $key]))
             ->toArray();
 
         foreach ($tasks as $description => $command) {
@@ -67,5 +68,18 @@ class OptimizeClearCommand extends Command
             'views' => 'view:clear',
             ...ServiceProvider::$optimizeClearCommands,
         ];
+    }
+
+    /**
+     * Resolve the name of the given command.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    protected function resolveCommandName($command)
+    {
+        return is_subclass_of($command, SymfonyCommand::class)
+            ? $this->laravel->make($command)->getName()
+            : $command;
     }
 }

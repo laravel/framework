@@ -2,21 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Tests\Integration\Generators\TestCase;
-use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class OptimizeCommandTest extends TestCase
 {
-    use InteractsWithPublishedFiles;
-
-    protected $files = [
-        'bootstrap/cache/config.php',
-        'bootstrap/cache/events.php',
-        'bootstrap/cache/routes-v7.php',
-    ];
-
     protected function getPackageProviders($app): array
     {
         return [ServiceProviderWithOptimize::class];
@@ -28,21 +20,33 @@ class OptimizeCommandTest extends TestCase
 
         $this->artisan('optimize')
             ->assertSuccessful()
-            ->expectsOutputToContain('my package');
+            ->expectsOutputToContain('ServiceProviderWithOptimize')
+            ->expectsOutputToContain('my-package-cache')
+            ->expectsOutputToContain('my-package-files');
     }
 
     public function testCanExcludeCommandsByKey(): void
     {
-        $this->artisan('optimize', ['--except' => 'my package'])
+        $this->artisan('optimize', ['--except' => 'my-package-cache'])
             ->assertSuccessful()
-            ->doesntExpectOutputToContain('my package');
+            ->doesntExpectOutputToContain('my-package-cache')
+            ->expectsOutputToContain('my-package-files');
     }
 
     public function testCanExcludeCommandsByCommand(): void
     {
         $this->artisan('optimize', ['--except' => 'my_package:cache'])
             ->assertSuccessful()
-            ->doesntExpectOutputToContain('my_package:cache');
+            ->doesntExpectOutputToContain('my-package-cache')
+            ->expectsOutputToContain('my-package-files');
+    }
+
+    public function testCanExcludeCommandsRegisteredByClass(): void
+    {
+        $this->artisan('optimize', ['--except' => 'my_package:cache-files'])
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('my-package-files')
+            ->expectsOutputToContain('my-package-cache');
     }
 }
 
@@ -51,12 +55,23 @@ class ServiceProviderWithOptimize extends ServiceProvider
     public function boot(): void
     {
         $this->commands([
+            new ClosureCommand('test-name-without-key', fn () => 0),
             new ClosureCommand('my_package:cache', fn () => 0),
+            CacheFilesCommand::class,
         ]);
 
-        $this->optimizes(
-            optimize: 'my_package:cache',
-            key: 'my package',
-        );
+        $this->optimizes(optimize: 'my_package:cache', key: 'my-package-cache');
+        $this->optimizes(optimize: CacheFilesCommand::class, key: 'my-package-files');
+        $this->optimizes(optimize: 'test-name-without-key');
+    }
+}
+
+class CacheFilesCommand extends Command
+{
+    protected $signature = 'my_package:cache-files';
+
+    public function handle()
+    {
+        return 0;
     }
 }

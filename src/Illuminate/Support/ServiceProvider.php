@@ -483,8 +483,8 @@ abstract class ServiceProvider
     /**
      * Register commands that should run on "optimize" or "optimize:clear".
      *
-     * @param  string|null  $optimize
-     * @param  string|null  $clear
+     * @param  class-string<\Symfony\Component\Console\Command\Command>|string|null  $optimize
+     * @param  class-string<\Symfony\Component\Console\Command\Command>|string|null  $clear
      * @param  string|null  $key
      * @return void
      */
@@ -504,7 +504,7 @@ abstract class ServiceProvider
     /**
      * Register commands that should run on "reload".
      *
-     * @param  string  $reload
+     * @param  class-string<\Symfony\Component\Console\Command\Command>|string  $reload
      * @param  string|null  $key
      * @return void
      */
