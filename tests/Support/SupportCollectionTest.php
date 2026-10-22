@@ -1368,6 +1368,7 @@ class SupportCollectionTest extends TestCase
             $c->whereBetween('v', [2, 4])->values()->all());
         $this->assertEquals([['v' => 1]], $c->whereBetween('v', [-1, 1])->all());
         $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereBetween('v', [3, 3])->values()->all());
+        $this->assertEquals([['v' => 2], ['v' => 3], ['v' => '3']], $c->whereBetween('v', new Collection([2, 3]))->values()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -1378,6 +1379,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['v' => 1]], $c->whereNotBetween('v', [2, 4])->values()->all());
         $this->assertEquals([['v' => 2], ['v' => 3], ['v' => 3], ['v' => 4]], $c->whereNotBetween('v', [-1, 1])->values()->all());
         $this->assertEquals([['v' => 1], ['v' => '2'], ['v' => '4']], $c->whereNotBetween('v', [3, 3])->values()->all());
+        $this->assertEquals([['v' => 1], ['v' => 4]], $c->whereNotBetween('v', new Collection([2, 3]))->values()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5375,6 +5377,20 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([null, null]);
         $this->assertNull($data->mode());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithFloats($collection)
+    {
+        $data = new $collection([1.5, 1.5, 2.5]);
+        $this->assertSame([1.5], $data->mode());
+
+        $data = new $collection([
+            (object) ['foo' => 0.5],
+            (object) ['foo' => 0.7],
+            (object) ['foo' => 0.7],
+        ]);
+        $this->assertSame([0.7], $data->mode('foo'));
     }
 
     #[DataProvider('collectionClassProvider')]

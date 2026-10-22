@@ -7,14 +7,14 @@ class Attribute
     /**
      * The attribute accessor.
      *
-     * @var callable
+     * @var callable|null
      */
     public $get;
 
     /**
      * The attribute mutator.
      *
-     * @var callable
+     * @var callable|null
      */
     public $set;
 

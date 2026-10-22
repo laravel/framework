@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use DateTimeInterface;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -199,7 +200,11 @@ class RetryCommand extends Command
             return json_encode($payload);
         }
 
-        $instance = $this->getInstanceFromPayload($payload);
+        try {
+            $instance = $this->getInstanceFromPayload($payload);
+        } catch (ModelNotFoundException) {
+            return json_encode($payload);
+        }
 
         if (is_object($instance) && ! $instance instanceof \__PHP_Incomplete_Class && method_exists($instance, 'retryUntil')) {
             $retryUntil = $instance->retryUntil();
@@ -231,7 +236,13 @@ class RetryCommand extends Command
             return [];
         }
 
-        return $queue->getQueueableOptions($this->getInstanceFromPayload($payload), $job->queue, $job->payload);
+        try {
+            $instance = $this->getInstanceFromPayload($payload);
+        } catch (ModelNotFoundException) {
+            return [];
+        }
+
+        return $queue->getQueueableOptions($instance, $job->queue, $job->payload);
     }
 
     /**

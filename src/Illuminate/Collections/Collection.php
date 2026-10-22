@@ -135,14 +135,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $counts = $this->newInstance();
 
-        $collection->each(fn ($value) => $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1);
+        $floats = [];
+
+        $collection->each(function ($value) use ($counts, &$floats) {
+            if (is_float($value)) {
+                $floats[$key = (string) $value] = $value;
+            } else {
+                $key = $value;
+            }
+
+            $counts[$key] = isset($counts[$key]) ? $counts[$key] + 1 : 1;
+        });
 
         $sorted = $counts->sort();
 
         $highestValue = $sorted->last();
 
         return $sorted->filter(fn ($value) => $value == $highestValue)
-            ->sort()->keys()->all();
+            ->sort()->keys()->map(fn ($key) => is_string($key) ? $floats[$key] ?? $key : $key)->all();
     }
 
     /**
@@ -1499,7 +1509,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue

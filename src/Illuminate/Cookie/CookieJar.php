@@ -36,7 +36,7 @@ class CookieJar implements JarContract
     /**
      * The default SameSite option (defaults to lax).
      *
-     * @var string
+     * @var string|null
      */
     protected $sameSite = 'lax';
 

@@ -309,7 +309,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Ensure the given tag is a valid tag given the selected cipher.
      *
-     * @param  string  $tag
+     * @param  string|null  $tag
      * @return void
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException

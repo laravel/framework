@@ -12,6 +12,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
@@ -322,6 +323,13 @@ class MailableQueuedTest extends TestCase
         $this->assertTrue($job->failOnTimeout);
     }
 
+    public function testQueuedMailableRespectsCountCrashesAsExceptions(): void
+    {
+        $this->assertTrue((new SendQueuedMailable(new MailableQueueableStubWithCountCrashesAttribute))->countCrashesAsExceptions);
+        $this->assertTrue((new SendQueuedMailable(new MailableQueueableStubWithCountCrashesProperty))->countCrashesAsExceptions);
+        $this->assertFalse((new SendQueuedMailable(new MailableQueueableStub))->countCrashesAsExceptions);
+    }
+
     protected function getMocks()
     {
         return ['smtp', Double::for(Factory::class), Double::for(TransportInterface::class)];
@@ -423,6 +431,17 @@ class MailableQueueableStubWithFailureProperties extends MailableQueueableStub
     public $deleteWhenMissingModels = true;
 
     public $failOnTimeout = true;
+}
+
+#[CountCrashesAsExceptions]
+class MailableQueueableStubWithCountCrashesAttribute extends MailableQueueableStub
+{
+    //
+}
+
+class MailableQueueableStubWithCountCrashesProperty extends MailableQueueableStub
+{
+    public $countCrashesAsExceptions = true;
 }
 
 #[Connection('sqs')]

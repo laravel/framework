@@ -227,7 +227,7 @@ abstract class Job
     /**
      * Determine if the current database transaction should be rolled back to level zero.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
      * @return bool
      */
     protected function shouldRollBackDatabaseTransaction($e)

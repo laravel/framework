@@ -247,7 +247,7 @@ class ServeCommand extends Command
     /**
      * Get the port for the command.
      *
-     * @return string
+     * @return int
      */
     protected function port()
     {

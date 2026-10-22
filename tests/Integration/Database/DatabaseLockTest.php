@@ -69,6 +69,34 @@ class DatabaseLockTest extends DatabaseTestCase
         $otherLock->release();
     }
 
+    public function testLockCannotBeAcquiredWhileHeldInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+
+        DB::transaction(function () {
+            $this->assertFalse(Cache::driver('database')->lock('foo')->get());
+
+            $this->assertSame(1, DB::table('cache_locks')->count());
+        });
+
+        $lock->release();
+    }
+
+    public function testExpiredLockCanBeAcquiredInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDay()->getTimestamp()]);
+
+        DB::transaction(function () {
+            $otherLock = Cache::driver('database')->lock('foo');
+            $this->assertTrue($otherLock->get());
+
+            $otherLock->release();
+        });
+    }
+
     public function testIsLocked()
     {
         $lock = Cache::driver('database')->lock('foo');
@@ -156,7 +184,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $insertBuilder = Double::for(Builder::class);
         $deleteBuilder = Double::for(Builder::class);
 
-        $insertBuilder->expects('insert')->returns(true);
+        $insertBuilder->expects('insertOrIgnore')->returns(1);
 
         $deleteBuilder->expects('where')->with('expiration', '<=', Argument::any())->returns($deleteBuilder);
         $deleteBuilder->expects('delete')->throws(new QueryException(
@@ -187,7 +215,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $insertBuilder = Double::for(Builder::class);
         $updateBuilder = Double::for(Builder::class);
 
-        $insertBuilder->expects('insert')->throws(new QueryException(
+        $insertBuilder->expects('insertOrIgnore')->throws(new QueryException(
             'mysql',
             'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
             [],

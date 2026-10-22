@@ -26,7 +26,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * The lock provider resolver.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $lockProviderResolver;
 

@@ -293,7 +293,7 @@ class ModelInspector
      * Get the class used for JSON response transforming.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Http\Resources\Json\JsonResource|null
+     * @return class-string<\Illuminate\Http\Resources\Json\JsonResource>|null
      */
     protected function getResource($model)
     {

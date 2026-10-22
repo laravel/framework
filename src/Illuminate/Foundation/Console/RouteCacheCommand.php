@@ -65,7 +65,7 @@ class RouteCacheCommand extends Command
             $route->prepareForSerialization();
         }
 
-        $this->files->put(
+        $this->files->replace(
             $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
         );
 

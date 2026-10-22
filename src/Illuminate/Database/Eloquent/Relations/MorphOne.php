@@ -50,11 +50,13 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
+        $query = parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+
         if ($this->isOneOfMany()) {
             $this->mergeOneOfManyJoinsTo($query);
         }
 
-        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+        return $query;
     }
 
     /**
@@ -89,8 +91,8 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)
     {
         $join
-            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->morphType))
-            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->getMorphType()))
+            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->getForeignKeyName()));
     }
 
     /**

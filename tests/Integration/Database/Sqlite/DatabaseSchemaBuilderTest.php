@@ -112,6 +112,29 @@ class DatabaseSchemaBuilderTest extends TestCase
         );
     }
 
+    public function testAlterTableWithForeignKeyToTableNameThatNeedsQuoting()
+    {
+        Schema::create('group', function (Blueprint $table) {
+            $table->id();
+        });
+
+        Schema::create('members', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('group_id')->constrained('group');
+            $table->string('name');
+        });
+
+        Schema::table('members', function (Blueprint $table) {
+            $table->string('name')->nullable()->change();
+        });
+
+        $this->assertTrue(collect(Schema::getForeignKeys('members'))->contains(
+            fn ($fk) => $fk['foreign_table'] === 'group' &&
+                $fk['foreign_columns'] === ['id'] &&
+                $fk['columns'] === ['group_id']
+        ));
+    }
+
     public function testAlterTableAddForeignKeyWithExpressionDefault()
     {
         Schema::create('items', function (Blueprint $table) {

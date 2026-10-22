@@ -27,4 +27,11 @@ abstract class MemcachedIntegrationTestCase extends TestCase
 
         $testConnection->quit();
     }
+
+    protected function tearDown(): void
+    {
+        $this->app['cache']->store('memcached')->flush();
+
+        parent::tearDown();
+    }
 }

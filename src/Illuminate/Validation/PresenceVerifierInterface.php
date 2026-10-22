@@ -10,7 +10,7 @@ interface PresenceVerifierInterface
      * @param  string  $collection
      * @param  string  $column
      * @param  string  $value
-     * @param  int|null  $excludeId
+     * @param  int|string|null  $excludeId
      * @param  string|null  $idColumn
      * @param  array  $extra
      * @return int

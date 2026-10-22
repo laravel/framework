@@ -622,6 +622,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
+     * @param  string  $boolean
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -669,6 +670,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  string  $boolean
      * @return $this
      *
      * @throws \InvalidArgumentException

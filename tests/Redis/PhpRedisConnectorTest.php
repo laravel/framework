@@ -455,6 +455,38 @@ class PhpRedisConnectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesAfterABrokenPipeWarning()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('llen')->with('foo')->willThrowException(new ErrorException('Redis::lLen(): SSL: Broken pipe'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('llen')->with('foo')->willReturn(2);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame(2, $connection->command('llen', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotAutomaticallyRetryNonIdempotentWriteAfterABrokenPipeWarning()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('rpush')->with('foo', 'bar')->willThrowException(new ErrorException('Redis::rPush(): SSL: Broken pipe'));
+        $failedClient->expects($this->once())->method('close')->willReturn(true);
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('rpush');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new ErrorException('Redis::rPush(): SSL: Broken pipe'));
+
+        $connection->command('rpush', ['foo', 'bar']);
+    }
+
+    #[RequiresPhpExtension('redis')]
     public function testConnectionAutomaticallyRetriesReadOnlyCommandAfterRebuildingItsClient()
     {
         $failedClient = $this->createMock(\Redis::class);

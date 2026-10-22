@@ -290,6 +290,8 @@ trait BuildsQueries
                     return;
                 }
 
+                unset($results);
+
                 $page++;
             }
         });
@@ -392,6 +394,8 @@ trait BuildsQueries
                 if ($lastId === null) {
                     throw new RuntimeException("The lazyById operation was aborted because the [{$alias}] column is not present in the query result.");
                 }
+
+                unset($results);
 
                 $page++;
             }

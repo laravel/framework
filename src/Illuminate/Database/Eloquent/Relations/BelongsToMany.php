@@ -411,6 +411,8 @@ class BelongsToMany extends Relation
 
             $column($pivotQuery);
 
+            $this->qualifyPivotWheres($pivotQuery->getQuery());
+
             $this->pivotWheres[] = [
                 fn ($query) => $query->addNestedWhereQuery($pivotQuery->getQuery()),
                 null,
@@ -1576,6 +1578,40 @@ class BelongsToMany extends Relation
         return Model::withoutEvents(fn () => $this->createMany($records, $joinings));
     }
 
+    /**
+     * Create a new instance of the related model and attach it to the parent model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     */
+    public function forceCreate(array $attributes = [], array $joining = [], $touch = true)
+    {
+        $attributes = array_merge($this->getQuery()->pendingAttributes, $attributes);
+
+        $instance = $this->related->newInstance()->forceFill($attributes);
+
+        $instance->save(['touch' => false]);
+
+        $this->attach($instance, $joining, $touch);
+
+        return $instance;
+    }
+
+    /**
+     * Create a new instance of the related model with mass assignment without raising any events and attach it to the parent model.
+     *
+     * @param  array  $attributes
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     */
+    public function forceCreateQuietly(array $attributes = [], array $joining = [], $touch = true)
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes, $joining, $touch));
+    }
+
     /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
@@ -1815,6 +1851,29 @@ class BelongsToMany extends Relation
     public function getPivotColumns()
     {
         return $this->pivotColumns;
+    }
+
+    /**
+     * Qualify the columns of the given pivot query's where clauses.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return void
+     */
+    protected function qualifyPivotWheres($query)
+    {
+        foreach ($query->wheres as &$where) {
+            if ($where['type'] === 'Nested') {
+                $this->qualifyPivotWheres($where['query']);
+
+                continue;
+            }
+
+            foreach (['column', 'first', 'second'] as $key) {
+                if (isset($where[$key]) && is_string($where[$key])) {
+                    $where[$key] = $this->qualifyPivotColumn($where[$key]);
+                }
+            }
+        }
     }
 
     /**

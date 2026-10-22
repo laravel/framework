@@ -14,14 +14,14 @@ abstract class Seeder
     /**
      * The container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container\Container|null
      */
     protected $container;
 
     /**
      * The console command instance.
      *
-     * @var \Illuminate\Console\Command
+     * @var \Illuminate\Console\Command|null
      */
     protected $command;
 

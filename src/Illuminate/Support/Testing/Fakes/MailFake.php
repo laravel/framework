@@ -31,7 +31,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * The mailer currently being used to send a message.
      *
-     * @var string
+     * @var string|null
      */
     protected $currentMailer;
 

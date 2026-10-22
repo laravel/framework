@@ -933,6 +933,30 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
+     * Allow dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withDispatchingAfterResponses()
+    {
+        $this->dispatcher->withDispatchingAfterResponses();
+
+        return $this;
+    }
+
+    /**
+     * Disable dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withoutDispatchingAfterResponses()
+    {
+        $this->dispatcher->withoutDispatchingAfterResponses();
+
+        return $this;
+    }
+
+    /**
      * Get the batches that have been dispatched.
      *
      * @return array

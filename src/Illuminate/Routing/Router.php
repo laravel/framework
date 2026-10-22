@@ -124,7 +124,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * The registered custom implicit binding callback.
      *
-     * @var array
+     * @var callable|null
      */
     protected $implicitBindingCallback;
 
@@ -761,6 +761,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function dispatch(Request $request)
     {
         $this->currentRequest = $request;
+        $this->current = null;
 
         return $this->dispatchToRoute($request);
     }

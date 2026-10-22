@@ -76,7 +76,7 @@ class GenericUser implements UserContract
     /**
      * Set the "remember me" token value.
      *
-     * @param  string  $value
+     * @param  string|null  $value
      * @return void
      */
     public function setRememberToken($value)

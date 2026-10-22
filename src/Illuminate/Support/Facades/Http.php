@@ -25,7 +25,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void assertNothingSent()
  * @method static void assertSentCount(int $count)
  * @method static void assertSequencesAreEmpty()
- * @method static \Illuminate\Support\Collection recorded(\Closure|callable $callback = null)
+ * @method static \Illuminate\Support\Collection recorded(\Closure|callable|null $callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest createPendingRequest()
  * @method static \Illuminate\Contracts\Events\Dispatcher|null getDispatcher()
  * @method static array getGlobalMiddleware()

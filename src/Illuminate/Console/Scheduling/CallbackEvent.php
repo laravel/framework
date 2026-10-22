@@ -14,7 +14,7 @@ class CallbackEvent extends Event
     /**
      * The callback to call.
      *
-     * @var string
+     * @var string|callable
      */
     protected $callback;
 
@@ -133,6 +133,7 @@ class CallbackEvent extends Event
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
+     * @param  bool  $releaseOnTerminationSignals
      * @return $this
      *
      * @throws \LogicException

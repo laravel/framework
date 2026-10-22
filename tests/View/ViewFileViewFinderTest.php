@@ -159,6 +159,17 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertSame($exceptedPath, $normalizedPath);
     }
 
+    public function testNormalizedNamespaceHints()
+    {
+        $finder = $this->getFinder();
+        $finder->addNamespace('foo', __DIR__.'/Fixtures/../Fixtures/nested');
+        $finder->prependNamespace('foo', 'incorrect_path');
+        $finder->replaceNamespace('bar', [__DIR__.'/Fixtures/nested/../namespaced']);
+
+        $this->assertSame(['incorrect_path', realpath(__DIR__.'/Fixtures/nested')], $finder->getHints()['foo']);
+        $this->assertSame([realpath(__DIR__.'/Fixtures/namespaced')], $finder->getHints()['bar']);
+    }
+
     protected function getFinder()
     {
         return new FileViewFinder(Double::for(Filesystem::class), [__DIR__]);

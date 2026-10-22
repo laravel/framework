@@ -1,6 +1,34 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.37.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.38.0...13.x)
+
+## [v13.38.0](https://github.com/laravel/framework/compare/v13.37.0...v13.38.0) - 2026-10-20
+
+* [13.x] Allow float values in Unique `where` rule by [@sertxudev](https://github.com/sertxudev) in https://github.com/laravel/framework/pull/62059
+* [13.x] Remove dead `until` higher order collection proxy by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62057
+* [13.x] Fix ofMany() alias inside closures by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62051
+* [13.x] Fix existence and aggregate queries on self-referencing one-of-many relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62043
+* [13.x] Support CountCrashesAsExceptions on queued listeners, mailables and notifications by [@Taldres](https://github.com/Taldres) in https://github.com/laravel/framework/pull/62048
+* [13.x] Make health route compatible with route caching across machines by [@percymamedy](https://github.com/percymamedy) in https://github.com/laravel/framework/pull/62049
+* [13.x] Restore the namespaced Cloud logging formatter by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62068
+* [13.x] Run the Memcached cache lock and tagged cache integration tests by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62069
+* [13.x] Fix `mode()` returning truncated values for floats by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62063
+* [13.x] Reset `NotificationFailed` flag before each channel send by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62074
+* [13.x] Respect child `#[Connection]` attribute over inherited `$connection` property by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62065
+* [13.x] Fix `whereBetween` and `whereNotBetween` with collection bounds by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62062
+* [13.x] Fix altering SQLite tables with a foreign key to a table name that needs quoting by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/62084
+* [13.x] Fix clone() on relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62081
+* [13.x] Release the unique lock when dispatching a scheduled job fails by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/62083
+* [13.x] Fix incorrect docblocks by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62097
+* [13.x] Fix PHPStan error when passing a closure to PendingBatch::allowFailures() by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62096
+* [13.x] Remove unused imports by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62087
+* [13.x] Free the previous chunk in `lazy()` and `lazyById()` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62086
+* [13.x] Add PreventStaleDatabaseReads middleware by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62078
+* [13.x] Dispatch UniqueJobSkipped when a unique broadcast event is skipped by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62077
+* [13.x] Remove dead test files by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62101
+* [13.x] Fix TypeError in date comparison rules on non-date values by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62103
+* [13.x] Fix incorrect docblocks by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62100
+* [13.x] add usingWritePdo to Connection by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62099
 
 ## [v13.37.0](https://github.com/laravel/framework/compare/v13.36.0...v13.37.0) - 2026-10-16
 

@@ -7,6 +7,7 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Support\Collection;
 use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
@@ -73,6 +74,13 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertTrue($job->failOnTimeout);
     }
+
+    public function testNotificationRespectsCountCrashesAsExceptions()
+    {
+        $this->assertTrue((new SendQueuedNotifications(new NotifiableUser, new CountCrashesAttributeNotification))->countCrashesAsExceptions);
+        $this->assertTrue((new SendQueuedNotifications(new NotifiableUser, new CountCrashesPropertyNotification))->countCrashesAsExceptions);
+        $this->assertFalse((new SendQueuedNotifications(new NotifiableUser, new TestNotification))->countCrashesAsExceptions);
+    }
 }
 
 class TestNotification extends Notification
@@ -82,4 +90,14 @@ class TestNotification extends Notification
 #[FailOnTimeout]
 class FailOnTimeoutNotification extends Notification
 {
+}
+
+#[CountCrashesAsExceptions]
+class CountCrashesAttributeNotification extends Notification
+{
+}
+
+class CountCrashesPropertyNotification extends Notification
+{
+    public $countCrashesAsExceptions = true;
 }

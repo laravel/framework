@@ -25,7 +25,7 @@ class ResetPassword extends Notification
     /**
      * The callback that should be used to build the mail message.
      *
-     * @var (\Closure(mixed, string): \Illuminate\Notifications\Messages\MailMessage|\Illuminate\Contracts\Mail\Mailable)|null
+     * @var (\Closure(mixed, string): (\Illuminate\Notifications\Messages\MailMessage|\Illuminate\Contracts\Mail\Mailable))|null
      */
     public static $toMailCallback;
 
@@ -54,7 +54,7 @@ class ResetPassword extends Notification
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return \Illuminate\Notifications\Messages\MailMessage|\Illuminate\Contracts\Mail\Mailable
      */
     public function toMail($notifiable)
     {

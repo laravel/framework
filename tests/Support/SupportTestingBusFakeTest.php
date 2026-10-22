@@ -617,6 +617,18 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testDispatchingAfterResponsesCanBeToggledOnTheFake()
+    {
+        $dispatcher = Mockery::mock(BusDispatcher::class);
+        $dispatcher->expects('withoutDispatchingAfterResponses');
+        $dispatcher->expects('withDispatchingAfterResponses');
+
+        $fake = new BusFake($dispatcher);
+
+        $this->assertSame($fake, $fake->withoutDispatchingAfterResponses());
+        $this->assertSame($fake, $fake->withDispatchingAfterResponses());
+    }
+
     public function testAssertDispatchedWithIgnoreClass()
     {
         $dispatcher = Double::for(QueueingDispatcher::class);

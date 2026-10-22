@@ -635,9 +635,11 @@ class Worker
             // proper events will be fired to let any listeners know this job has completed.
             $startedAt = $this->currentTime();
 
-            $job->fire();
-
-            $duration = round(($this->currentTime() - $startedAt) * 1000, 2);
+            try {
+                $job->fire();
+            } finally {
+                $duration = round(($this->currentTime() - $startedAt) * 1000, 2);
+            }
 
             $this->raiseAfterJobEvent($connectionName, $job, $duration);
 
@@ -656,7 +658,7 @@ class Worker
             }
 
             $this->events->dispatch(new JobAttempted(
-                $connectionName, $job, $exceptionOccurred ?? null
+                $connectionName, $job, $exceptionOccurred ?? null, $duration ?? null
             ));
         }
     }

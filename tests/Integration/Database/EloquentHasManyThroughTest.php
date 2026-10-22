@@ -151,6 +151,16 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertCount(1, $users);
     }
 
+    public function testCloneKeepsTheRelationQuery()
+    {
+        $team = Team::create();
+        User::create(['name' => Str::random()]);
+        $user = User::create(['name' => Str::random(), 'team_id' => $team->id]);
+        $article = Article::create(['user_id' => $user->id, 'title' => Str::random()]);
+
+        $this->assertEquals([$article->id], $team->articles()->clone()->get()->modelKeys());
+    }
+
     public function testHasSameParentAndThroughParentTable()
     {
         Category::create();

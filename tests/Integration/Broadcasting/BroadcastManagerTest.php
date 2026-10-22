@@ -15,8 +15,10 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\UniqueFor;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
@@ -150,6 +152,28 @@ class BroadcastManagerTest extends TestCase
         Broadcast::queue(new TestEventUniqueWithInheritedUniqueFor);
 
         Queue::assertPushed(UniqueBroadcastEvent::class, 2);
+    }
+
+    public function testUniqueEventsEmitUniqueJobSkippedEventWhenLockNotAcquired()
+    {
+        Queue::fake();
+
+        $skipped = [];
+
+        Event::listen(UniqueJobSkipped::class, function ($event) use (&$skipped) {
+            $skipped[] = $event->job;
+        });
+
+        Broadcast::queue(new TestEventUnique);
+
+        $this->assertSame([], $skipped);
+
+        Broadcast::queue(new TestEventUnique);
+
+        Queue::assertPushed(UniqueBroadcastEvent::class, 1);
+        $this->assertCount(1, $skipped);
+        $this->assertInstanceOf(UniqueBroadcastEvent::class, $skipped[0]);
+        $this->assertInstanceOf(TestEventUnique::class, $skipped[0]->event);
     }
 
     public function testUniqueForAttributeDoesNotMakeEventsUniqueWithoutTheContract()

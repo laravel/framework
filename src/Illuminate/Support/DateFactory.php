@@ -112,7 +112,7 @@ class DateFactory
     /**
      * The type (class) of dates that should be created.
      *
-     * @var string
+     * @var string|null
      */
     protected static $dateClass;
 
@@ -126,7 +126,7 @@ class DateFactory
     /**
      * The Carbon factory that should be used when creating dates.
      *
-     * @var object
+     * @var object|null
      */
     protected static $factory;
 

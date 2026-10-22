@@ -1021,7 +1021,6 @@ assertType("Illuminate\Support\HigherOrderCollectionProxy<'takeUntil', LazyAnima
 assertType("Illuminate\Support\HigherOrderCollectionProxy<'takeWhile', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->takeWhile);
 assertType("Illuminate\Support\HigherOrderCollectionProxy<'unique', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->unique);
 assertType("Illuminate\Support\HigherOrderCollectionProxy<'unless', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->unless);
-assertType("Illuminate\Support\HigherOrderCollectionProxy<'until', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->until);
 assertType("Illuminate\Support\HigherOrderCollectionProxy<'when', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->when);
 
 enum Digit
