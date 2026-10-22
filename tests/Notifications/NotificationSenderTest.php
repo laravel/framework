@@ -255,7 +255,7 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $bus = new BusFake(new BusDispatcher(new Container));
         $events = new EventDispatcher;
 
@@ -279,8 +279,8 @@ class NotificationSenderTest extends TestCase
         $smsChannel = new ChannelSpy;
         $smsChannel->exception = new RuntimeException('SMS gateway down');
 
-        $manager->expects('driver')->with('push')->andReturn($pushChannel);
-        $manager->expects('driver')->with('sms')->andReturn($smsChannel);
+        $manager->expects('driver')->with('push')->returns($pushChannel);
+        $manager->expects('driver')->with('sms')->returns($smsChannel);
 
         $sender = new NotificationSender($manager, $bus, $events);
 

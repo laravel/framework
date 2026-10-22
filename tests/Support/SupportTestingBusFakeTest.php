@@ -619,7 +619,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchingAfterResponsesCanBeToggledOnTheFake()
     {
-        $dispatcher = Mockery::mock(BusDispatcher::class);
+        $dispatcher = Double::for(BusDispatcher::class);
         $dispatcher->expects('withoutDispatchingAfterResponses');
         $dispatcher->expects('withDispatchingAfterResponses');
 
