@@ -101,11 +101,14 @@ class ExceptionReporter
     protected ?string $currentlyProcessingJobAttemptId = null;
 
     /**
-     * The payload of the currently executing job on the queue.
-     *
-     * @var array<string, mixed>
+     * The trace identifier the currently executing job was dispatched with.
      */
-    protected array $currentlyProcessingJobPayload = [];
+    protected ?string $currentlyProcessingJobTraceId = null;
+
+    /**
+     * The identifier of the user the currently executing job was dispatched by.
+     */
+    protected ?string $currentlyProcessingJobUserId = null;
 
     /**
      * The identifier of the user that logged out during the current request.
@@ -950,9 +953,13 @@ class ExceptionReporter
         $this->currentlyProcessingJob = $job;
 
         try {
-            $this->currentlyProcessingJobPayload = $job->payload();
+            $payload = $job->payload();
+
+            $this->currentlyProcessingJobTraceId = $payload['laravel_cloud_trace_id'] ?? null;
+            $this->currentlyProcessingJobUserId = $payload['laravel_cloud_user_id'] ?? null;
         } catch (Throwable) {
-            $this->currentlyProcessingJobPayload = [];
+            $this->currentlyProcessingJobTraceId = null;
+            $this->currentlyProcessingJobUserId = null;
         }
 
         $this->executionContext['job'] = [
@@ -969,7 +976,8 @@ class ExceptionReporter
         $this->executionContext['job'] = [];
         $this->currentlyProcessingJob = null;
         $this->currentlyProcessingJobAttemptId = null;
-        $this->currentlyProcessingJobPayload = [];
+        $this->currentlyProcessingJobTraceId = null;
+        $this->currentlyProcessingJobUserId = null;
     }
 
     /**
@@ -1032,7 +1040,7 @@ class ExceptionReporter
      */
     protected function traceIdFromContext(): ?string
     {
-        return $this->currentlyProcessingJobPayload['laravel_cloud_trace_id'] ?? null;
+        return $this->currentlyProcessingJobTraceId;
     }
 
     /**
@@ -1125,7 +1133,7 @@ class ExceptionReporter
      */
     protected function userIdFromContext(): ?string
     {
-        return $this->loggedOutUserId ?? $this->currentlyProcessingJobPayload['laravel_cloud_user_id'] ?? null;
+        return $this->loggedOutUserId ?? $this->currentlyProcessingJobUserId;
     }
 
     /**
