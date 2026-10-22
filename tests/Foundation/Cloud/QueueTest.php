@@ -482,7 +482,7 @@ class QueueTest extends TestCase
         [$queue, $agent] = $this->fakeQueue();
         $reporter = new ExceptionReporter(
             $eventsFake,
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             ['stop' => true],
         );
