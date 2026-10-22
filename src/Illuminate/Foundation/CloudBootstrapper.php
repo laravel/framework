@@ -14,7 +14,6 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
-use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -227,15 +226,16 @@ class CloudBootstrapper
             Queue::createPayloadUsing(fn () => $exceptionReporter->jobPayload());
 
             if (! $app->runningInConsole()) {
-                $app['events']->listen(fn (RequestReceived $event) => $exceptionReporter->prepareForOctaneRequest());
+                $app['events']->listen(function (RequestReceived $event) use ($exceptionReporter) {
+                    $exceptionReporter->prepareForOctaneRequest();
+                    $exceptionReporter->forgetUser();
+                });
 
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
                     if ($event->user !== null) {
                         $exceptionReporter->rememberUser($event->user);
                     }
                 });
-
-                $app['events']->listen(fn (RequestHandled $event) => $exceptionReporter->forgetUser());
             } else {
                 $preparedForCommand = false;
 
