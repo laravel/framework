@@ -470,7 +470,7 @@ class Builder implements BuilderContract
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
 
-            if (! empty($this->query->joins) && empty($this->query->unions)) {
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
                 $column = $this->qualifyColumn($column);
             }
         }
@@ -491,7 +491,7 @@ class Builder implements BuilderContract
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
 
-            if (! empty($this->query->joins) && empty($this->query->unions)) {
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
                 $column = $this->qualifyColumn($column);
             }
         }

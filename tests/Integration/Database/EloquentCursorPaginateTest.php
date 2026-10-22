@@ -317,6 +317,23 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertSame(['Title 1', 'Title 2'], $firstPage->pluck('title')->all());
         $this->assertSame(['Title 3'], $secondPage->pluck('title')->all());
     }
+
+    public function testLatestAndOldestWithJoinFromSubquery()
+    {
+        $user = TestUser::create(['name' => 'Taylor']);
+
+        for ($i = 1; $i <= 3; $i++) {
+            TestPost::create(['title' => 'Title '.$i, 'user_id' => $user->id, 'created_at' => now()->startOfSecond()->addMinutes($i)]);
+        }
+
+        $query = fn () => TestPost::query()
+            ->fromSub(TestPost::query(), 'posts')
+            ->joinSub(TestUser::query()->select('id', 'name'), 'users', 'users.id', '=', 'posts.user_id')
+            ->select('posts.*');
+
+        $this->assertSame(['Title 3', 'Title 2', 'Title 1'], $query()->latest()->pluck('title')->all());
+        $this->assertSame(['Title 1', 'Title 2', 'Title 3'], $query()->oldest()->pluck('title')->all());
+    }
 }
 
 class TestPost extends Model
