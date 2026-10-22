@@ -993,6 +993,30 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
     }
 
+    public function testItResolvesTheBladeMapperForEachViewExceptionReported(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        $resolved = 0;
+
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            function () use (&$resolved) {
+                $resolved++;
+
+                return $this->app[BladeMapper::class];
+            },
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The first!')));
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The second!')));
+
+        $this->assertSame(2, $resolved);
+        $this->assertCount(1, $streams);
+    }
+
     public function testItNormalizesViewExceptions(): void
     {
         $this->setupExceptionReporting();
@@ -1042,6 +1066,37 @@ class ExceptionReportingTest extends TestCase
             unset($reportedInView['trace'][0], $thrownInView['trace'][0], $thrownInView['trace'][9], $reportedInView['trace'][9]);
 
             $this->assertSame($reportedInView['trace'], $thrownInView['trace']);
+
+            return true;
+        });
+    }
+
+    public function testItNormalizesViewExceptionsFromEachViewTheProcessRenders(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        foreach (['reentrancy.blade.php', 'components/profile.blade.php'] as $view) {
+            try {
+                view()->file(__DIR__.'/'.$view)->render();
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWritten(function (string $stream) {
+            [
+                $thrownInFirstView,
+                $reportedInSecondView,
+                $thrownInSecondView,
+            ] = array_map(
+                fn ($payload) => json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR),
+                explode("\n", trim($stream)),
+            );
+
+            $this->assertSame('tests/Foundation/Cloud/reentrancy.blade.php', $thrownInFirstView['trace'][0]['file']);
+            $this->assertSame('tests/Foundation/Cloud/components/profile.blade.php', $thrownInSecondView['trace'][0]['file']);
 
             return true;
         });
@@ -3675,7 +3730,7 @@ class ExceptionReportingTest extends TestCase
         // runs on, so that a file is the same file everywhere.
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             'D:\\a\\framework\\framework\\',
             ['stop' => true],
         );
@@ -3873,7 +3928,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => $stopConfig,
@@ -3900,7 +3955,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => false,
@@ -4077,7 +4132,7 @@ class ExceptionReportingTest extends TestCase
     {
         return new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => true,
