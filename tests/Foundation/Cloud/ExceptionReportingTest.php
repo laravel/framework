@@ -1054,6 +1054,61 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItResolvesTheBladeMapperForEachViewExceptionReported(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        $resolved = 0;
+
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            function () use (&$resolved) {
+                $resolved++;
+
+                return $this->app[BladeMapper::class];
+            },
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The first!')));
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The second!')));
+
+        $this->assertSame(2, $resolved);
+        $this->assertCount(1, $streams);
+    }
+
+    public function testItNormalizesViewExceptionsFromEachViewTheProcessRenders(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        foreach (['reentrancy.blade.php', 'components/profile.blade.php'] as $view) {
+            try {
+                view()->file(__DIR__.'/'.$view)->render();
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWritten(function (string $stream) {
+            [
+                $thrownInFirstView,
+                $reportedInSecondView,
+                $thrownInSecondView,
+            ] = array_map(
+                fn ($payload) => json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR),
+                explode("\n", trim($stream)),
+            );
+
+            $this->assertSame('tests/Foundation/Cloud/reentrancy.blade.php', $thrownInFirstView['trace'][0]['file']);
+            $this->assertSame('tests/Foundation/Cloud/components/profile.blade.php', $thrownInSecondView['trace'][0]['file']);
+
+            return true;
+        });
+    }
+
     public function testItNormalizesViewExceptions(): void
     {
         $this->setupExceptionReporting();
