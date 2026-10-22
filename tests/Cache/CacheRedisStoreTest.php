@@ -28,7 +28,7 @@ class CacheRedisStoreTest extends TestCase
     #[RequiresPhpExtension('redis', '>= 6.1.0')]
     public function testFlushStaleTagsStopsScanningWhenTheCursorReturnsToItsStartingValue()
     {
-        $connection = Double::for(PhpRedisConnection::class);
+        $connection = Double::for(CacheRedisStoreTestConnection::class);
         $client = Double::for(\Redis::class);
 
         $connection->allows('_prefix')->with('')->returns('');
@@ -48,7 +48,7 @@ class CacheRedisStoreTest extends TestCase
     #[RequiresPhpExtension('redis')]
     public function testFlushStaleTagsDoesNotDoublePrefixTheMatchPattern()
     {
-        $connection = Double::for(PhpRedisConnection::class);
+        $connection = Double::for(CacheRedisStoreTestConnection::class);
         $client = Double::for(\Redis::class);
 
         $connection->allows('_prefix')->with('')->returns('app_');
@@ -68,5 +68,14 @@ class CacheRedisStoreTest extends TestCase
     protected function getRedis()
     {
         return new RedisStore(Double::for(Factory::class), 'prefix:');
+    }
+}
+
+// PhpRedisConnection only exposes _prefix() through __call, which a double can't configure.
+class CacheRedisStoreTestConnection extends PhpRedisConnection
+{
+    public function _prefix($value)
+    {
+        return $value;
     }
 }

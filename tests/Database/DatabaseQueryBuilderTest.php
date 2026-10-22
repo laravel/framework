@@ -3109,8 +3109,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('category')->groupBy('category')->unionAll($this->getBuilder()->from('videos')->select('category'))->limit(15)->offset(1);
 
-        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->returns([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->resolves(function ($builder, $results) {
             return $results;
         });
 
@@ -3123,8 +3123,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('category')->groupBy('category')->unionAll($this->getBuilder()->from('videos')->select('category'))->orderBy('category')->orderByRaw('field(category, ?)', ['news']);
 
-        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->andReturn([['aggregate' => 1]]);
-        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->returns([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->resolves(function ($builder, $results) {
             return $results;
         });
 
