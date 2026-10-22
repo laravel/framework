@@ -1018,7 +1018,11 @@ class ExceptionReporter
      */
     protected function traceIdFromContext(): ?string
     {
-        return $this->currentlyProcessingJobPayloadValue('laravel_cloud_trace_id');
+        try {
+            return $this->currentlyProcessingJob?->payload()['laravel_cloud_trace_id'] ?? null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -1107,23 +1111,15 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the given value from the payload of the currently executing job.
-     */
-    protected function currentlyProcessingJobPayloadValue(string $key): ?string
-    {
-        try {
-            return $this->currentlyProcessingJob?->payload()[$key] ?? null;
-        } catch (Throwable) {
-            return null;
-        }
-    }
-
-    /**
      * Retrieve the identifier of the user that logged out, or that dispatched the current job.
      */
     protected function userIdFromContext(): ?string
     {
-        return $this->loggedOutUserId ?? $this->currentlyProcessingJobPayloadValue('laravel_cloud_user_id');
+        try {
+            return $this->loggedOutUserId ?? $this->currentlyProcessingJob?->payload()['laravel_cloud_user_id'] ?? null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
