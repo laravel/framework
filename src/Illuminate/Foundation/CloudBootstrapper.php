@@ -241,7 +241,7 @@ class CloudBootstrapper
 
                 $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
                     if (! $preparedForCommand) {
-                        $exceptionReporter->prepareForCommand($event->command);
+                        $exceptionReporter->prepareForCommand($event->command, $event->input);
 
                         $preparedForCommand = true;
                     }
