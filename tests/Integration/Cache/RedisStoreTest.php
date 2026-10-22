@@ -6,6 +6,7 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -423,6 +424,41 @@ class RedisStoreTest extends TestCase
 
         $this->assertSame(1, $store->connection()->zcard($tagSet));
         $this->assertSame('value', $store->tags(['foo'])->get('fresh'));
+    }
+
+    #[RequiresPhpExtension('redis', '>= 6.1.0')]
+    public function testFlushStaleTagsDoesNotDoublePrefixTheMatchPatternWithScanPrefix(): void
+    {
+        $store = Cache::store('redis');
+
+        if (! $store->connection() instanceof PhpRedisConnection || $store->connection() instanceof PhpRedisClusterConnection) {
+            $this->markTestSkipped('SCAN_PREFIX only applies to a single phpredis connection.');
+        }
+
+        $store->clear();
+
+        Carbon::setTestNow(Carbon::now()->subMinutes(5));
+
+        try {
+            $store->tags(['foo'])->put('expired', 'value', 60);
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $tagSet = $store->getPrefix().'tag:foo:entries';
+
+        $this->assertSame(1, $store->connection()->zcard($tagSet));
+
+        // With SCAN_PREFIX, phpredis prepends the connection prefix to the pattern itself...
+        $store->connection()->client()->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
+
+        try {
+            $store->flushStaleTags();
+        } finally {
+            $store->connection()->client()->setOption(\Redis::OPT_SCAN, \Redis::SCAN_NORETRY);
+        }
+
+        $this->assertSame(0, $store->connection()->zcard($tagSet));
     }
 
     public function testItForgetsAndFlushesValues(): void
