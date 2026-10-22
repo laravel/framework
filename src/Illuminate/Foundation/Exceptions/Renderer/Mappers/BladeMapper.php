@@ -71,6 +71,7 @@ class BladeMapper
      *
      * @param  \Illuminate\Contracts\View\Factory  $factory
      * @param  \Illuminate\View\Compilers\BladeCompiler  $bladeCompiler
+     * @return void
      */
     public function __construct(Factory $factory, BladeCompiler $bladeCompiler)
     {
