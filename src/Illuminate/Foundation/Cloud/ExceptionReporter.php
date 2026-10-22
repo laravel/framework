@@ -138,6 +138,7 @@ class ExceptionReporter
      *    capture_request_payload: bool,
      *    redact_request_payload_fields: list<string>,
      *    redact_headers: list<string>,
+     *    redact_command_input_fields: list<string>,
      * }  $config
      */
     public function __construct(

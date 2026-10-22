@@ -3493,6 +3493,7 @@ class ExceptionReportingTest extends TestCase
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => [],
                 'redact_headers' => [],
+                'redact_command_input_fields' => [],
             ],
         );
 
@@ -3520,6 +3521,7 @@ class ExceptionReportingTest extends TestCase
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => [],
                 'redact_headers' => [],
+                'redact_command_input_fields' => [],
             ],
         );
 
@@ -3689,6 +3691,7 @@ class ExceptionReportingTest extends TestCase
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => [],
                 'redact_headers' => [],
+                'redact_command_input_fields' => [],
                 ...$config,
             ],
         );
