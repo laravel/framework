@@ -193,6 +193,7 @@ class CloudBootstrapper
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
                 'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
+                'redact_command_input_fields' => ['token', 'password', 'key', 'secret'],
             ], $config);
 
             $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
