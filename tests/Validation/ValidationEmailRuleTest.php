@@ -198,6 +198,10 @@ class ValidationEmailRuleTest extends TestCase
     #[RequiresPhpExtension('intl')]
     public function testValidateMxRecord()
     {
+        if (! checkdnsrr('laravel.com')) {
+            $this->markTestSkipped('MX lookup unavailable in this environment.');
+        }
+
         $this->fails(
             (new Email())->validateMxRecord(),
             'plainaddress@example.com',
