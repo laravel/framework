@@ -1099,7 +1099,7 @@ class ExceptionReporter
     /**
      * Forget the user that logged out during the current request.
      */
-    public function forgetLoggedOutUser(): void
+    public function forgetUser(): void
     {
         $this->loggedOutUserId = null;
     }
