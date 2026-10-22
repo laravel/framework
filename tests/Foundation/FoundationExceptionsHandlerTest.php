@@ -432,7 +432,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         });
 
         $validator = Mockery::mock(Validator::class);
-        $validator->expects('errors')->times(4)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+        $validator->expects('errors')->times(3)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
