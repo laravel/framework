@@ -29,7 +29,7 @@ class CompilerEngine extends PhpEngine
     protected $lastCompiled = [];
 
     /**
-     * The view paths that were compiled or are not expired, keyed by the path.
+     * The views that were compiled or are not expired, keyed by the compiled path.
      *
      * @var array<string, true>
      */
@@ -61,10 +61,12 @@ class CompilerEngine extends PhpEngine
     {
         $this->lastCompiled[] = $path;
 
+        $compiled = $this->compiler->getCompiledPath($path);
+
         // If this given view has expired, which means it has simply been edited since
         // it was last compiled, we will re-compile the views so we can evaluate a
         // fresh copy of the view. We'll pass the compiler the path of the view.
-        if (! isset($this->compiledOrNotExpired[$path]) && $this->compiler->isExpired($path)) {
+        if (! isset($this->compiledOrNotExpired[$compiled]) && $this->compiler->isExpired($path)) {
             $this->compiler->compile($path);
         }
 
@@ -73,13 +75,13 @@ class CompilerEngine extends PhpEngine
         // which have been rendered for right exception messages to be generated.
 
         try {
-            $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
+            $results = $this->evaluatePath($compiled, $data);
         } catch (ViewException $e) {
             if ((new Stringable($e->getMessage()))->doesntContain(['No such file or directory', 'File does not exist at path'])) {
                 throw $e;
             }
 
-            if (! isset($this->compiledOrNotExpired[$path])) {
+            if (! isset($this->compiledOrNotExpired[$compiled])) {
                 throw $e;
             }
 
@@ -88,7 +90,7 @@ class CompilerEngine extends PhpEngine
             $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
         }
 
-        $this->compiledOrNotExpired[$path] = true;
+        $this->compiledOrNotExpired[$compiled] = true;
 
         array_pop($this->lastCompiled);
 

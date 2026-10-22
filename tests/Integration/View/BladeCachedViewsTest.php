@@ -70,4 +70,30 @@ class BladeCachedViewsTest extends TestCase
             @unlink($path);
         }
     }
+
+    public function test_expired_view_is_recompiled_for_each_echo_format()
+    {
+        $compiler = Blade::getFacadeRoot();
+        $path = join_paths(__DIR__, 'templates', 'expired-echo-format.blade.php');
+
+        @mkdir(dirname($path), 0777, true);
+        file_put_contents($path, 'old {{ $value }}');
+
+        try {
+            $compiler->compile($path);
+            touch($compiler->getCompiledPath($path), time() - 60);
+            file_put_contents($path, 'new {{ $value }}');
+
+            // A markdown mail renders its HTML part with a custom echo format, then its text part with the default one.
+            $html = $compiler->usingEchoFormat(
+                'new \Illuminate\Support\EncodedHtmlString(%s)',
+                fn () => View::file($path, ['value' => 'html'])->render()
+            );
+
+            $this->assertSame('new html', $html);
+            $this->assertSame('new text', View::file($path, ['value' => 'text'])->render());
+        } finally {
+            @unlink($path);
+        }
+    }
 }
