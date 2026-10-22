@@ -235,7 +235,7 @@ class CloudBootstrapper
                     }
                 });
 
-                $app['events']->listen(fn (RequestHandled $event) => $exceptionReporter->forgetLoggedOutUser());
+                $app['events']->listen(fn (RequestHandled $event) => $exceptionReporter->forgetUser());
             } else {
                 $preparedForCommand = false;
 
