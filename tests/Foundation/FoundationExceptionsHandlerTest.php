@@ -409,6 +409,44 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertEquals($argumentExpected, $argumentActual);
     }
 
+    public function testInvalidUsesErrorBagWhenStringAndFallsBackWhenNotString()
+    {
+        $errorBagActual = null;
+
+        $this->container->singleton('redirect', function () use (&$errorBagActual) {
+            $redirector = Mockery::mock(Redirector::class);
+
+            $responder = Mockery::mock(RedirectResponse::class);
+            $redirector->expects('to')->times(2)->andReturn($responder);
+            $responder->expects('withInput')->times(2)->andReturn($responder);
+            $responder->expects('withErrors')->times(2)->with(
+                Mockery::any(),
+                Mockery::on(function ($errorBag) use (&$errorBagActual) {
+                    $errorBagActual = $errorBag;
+
+                    return true;
+                })
+            )->andReturn($responder);
+
+            return $redirector;
+        });
+
+        $validator = Mockery::mock(Validator::class);
+        $validator->expects('errors')->times(4)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+
+        $validationException = new ValidationException($validator);
+        $validationException->redirectTo = '/';
+        $validationException->errorBag = 'default_bag';
+
+        $request = Request::create('/', 'POST', ['_error_bag' => 'custom_bag']);
+        $this->handler->render($request, $validationException);
+        $this->assertSame('custom_bag', $errorBagActual);
+
+        $request = Request::create('/', 'POST', ['_error_bag' => ['invalid_array_bag']]);
+        $this->handler->render($request, $validationException);
+        $this->assertSame('default_bag', $errorBagActual);
+    }
+
     public function testSuspiciousOperationReturns400WithoutReporting()
     {
         $this->config->expects('get')->with('app.debug', null)->andReturn(true);
