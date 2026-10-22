@@ -40,6 +40,11 @@ class ExceptionReporter
     protected bool $reportingViewException = false;
 
     /**
+     * The Blade mapper resolved for the currently reporting exception.
+     */
+    protected ?BladeMapper $resolvedBladeMapper = null;
+
+    /**
      * The captured identifiers, keyed by exception.
      *
      * @var \WeakMap<\Throwable, string>
@@ -150,9 +155,11 @@ class ExceptionReporter
     public function __invoke(Throwable $e): ?bool
     {
         $previousReportingViewException = $this->reportingViewException;
+        $previousResolvedBladeMapper = $this->resolvedBladeMapper;
 
         try {
             $this->reportingViewException = $this->isViewException($e);
+            $this->resolvedBladeMapper = null;
 
             $e = $this->unwrapViewException($e);
 
@@ -167,6 +174,7 @@ class ExceptionReporter
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
+            $this->resolvedBladeMapper = $previousResolvedBladeMapper;
 
             if ($this->scheduledTaskAwaitingFailureReport) {
                 $this->flushScheduledTaskContext();
@@ -1153,8 +1161,8 @@ class ExceptionReporter
      */
     protected function bladeMapper(): BladeMapper
     {
-        return $this->bladeMapper instanceof Closure
-            ? $this->bladeMapper = ($this->bladeMapper)()
+        return $this->resolvedBladeMapper ??= $this->bladeMapper instanceof Closure
+            ? ($this->bladeMapper)()
             : $this->bladeMapper;
     }
 
