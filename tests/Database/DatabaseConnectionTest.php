@@ -24,6 +24,7 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
+use LogicException;
 use Mockery;
 use PDO;
 use PDOException;
@@ -721,6 +722,104 @@ class DatabaseConnectionTest extends TestCase
             $this->assertCount(1, $failures);
             $this->assertSame($e, $failures[0]->exception);
         }
+    }
+
+    public function testQueryFailedListenerQueryFailuresDoNotDispatchQueryFailedAgain()
+    {
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
+        $connection->setEventDispatcher(new Dispatcher);
+
+        $failures = [];
+
+        $connection->listenForFailures(function (QueryFailed $event) use ($connection, &$failures) {
+            $failures[] = $event;
+
+            if (count($failures) > 3) {
+                return;
+            }
+
+            try {
+                $connection->statement('select * from listener_missing');
+            } catch (QueryException) {
+                //
+            }
+        });
+
+        try {
+            $connection->statement('select * from caller_missing');
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertSame('select * from caller_missing', $e->getSql());
+        }
+
+        $this->assertCount(1, $failures);
+        $this->assertSame('select * from caller_missing', $failures[0]->sql);
+        $this->assertSame($e, $failures[0]->exception);
+    }
+
+    public function testQueryFailedEventIsDispatchedAgainAfterAListenerQueryFails()
+    {
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
+        $connection->setEventDispatcher(new Dispatcher);
+
+        $failures = [];
+
+        $connection->listenForFailures(function (QueryFailed $event) use ($connection, &$failures) {
+            $failures[] = $event;
+
+            if (count($failures) > 3) {
+                return;
+            }
+
+            try {
+                $connection->statement('select * from listener_missing');
+            } catch (QueryException) {
+                //
+            }
+        });
+
+        foreach (['select * from first_missing', 'select * from second_missing'] as $query) {
+            try {
+                $connection->statement($query);
+
+                $this->fail('A QueryException was not thrown.');
+            } catch (QueryException) {
+                //
+            }
+        }
+
+        $this->assertCount(2, $failures);
+        $this->assertSame('select * from first_missing', $failures[0]->sql);
+        $this->assertSame('select * from second_missing', $failures[1]->sql);
+    }
+
+    public function testQueryFailedEventIsDispatchedAgainAfterAListenerThrows()
+    {
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
+        $connection->setEventDispatcher(new Dispatcher);
+
+        $failures = [];
+
+        $connection->listenForFailures(function (QueryFailed $event) use (&$failures) {
+            $failures[] = $event;
+
+            throw new LogicException('listener');
+        });
+
+        foreach (['select * from first_missing', 'select * from second_missing'] as $query) {
+            try {
+                $connection->statement($query);
+
+                $this->fail('A LogicException was not thrown.');
+            } catch (LogicException $e) {
+                $this->assertSame('listener', $e->getMessage());
+            }
+        }
+
+        $this->assertCount(2, $failures);
+        $this->assertSame('select * from first_missing', $failures[0]->sql);
+        $this->assertSame('select * from second_missing', $failures[1]->sql);
     }
 
     public function testRunMethodRetriesOnFailure()

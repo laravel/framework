@@ -115,6 +115,13 @@ class Connection implements ConnectionInterface
     protected $reconnecting = false;
 
     /**
+     * Indicates if the connection is dispatching a query failed event.
+     *
+     * @var bool
+     */
+    protected $dispatchingQueryFailed = false;
+
+    /**
      * The query grammar implementation.
      *
      * @var \Illuminate\Database\Query\Grammars\Grammar
@@ -826,9 +833,17 @@ class Connection implements ConnectionInterface
                     $e, $query, $bindings, $callback
                 );
             } catch (Throwable $e) {
-                $this->event(new QueryFailed(
-                    $query, $bindings, $this->getElapsedTime($start), $this, $e, $this->latestReadWriteTypeUsed()
-                ));
+                if (! $this->dispatchingQueryFailed) {
+                    $this->dispatchingQueryFailed = true;
+
+                    try {
+                        $this->event(new QueryFailed(
+                            $query, $bindings, $this->getElapsedTime($start), $this, $e, $this->latestReadWriteTypeUsed()
+                        ));
+                    } finally {
+                        $this->dispatchingQueryFailed = false;
+                    }
+                }
 
                 throw $e;
             }
