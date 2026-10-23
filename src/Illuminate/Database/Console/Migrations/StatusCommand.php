@@ -19,7 +19,8 @@ class StatusCommand extends BaseCommand
                     {--database= : The database connection to use}
                     {--pending= : Only list pending migrations}
                     {--path=* : The path(s) to the migrations files to use}
-                    {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}';
+                    {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+                    {--json : Output the migration status as JSON}';
 
     /**
      * The console command description.
@@ -74,6 +75,10 @@ class StatusCommand extends BaseCommand
 
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
+            if ($this->option('json')) {
+                return $this->displayJson($ran, $batches);
+            }
+
             $migrations = $this->getStatusFor($ran, $batches)
                 ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
                     return (new Stringable($migration[1]))->contains('Pending');
@@ -103,6 +108,25 @@ class StatusCommand extends BaseCommand
     }
 
     /**
+     * Display the migration status as JSON.
+     *
+     * @param  array  $ran
+     * @param  array  $batches
+     * @return int|null
+     */
+    protected function displayJson(array $ran, array $batches)
+    {
+        $migrations = $this->getMigrationStatuses($ran, $batches)
+            ->when($this->option('pending') !== false, fn ($collection) => $collection->where('status', 'pending'));
+
+        $this->output->writeln($migrations->values()->toJson());
+
+        if ($this->option('pending') && $migrations->isNotEmpty()) {
+            return $this->option('pending');
+        }
+    }
+
+    /**
      * Get the status for the given run migrations.
      *
      * @param  array  $ran
@@ -111,6 +135,25 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
+        return $this->getMigrationStatuses($ran, $batches)->map(fn ($migration) => [
+            $migration['migration'],
+            match ($migration['status']) {
+                'ran' => '['.$migration['batch'].'] <fg=green;options=bold>Ran</>',
+                'skipped' => '<fg=gray;options=bold>Skipped</>',
+                'pending' => '<fg=yellow;options=bold>Pending</>',
+            },
+        ]);
+    }
+
+    /**
+     * Get the name, batch, and status of each migration.
+     *
+     * @param  array  $ran
+     * @param  array  $batches
+     * @return \Illuminate\Support\Collection<string, array{migration: string, batch: int|null, status: 'ran'|'skipped'|'pending'}>
+     */
+    protected function getMigrationStatuses(array $ran, array $batches)
+    {
         $hasPending = false;
 
         return (new Collection($this->getAllMigrationFiles()))
@@ -118,16 +161,20 @@ class StatusCommand extends BaseCommand
                 $migrationName = $this->migrator->getMigrationName($migration);
 
                 if (in_array($migrationName, $ran)) {
-                    $status = '['.$batches[$migrationName].'] <fg=green;options=bold>Ran</>';
+                    $status = 'ran';
                 } elseif (! $hasPending && $this->migrator->shouldSkip($migration)) {
-                    $status = '<fg=gray;options=bold>Skipped</>';
+                    $status = 'skipped';
                 } else {
                     $hasPending = true;
 
-                    $status = '<fg=yellow;options=bold>Pending</>';
+                    $status = 'pending';
                 }
 
-                return [$migrationName, $status];
+                return [
+                    'migration' => $migrationName,
+                    'batch' => $status === 'ran' ? (int) $batches[$migrationName] : null,
+                    'status' => $status,
+                ];
             });
     }
 

@@ -970,6 +970,17 @@ return [
                 'default' => false,
                 'description' => 'Indicate any provided migration file paths are pre-resolved absolute paths',
             ],
+            [
+                'name' => 'json',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Output the migration status as JSON',
+            ],
         ],
     ],
     \Illuminate\Database\Console\MonitorCommand::class => [
