@@ -39,6 +39,28 @@ class Onceable
     }
 
     /**
+     * Get the objects used by the callable, which are hashed by their identity.
+     *
+     * @return array<int, object>
+     */
+    public function objects()
+    {
+        if (! $this->callable instanceof Closure) {
+            return [];
+        }
+
+        $objects = [];
+
+        foreach ((new ReflectionClosure($this->callable))->getClosureUsedVariables() as $argument) {
+            if (is_object($argument) && ! $argument instanceof HasOnceHash) {
+                $objects[] = $argument;
+            }
+        }
+
+        return $objects;
+    }
+
+    /**
      * Computes the object of the onceable from the given trace, if any.
      *
      * @param  array<int, array<string, mixed>>  $trace

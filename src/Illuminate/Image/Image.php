@@ -494,8 +494,8 @@ class Image implements Responsable, Stringable
         return once(function () {
             $contents = $this->toBytes();
 
-            // getimagesize() misreports HEIC's coded / padded frame size, so read HEIC via the driver...
-            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic'], true)) {
+            // getimagesize() misreports HEIC's coded / padded frame size and can't read JXL, so read them via the driver...
+            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic', 'image/jxl', 'image/x-jxl'], true)) {
                 try {
                     return $this->resolveDriver()->dimensions($contents);
                 } catch (Throwable) {
