@@ -8,16 +8,20 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Events\QueryFailed;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
+use Illuminate\Database\LostConnectionException;
 use Illuminate\Database\MultipleColumnsSelectedException;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
@@ -539,6 +543,183 @@ class DatabaseConnectionTest extends TestCase
             $this->fail('A QueryException was not thrown.');
         } catch (QueryException $e) {
             $this->assertSame(1, $reconnects);
+        }
+    }
+
+    public function testQueryFailedEventIsDispatchedWhenAQueryFails()
+    {
+        $connection = new Connection($this->getFailingPdo(), '', '', ['name' => 'conn']);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE active = ?', [true]);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertSame([1], $e->getBindings());
+        }
+
+        $events->assertDispatchedOnce(QueryFailed::class);
+        $events->assertNotDispatched(QueryExecuted::class);
+        $events->assertDispatched(QueryFailed::class, function (QueryFailed $event) use ($connection, $e) {
+            return $event->sql === 'SELECT * FROM users WHERE active = ?'
+                && $event->bindings === [true]
+                && is_float($event->time)
+                && $event->connection === $connection
+                && $event->connectionName === 'conn'
+                && $event->readWriteType === 'write'
+                && $event->exception === $e;
+        });
+    }
+
+    public function testQueryFailedEventIsDispatchedOnceWhenAQueryFailsWithinATransaction()
+    {
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->expects('beginTransaction');
+        $statement = Mockery::mock(PDOStatement::class);
+        $pdo->expects('prepare')->andReturn($statement);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+
+        $connection = new Connection($pdo);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+        $connection->beginTransaction();
+
+        try {
+            $connection->statement('foo');
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $events->assertDispatchedOnce(QueryFailed::class);
+            $events->assertDispatched(QueryFailed::class, fn (QueryFailed $event) => $event->exception === $e);
+        }
+    }
+
+    public function testQueryFailedEventIsNotDispatchedWhenALostConnectionIsRetriedSuccessfully()
+    {
+        $pdo = Mockery::mock(PDO::class);
+
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $statement->expects('execute')->andReturn(true);
+
+        $pdo->expects('prepare')->times(2)->andReturn($statement);
+
+        $connection = new Connection($pdo);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+        $connection->setReconnector(function () {
+            //
+        });
+
+        $this->assertTrue($connection->statement('foo'));
+
+        $events->assertNotDispatched(QueryFailed::class);
+        $events->assertDispatchedOnce(QueryExecuted::class);
+    }
+
+    public function testQueryFailedEventCarriesTheRetryExceptionWhenARetriedQueryFails()
+    {
+        $pdo = Mockery::mock(PDO::class);
+
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $statement->expects('execute')->andThrow(new PDOException('SQLSTATE[42S02]: Base table or view not found'));
+
+        $pdo->expects('prepare')->times(2)->andReturn($statement);
+
+        $connection = new Connection($pdo);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+        $connection->setReconnector(function () {
+            //
+        });
+
+        try {
+            $connection->statement('foo');
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertSame('SQLSTATE[42S02]: Base table or view not found', $e->getPrevious()->getMessage());
+        }
+
+        $events->assertDispatchedOnce(QueryFailed::class);
+        $events->assertNotDispatched(QueryExecuted::class);
+        $events->assertDispatched(QueryFailed::class, fn (QueryFailed $event) => $event->exception === $e);
+    }
+
+    public function testQueryFailedEventCarriesTheExceptionWhenReconnectingFails()
+    {
+        $pdo = Mockery::mock(PDO::class);
+
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+
+        $pdo->expects('prepare')->andReturn($statement);
+
+        $connection = new Connection($pdo);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+
+        try {
+            $connection->statement('foo');
+
+            $this->fail('A LostConnectionException was not thrown.');
+        } catch (LostConnectionException $e) {
+            $events->assertDispatchedOnce(QueryFailed::class);
+            $events->assertDispatched(QueryFailed::class, fn (QueryFailed $event) => $event->exception === $e);
+        }
+    }
+
+    public function testQueryFailedEventCarriesUniqueConstraintViolations()
+    {
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(
+            new PDOException('SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: users.email')
+        );
+
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->expects('prepare')->andReturn($statement);
+
+        $connection = new SQLiteConnection($pdo);
+        $connection->setEventDispatcher($events = new EventFake(new Dispatcher));
+
+        try {
+            $connection->statement('insert into users (email) values (?)');
+
+            $this->fail('A UniqueConstraintViolationException was not thrown.');
+        } catch (UniqueConstraintViolationException $e) {
+            $events->assertDispatchedOnce(QueryFailed::class);
+            $events->assertDispatched(QueryFailed::class, fn (QueryFailed $event) => $event->exception === $e);
+        }
+    }
+
+    public function testQueryFailuresThrowWithoutAnEventDispatcher()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('SQLSTATE[42S02]: Base table or view not found');
+
+        $connection = new Connection($this->getFailingPdo());
+
+        $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+    }
+
+    public function testListenForFailuresRegistersCallback()
+    {
+        $connection = new Connection($this->getFailingPdo());
+        $connection->setEventDispatcher($events = new Dispatcher);
+
+        $failures = [];
+
+        $connection->listenForFailures(function (QueryFailed $event) use (&$failures) {
+            $failures[] = $event;
+        });
+
+        $this->assertTrue($events->hasListeners(QueryFailed::class));
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertCount(1, $failures);
+            $this->assertSame($e, $failures[0]->exception);
         }
     }
 

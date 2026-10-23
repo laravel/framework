@@ -317,6 +317,44 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         }
     }
 
+    public function testQueryFailedEventIsDispatchedForFailedQueries()
+    {
+        $readPath = __DIR__.'/read.sqlite';
+        $writePath = __DIR__.'/write.sqlite';
+        Config::set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'read' => [
+                'database' => $readPath,
+            ],
+            'write' => [
+                'database' => $writePath,
+            ],
+        ]);
+        $events = collect();
+        DB::listenForFailures($events->push(...));
+
+        try {
+            touch($readPath);
+            touch($writePath);
+
+            try {
+                DB::connection('sqlite::write')->statement('xxxx');
+                $this->fail();
+            } catch (QueryException $exception) {
+                $this->assertCount(1, $events);
+
+                $event = $events->shift();
+
+                $this->assertSame($exception, $event->exception);
+                $this->assertSame('write', $event->readWriteType);
+                $this->assertSame('xxxx', $event->toRawSql());
+            }
+        } finally {
+            @unlink($writePath);
+            @unlink($readPath);
+        }
+    }
+
     #[DataProvider('readWriteExpectations')]
     public function testQueryInEventListenerCannotInterfereWithReadWriteType(string $connectionName, array $expectedTypes, ?string $loggedType)
     {

@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Events\QueryFailed;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -24,6 +25,7 @@ use Illuminate\Support\Traits\Macroable;
 use PDO;
 use PDOStatement;
 use RuntimeException;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -819,9 +821,17 @@ class Connection implements ConnectionInterface
         try {
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {
-            $result = $this->handleQueryException(
-                $e, $query, $bindings, $callback
-            );
+            try {
+                $result = $this->handleQueryException(
+                    $e, $query, $bindings, $callback
+                );
+            } catch (Throwable $e) {
+                $this->event(new QueryFailed(
+                    $query, $bindings, $this->getElapsedTime($start), $this, $e, $this->latestReadWriteTypeUsed()
+                ));
+
+                throw $e;
+            }
         }
 
         // Once we have run the query we will calculate the time that it took to run and
@@ -1130,6 +1140,17 @@ class Connection implements ConnectionInterface
     public function listen(Closure $callback)
     {
         $this->events?->listen(Events\QueryExecuted::class, $callback);
+    }
+
+    /**
+     * Register a database query failure listener with the connection.
+     *
+     * @param  \Closure(\Illuminate\Database\Events\QueryFailed): mixed  $callback
+     * @return void
+     */
+    public function listenForFailures(Closure $callback)
+    {
+        $this->events?->listen(Events\QueryFailed::class, $callback);
     }
 
     /**
