@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -31,6 +32,7 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\WorkerStopReason;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
@@ -461,6 +463,40 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($second->fired);
         $this->assertInstanceOf(MaxAttemptsExceededException::class, $second->failedWith);
         $this->assertNull($cache->get('job-processing:uuid'));
+    }
+
+    public function testMaxExceptionsCounterIsWrittenWithoutSerializationOrCompressionOnPhpRedis()
+    {
+        $worker = $this->getWorker();
+
+        $connection = Mockery::mock(PhpRedisConnection::class);
+        $connection->shouldReceive('withoutSerializationOrCompression')
+            ->once()
+            ->andReturnUsing(function ($callback) {
+                return $callback();
+            });
+
+        $store = Mockery::mock(RedisStore::class);
+        $store->shouldReceive('connection')->andReturn($connection);
+
+        $worker->setCache(new Repository($store));
+
+        $job = new WorkerFakeJob(fn () => throw new RuntimeException);
+        $job->uuid = 'uuid';
+        $job->maxExceptions = 1;
+
+        $store->shouldReceive('get')->with('job-exceptions:uuid')->andReturn(null);
+        $store->shouldReceive('put')->with('job-exceptions:uuid', 0, Mockery::any())->andReturn(true);
+        $store->shouldReceive('increment')->with('job-exceptions:uuid', 1)->andReturn(1);
+        $store->shouldReceive('forget')->with('job-exceptions:uuid')->andReturn(true);
+
+        try {
+            $worker->process('default', $job, $this->workerOptions());
+        } catch (RuntimeException) {
+            //
+        }
+
+        $this->assertTrue($job->hasFailed());
     }
 
     public function testAttemptsThatFinishDoNotLeaveTheirMarkerBehind()
