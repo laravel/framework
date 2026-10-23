@@ -6,7 +6,6 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -111,12 +110,28 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createFactory()
     {
-        $factory = Str::studly($this->argument('name'));
-
         $this->call('make:factory', [
-            'name' => "{$factory}Factory",
+            'name' => $this->getFactoryName(),
             '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
+    }
+
+    /**
+     * Get the factory name for the model, relative to the factories namespace.
+     *
+     * @return string
+     */
+    protected function getFactoryName()
+    {
+        $model = $this->qualifyClass($this->getNameInput());
+
+        $rootNamespace = $this->rootNamespace();
+
+        $model = Str::startsWith($model, $rootNamespace.'Models\\')
+            ? Str::after($model, $rootNamespace.'Models\\')
+            : Str::after($model, $rootNamespace);
+
+        return Str::studly($model).'Factory';
     }
 
     /**
@@ -275,9 +290,7 @@ class ModelMakeCommand extends GeneratorCommand
         $replacements = [];
 
         if ($this->option('factory') || $this->option('all')) {
-            $modelPath = (new Stringable($this->argument('name')))->studly()->replace('/', '\\')->toString();
-
-            $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
+            $factoryNamespace = '\\Database\\Factories\\'.$this->getFactoryName();
 
             $factoryCode = <<<EOT
             /** @use HasFactory<$factoryNamespace> */

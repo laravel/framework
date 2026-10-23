@@ -11,10 +11,12 @@ class ModelMakeCommandTest extends TestCase
         'app/Models/Foo/Bar.php',
         'app/Models/Aaa.php',
         'app/Models/Xxx.php',
+        'app/Foo/Bar.php',
         'app/Http/Controllers/FooController.php',
         'app/Http/Controllers/BarController.php',
         'database/factories/FooFactory.php',
         'database/factories/Foo/BarFactory.php',
+        'database/factories/Models/FooFactory.php',
         'database/migrations/*_create_aaas_table.php',
         'database/migrations/*_create_foos_table.php',
         'database/migrations/*_create_xxxes_table.php',
@@ -149,6 +151,42 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('app/Http/Controllers/Foo/BarController.php');
         $this->assertFilenameExists('database/factories/Foo/BarFactory.php');
         $this->assertFilenameNotExists('database/seeders/Foo/BarSeeder.php');
+    }
+
+    public function testItCanGenerateModelFileWithFactoryOptionForFullyQualifiedName()
+    {
+        $this->artisan('make:model', ['name' => 'App\\Models\\Foo', '--factory' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models;',
+            'class Foo extends Model',
+            '/** @use HasFactory<\Database\Factories\FooFactory> */',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileContains([
+            'namespace Database\Factories;',
+            'class FooFactory extends Factory',
+        ], 'database/factories/FooFactory.php');
+
+        $this->assertFilenameNotExists('database/factories/Models/FooFactory.php');
+    }
+
+    public function testItCanGenerateModelFileWithFactoryOptionForFullyQualifiedNameOutsideModelsFolder()
+    {
+        $this->artisan('make:model', ['name' => 'App/Foo/Bar', '--factory' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Foo;',
+            'class Bar extends Model',
+            '/** @use HasFactory<\Database\Factories\Foo\BarFactory> */',
+        ], 'app/Foo/Bar.php');
+
+        $this->assertFileContains([
+            'namespace Database\Factories\Foo;',
+            'class BarFactory extends Factory',
+        ], 'database/factories/Foo/BarFactory.php');
     }
 
     public function testItGeneratesModelWithHasFactoryTraitWhenUsingAllOption()
