@@ -88,6 +88,21 @@ class EloquentRelationRestoreOrCreateTest extends DatabaseTestCase
         $this->assertTrue($user->roles()->whereKey($created->getKey())->exists());
     }
 
+    public function testRestoreOrCreateOnBelongsToManyRestoresUnattachedModel()
+    {
+        $user = User::create();
+
+        $role = Role::create(['name' => 'admin']);
+        $role->delete();
+
+        $restored = $user->roles()->restoreOrCreate(['name' => 'admin']);
+
+        $this->assertTrue($restored->is($role));
+        $this->assertFalse($role->fresh()->trashed());
+        $this->assertSame(1, Role::withTrashed()->count());
+        $this->assertTrue($user->roles()->whereKey($role->getKey())->exists());
+    }
+
     public function testCreateOrRestoreOnBelongsToMany()
     {
         $user = User::create();
