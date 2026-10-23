@@ -8,6 +8,7 @@ use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Markdown;
+use Illuminate\Mail\TextMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -124,9 +125,17 @@ class MailChannel
      */
     protected function buildMarkdownText($message)
     {
-        return fn ($data) => $this->markdownRenderer($message)->renderText(
-            $message->markdown, array_merge($data, $message->data()),
-        );
+        return function ($data) use ($message) {
+            if (isset($data['message'])) {
+                $data = array_merge($data, [
+                    'message' => new TextMessage($data['message']),
+                ]);
+            }
+
+            return $this->markdownRenderer($message)->renderText(
+                $message->markdown, array_merge($data, $message->data()),
+            );
+        };
     }
 
     /**
