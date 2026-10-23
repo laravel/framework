@@ -11,6 +11,7 @@ use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use IteratorAggregate;
@@ -103,6 +104,13 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
      * @var int
      */
     protected $compromisedThreshold = 0;
+
+    /**
+     * The fields whose values the password should not contain.
+     *
+     * @var array
+     */
+    protected $notContaining = [];
 
     /**
      * Additional validation rules that should be merged into the default rules during validation.
@@ -314,6 +322,19 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
     }
 
     /**
+     * Makes the password not contain the values of the given fields, such as the user's name or email address.
+     *
+     * @param  array|string  $fields
+     * @return $this
+     */
+    public function notContaining($fields)
+    {
+        $this->notContaining = is_array($fields) ? $fields : func_get_args();
+
+        return $this;
+    }
+
+    /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
      * @param  \Closure|string|array  $rules
@@ -370,6 +391,10 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
                 $validator->addFailure($attribute, 'password.numbers');
             }
+
+            if ($this->notContaining && Str::contains($value, $this->contextWords(), ignoreCase: true)) {
+                $validator->addFailure($attribute, 'password.context');
+            }
         });
 
         if ($validator->fails()) {
@@ -386,6 +411,37 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
         }
 
         return true;
+    }
+
+    /**
+     * Get the words from the given fields that the password should not contain.
+     *
+     * @return array<int, string>
+     */
+    protected function contextWords()
+    {
+        $words = [];
+
+        foreach ($this->notContaining as $field) {
+            $value = Arr::get($this->data ?? [], $field);
+
+            if (! is_string($value)) {
+                continue;
+            }
+
+            // Only the part before the "@" identifies the user, the domain is shared with many others...
+            if (str_contains($value, '@')) {
+                $value = Str::before($value, '@');
+            }
+
+            $value = trim($value);
+
+            array_push($words, $value, ...(preg_split('/[^\pL\pN]+/u', $value) ?: []));
+        }
+
+        return array_values(array_unique(array_filter(
+            $words, fn ($word) => mb_strlen($word) >= 3
+        )));
     }
 
     /**
@@ -427,6 +483,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
             'symbols' => $this->symbols,
             'uncompromised' => $this->uncompromised,
             'compromisedThreshold' => $this->compromisedThreshold,
+            'notContaining' => $this->notContaining,
             'customRules' => $this->customRules,
         ];
     }

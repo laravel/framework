@@ -103,6 +103,55 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00', '京都府 1']);
     }
 
+    public function testNotContaining()
+    {
+        $data = [
+            'email' => 'Volodya.K@gmail.com',
+            'name' => 'Al Smith',
+            'profile' => ['nickname' => 'xurshudyan'],
+            'age' => 30,
+        ];
+
+        $rule = Password::min(8)->notContaining('email', 'name', 'profile.nickname', 'age', 'missing');
+
+        foreach (['volodya123', 'VOLODYA.K!', 'mr-smith-1', 'xurshudyan1'] as $password) {
+            $v = new Validator(resolve('translator'), [...$data, 'password' => $password], ['password' => clone $rule]);
+
+            $this->assertFalse($v->passes(), $password);
+            $this->assertSame(['password' => ['validation.password.context']], $v->messages()->toArray());
+        }
+
+        foreach (['gmail.com-pw', 'always-fine', 'k-secret-99', 'thirty-30!'] as $password) {
+            $v = new Validator(resolve('translator'), [...$data, 'password' => $password], ['password' => clone $rule]);
+
+            $this->assertTrue($v->passes(), $password);
+        }
+    }
+
+    public function testNotContainingIgnoresBlankAndMalformedValues()
+    {
+        foreach (['   ', "Vol\xC3odya"] as $name) {
+            $v = new Validator(
+                resolve('translator'),
+                ['name' => $name, 'password' => 'my   secret'],
+                ['password' => Password::min(8)->notContaining('name')]
+            );
+
+            $this->assertTrue($v->passes());
+        }
+    }
+
+    public function testNotContainingAcceptsAnArrayOfFields()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            ['email' => 'taylor@laravel.com', 'password' => 'taylor-2026'],
+            ['password' => Password::min(8)->notContaining(['email'])]
+        );
+
+        $this->assertFalse($v->passes());
+    }
+
     public function testDefaultRules()
     {
         $this->fails(Password::min(3), [null], [
@@ -402,6 +451,7 @@ class ValidationPasswordRuleTest extends TestCase
             'symbols' => true,
             'uncompromised' => false,
             'compromisedThreshold' => 0,
+            'notContaining' => [],
             'customRules' => [],
         ], $password->appliedRules());
 
@@ -416,6 +466,7 @@ class ValidationPasswordRuleTest extends TestCase
             'symbols' => false,
             'uncompromised' => false,
             'compromisedThreshold' => 0,
+            'notContaining' => [],
             'customRules' => [],
         ], $password->appliedRules());
     }
