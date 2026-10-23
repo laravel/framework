@@ -418,25 +418,25 @@ class FoundationExceptionsHandlerTest extends TestCase
         $errorBagActual = null;
 
         $this->container->singleton('redirect', function () use (&$errorBagActual) {
-            $redirector = Mockery::mock(Redirector::class);
+            $redirector = Double::for(Redirector::class);
 
-            $responder = Mockery::mock(RedirectResponse::class);
-            $redirector->expects('to')->times(2)->andReturn($responder);
-            $responder->expects('withInput')->times(2)->andReturn($responder);
+            $responder = Double::for(RedirectResponse::class);
+            $redirector->expects('to')->times(2)->returns($responder);
+            $responder->expects('withInput')->times(2)->returns($responder);
             $responder->expects('withErrors')->times(2)->with(
-                Mockery::any(),
-                Mockery::on(function ($errorBag) use (&$errorBagActual) {
+                Argument::any(),
+                Argument::satisfies(function ($errorBag) use (&$errorBagActual) {
                     $errorBagActual = $errorBag;
 
                     return true;
                 })
-            )->andReturn($responder);
+            )->returns($responder);
 
             return $redirector;
         });
 
-        $validator = Mockery::mock(Validator::class);
-        $validator->expects('errors')->times(3)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+        $validator = Double::for(Validator::class);
+        $validator->expects('errors')->times(3)->returns(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
