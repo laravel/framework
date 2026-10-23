@@ -26,6 +26,10 @@ class Filesystem
      */
     public function exists($path)
     {
+        if ($this->hasDangerousStreamWrapper($path)) {
+            return false;
+        }
+
         return file_exists($path);
     }
 
@@ -560,7 +564,27 @@ class Filesystem
      */
     public function isFile($file)
     {
+        if ($this->hasDangerousStreamWrapper($file)) {
+            return false;
+        }
+
         return is_file($file);
+    }
+
+    /**
+     * Determine if the given path uses a stream wrapper that could trigger
+     * PHP object deserialization (e.g. phar://).
+     *
+     * PHP filesystem functions automatically deserialize the PHAR manifest
+     * when passed a phar:// URI, which can execute arbitrary code through
+     * gadget chains present in vendor dependencies.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    protected function hasDangerousStreamWrapper($path)
+    {
+        return str_starts_with(strtolower((string) $path), 'phar://');
     }
 
     /**
