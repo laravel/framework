@@ -377,6 +377,87 @@ class DatabaseConnectionTest extends TestCase
     }
 
     #[AllowMockObjectsWithoutExpectations]
+    public function testTransactionRetriesOnCommitDeadlockAndRollsBackTransactionsManager()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection(['getName'], $pdo);
+        $mock->method('getName')->willReturn('default');
+
+        $manager = new DatabaseTransactionsManager;
+        $mock->setTransactionManager($manager);
+
+        $pdo->expects($this->exactly(2))->method('beginTransaction');
+        $pdo->expects($this->exactly(2))->method('commit')->willReturnOnConsecutiveCalls(
+            $this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')),
+            true,
+        );
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->once())->method('rollBack');
+
+        $attempt = 0;
+        $ran = [];
+
+        $result = $mock->transaction(function () use ($mock, &$attempt, &$ran) {
+            $currentAttempt = ++$attempt;
+
+            $mock->afterCommit(function () use (&$ran, $currentAttempt) {
+                $ran[] = $currentAttempt;
+            });
+
+            return 'success';
+        }, 2);
+
+        $this->assertSame('success', $result);
+        $this->assertSame([2], $ran);
+        $this->assertCount(0, $manager->getPendingTransactions());
+        $this->assertCount(0, $manager->getCommittedTransactions());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testTransactionRollsBackTransactionsManagerOnCommitFailureWithoutRetry()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection(['getName'], $pdo);
+        $mock->method('getName')->willReturn('default');
+
+        $manager = new DatabaseTransactionsManager;
+        $mock->setTransactionManager($manager);
+
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('commit')->willThrowException(new Exception('Commit failed'));
+
+        $ran = [];
+        $rollbackRan = false;
+
+        try {
+            $mock->transaction(function () use ($mock, &$ran, &$rollbackRan) {
+                $mock->afterCommit(function () use (&$ran) {
+                    $ran[] = 'inside';
+                });
+                $mock->afterRollBack(function () use (&$rollbackRan) {
+                    $rollbackRan = true;
+                });
+            });
+            $this->fail('Expected commit failure to throw.');
+        } catch (Exception $e) {
+            $this->assertSame('Commit failed', $e->getMessage());
+        }
+
+        $this->assertSame(0, $mock->transactionLevel());
+        $this->assertCount(0, $manager->getPendingTransactions());
+        $this->assertCount(0, $manager->getCommittedTransactions());
+        $this->assertSame([], $ran);
+        $this->assertTrue($rollbackRan);
+
+        $outsideRan = false;
+        $mock->afterCommit(function () use (&$outsideRan) {
+            $outsideRan = true;
+        });
+
+        $this->assertTrue($outsideRan);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionRetriesOnSerializationFailure()
     {
         $this->expectException(PDOException::class);
