@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -21,7 +20,7 @@ class TestSeeder extends Seeder
 
 class TestDepsSeeder extends Seeder
 {
-    public function run(Mock $someDependency, $someParam = '')
+    public function run(Container $someDependency, $someParam = '')
     {
         //
     }
