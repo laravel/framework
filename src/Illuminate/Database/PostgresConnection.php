@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\PostgresSchemaState;
 use Illuminate\Filesystem\Filesystem;
 use PDO;
+use RuntimeException;
 
 class PostgresConnection extends Connection
 {
@@ -99,6 +100,66 @@ class PostgresConnection extends Connection
         }
 
         return ['columns' => $columns, 'index' => $index];
+    }
+
+    /**
+     * Get the ID of the last committed transaction.
+     *
+     * @return string
+     */
+    public function getLastCommitId()
+    {
+        // Some examples recommend using pg_current_wal_insert_lsn(), but it can't be used reliably: When the last WAL
+        // record ends exactly at a page boundary, it points behind the header of the next page. This is a WAL position
+        // that a replica can't ever reach. The only way to have a replica acknowledging to have received this WAL is
+        // when more WAL records are written and that impossible position is superseded by new WAL blocks. So a simple
+        // read-after-write couldn't work until some other connection also commits a transaction.
+        return $this->usingWritePdo(fn () => $this->scalar('select pg_current_wal_lsn()'));
+    }
+
+    /**
+     * Calculate the commit ID for a set of commit IDs that includes all of them.
+     *
+     * @param  string[]  $values
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function mergeCommitIds(array $values)
+    {
+        if ($values === []) {
+            throw new RuntimeException("The list of commit IDs can't be empty.");
+        }
+
+        // LSNs are linear, so the newest one includes all older ones.
+        return $this->scalar('select value::pg_lsn from json_array_elements_text(?) order by 1 desc limit 1', [json_encode($values)]);
+    }
+
+    /**
+     * Determine if the given commit ID has been applied.
+     *
+     * @param  string  $value
+     * @param  int  $wait
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function hasCommitId(string $value, int $wait = 0)
+    {
+        if ($wait > 0) {
+            if (version_compare($this->getServerVersion(), '19', '<')) {
+                throw new RuntimeException('The PostgreSQL version does not support waiting for a commit ID. PostgreSQL 19 or newer is required.');
+            }
+
+            $status = $this->scalar("wait for lsn {$this->escapeString($value)} with (timeout {$this->escapeString("{$wait}s")}, no_throw)");
+
+            // A primary can't wait for its own LSNs, the normal wait = 0 check must be used.
+            if ($status !== 'not in recovery') {
+                return $status === 'success';
+            }
+        }
+
+        return $this->scalar('select case when pg_is_in_recovery() then pg_last_wal_replay_lsn() else pg_current_wal_insert_lsn() end >= ?::pg_lsn', [$value]);
     }
 
     /**
