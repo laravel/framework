@@ -228,6 +228,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareWithParametersCanBeSkipped()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('two', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/bar', ['middleware' => RoutingTestMiddlewareGroupTwo::class.':taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/baz', ['middleware' => 'two:taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware('two');
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
     public function testMiddlewareCanBeSkippedFromResources()
     {
         $router = $this->getRouter();
