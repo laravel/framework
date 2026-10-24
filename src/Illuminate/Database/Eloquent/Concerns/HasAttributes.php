@@ -1249,9 +1249,9 @@ trait HasAttributes
 
         $this->mergeAttributeFromCachedCasts($key);
 
-        $value = $this->asJson($this->getArrayAttributeWithValue(
+        $value = $this->castAttributeAsJson($key, $this->getArrayAttributeWithValue(
             $path, $key, $value
-        ), $this->getJsonCastFlags($key));
+        ));
 
         $this->attributes[$key] = match (true) {
             $this->isEncryptedCastable($key) => $this->castAttributeAsEncryptedString($key, $value),
