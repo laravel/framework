@@ -572,12 +572,7 @@ class Filesystem
     }
 
     /**
-     * Determine if the given path uses a stream wrapper that could trigger
-     * PHP object deserialization (e.g. phar://).
-     *
-     * PHP filesystem functions automatically deserialize the PHAR manifest
-     * when passed a phar:// URI, which can execute arbitrary code through
-     * gadget chains present in vendor dependencies.
+     * Determine if the given path uses a stream wrapper that could trigger PHP object deserialization.
      *
      * @param  string  $path
      * @return bool
