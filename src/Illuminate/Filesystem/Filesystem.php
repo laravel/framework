@@ -579,7 +579,15 @@ class Filesystem
      */
     protected function hasDangerousStreamWrapper($path)
     {
-        return str_starts_with(strtolower((string) $path), 'phar://');
+        $path = (string) $path;
+
+        if (! str_starts_with(strtolower($path), 'phar://')) {
+            return false;
+        }
+
+        $running = class_exists(\Phar::class, false) ? \Phar::running() : '';
+
+        return $running === '' || ! str_starts_with($path, $running.'/');
     }
 
     /**
