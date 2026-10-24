@@ -13,6 +13,13 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     use Concerns\ResolvesJsonApiRequest;
 
     /**
+     * The "data" wrapper that should be applied.
+     *
+     * @var string|null
+     */
+    public static $wrap = 'data';
+
+    /**
      * Get any additional data that should be returned with the resource array.
      *
      * @param  \Illuminate\Http\Request  $request

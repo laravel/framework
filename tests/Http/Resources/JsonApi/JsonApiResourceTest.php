@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http\Resources\JsonApi;
 
 use BadMethodCallException;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +21,13 @@ class JsonApiResourceTest extends TestCase
         JsonResource::wrap('laravel');
 
         $this->assertSame('data', JsonApiResource::$wrap);
+    }
+
+    public function testCollectionResponseWrapperIsHardCodedToData()
+    {
+        JsonResource::withoutWrapping();
+
+        $this->assertSame('data', AnonymousResourceCollection::$wrap);
     }
 
     public function testUnableToSetWrapper()
