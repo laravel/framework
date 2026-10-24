@@ -3,7 +3,10 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use Error;
+use Exception;
 use Illuminate\Database\DeadlockException;
+use ReflectionProperty;
 use RuntimeException;
 use Throwable;
 
@@ -104,7 +107,40 @@ trait ManagesTransactions
         // If there was an exception we will rollback this transaction and then we
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
-        $this->rollBack();
+        $currentTransaction = $this->transactions;
+
+        try {
+            $this->rollBack();
+        } catch (Throwable $rollbackException) {
+            if ($this->transactions >= $currentTransaction) {
+                $this->transactions = $this->causedByLostConnection($rollbackException)
+                    ? 0
+                    : max(0, $currentTransaction - 1);
+
+                $this->transactionsManager?->rollback(
+                    $this->getName(), $this->transactions
+                );
+            }
+
+            if ($rollbackException !== $e) {
+                try {
+                    $target = $e;
+                    while ($target->getPrevious() !== null && $target->getPrevious() !== $rollbackException) {
+                        $target = $target->getPrevious();
+                    }
+
+                    if ($target !== $rollbackException && $target->getPrevious() !== $rollbackException) {
+                        $class = $target instanceof Error ? Error::class : Exception::class;
+                        $prop = new ReflectionProperty($class, 'previous');
+                        $prop->setValue($target, $rollbackException);
+                    }
+                } catch (Throwable) {
+                    //
+                }
+            }
+
+            throw $e;
+        }
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
@@ -277,7 +313,17 @@ trait ManagesTransactions
         try {
             $this->performRollBack($toLevel);
         } catch (Throwable $e) {
+            $this->transactions = $toLevel;
+
+            $this->transactionsManager?->rollback(
+                $this->getName(), $this->transactions
+            );
+
             $this->handleRollBackException($e);
+
+            $this->fireConnectionEvent('rollingBack');
+
+            return;
         }
 
         $this->transactions = $toLevel;
