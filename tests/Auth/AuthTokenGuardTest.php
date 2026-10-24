@@ -51,6 +51,17 @@ class AuthTokenGuardTest extends TestCase
         $this->assertSame(1, $guard->id());
     }
 
+    public function testUserCannotBeRetrievedWithNonStringToken()
+    {
+        $provider = m::mock(UserProvider::class);
+        $provider->shouldNotReceive('retrieveByCredentials');
+        $request = Request::create('/', 'GET', ['api_token' => [0]]);
+
+        $guard = new TokenGuard($provider, $request);
+
+        $this->assertNull($guard->user());
+    }
+
     public function testUserCanBeRetrievedByAuthHeaders()
     {
         $provider = m::mock(UserProvider::class);
@@ -109,6 +120,17 @@ class AuthTokenGuardTest extends TestCase
         $guard = new TokenGuard($provider, $request);
 
         $this->assertFalse($guard->validate(['api_token' => '']));
+    }
+
+    public function testValidateRejectsNonStringToken()
+    {
+        $provider = m::mock(UserProvider::class);
+        $provider->shouldNotReceive('retrieveByCredentials');
+        $request = Request::create('/');
+
+        $guard = new TokenGuard($provider, $request);
+
+        $this->assertFalse($guard->validate(['api_token' => [0]]));
     }
 
     public function testItAllowsToPassCustomRequestInSetterAndUseItForValidation()
