@@ -529,6 +529,25 @@ class ContextualBindingTest extends TestCase
         $valueResolvedUsingFirstClassSyntax = $container->call($object->method(...));
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingFirstClassSyntax);
     }
+
+    public function testContextualBindingIsNotUsedWhenResolvingFromDependencyConstructor()
+    {
+        $container = Container::setInstance(new Container);
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container
+            ->when(ContainerTestContextInjectResolvingDependency::class)
+            ->needs(IContainerContextContractStub::class)
+            ->give(ContainerContextImplementationStubTwo::class);
+
+        $object = $container->make(ContainerTestContextInjectResolvingDependency::class);
+
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $object->impl);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $object->dependency->impl);
+
+        Container::setInstance(null);
+    }
 }
 
 interface IContainerContextContractStub
@@ -558,6 +577,28 @@ class ContainerTestContextInjectInstantiations implements IContainerContextContr
     public function __construct()
     {
         static::$instantiations++;
+    }
+}
+
+class ContainerTestContextResolvingInConstructor
+{
+    public $impl;
+
+    public function __construct()
+    {
+        $this->impl = Container::getInstance()->make(IContainerContextContractStub::class);
+    }
+}
+
+class ContainerTestContextInjectResolvingDependency
+{
+    public $dependency;
+    public $impl;
+
+    public function __construct(ContainerTestContextResolvingInConstructor $dependency, IContainerContextContractStub $impl)
+    {
+        $this->dependency = $dependency;
+        $this->impl = $impl;
     }
 }
 
