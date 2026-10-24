@@ -700,7 +700,7 @@ class BelongsToMany extends Relation
     public function firstOrCreate(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = (clone $this)->where($attributes)->first())) {
-            if (is_null($instance = $this->related->where($attributes)->first())) {
+            if (is_null($instance = $this->related->newQuery()->withoutGlobalScopes($this->query->removedScopes())->where($attributes)->first())) {
                 $instance = $this->createOrFirst($attributes, $values, $joining, $touch);
             } else {
                 try {
@@ -734,12 +734,50 @@ class BelongsToMany extends Relation
         }
 
         try {
-            return tap($this->related->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
+            return tap($this->related->newQuery()->withoutGlobalScopes($this->query->removedScopes())->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
         } catch (UniqueConstraintViolationException $e) {
             return (clone $this)->useWritePdo()->where($attributes)->first() ?? throw $e;
         }
+    }
+
+    /**
+     * Get the first record matching the attributes, including trashed records, and restore it. If the record is not found, create it.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     */
+    public function restoreOrCreate(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
+    {
+        $this->withTrashed();
+
+        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) {
+            $instance->restore();
+        });
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, find the matching record, including trashed records, and restore it.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
+     */
+    public function createOrRestore(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
+    {
+        $this->withTrashed();
+
+        return tap($this->createOrFirst($attributes, $values, $joining, $touch), function ($instance) {
+            $instance->restore();
+        });
     }
 
     /**
