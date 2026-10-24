@@ -460,6 +460,19 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the registered command instance with the given name, if any.
+     *
+     * @param  string  $name
+     * @return \Symfony\Component\Console\Command\Command|null
+     */
+    public function findCommand($name)
+    {
+        $artisan = $this->getArtisan();
+
+        return $artisan->has($name) ? $artisan->get($name) : null;
+    }
+
+    /**
      * Get all of the commands registered with the console.
      *
      * @return array

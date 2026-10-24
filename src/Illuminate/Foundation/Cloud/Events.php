@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Cloud;
 
-use Illuminate\Foundation\Cloud;
 use RuntimeException;
 use Throwable;
 
@@ -14,6 +13,13 @@ class Events
      * @var resource|null
      */
     protected $socket = null;
+
+    /**
+     * The cloud socket factory.
+     *
+     * @var callable|null
+     */
+    public static $socketFactory = null;
 
     /**
      * Create a new instance.
@@ -28,9 +34,13 @@ class Events
      *
      * @param  array<string, mixed>  $payload
      */
-    public function emit(array $payload): void
+    public function emit(array $payload): bool
     {
-        $this->emitMany([$payload]);
+        if ($payload === []) {
+            return true;
+        }
+
+        return $this->emitMany([$payload]);
     }
 
     /**
@@ -38,25 +48,25 @@ class Events
      *
      * @param  list<array<string, mixed>>  $payloads
      */
-    public function emitMany(array $payloads): void
+    public function emitMany(array $payloads): bool
     {
         if ($payloads === []) {
-            return;
+            return true;
         }
 
         try {
             $this->ensureConnected();
 
             $this->write($this->format($payloads));
+
+            return true;
         } catch (Throwable) {
-            //
+            return false;
         }
     }
 
     /**
      * Write the payload to the socket.
-     *
-     * @param  list<array<string, mixed>>  $payloads
      */
     protected function write(string $payload): void
     {
@@ -101,6 +111,8 @@ class Events
      * Format the payload.
      *
      * @param  list<array<string, mixed>>  $payloads
+     *
+     * @throws \JsonException
      */
     protected function format(array $payloads): string
     {
@@ -128,7 +140,12 @@ class Events
      */
     protected function connect(): void
     {
-        $socket = stream_socket_client(
+        $factory = static::$socketFactory ?? stream_socket_client(...);
+
+        $errorCode = null;
+        $errorMessage = null;
+
+        $socket = $factory(
             address: $this->address,
             error_code: $errorCode,
             error_message: $errorMessage,
