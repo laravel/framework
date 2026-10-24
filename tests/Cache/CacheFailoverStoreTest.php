@@ -8,11 +8,14 @@ use Illuminate\Cache\FailoverStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Events\Dispatcher;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class CacheFailoverStoreTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testImplementsCanFlushLocks()
     {
         $store = $this->makeFailoverStore([]);
@@ -28,9 +31,9 @@ class CacheFailoverStoreTest extends TestCase
         $storeA->lock('lock-a', 60)->get();
         $storeB->lock('lock-b', 60)->get();
 
-        $cache = Mockery::mock(CacheManager::class);
-        $cache->expects('store')->with('store-a')->andReturn(new Repository($storeA));
-        $cache->expects('store')->with('store-b')->andReturn(new Repository($storeB));
+        $cache = Double::for(CacheManager::class);
+        $cache->expects('store')->with('store-a')->returns(new Repository($storeA));
+        $cache->expects('store')->with('store-b')->returns(new Repository($storeB));
 
         $failover = new FailoverStore($cache, new Dispatcher, ['store-a', 'store-b']);
 
@@ -51,7 +54,7 @@ class CacheFailoverStoreTest extends TestCase
     protected function makeFailoverStore(array $stores): FailoverStore
     {
         return new FailoverStore(
-            Mockery::mock(CacheManager::class),
+            Double::for(CacheManager::class),
             new Dispatcher,
             $stores
         );

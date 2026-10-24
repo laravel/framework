@@ -19,12 +19,14 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -438,13 +440,13 @@ class MockedConnectionModel extends Model
 {
     public function getConnection()
     {
-        $mock = Mockery::mock(Connection::class);
+        $mock = Double::for(Connection::class);
         $grammar = new Grammar($mock);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $mock->allows('getQueryGrammar')->returns($grammar);
         $processor = new Processor;
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor);
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
+        $mock->allows('getPostProcessor')->returns($processor);
+        $mock->allows('getName')->returns('name');
+        $mock->allows('query')->resolves(function () use ($mock, $grammar, $processor) {
             return new BaseBuilder($mock, $grammar, $processor);
         });
 

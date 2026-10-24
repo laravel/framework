@@ -11,15 +11,16 @@ use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Mockery as m;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentAsVectorCastTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        m::close();
-
         Model::unsetConnectionResolver();
     }
 
@@ -139,9 +140,9 @@ class DatabaseEloquentAsVectorCastTest extends TestCase
 
     protected function useGrammar(string $grammar)
     {
-        $connection = m::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new $grammar($connection);
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->allows('getQueryGrammar')->returns($grammar);
 
         $resolver = new ConnectionResolver(['default' => $connection]);
         $resolver->setDefaultConnection('default');

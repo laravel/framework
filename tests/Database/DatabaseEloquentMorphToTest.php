@@ -14,13 +14,15 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\TestEnum;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -88,7 +90,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentMorphToModelStub;
 
@@ -101,7 +103,7 @@ class DatabaseEloquentMorphToTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentMorphToModelStub;
         $newModel->username = 'taylor';
@@ -117,7 +119,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentMorphToModelStub;
         $newModel->username = 'taylor';
@@ -211,9 +213,9 @@ class DatabaseEloquentMorphToTest extends TestCase
             }
         };
 
-        $builder = Mockery::mock(Builder::class);
+        $builder = Double::for(Builder::class);
         $related = new EloquentMorphToRelatedStub;
-        $builder->expects('getModel')->andReturn($related);
+        $builder->expects('getModel')->returns($related);
 
         $parent = new EloquentMorphToModelStub;
         $parent->morph_type = 'type_1';
@@ -225,8 +227,8 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $relation->addEagerConstraints([$parent]);
 
-        $result = Mockery::mock(Model::class);
-        $result->expects('getKey')->andReturn($uuidObject);
+        $result = Double::for(Model::class);
+        $result->expects('getKey')->returns($uuidObject);
 
         $relation->callMatchToMorphParents('type_1', new EloquentCollection([$result]));
 
@@ -258,16 +260,16 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function getRelation($parent = null, $builder = null)
     {
-        $this->builder = $builder ?: Mockery::mock(Builder::class);
-        $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = Mockery::mock(Model::class);
-        $this->related->shouldReceive('getKeyName')->andReturn('id');
-        $this->related->shouldReceive('getTable')->andReturn('relation');
-        $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
-        $this->builder->shouldReceive('getModel')->andReturn($this->related);
+        $this->builder = $builder ?: Double::for(Builder::class);
+        $this->builder->allows('where')->with('relation.id', '=', 'foreign.value');
+        $this->related = Double::for(Model::class);
+        $this->related->allows('getKeyName')->returns('id');
+        $this->related->allows('getTable')->returns('relation');
+        $this->related->allows('qualifyColumn')->resolves(fn (string $column) => "relation.{$column}");
+        $this->builder->allows('getModel')->returns($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
 
-        return Mockery::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
+        return Double::for(MorphTo::class)->passthru(new MorphTo($this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation'));
     }
 }
 

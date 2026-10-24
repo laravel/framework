@@ -7,11 +7,14 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Session\SessionManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class SessionManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testSetDefaultDriverAcceptsBackedEnum()
     {
         $app = new Container;
@@ -31,7 +34,7 @@ class SessionManagerTest extends TestCase
             'cache' => ['prefix' => 'cache_prefix', 'stores' => ['redis' => ['driver' => 'redis']]],
         ]));
         $app->singleton('cache', fn ($app) => new CacheManager($app));
-        $app->instance('redis', Mockery::mock(RedisFactory::class));
+        $app->instance('redis', Double::for(RedisFactory::class));
 
         $manager = new SessionManager($app);
 
@@ -46,7 +49,7 @@ class SessionManagerTest extends TestCase
             'cache' => ['prefix' => 'cache_prefix', 'stores' => ['redis' => ['driver' => 'redis']]],
         ]));
         $app->singleton('cache', fn ($app) => new CacheManager($app));
-        $app->instance('redis', Mockery::mock(RedisFactory::class));
+        $app->instance('redis', Double::for(RedisFactory::class));
 
         $manager = new SessionManager($app);
 

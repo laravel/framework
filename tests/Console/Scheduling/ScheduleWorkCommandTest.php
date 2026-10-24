@@ -7,8 +7,8 @@ use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -18,7 +18,7 @@ use Symfony\Component\Process\Process;
 
 class ScheduleWorkCommandTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
+    use VerifiesDoubles;
 
     /**
      * The signal availability resolver in place before the test ran.
@@ -82,13 +82,13 @@ class ScheduleWorkCommandTest extends TestCase
 
     public function test_in_flight_executions_finish_before_the_worker_quits()
     {
-        $execution = Mockery::mock(Process::class);
-        $execution->expects('getIncrementalOutput')->times(2)->andReturn('scheduled task ran', '');
-        $execution->expects('getIncrementalErrorOutput')->times(2)->andReturn('');
+        $execution = Double::for(Process::class);
+        $execution->expects('getIncrementalOutput')->times(2)->returns('scheduled task ran', '');
+        $execution->expects('getIncrementalErrorOutput')->times(2)->returns('');
 
         // The worker should poll the running execution after the signal arrives,
         // wait for it to report finished, and flush its output before quitting.
-        $execution->expects('isRunning')->times(2)->andReturn(true, false);
+        $execution->expects('isRunning')->times(2)->returns(true, false);
 
         $command = new ScheduleWorkCommandTestStub;
         $command->setOutput(new OutputStyle(new ArrayInput([]), $buffer = new BufferedOutput));

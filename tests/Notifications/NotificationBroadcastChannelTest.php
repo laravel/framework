@@ -8,20 +8,24 @@ use Illuminate\Notifications\Channels\BroadcastChannel;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;
         $notification->id = 1;
         $notifiable = new stdClass;
 
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(BroadcastNotificationCreated::class));
+        $events = Double::for(Dispatcher::class);
+        $events->expects('dispatch')->with(Argument::type(BroadcastNotificationCreated::class));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
@@ -77,8 +81,8 @@ class NotificationBroadcastChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = new stdClass;
 
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::on(function ($event) {
+        $events = Double::for(Dispatcher::class);
+        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
             return $event->connection === 'sync';
         }));
         $channel = new BroadcastChannel($events);
