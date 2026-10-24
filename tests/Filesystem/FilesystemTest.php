@@ -200,6 +200,27 @@ class FilesystemTest extends TestCase
         $this->assertTrue($files->missing(self::$tempDir.'/file.txt'));
     }
 
+    public function testExistsReturnsFalseForPharUri()
+    {
+        $files = new Filesystem;
+        $this->assertFalse($files->exists('phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->exists('PHAR:///some/archive.phar/entry'));
+    }
+
+    public function testIsFileReturnsFalseForPharUri()
+    {
+        $files = new Filesystem;
+        $this->assertFalse($files->isFile('phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->isFile('PHAR:///some/archive.phar/entry'));
+    }
+
+    public function testGetThrowsExceptionForPharUri()
+    {
+        $files = new Filesystem;
+        $this->expectException(FileNotFoundException::class);
+        $files->get('phar:///some/archive.phar/entry');
+    }
+
     public function testDeleteDirectory()
     {
         mkdir(self::$tempDir.'/foo');
