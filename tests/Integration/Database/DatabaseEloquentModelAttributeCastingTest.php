@@ -184,6 +184,26 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 
+    public function testMergingCastsDoesNotReindexNumericAttributes()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $model->setRawAttributes([
+            '2024' => 'foo',
+            'address_line_one' => '110 Kingsbrook St.',
+            'address_line_two' => 'My Childhood House',
+        ], true);
+
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
+
+        $this->assertSame([2024 => 'foo', 'address_line_one' => '110 Kingsbrook St.', 'address_line_two' => 'My Childhood House'], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+
+        $model->uppercase = 'taylor';
+
+        $this->assertSame([2024 => 'foo', 'address_line_one' => '110 Kingsbrook St.', 'address_line_two' => 'My Childhood House', 'uppercase' => 'TAYLOR'], $model->getAttributes());
+    }
+
     public function testCastsThatOnlyHaveGetterDoNotPersistAnythingToModelOnSave()
     {
         $model = new TestEloquentModelWithAttributeCast;

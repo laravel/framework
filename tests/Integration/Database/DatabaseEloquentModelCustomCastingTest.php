@@ -308,6 +308,22 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->dob->addDay();
         $this->assertSame('2000-11-12 11:11:00', $model->tob);
     }
+
+    public function testMergingCastsDoesNotReindexNumericAttributes()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            '2024' => 'foo',
+            'address_line_one' => '110 Kingsbrook St.',
+            'address_line_two' => 'My Childhood House',
+        ], true);
+
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
+
+        $this->assertSame([2024 => 'foo', 'address_line_one' => '110 Kingsbrook St.', 'address_line_two' => 'My Childhood House'], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model

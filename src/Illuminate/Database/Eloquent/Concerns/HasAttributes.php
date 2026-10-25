@@ -1208,7 +1208,7 @@ trait HasAttributes
             $this->attributes[$key] = $value;
         };
 
-        $this->attributes = array_merge(
+        $this->attributes = array_replace(
             $this->attributes,
             $this->normalizeCastClassResponse(
                 $key, $callback($value, $this->attributes)
@@ -2007,7 +2007,7 @@ trait HasAttributes
 
         $caster = $this->resolveCasterClass($key);
 
-        $this->attributes = array_merge(
+        $this->attributes = array_replace(
             $this->attributes,
             $caster instanceof CastsInboundAttributes
                 ? [$key => $value]
@@ -2050,7 +2050,7 @@ trait HasAttributes
             $this->attributes[$key] = $value;
         };
 
-        $this->attributes = array_merge(
+        $this->attributes = array_replace(
             $this->attributes,
             $this->normalizeCastClassResponse(
                 $key, $callback($value, $this->attributes)
