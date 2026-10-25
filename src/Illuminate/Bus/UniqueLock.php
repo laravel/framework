@@ -4,12 +4,12 @@ namespace Illuminate\Bus;
 
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\UniqueFor;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 
 class UniqueLock
 {
-    use ReadsQueueAttributes;
+    use ReadsClassAttributes;
 
     /**
      * The cache repository implementation.

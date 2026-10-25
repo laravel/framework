@@ -4,13 +4,13 @@ namespace Illuminate\Bus;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\DebounceFor;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 
 class DebounceLock
 {
-    use ReadsQueueAttributes;
+    use ReadsClassAttributes;
 
     /**
      * The cache repository implementation.
