@@ -39,8 +39,8 @@ class ArrayRule implements Stringable
     /**
      * The field under validation must have between the given min and max number of items (inclusive).
      *
-     * @param  int  $min
-     * @param  int  $max
+     * @param  non-negative-int  $min
+     * @param  non-negative-int  $max
      * @return $this
      */
     public function between(int $min, int $max): static
