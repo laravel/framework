@@ -287,6 +287,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testReleasedJobIsWrittenAsReleased()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         Queue::push(new ReleasingJob);
 
         $this->artisan('queue:work', [
