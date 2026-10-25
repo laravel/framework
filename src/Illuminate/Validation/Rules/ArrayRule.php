@@ -62,7 +62,7 @@ class ArrayRule implements Stringable
     /**
      * The field under validation must not have more than the given number of items.
      *
-     * @param  int  $value
+     * @param  non-negative-int  $value
      * @return $this
      */
     public function max(int $value): static
