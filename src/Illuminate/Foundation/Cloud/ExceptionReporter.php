@@ -133,6 +133,11 @@ class ExceptionReporter
     ];
 
     /**
+     * The memory reserved for reporting fatal errors.
+     */
+    public ?string $reservedMemory;
+
+    /**
      * Create a new Exception Reporter instance.
      *
      * @param  array{
@@ -150,6 +155,8 @@ class ExceptionReporter
         protected array $config,
     ) {
         $this->exceptionIds = new WeakMap;
+
+        $this->reservedMemory = str_repeat('x', 32768);
     }
 
     /**
@@ -157,6 +164,10 @@ class ExceptionReporter
      */
     public function __invoke(Throwable $e): ?bool
     {
+        if (HandleExceptions::$reservedMemory === null) {
+            $this->reservedMemory = null;
+        }
+
         $previousReportingViewException = $this->reportingViewException;
         $previousBladeMapper = $this->bladeMapper;
 
