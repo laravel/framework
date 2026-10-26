@@ -36,6 +36,7 @@ class RefreshDatabaseTest extends TestCase
         $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
+        RefreshDatabaseState::$inMemoryConnections = [];
     }
 
     protected function refreshApplication()
@@ -83,5 +84,22 @@ class RefreshDatabaseTest extends TestCase
         $this->assertSame([
             ['migrate:fresh', ['--drop-views' => false, '--drop-types' => true, '--seed' => false]],
         ], $kernel->calls);
+    }
+
+    public function testTestTransactionIsRolledBackWhenTheTestLeavesATransactionOpen()
+    {
+        $this->app['config']->set('database.default', 'testing');
+        $this->app['config']->set('database.connections.testing', ['driver' => 'sqlite', 'database' => ':memory:']);
+        $this->app->instance(ConsoleKernelContract::class, new ConsoleKernelSpy);
+
+        $this->refreshTestDatabase();
+
+        $pdo = $this->app['db']->connection()->getPdo();
+
+        $this->app['db']->connection()->beginTransaction();
+
+        $this->callBeforeApplicationDestroyedCallbacks();
+
+        $this->assertFalse($pdo->inTransaction());
     }
 }
