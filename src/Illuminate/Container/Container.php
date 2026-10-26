@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\BindWhen;
+use Illuminate\Container\Attributes\Lazy;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -1161,9 +1162,16 @@ class Container implements ArrayAccess, ContainerContract
             return $this->buildSelfBuildingInstance($concrete, $reflector);
         }
 
-        $this->buildStack[] = $concrete;
-
         $constructor = $reflector->getConstructor();
+
+        // If the class is marked as lazy, we will return a lazy ghost of it instead of
+        // building it right away. The class and its dependencies are only resolved
+        // once the instance is first used, which keeps unused services cheap.
+        if (! is_null($constructor) && $reflector->getAttributes(Lazy::class) !== []) {
+            return $this->buildLazyInstance($concrete, $reflector);
+        }
+
+        $this->buildStack[] = $concrete;
 
         // If there are no constructors, that means there are no dependencies then
         // we can just resolve the instances of the objects right away, without
@@ -1191,6 +1199,49 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->fireAfterResolvingAttributeCallbacks(
             $reflector->getAttributes(), $instance = new $concrete(...$instances)
+        );
+
+        return $instance;
+    }
+
+    /**
+     * Instantiate a lazy ghost of the given type that is built on first use.
+     *
+     * @template TClass of object
+     *
+     * @param  class-string<TClass>  $concrete
+     * @param  \ReflectionClass<TClass>  $reflector
+     * @return TClass
+     */
+    protected function buildLazyInstance($concrete, ReflectionClass $reflector)
+    {
+        // The instance is built later, so we capture the parameter overrides and the
+        // build stack now. This keeps contextual bindings and the parameters given
+        // to "make" working the same as they would if it was built right away.
+        $parameters = $this->getLastParameterOverride();
+
+        $buildStack = $this->buildStack;
+
+        $instance = $reflector->newLazyGhost(function ($instance) use ($concrete, $reflector, $parameters, $buildStack) {
+            [$previousBuildStack, $previousWith] = [$this->buildStack, $this->with];
+
+            $this->buildStack = [...$buildStack, $concrete];
+
+            $this->with[] = $parameters;
+
+            try {
+                $instance->__construct(...$this->resolveDependencies(
+                    $reflector->getConstructor()->getParameters()
+                ));
+            } finally {
+                $this->buildStack = $previousBuildStack;
+
+                $this->with = $previousWith;
+            }
+        });
+
+        $this->fireAfterResolvingAttributeCallbacks(
+            $reflector->getAttributes(), $instance
         );
 
         return $instance;
