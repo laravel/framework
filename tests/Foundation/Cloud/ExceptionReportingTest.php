@@ -3696,7 +3696,7 @@ class ExceptionReportingTest extends TestCase
     {
         $this->setupExceptionReporting();
 
-        $this->assertSame(32768, strlen($this->exceptionReporter()->reservedMemory));
+        $this->assertSame(32768, strlen($this->reservedMemory($this->exceptionReporter())));
     }
 
     public function testItKeepsTheReservedMemoryWhenReportingOtherExceptions(): void
@@ -3708,7 +3708,7 @@ class ExceptionReportingTest extends TestCase
         HandleExceptions::$reservedMemory = null;
         $reporter(new RuntimeException('Whoops!'));
 
-        $this->assertSame(32768, strlen($reporter->reservedMemory));
+        $this->assertSame(32768, strlen($this->reservedMemory($reporter)));
     }
 
     public function testItReleasesTheReservedMemoryWhenReportingFatalErrors(): void
@@ -3720,7 +3720,7 @@ class ExceptionReportingTest extends TestCase
         HandleExceptions::$reservedMemory = str_repeat('x', 32768);
         $reporter(new FatalError('Out of memory', 0, ['file' => __FILE__, 'line' => __LINE__], 0));
 
-        $this->assertNull($reporter->reservedMemory);
+        $this->assertNull($this->reservedMemory($reporter));
     }
 
     public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
@@ -4267,6 +4267,11 @@ class ExceptionReportingTest extends TestCase
         $this->iniSettingsToRestore['zend.exception_ignore_args'] ??= ini_get('zend.exception_ignore_args');
 
         ini_set('zend.exception_ignore_args', $capture ? '0' : '1');
+    }
+
+    protected function reservedMemory(ExceptionReporter $reporter): ?string
+    {
+        return (fn () => $this->reservedMemory)->call($reporter);
     }
 
     protected function setRunningInConsole(bool $runningInConsole): void
