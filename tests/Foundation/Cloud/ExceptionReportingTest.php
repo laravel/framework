@@ -14,6 +14,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Cloud\Events;
@@ -3695,6 +3696,37 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItReservesMemoryForReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+
+        $this->assertSame(32768, strlen($this->reservedMemory($this->exceptionReporter())));
+    }
+
+    public function testItKeepsTheReservedMemoryWhenReportingOtherExceptions(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = null;
+        $reporter(new RuntimeException('Whoops!'));
+
+        $this->assertSame(32768, strlen($this->reservedMemory($reporter)));
+    }
+
+    public function testItReleasesTheReservedMemoryWhenReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = str_repeat('x', 32768);
+        $reporter(new FatalError('Out of memory', 0, ['file' => __FILE__, 'line' => __LINE__], 0));
+
+        $this->assertNull($this->reservedMemory($reporter));
+    }
+
     public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
     {
         $this->setupExceptionReporting();
@@ -4244,6 +4276,11 @@ class ExceptionReportingTest extends TestCase
         $this->iniSettingsToRestore['zend.exception_ignore_args'] ??= ini_get('zend.exception_ignore_args');
 
         ini_set('zend.exception_ignore_args', $capture ? '0' : '1');
+    }
+
+    protected function reservedMemory(ExceptionReporter $reporter): ?string
+    {
+        return (fn () => $this->reservedMemory)->call($reporter);
     }
 
     protected function setRunningInConsole(bool $runningInConsole): void
