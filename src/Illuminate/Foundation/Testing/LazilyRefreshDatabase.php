@@ -6,6 +6,7 @@ trait LazilyRefreshDatabase
 {
     use RefreshDatabase {
         refreshDatabase as baseRefreshDatabase;
+        migrateDatabases as baseMigrateDatabases;
     }
 
     /**
@@ -45,5 +46,35 @@ trait LazilyRefreshDatabase
         $this->beforeApplicationDestroyed(function () {
             RefreshDatabaseState::$lazilyRefreshed = false;
         });
+    }
+
+    /**
+     * Migrate the database without dispatching query events to the running test.
+     *
+     * @return void
+     */
+    protected function migrateDatabases()
+    {
+        $database = $this->app->make('db');
+
+        $dispatchers = [];
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $connection = $database->connection($name);
+
+            $dispatchers[$name] = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+        }
+
+        try {
+            $this->baseMigrateDatabases();
+        } finally {
+            foreach ($dispatchers as $name => $dispatcher) {
+                if ($dispatcher) {
+                    $database->connection($name)->setEventDispatcher($dispatcher);
+                }
+            }
+        }
     }
 }
