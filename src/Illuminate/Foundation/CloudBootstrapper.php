@@ -156,14 +156,6 @@ class CloudBootstrapper
     }
 
     /**
-     * Register the events system for Laravel Cloud.
-     */
-    public static function registerEvents(Application $app): void
-    {
-        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
-    }
-
-    /**
      * Configure the Laravel Cloud exception reporting if applicable.
      *
      * @throws \JsonException
@@ -262,6 +254,14 @@ class CloudBootstrapper
         } catch (Throwable) {
             return;
         }
+    }
+
+    /**
+     * Register the events system for Laravel Cloud.
+     */
+    public static function registerEvents(Application $app): void
+    {
+        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
     }
 
     /**
