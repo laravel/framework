@@ -135,7 +135,7 @@ class ExceptionReporter
     /**
      * The memory reserved for reporting fatal errors.
      */
-    public ?string $reservedMemory;
+    protected ?string $reservedMemory;
 
     /**
      * Create a new Exception Reporter instance.
