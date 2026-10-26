@@ -16,7 +16,7 @@ $request = Request::create('/', 'GET', [
 assertType('TestEnum|null', $request->enum('key', TestEnum::class));
 assertType('TestEnum|TestEnum::Foo', $request->enum('key', TestEnum::class, TestEnum::Foo));
 
-assertType('Illuminate\Routing\Route', $request->route());
+assertType('Illuminate\Routing\Route|null', $request->route());
 assertType('object|string|null', $request->route('key'));
 
 assertType('Symfony\Component\HttpFoundation\InputBag', $request->json());
