@@ -12,6 +12,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\CloudBootstrapper as Cloud;
@@ -3695,6 +3696,37 @@ class ExceptionReportingTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testItReservesMemoryForReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+
+        $this->assertSame(32768, strlen($this->exceptionReporter()->reservedMemory));
+    }
+
+    public function testItKeepsTheReservedMemoryWhileLaravelHoldsItsOwn(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = str_repeat('x', 32768);
+        $reporter(new RuntimeException('Whoops!'));
+
+        $this->assertSame(32768, strlen($reporter->reservedMemory));
+    }
+
+    public function testItReleasesTheReservedMemoryOnceLaravelHasReleasedItsOwn(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = null;
+        $reporter(new FatalError('Out of memory', 0, ['file' => __FILE__, 'line' => __LINE__], 0));
+
+        $this->assertNull($reporter->reservedMemory);
     }
 
     public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
