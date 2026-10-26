@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -271,6 +272,33 @@ class SubMinuteSchedulingTest extends TestCase
 
         Sleep::assertSleptTimes(1200);
         $this->assertEquals(60, $runs);
+    }
+
+    public function test_sub_minute_events_stop_at_the_end_of_the_minute_when_clocks_go_back()
+    {
+        // Carbon::setTestNow() goes through the wall time of the default timezone, which hits the same
+        // ambiguity, so the clock stays in UTC and the date factory hands out Europe/Dublin times.
+        Date::useCallable(fn ($date) => $date->setTimezone('Europe/Dublin'));
+
+        try {
+            $runs = 0;
+            $this->schedule->call(function () use (&$runs) {
+                $runs++;
+            })->everyFiveSeconds();
+
+            // 01:10 IST, the first of the two 01:10s on the day Ireland's clocks go back
+            Carbon::setTestNow(Carbon::parse('2026-10-25 00:10:00', 'UTC'));
+            Sleep::fake();
+            Sleep::whenFakingSleep(fn ($duration) => Carbon::setTestNow(Carbon::now()->add($duration)));
+
+            $this->artisan('schedule:run')
+                ->expectsOutputToContain('Running [Callback]');
+
+            Sleep::assertSleptTimes(600);
+            $this->assertEquals(12, $runs);
+        } finally {
+            Date::useDefault();
+        }
     }
 
     public static function frequencyProvider()

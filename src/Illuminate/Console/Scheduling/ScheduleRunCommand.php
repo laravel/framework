@@ -240,7 +240,7 @@ class ScheduleRunCommand extends Command
     {
         $hasEnteredMaintenanceMode = false;
 
-        $endOfMinute = $this->startedAt->copy()->endOfMinute();
+        $endOfMinute = $this->startedAt->copy()->utc()->endOfMinute();
 
         while (Date::now()->lte($endOfMinute)) {
             $paused = $this->isPaused();
