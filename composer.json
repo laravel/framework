@@ -146,6 +146,7 @@
     },
     "suggest": {
         "ext-apcu": "Required to use the APC cache driver.",
+        "ext-bcmath": "Required to use the AsNumber Eloquent cast.",
         "ext-fileinfo": "Required to use the Filesystem class.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
