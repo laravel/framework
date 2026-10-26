@@ -164,7 +164,7 @@ class ExceptionReporter
      */
     public function __invoke(Throwable $e): ?bool
     {
-        if (HandleExceptions::$reservedMemory === null) {
+        if ($e instanceof FatalError) {
             $this->reservedMemory = null;
         }
 
