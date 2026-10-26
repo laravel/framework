@@ -1222,7 +1222,9 @@ class Container implements ArrayAccess, ContainerContract
 
         $buildStack = $this->buildStack;
 
-        $instance = $reflector->newLazyGhost(function ($instance) use ($concrete, $reflector, $parameters, $buildStack) {
+        // The callback returns the resolved constructor arguments, which the lazy()
+        // helper passes to the constructor when the instance is first used...
+        $instance = lazy($concrete, function () use ($concrete, $reflector, $parameters, $buildStack) {
             [$previousBuildStack, $previousWith] = [$this->buildStack, $this->with];
 
             $this->buildStack = [...$buildStack, $concrete];
@@ -1230,9 +1232,9 @@ class Container implements ArrayAccess, ContainerContract
             $this->with[] = $parameters;
 
             try {
-                $instance->__construct(...$this->resolveDependencies(
+                return $this->resolveDependencies(
                     $reflector->getConstructor()->getParameters()
-                ));
+                );
             } finally {
                 $this->buildStack = $previousBuildStack;
 
