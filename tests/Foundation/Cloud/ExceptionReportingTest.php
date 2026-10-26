@@ -3704,25 +3704,25 @@ class ExceptionReportingTest extends TestCase
         $this->assertSame(32768, strlen($this->exceptionReporter()->reservedMemory));
     }
 
-    public function testItKeepsTheReservedMemoryWhileLaravelHoldsItsOwn(): void
-    {
-        $this->setupExceptionReporting();
-        $this->fakeEventsStreams();
-        $reporter = $this->exceptionReporter();
-
-        HandleExceptions::$reservedMemory = str_repeat('x', 32768);
-        $reporter(new RuntimeException('Whoops!'));
-
-        $this->assertSame(32768, strlen($reporter->reservedMemory));
-    }
-
-    public function testItReleasesTheReservedMemoryOnceLaravelHasReleasedItsOwn(): void
+    public function testItKeepsTheReservedMemoryWhenReportingOtherExceptions(): void
     {
         $this->setupExceptionReporting();
         $this->fakeEventsStreams();
         $reporter = $this->exceptionReporter();
 
         HandleExceptions::$reservedMemory = null;
+        $reporter(new RuntimeException('Whoops!'));
+
+        $this->assertSame(32768, strlen($reporter->reservedMemory));
+    }
+
+    public function testItReleasesTheReservedMemoryWhenReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = str_repeat('x', 32768);
         $reporter(new FatalError('Out of memory', 0, ['file' => __FILE__, 'line' => __LINE__], 0));
 
         $this->assertNull($reporter->reservedMemory);
