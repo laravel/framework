@@ -82,6 +82,10 @@ class NotificationMakeCommand extends GeneratorCommand
             str_replace('.', $separator, $this->getView()).'.blade.php'
         );
 
+        if ($this->files->exists($path) && ! $this->option('force')) {
+            return $this->components->error(sprintf('%s [%s] already exists.', 'Markdown', $path));
+        }
+
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0755, true);
         }

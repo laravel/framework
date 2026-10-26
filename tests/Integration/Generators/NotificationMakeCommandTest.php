@@ -59,6 +59,42 @@ class NotificationMakeCommandTest extends TestCase
         ], 'resources/views/mail/foo-notification.blade.php');
     }
 
+    public function testErrorsWillBeDisplayedWhenMarkdownsAlreadyExist()
+    {
+        $this->app['files']->put(
+            $this->app->basePath('resources/views/foo-notification.blade.php'),
+            '<x-mail::message>My existing markdown</x-mail::message>'
+        );
+
+        $this->artisan('make:notification', ['name' => 'FooNotification', '--markdown' => 'foo-notification'])
+            ->expectsOutputToContain('already exists.')
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'class FooNotification extends Notification',
+            "return (new MailMessage)->markdown('foo-notification')",
+        ], 'app/Notifications/FooNotification.php');
+
+        $this->assertFileContains([
+            '<x-mail::message>My existing markdown</x-mail::message>',
+        ], 'resources/views/foo-notification.blade.php');
+    }
+
+    public function testExistingMarkdownCanBeOverwrittenWithForceOption()
+    {
+        $this->app['files']->put(
+            $this->app->basePath('resources/views/foo-notification.blade.php'),
+            '<x-mail::message>My existing markdown</x-mail::message>'
+        );
+
+        $this->artisan('make:notification', ['name' => 'FooNotification', '--markdown' => 'foo-notification', '--force' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileNotContains([
+            'My existing markdown',
+        ], 'resources/views/foo-notification.blade.php');
+    }
+
     public function testItCanGenerateNotificationFileWithTest()
     {
         $this->artisan('make:notification', ['name' => 'FooNotification', '--test' => true])
