@@ -37,7 +37,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -71,7 +71,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -104,7 +104,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -137,7 +137,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -169,7 +169,7 @@ jobs:
       - name: Setup PHP project
         uses: ./.github/actions/setup-php-project
         with:
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -201,7 +201,7 @@ jobs:
       - name: Setup PHP project
         uses: ./.github/actions/setup-php-project
         with:
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -235,7 +235,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_pgsql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -271,7 +271,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_pgsql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -307,7 +307,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, pdo_pgsql, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -341,7 +341,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -376,7 +376,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -402,7 +402,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, pcntl, pdo, sqlite, pdo_sqlite, :php-psr
 
       - name: Setup SQLite Database
         run: php vendor/bin/testbench package:create-sqlite-db
