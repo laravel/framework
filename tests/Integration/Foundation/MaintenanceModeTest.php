@@ -311,6 +311,29 @@ class MaintenanceModeTest extends TestCase
         ];
     }
 
+    public function testMaintenanceModeRetryDatetimeIsConvertedToGmt(): void
+    {
+        $timezone = date_default_timezone_get();
+
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31 15:30:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 14:30:00 GMT', $data['retry']);
+
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31T15:30:00+02:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 13:30:00 GMT', $data['retry']);
+        } finally {
+            date_default_timezone_set($timezone);
+        }
+    }
+
     public function testMaintenanceModeRetryWithHttpDateHeader(): void
     {
         $retryDate = Carbon::now()->addWeek();
