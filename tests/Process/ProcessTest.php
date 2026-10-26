@@ -281,6 +281,16 @@ class ProcessTest extends TestCase
         $this->assertFalse($result->successful());
     }
 
+    public function testProcessFakeExitCodeShorthandWhenStartingProcesses()
+    {
+        $factory = new Factory;
+        $factory->fake(['ls -la' => 1]);
+
+        $result = $factory->start('ls -la')->wait();
+        $this->assertSame(1, $result->exitCode());
+        $this->assertFalse($result->successful());
+    }
+
     public function testBasicProcessFakeWithCustomOutput()
     {
         $factory = new Factory;
@@ -499,6 +509,17 @@ class ProcessTest extends TestCase
         $factory->fake(['cat me' => new RuntimeException('fake exception message')]);
 
         $factory->run('cat me');
+    }
+
+    public function testProcessFakeThrowShorthandWhenStartingProcesses()
+    {
+        $this->expectExceptionObject(new RuntimeException('fake exception message'));
+
+        $factory = new Factory;
+
+        $factory->fake(['cat me' => new RuntimeException('fake exception message')]);
+
+        $factory->start('cat me');
     }
 
     public function testFakeProcessesCanThrow()
