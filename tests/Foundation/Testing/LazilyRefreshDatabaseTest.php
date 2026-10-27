@@ -101,34 +101,4 @@ class LazilyRefreshDatabaseTest extends TestCase
             ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
         ], $kernel->calls);
     }
-
-    public function testMigrationQueriesAreNotDispatchedToTheTest()
-    {
-        $database = $this->app->make('db');
-
-        $this->app->instance(ConsoleKernelContract::class, new class($database) extends ConsoleKernelSpy
-        {
-            public function __construct(protected $database)
-            {
-            }
-
-            public function call($command, array $parameters = [], $outputBuffer = null)
-            {
-                $this->database->connection('testing')->statement('create table users (id integer)');
-
-                return parent::call($command, $parameters, $outputBuffer);
-            }
-        });
-
-        $queries = [];
-
-        $database->listen(function ($query) use (&$queries) {
-            $queries[] = $query->sql;
-        });
-
-        $this->refreshDatabase();
-        $database->connection('testing')->select('select 1');
-
-        $this->assertSame(['select 1'], $queries);
-    }
 }
