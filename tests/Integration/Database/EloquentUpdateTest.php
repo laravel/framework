@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
@@ -31,6 +32,11 @@ class EloquentUpdateTest extends DatabaseTestCase
             $table->unsignedInteger('counter');
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::create('test_wallets', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('balance');
         });
 
         Schema::create('test_model4', function (Blueprint $table) {
@@ -190,6 +196,22 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(['counter' => 0], $model->getPrevious());
     }
 
+    public function testIncrementAndDecrementOnAttributeWithAccessor()
+    {
+        $wallet = TestUpdateWallet::create(['balance' => 10]);
+
+        $wallet->increment('balance', 250);
+
+        $this->assertEquals(12.5, $wallet->balance);
+        $this->assertEquals(12.5, $wallet->fresh()->balance);
+        $this->assertFalse($wallet->isDirty());
+
+        $wallet->decrementEach(['balance' => 50]);
+
+        $this->assertEquals(12, $wallet->balance);
+        $this->assertEquals(12, $wallet->fresh()->balance);
+    }
+
     public function testIncrementEachOnModelInstanceOnlyAffectsThatRow()
     {
         $post1 = TestUpdateModel4::create(['views' => 10, 'likes' => 5]);
@@ -341,4 +363,19 @@ class TestUpdateModel5 extends Model
     public $table = 'test_model4';
     protected $fillable = ['views', 'likes', 'name'];
     protected $casts = ['name' => 'encrypted'];
+}
+
+class TestUpdateWallet extends Model
+{
+    public $table = 'test_wallets';
+    public $timestamps = false;
+    protected $guarded = [];
+
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value / 100,
+            set: fn ($value) => (int) round($value * 100),
+        );
+    }
 }

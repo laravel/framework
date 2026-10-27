@@ -1145,9 +1145,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->newQueryWithoutRelationships()->{$method}($column, $amount, $extra);
         }
 
-        $this->{$column} = $this->isClassDeviable($column)
-            ? $this->deviateClassCastableAttribute($method, $column, $amount)
-            : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+        $this->applyIncrementOrDecrementToAttribute($column, $amount, $method);
 
         $this->forceFill($extra);
 
@@ -1170,6 +1168,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->syncOriginalAttributes(array_merge([$column], $this->refreshes));
         });
+    }
+
+    /**
+     * Apply an increment or decrement to the model's in-memory attribute value.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @param  string  $method
+     * @return void
+     */
+    protected function applyIncrementOrDecrementToAttribute($column, $amount, $method)
+    {
+        if ($this->isClassDeviable($column)) {
+            $this->{$column} = $this->deviateClassCastableAttribute($method, $column, $amount);
+
+            return;
+        }
+
+        $amount = $method === 'increment' ? $amount : $amount * -1;
+
+        if ($this->hasGetMutator($column) || $this->hasAttributeGetMutator($column)) {
+            $this->attributes[$column] = $this->getAttributeFromArray($column) + $amount;
+
+            unset($this->attributeCastCache[$column]);
+
+            return;
+        }
+
+        $this->{$column} = $this->{$column} + $amount;
     }
 
     /**
@@ -1322,9 +1349,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $singleMethod = $isIncrement ? 'increment' : 'decrement';
 
         foreach ($columns as $column => $amount) {
-            $this->{$column} = $this->isClassDeviable($column)
-                ? $this->deviateClassCastableAttribute($singleMethod, $column, $amount)
-                : $this->{$column} + ($isIncrement ? $amount : $amount * -1);
+            $this->applyIncrementOrDecrementToAttribute($column, $amount, $singleMethod);
         }
 
         $this->forceFill($extra);
