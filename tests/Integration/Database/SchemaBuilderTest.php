@@ -817,4 +817,25 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
         $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
     }
+
+    #[RequiresDatabase(['mysql', 'mariadb', 'pgsql'])]
+    public function testStartingValueForAutoIncrementingColumn()
+    {
+        Schema::create('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->from(100);
+            $table->string('name');
+        });
+
+        $id = DB::table('test')->insertGetId(['name' => 'foo']);
+
+        $this->assertSame(100, $id);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->from(200)->change();
+        });
+
+        $id = DB::table('test')->insertGetId(['name' => 'bar']);
+
+        $this->assertSame(200, $id);
+    }
 }
