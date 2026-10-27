@@ -25,3 +25,8 @@ enum TestIntegerBackedEnum: int
     case zero = 0;
     case plus_1 = 1;
 }
+
+enum TestEmptyStringBackedEnum: string
+{
+    case Empty = '';
+}

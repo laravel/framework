@@ -7,6 +7,7 @@ use Carbon\Unit;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\Support\Fixtures\TestEmptyStringBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestEnum;
 use Illuminate\Tests\Support\Fixtures\TestIntegerBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
@@ -318,7 +319,7 @@ trait TestsInteractsWithDataContract
     {
         $data = static::arrayToDataFactory(['status' => 'A', 'invalid' => 'invalid', 'empty' => '']);
 
-        $status = $invalid = $empty = $unit = $missing = $default = false;
+        $status = $invalid = $empty = $emptyCase = $unit = $missing = $default = false;
 
         $data->whenEnum('status', TestStringBackedEnum::class, function ($value) use (&$status) {
             $status = $value;
@@ -330,6 +331,10 @@ trait TestsInteractsWithDataContract
 
         $data->whenEnum('empty', TestStringBackedEnum::class, function ($value) use (&$empty) {
             $empty = $value;
+        });
+
+        $data->whenEnum('empty', TestEmptyStringBackedEnum::class, function ($value) use (&$emptyCase) {
+            $emptyCase = $value;
         });
 
         $data->whenEnum('status', TestEnum::class, function ($value) use (&$unit) {
@@ -345,6 +350,7 @@ trait TestsInteractsWithDataContract
         $this->assertSame(TestStringBackedEnum::A, $status);
         $this->assertFalse($invalid);
         $this->assertFalse($empty);
+        $this->assertFalse($emptyCase);
         $this->assertFalse($unit);
         $this->assertFalse($missing);
         $this->assertTrue($default);
@@ -691,6 +697,7 @@ trait TestsInteractsWithDataContract
 
         $this->assertNull($data->enum('invalid_enum_value', TestStringBackedEnum::class));
         $this->assertNull($data->enum('empty_value', TestStringBackedEnum::class));
+        $this->assertNull($data->enum('empty_value', TestEmptyStringBackedEnum::class));
         $this->assertNull($data->enum('valid_enum_value', TestEnum::class));
 
         $this->assertSame(TestStringBackedEnum::B, $data->enum('invalid_enum_value', TestStringBackedEnum::class, TestStringBackedEnum::B));
@@ -722,6 +729,7 @@ trait TestsInteractsWithDataContract
             'invalid_enum_values' => ['invalid', 'invalid'],
             'single_value' => 'B',
             'integer_values' => ['-1', '0', '1'],
+            'empty_value' => '',
         ]);
 
         $this->assertSame([], $data->enums('missing_key', TestStringBackedEnum::class));
@@ -731,6 +739,7 @@ trait TestsInteractsWithDataContract
         $this->assertSame([TestStringBackedEnum::A], $data->enums('mixed_enum_values', TestStringBackedEnum::class));
         $this->assertSame([], $data->enums('invalid_enum_values', TestStringBackedEnum::class));
         $this->assertSame([TestStringBackedEnum::B], $data->enums('single_value', TestStringBackedEnum::class));
+        $this->assertSame([], $data->enums('empty_value', TestEmptyStringBackedEnum::class));
 
         $this->assertSame([TestIntegerBackedEnum::minus_1, TestIntegerBackedEnum::zero, TestIntegerBackedEnum::plus_1], $data->enums('integer_values', TestIntegerBackedEnum::class));
     }
