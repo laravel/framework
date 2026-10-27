@@ -17,6 +17,7 @@ include_once dirname(__DIR__).'/Fixtures/Enums.php';
 
 trait TestsInteractsWithDataContract
 {
+    /** @return \Illuminate\Support\Traits\InteractsWithData */
     abstract protected static function arrayToDataFactory(array $data);
 
     protected function assertDataExistsContract()
