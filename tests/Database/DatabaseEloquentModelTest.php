@@ -2528,6 +2528,22 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
+    public function testModelJsonPathCastingFailsOnUnencodableData()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->jsonAttribute = ['theme' => 'dark'];
+
+        try {
+            $model->{'jsonAttribute->name'} = "b\xF8r";
+
+            $this->fail('JsonEncodingException was not thrown.');
+        } catch (JsonEncodingException $e) {
+            $this->assertSame('Unable to encode attribute [jsonAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.', $e->getMessage());
+        }
+
+        $this->assertSame(['theme' => 'dark'], $model->jsonAttribute);
+    }
+
     public function testModelAttributeCastingFailsOnUnencodableDataWithUnicode()
     {
         $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [jsonAttributeWithUnicode] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
@@ -2536,6 +2552,19 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttributeWithUnicode = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
+    }
+
+    #[TestWith(['asarrayobjectAttribute'])]
+    #[TestWith(['ascollectionAttribute'])]
+    #[TestWith(['asFluentAttribute'])]
+    #[TestWith(['asEncryptedArrayObjectAttribute'])]
+    #[TestWith(['asEncryptedCollectionAttribute'])]
+    public function testObjectCastsFailOnUnencodableData(string $attribute)
+    {
+        $this->expectExceptionObject(new JsonEncodingException("Unable to encode attribute [{$attribute}] for model [Illuminate\\Tests\\Database\\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded."));
+
+        $model = new EloquentModelCastingStub;
+        $model->{$attribute} = ['foo' => "b\xF8r"];
     }
 
     public function testJsonCastingRespectsUnicodeOption()

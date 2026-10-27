@@ -223,15 +223,21 @@ class SyncQueue extends Queue implements QueueContract
         try {
             $this->raiseBeforeJobEvent($queueJob);
 
-            $queueJob->fire();
+            $startedAt = hrtime(true);
 
-            $this->raiseAfterJobEvent($queueJob);
+            try {
+                $queueJob->fire();
+            } finally {
+                $duration = round((hrtime(true) - $startedAt) / 1e6, 2);
+            }
+
+            $this->raiseAfterJobEvent($queueJob, $duration);
         } catch (Throwable $e) {
             $exceptionOccurred = $e;
 
             $this->handleException($queueJob, $e);
         } finally {
-            $this->raiseJobAttemptedEvent($queueJob, $exceptionOccurred ?? null);
+            $this->raiseJobAttemptedEvent($queueJob, $exceptionOccurred ?? null, $duration ?? null);
         }
 
         return 0;
@@ -266,12 +272,13 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the after queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  float|null  $duration
      * @return void
      */
-    protected function raiseAfterJobEvent(Job $job)
+    protected function raiseAfterJobEvent(Job $job, $duration = null)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job));
+            $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job, $duration));
         }
     }
 
@@ -280,12 +287,13 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Throwable|null  $exceptionOccurred
+     * @param  float|null  $duration
      * @return void
      */
-    protected function raiseJobAttemptedEvent(Job $job, ?Throwable $exceptionOccurred = null)
+    protected function raiseJobAttemptedEvent(Job $job, ?Throwable $exceptionOccurred = null, $duration = null)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobAttempted($this->connectionName, $job, $exceptionOccurred));
+            $this->container['events']->dispatch(new JobAttempted($this->connectionName, $job, $exceptionOccurred, $duration));
         }
     }
 

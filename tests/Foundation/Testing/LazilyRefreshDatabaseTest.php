@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Testing\Attributes\WithoutMigrationEvents;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
@@ -101,5 +102,36 @@ class LazilyRefreshDatabaseTest extends TestCase
         $this->assertSame([
             ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
         ], $kernel->calls);
+    }
+
+    #[WithoutMigrationEvents]
+    public function testMigrationQueriesAreNotDispatchedToTheTestMethod()
+    {
+        $database = $this->app->make('db');
+
+        $this->app->instance(ConsoleKernelContract::class, new class($database) extends ConsoleKernelSpy
+        {
+            public function __construct(protected $database)
+            {
+            }
+
+            public function call($command, array $parameters = [], $outputBuffer = null)
+            {
+                $this->database->connection('testing')->select('select 2');
+
+                return parent::call($command, $parameters, $outputBuffer);
+            }
+        });
+
+        $queries = [];
+
+        $database->listen(function ($query) use (&$queries) {
+            $queries[] = $query->sql;
+        });
+
+        $this->refreshDatabase();
+        $database->connection('testing')->select('select 1');
+
+        $this->assertSame(['select 1'], $queries);
     }
 }

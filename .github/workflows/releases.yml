@@ -80,7 +80,7 @@ jobs:
 
       - name: Generate release notes
         id: generated-notes
-        uses: RedCrafter07/release-notes-action@31674bfa3a219e7c661fc0c5b7b3851c741b9965 # main
+        uses: RedCrafter07/release-notes-action@304edb57ff4d0cb822b39a00556c015790dee977 # main
         with:
           tag-name: v${{ steps.version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}

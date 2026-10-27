@@ -648,6 +648,18 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($guard->viaRemember());
     }
 
+    public function testUserReturnsNullWhenRememberCookieHasEmptyToken()
+    {
+        $guard = $this->getGuard();
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id||baz']);
+        $guard = new SessionGuard('default', $provider, $session, $request);
+        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
+        $guard->getProvider()->shouldReceive('retrieveByToken')->never();
+        $this->assertNull($guard->user());
+        $this->assertFalse($guard->viaRemember());
+    }
+
     public function testUserReturnsNullWhenRecallerUserHasNullPassword()
     {
         $guard = $this->getGuard();

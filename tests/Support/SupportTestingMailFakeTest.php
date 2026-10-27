@@ -389,6 +389,15 @@ class SupportTestingMailFakeTest extends TestCase
         }
     }
 
+    public function testRawHtmlAndPlainMessagesAreNotSent()
+    {
+        $this->fake->raw('Hello', fn ($message) => $message->to('taylor@laravel.com'));
+        $this->fake->html('<p>Hello</p>', fn ($message) => $message->to('taylor@laravel.com'));
+        $this->fake->plain('emails.welcome', [], fn ($message) => $message->to('taylor@laravel.com'));
+
+        $this->fake->assertNothingOutgoing();
+    }
+
     public function testAssertOutgoingCount()
     {
         $this->fake->assertNothingOutgoing();
