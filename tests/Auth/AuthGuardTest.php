@@ -654,8 +654,8 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id||baz']);
         $guard = new SessionGuard('default', $provider, $session, $request);
-        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
-        $guard->getProvider()->shouldReceive('retrieveByToken')->never();
+        $guard->getSession()->expects('get')->with($guard->getName())->returns(null);
+        $guard->getProvider()->expects('retrieveByToken')->never();
         $this->assertNull($guard->user());
         $this->assertFalse($guard->viaRemember());
     }
