@@ -197,7 +197,7 @@ class DownCommand extends Command
             $expiresAt = null;
         }
 
-        if (is_null($expiresAt) || $expiresAt->isNowOrPast()) {
+        if (is_null($expiresAt) || ! $expiresAt->isFuture()) {
             throw new InvalidArgumentException('The limit must be a number of seconds or a datetime in the future');
         }
 
