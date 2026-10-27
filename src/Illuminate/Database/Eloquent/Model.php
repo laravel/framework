@@ -477,6 +477,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->incrementing = false;
         } elseif ($table && $table->incrementing !== null) {
             $this->incrementing = $table->incrementing;
+        } elseif ($table && $table->key === false && is_null($this->primaryKey)) {
+            $this->incrementing = false;
         }
 
         if ($this->refreshes === []) {
