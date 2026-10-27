@@ -421,17 +421,58 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
-        // While allowing failures this batch never actually completes...
         $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
         $this->assertEquals(2, $batch->failedJobs);
-        $this->assertFalse($batch->finished());
+        $this->assertTrue($batch->finished());
+        $this->assertTrue($_SERVER['__finally.batch']->finished());
         $this->assertFalse($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals(2, $_SERVER['__progress.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
+    }
+
+    public function test_batch_allowing_failures_is_finished_when_the_last_job_succeeds_after_a_failure()
+    {
+        $queue = Mockery::mock(Factory::class);
+
+        $batch = $this->createTestBatch($queue, $allowFailures = true);
+
+        $connection = Mockery::mock(QueueContract::class);
+        $queue->expects('connection')
+            ->with('test-connection')
+            ->andReturn($connection);
+
+        $connection->expects('bulk');
+
+        $batch = $batch->add([new class
+        {
+            use Batchable;
+        }, new class
+        {
+            use Batchable;
+        }]);
+
+        $batch->recordFailedJob('first-id', new RuntimeException('Something went wrong.'));
+
+        $this->assertFalse($batch->fresh()->finished());
+
+        $batch->recordSuccessfulJob('second-id');
+
+        $batch = $batch->fresh();
+        $this->assertTrue($batch->finished());
+        $this->assertEquals(1, $batch->pendingJobs);
+        $this->assertSame(['first-id'], $batch->failedJobIds);
+        $this->assertEquals(0, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
+        $this->assertTrue($_SERVER['__finally.batch']->finished());
+
+        $batch->recordSuccessfulJob('first-id');
+
+        $this->assertSame([], $batch->fresh()->failedJobIds);
+        $this->assertEquals(1, $_SERVER['__then.count']);
     }
 
     public function test_pending_batch_filters_out_falsy_jobs()
