@@ -12,14 +12,26 @@ class EloquentRelationRestoreOrCreateTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
+        Schema::create('countries', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('country_id')->nullable();
         });
 
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->nullable();
             $table->string('title');
+            $table->softDeletes();
+        });
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id')->nullable();
+            $table->string('body')->unique();
             $table->softDeletes();
         });
 
@@ -64,6 +76,42 @@ class EloquentRelationRestoreOrCreateTest extends DatabaseTestCase
 
         $this->assertEquals($user->id, $created->user_id);
         $this->assertEquals($user->id, Post::where('title', 'Draft')->value('user_id'));
+    }
+
+    public function testRestoreOrCreateOnHasManyThrough()
+    {
+        $country = Country::create();
+        $otherUser = User::create(['country_id' => Country::create()->id]);
+        $user = User::create(['country_id' => $country->id]);
+
+        $otherUser->posts()->create(['title' => 'Other'])->delete();
+        $otherUser->posts()->create(['title' => 'Other'])->delete();
+        $post = $user->posts()->create(['title' => 'Draft']);
+        $post->delete();
+
+        $restored = $country->posts()->restoreOrCreate(['title' => 'Draft']);
+
+        $this->assertTrue($restored->is($post));
+        $this->assertFalse($post->fresh()->trashed());
+        $this->assertSame(2, Post::onlyTrashed()->where('title', 'Other')->count());
+    }
+
+    public function testCreateOrRestoreOnHasManyThrough()
+    {
+        $country = Country::create();
+        $otherUser = User::create(['country_id' => Country::create()->id]);
+        $user = User::create(['country_id' => $country->id]);
+
+        $otherUser->comments()->create(['body' => 'First'])->delete();
+        $otherUser->comments()->create(['body' => 'Second'])->delete();
+        $comment = $user->comments()->create(['body' => 'Draft']);
+        $comment->delete();
+
+        $restored = $country->comments()->createOrRestore(['body' => 'Draft']);
+
+        $this->assertTrue($restored->is($comment));
+        $this->assertFalse($comment->fresh()->trashed());
+        $this->assertSame(2, Comment::onlyTrashed()->count());
     }
 
     public function testRestoreOrCreateOnBelongsToMany()
@@ -113,13 +161,35 @@ class EloquentRelationRestoreOrCreateTest extends DatabaseTestCase
     }
 }
 
-class User extends Model
+class Country extends Model
 {
     public $timestamps = false;
 
     public function posts()
     {
+        return $this->hasManyThrough(Post::class, User::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasManyThrough(Comment::class, User::class);
+    }
+}
+
+class User extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    public function posts()
+    {
         return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function roles()
@@ -129,6 +199,15 @@ class User extends Model
 }
 
 class Post extends Model
+{
+    use SoftDeletes;
+
+    public $timestamps = false;
+
+    protected $guarded = [];
+}
+
+class Comment extends Model
 {
     use SoftDeletes;
 
