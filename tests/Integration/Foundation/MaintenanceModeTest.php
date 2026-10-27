@@ -11,9 +11,11 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
+use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Mockery;
@@ -55,8 +57,7 @@ class MaintenanceModeTest extends TestCase
     {
         $cache = Mockery::mock(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
-        $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
-        $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
+        $cache->shouldReceive('get')->with('framework:down')->andReturn(['retry' => 60], null);
 
         $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
             $cache, 'maintenance', 'framework:down'
@@ -424,6 +425,7 @@ class MaintenanceModeTest extends TestCase
 
         $this->get('/foo')->assertOk()->assertSeeText('Hello World');
         $this->assertFalse($this->app->isDownForMaintenance());
+        $this->assertFileDoesNotExist(storage_path('framework/down'));
     }
 
     public function testMaintenanceModeCanBeLimitedToDatetime()
@@ -512,8 +514,56 @@ class MaintenanceModeTest extends TestCase
         $this->assertTrue($this->app->maintenanceMode()->active());
     }
 
+    public function testFileMaintenanceModeIsDisabledOnceLimitExpires()
+    {
+        Event::fake();
+
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $this->artisan(DownCommand::class, ['--limit' => 60])->assertSuccessful();
+
+        Carbon::setTestNow('2026-01-01 00:01:00');
+
+        $this->assertFalse($this->app->isDownForMaintenance());
+        $this->assertFalse($this->app->isDownForMaintenance());
+        $this->assertFileDoesNotExist(storage_path('framework/down'));
+        $this->assertFileDoesNotExist(storage_path('framework/maintenance.php'));
+
+        $this->artisan(UpCommand::class)->expectsOutputToContain('Application is already up.');
+
+        Event::assertDispatchedTimes(MaintenanceModeDisabled::class, 1);
+    }
+
+    public function testFileMaintenanceModeLetsASingleProcessRemoveTheExpiredFile()
+    {
+        Event::fake();
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'expires_at' => Carbon::now()->subSecond()->getTimestamp(),
+        ]));
+
+        $maintenanceMode = new class($this->app['events']) extends FileBasedMaintenanceMode
+        {
+            public function data(): array
+            {
+                $data = parent::data();
+
+                // Another process removes the expired file first...
+                unlink($this->path());
+
+                return $data;
+            }
+        };
+
+        $this->assertFalse($maintenanceMode->active());
+
+        Event::assertNotDispatched(MaintenanceModeDisabled::class);
+    }
+
     public function testCacheMaintenanceModeCanBeLimited()
     {
+        Event::fake();
+
         $this->app['config']->set('app.maintenance.driver', 'cache');
         $this->app['config']->set('app.maintenance.store', 'array');
 
@@ -526,6 +576,10 @@ class MaintenanceModeTest extends TestCase
         Carbon::setTestNow('2026-01-01 00:01:00');
 
         $this->assertFalse($this->app->isDownForMaintenance());
+        $this->assertFalse($this->app->isDownForMaintenance());
+        $this->assertNull(Cache::store('array')->get('illuminate:foundation:down'));
+
+        Event::assertDispatchedTimes(MaintenanceModeDisabled::class, 1);
     }
 
     public function testPrerenderedMaintenanceFileAllowsRequestsToReachFrameworkOnceExpired()

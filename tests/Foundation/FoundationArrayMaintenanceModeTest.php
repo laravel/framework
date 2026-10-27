@@ -2,19 +2,15 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\ArrayMaintenanceMode;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Support\Carbon;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FoundationArrayMaintenanceModeTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function test_it_determines_whether_maintenance_mode_is_active()
     {
         $manager = new ArrayMaintenanceMode();
@@ -54,16 +50,23 @@ class FoundationArrayMaintenanceModeTest extends TestCase
         $this->assertSame([], $manager->data());
     }
 
-    public function test_it_is_no_longer_active_once_expired()
+    public function test_it_is_deactivated_once_expired()
     {
         Carbon::setTestNow('2026-01-01 00:00:00');
 
-        $manager = new ArrayMaintenanceMode();
+        $events = Mockery::spy(Dispatcher::class);
+
+        $manager = new ArrayMaintenanceMode($events);
 
         $manager->activate(['expires_at' => Carbon::now()->addMinute()->getTimestamp()]);
         $this->assertTrue($manager->active());
 
         Carbon::setTestNow('2026-01-01 00:01:00');
+
         $this->assertFalse($manager->active());
+        $this->assertFalse($manager->active());
+        $this->assertSame([], $manager->data());
+
+        $events->shouldHaveReceived('dispatch')->once()->with(Mockery::type(MaintenanceModeDisabled::class));
     }
 }

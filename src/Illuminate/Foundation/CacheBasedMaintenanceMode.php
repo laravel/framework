@@ -4,7 +4,9 @@ namespace Illuminate\Foundation;
 
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Support\Carbon;
 
 class CacheBasedMaintenanceMode implements MaintenanceMode
@@ -31,17 +33,26 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
     protected $key;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $events;
+
+    /**
      * Create a new cache based maintenance mode implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @param  string  $store
      * @param  string  $key
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      */
-    public function __construct(Factory $cache, string $store, string $key)
+    public function __construct(Factory $cache, string $store, string $key, ?Dispatcher $events = null)
     {
         $this->cache = $cache;
         $this->store = $store;
         $this->key = $key;
+        $this->events = $events;
     }
 
     /**
@@ -52,11 +63,7 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
      */
     public function activate(array $payload): void
     {
-        $this->getStore()->put(
-            $this->key,
-            $payload,
-            isset($payload['expires_at']) ? Carbon::createFromTimestamp($payload['expires_at']) : null
-        );
+        $this->getStore()->put($this->key, $payload);
     }
 
     /**
@@ -76,7 +83,26 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
      */
     public function active(): bool
     {
-        return $this->getStore()->has($this->key);
+        $payload = $this->getStore()->get($this->key);
+
+        if (is_null($payload)) {
+            return false;
+        }
+
+        $expiresAt = $payload['expires_at'] ?? null;
+
+        if (is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt) {
+            return true;
+        }
+
+        // Not every store reports whether forget() removed the key, so add() elects a single process...
+        if ($this->getStore()->add("{$this->key}:expired:{$expiresAt}", true, 60)) {
+            $this->getStore()->forget($this->key);
+
+            $this->events?->dispatch(new MaintenanceModeDisabled());
+        }
+
+        return false;
     }
 
     /**

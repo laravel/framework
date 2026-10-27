@@ -3,12 +3,31 @@
 namespace Illuminate\Foundation;
 
 use ErrorException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Support\Carbon;
 use TypeError;
 
 class FileBasedMaintenanceMode implements MaintenanceModeContract
 {
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $events;
+
+    /**
+     * Create a new file based maintenance mode implementation.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
+     */
+    public function __construct(?Dispatcher $events = null)
+    {
+        $this->events = $events;
+    }
+
     /**
      * Take the application down for maintenance.
      *
@@ -52,7 +71,20 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
             return file_exists($this->path());
         }
 
-        return is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt;
+        if (is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt) {
+            return true;
+        }
+
+        // Concurrent requests may all see the expired file, but only one can remove it...
+        if (@unlink($this->path())) {
+            if (is_file(storage_path('framework/maintenance.php'))) {
+                @unlink(storage_path('framework/maintenance.php'));
+            }
+
+            $this->events?->dispatch(new MaintenanceModeDisabled());
+        }
+
+        return false;
     }
 
     /**

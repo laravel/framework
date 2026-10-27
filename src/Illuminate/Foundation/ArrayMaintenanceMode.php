@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Support\Carbon;
 
 class ArrayMaintenanceMode implements MaintenanceMode
@@ -20,6 +22,23 @@ class ArrayMaintenanceMode implements MaintenanceMode
      * @var array
      */
     protected $payload = [];
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $events;
+
+    /**
+     * Create a new array based maintenance mode implementation.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
+     */
+    public function __construct(?Dispatcher $events = null)
+    {
+        $this->events = $events;
+    }
 
     /**
      * Take the application down for maintenance.
@@ -57,7 +76,15 @@ class ArrayMaintenanceMode implements MaintenanceMode
 
         $expiresAt = $this->payload['expires_at'] ?? null;
 
-        return is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt;
+        if (is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt) {
+            return true;
+        }
+
+        $this->deactivate();
+
+        $this->events?->dispatch(new MaintenanceModeDisabled());
+
+        return false;
     }
 
     /**
