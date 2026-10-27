@@ -2,8 +2,32 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Database\Migrations\Migration;
+
 class MigrateMakeCommandTest extends TestCase
 {
+    public function test_it_can_generate_a_migration_without_a_down_method()
+    {
+        Migration::withoutDownMethod();
+
+        try {
+            $this->artisan('make:migration', ['name' => 'CreateFoosTable'])
+                ->assertExitCode(0);
+
+            $this->assertMigrationFileContains([
+                'public function up(): void',
+                "Schema::create('foos', function (Blueprint \$table) {",
+            ], 'create_foos_table.php');
+
+            $this->assertMigrationFileNotContains([
+                'public function down()',
+                'Schema::dropIfExists(',
+            ], 'create_foos_table.php');
+        } finally {
+            Migration::withoutDownMethod(false);
+        }
+    }
+
     public function testItCanGenerateMigrationFile()
     {
         $this->artisan('make:migration', ['name' => 'AddBarToFoosTable'])

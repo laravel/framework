@@ -2,16 +2,74 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
+    #[DataProvider('migrationStubs')]
+    public function test_without_down_method_only_affects_built_in_stubs($table, $create, $stub)
+    {
+        $files = new Filesystem;
+        $path = sys_get_temp_dir().'/laravel-migration-creator-'.uniqid();
+        $creator = new MigrationCreator($files, $path.'/stubs');
+
+        try {
+            $default = $creator->create('default_migration', $path, $table, $create);
+
+            $this->assertSame(
+                str_replace('{{ table }}', $table ?? '', $files->get($creator->stubPath().'/'.$stub)),
+                $files->get($default)
+            );
+
+            Migration::withoutDownMethod();
+
+            $withoutDown = $creator->create('without_down_migration', $path, $table, $create);
+            $migration = require $withoutDown;
+
+            $this->assertTrue(method_exists($migration, 'up'));
+            $this->assertFalse(method_exists($migration, 'down'));
+            $this->assertStringStartsWith(
+                strstr($files->get($default), "\n\n    /**\n     * Reverse the migrations.", true),
+                $files->get($withoutDown)
+            );
+
+            Migration::withoutDownMethod(false);
+
+            $restored = $creator->create('restored_migration', $path, $table, $create);
+
+            $this->assertSame($files->get($default), $files->get($restored));
+
+            $files->ensureDirectoryExists($path.'/stubs');
+            $files->put($path.'/stubs/'.$stub, $files->get($default));
+
+            Migration::withoutDownMethod();
+
+            $custom = $creator->create('custom_migration', $path, $table, $create);
+
+            $this->assertSame($files->get($default), $files->get($custom));
+        } finally {
+            Migration::withoutDownMethod(false);
+            $files->deleteDirectory($path);
+        }
+    }
+
+    public static function migrationStubs()
+    {
+        return [
+            'empty' => [null, false, 'migration.stub'],
+            'create' => ['widgets', true, 'migration.create.stub'],
+            'update' => ['widgets', false, 'migration.update.stub'],
+        ];
+    }
+
     #[AllowMockObjectsWithoutExpectations]
     public function testBasicCreateMethodStoresMigrationFile()
     {

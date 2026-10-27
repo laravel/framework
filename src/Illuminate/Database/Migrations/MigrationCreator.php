@@ -253,7 +253,7 @@ class MigrationCreator
      */
     public function stubPath()
     {
-        return __DIR__.'/stubs';
+        return __DIR__.'/stubs'.(Migration::$withoutDownMethod ? '/without-down' : '');
     }
 
     /**
