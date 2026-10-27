@@ -1999,6 +1999,17 @@ return [
                 'default' => '503',
                 'description' => 'The status code that should be used when returning the maintenance mode response',
             ],
+            [
+                'name' => 'limit',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'The number of seconds or the datetime after which maintenance mode should expire',
+            ],
         ],
     ],
     \Illuminate\Foundation\Console\EnumMakeCommand::class => [

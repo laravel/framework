@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use DateTimeInterface;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\CacheBasedMaintenanceMode;
@@ -43,7 +44,20 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
         $manager->activate(['payload']);
 
-        $cache->shouldHaveReceived('put')->once()->with('key', ['payload']);
+        $cache->shouldHaveReceived('put')->once()->with('key', ['payload'], null);
+    }
+
+    public function test_it_stores_payload_in_cache_until_it_expires()
+    {
+        $cache = Mockery::spy(Factory::class, Repository::class);
+        $cache->expects('store')->with('store-key')->andReturnSelf();
+
+        $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
+        $manager->activate(['expires_at' => 1767225600]);
+
+        $cache->shouldHaveReceived('put')->once()->with('key', ['expires_at' => 1767225600], Mockery::on(
+            fn ($ttl) => $ttl instanceof DateTimeInterface && $ttl->getTimestamp() === 1767225600
+        ));
     }
 
     public function test_it_removes_payload_from_cache()

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Support\Carbon;
 
 class ArrayMaintenanceMode implements MaintenanceMode
 {
@@ -50,7 +51,13 @@ class ArrayMaintenanceMode implements MaintenanceMode
      */
     public function active(): bool
     {
-        return $this->active;
+        if (! $this->active) {
+            return false;
+        }
+
+        $expiresAt = $this->payload['expires_at'] ?? null;
+
+        return is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt;
     }
 
     /**

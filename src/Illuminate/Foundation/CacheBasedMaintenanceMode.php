@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Support\Carbon;
 
 class CacheBasedMaintenanceMode implements MaintenanceMode
 {
@@ -51,7 +52,11 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
      */
     public function activate(array $payload): void
     {
-        $this->getStore()->put($this->key, $payload);
+        $this->getStore()->put(
+            $this->key,
+            $payload,
+            isset($payload['expires_at']) ? Carbon::createFromTimestamp($payload['expires_at']) : null
+        );
     }
 
     /**

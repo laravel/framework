@@ -402,4 +402,158 @@ class MaintenanceModeTest extends TestCase
             '/webhooks/*',
         ], $data['except']);
     }
+
+    public function testMaintenanceModeCanBeLimitedToNumberOfSeconds()
+    {
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $this->artisan(DownCommand::class, ['--limit' => 60])
+            ->expectsOutputToContain('Maintenance mode will expire at [2026-01-01 00:01:00].')
+            ->assertSuccessful();
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+        $this->assertSame(Carbon::now()->addMinute()->getTimestamp(), $data['expires_at']);
+
+        Route::get('/foo', fn () => 'Hello World')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $this->get('/foo')->assertStatus(503);
+        $this->assertTrue($this->app->isDownForMaintenance());
+
+        Carbon::setTestNow('2026-01-01 00:01:00');
+
+        $this->get('/foo')->assertOk()->assertSeeText('Hello World');
+        $this->assertFalse($this->app->isDownForMaintenance());
+    }
+
+    public function testMaintenanceModeCanBeLimitedToDatetime()
+    {
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $this->artisan(DownCommand::class, ['--limit' => '2026-01-01 12:00:00'])
+            ->expectsOutputToContain('Maintenance mode will expire at [2026-01-01 12:00:00].')
+            ->assertSuccessful();
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+        $this->assertSame(Carbon::parse('2026-01-01 12:00:00')->getTimestamp(), $data['expires_at']);
+
+        Carbon::setTestNow('2026-01-01 11:59:59');
+
+        $this->assertTrue($this->app->isDownForMaintenance());
+
+        Carbon::setTestNow('2026-01-01 12:00:00');
+
+        $this->assertFalse($this->app->isDownForMaintenance());
+    }
+
+    public function testMaintenanceModeLimitDatetimeUsesApplicationTimezone()
+    {
+        $timezone = date_default_timezone_get();
+
+        date_default_timezone_set('America/Sao_Paulo');
+
+        try {
+            Carbon::setTestNow('2026-01-01 00:00:00');
+
+            $this->artisan(DownCommand::class, ['--limit' => '2026-01-01 12:00:00'])
+                ->expectsOutputToContain('Maintenance mode will expire at [2026-01-01 12:00:00].')
+                ->assertSuccessful();
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame(Carbon::parse('2026-01-01 15:00:00', 'UTC')->getTimestamp(), $data['expires_at']);
+        } finally {
+            date_default_timezone_set($timezone);
+        }
+    }
+
+    #[DataProvider('invalidLimitProvider')]
+    public function testMaintenanceModeIsNotEnabledWithInvalidLimit(string $limit)
+    {
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $this->artisan(DownCommand::class, ['--limit' => $limit])
+            ->expectsOutputToContain('The limit must be a number of seconds or a datetime in the future')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(storage_path('framework/down'));
+    }
+
+    public static function invalidLimitProvider(): array
+    {
+        return [
+            'zero seconds' => ['0'],
+            'negative seconds' => ['-60'],
+            'past datetime' => ['2025-12-31 23:59:59'],
+            'invalid datetime' => ['not-a-valid-date'],
+        ];
+    }
+
+    public function testMaintenanceModeCanBeEnabledAgainAfterLimitExpires()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'expires_at' => Carbon::now()->subSecond()->getTimestamp(),
+        ]));
+
+        $this->artisan(DownCommand::class)
+            ->expectsOutputToContain('Application is now in maintenance mode.');
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+        $this->assertNull($data['expires_at']);
+        $this->assertTrue($this->app->isDownForMaintenance());
+    }
+
+    public function testFileMaintenanceModeRemainsActiveWhileDownFileIsBeingWritten()
+    {
+        file_put_contents(storage_path('framework/down'), '');
+
+        $this->assertTrue($this->app->maintenanceMode()->active());
+    }
+
+    public function testCacheMaintenanceModeCanBeLimited()
+    {
+        $this->app['config']->set('app.maintenance.driver', 'cache');
+        $this->app['config']->set('app.maintenance.store', 'array');
+
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $this->artisan(DownCommand::class, ['--limit' => 60])->assertSuccessful();
+
+        $this->assertTrue($this->app->isDownForMaintenance());
+
+        Carbon::setTestNow('2026-01-01 00:01:00');
+
+        $this->assertFalse($this->app->isDownForMaintenance());
+    }
+
+    public function testPrerenderedMaintenanceFileAllowsRequestsToReachFrameworkOnceExpired()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'template' => 'Rendered Content',
+            'expires_at' => time() - 1,
+        ]));
+
+        file_put_contents(
+            storage_path('framework/maintenance.php'),
+            file_get_contents(__DIR__.'/../../../src/Illuminate/Foundation/Console/stubs/maintenance-mode.stub')
+        );
+
+        $server = $_SERVER;
+
+        try {
+            $_SERVER['REQUEST_URI'] = '/foo';
+
+            unset($_SERVER['HTTP_ACCEPT']);
+
+            ob_start();
+            include storage_path('framework/maintenance.php');
+            $output = ob_get_clean();
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame('', $output);
+    }
 }

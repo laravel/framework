@@ -2,7 +2,10 @@
 
 namespace Illuminate\Foundation;
 
+use ErrorException;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Support\Carbon;
+use TypeError;
 
 class FileBasedMaintenanceMode implements MaintenanceModeContract
 {
@@ -27,7 +30,7 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
      */
     public function deactivate(): void
     {
-        if ($this->active()) {
+        if (file_exists($this->path())) {
             unlink($this->path());
         }
     }
@@ -39,7 +42,17 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
      */
     public function active(): bool
     {
-        return file_exists($this->path());
+        if (! file_exists($this->path())) {
+            return false;
+        }
+
+        try {
+            $expiresAt = $this->data()['expires_at'] ?? null;
+        } catch (ErrorException|TypeError) {
+            return file_exists($this->path());
+        }
+
+        return is_null($expiresAt) || Carbon::now()->getTimestamp() < $expiresAt;
     }
 
     /**

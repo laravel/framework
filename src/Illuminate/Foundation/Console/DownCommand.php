@@ -10,6 +10,7 @@ use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
@@ -27,7 +28,8 @@ class DownCommand extends Command
                                  {--refresh= : The number of seconds after which the browser may refresh}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
                                  {--with-secret : Generate a random secret phrase that may be used to bypass maintenance mode}
-                                 {--status=503 : The status code that should be used when returning the maintenance mode response}';
+                                 {--status=503 : The status code that should be used when returning the maintenance mode response}
+                                 {--limit= : The number of seconds or the datetime after which maintenance mode should expire}';
 
     /**
      * The console command description.
@@ -65,6 +67,12 @@ class DownCommand extends Command
             if ($downFilePayload['secret'] !== null) {
                 $this->components->info('You may bypass maintenance mode via ['.config('app.url')."/{$downFilePayload['secret']}].");
             }
+
+            if (isset($downFilePayload['expires_at'])) {
+                $expiresAt = Carbon::createFromTimestamp($downFilePayload['expires_at'], date_default_timezone_get());
+
+                $this->components->info("Maintenance mode will expire at [{$expiresAt->toDateTimeString()}].");
+            }
         } catch (Exception $e) {
             report($e);
 
@@ -92,6 +100,7 @@ class DownCommand extends Command
             'secret' => $this->getSecret(),
             'status' => (int) ($this->option('status') ?? 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
+            'expires_at' => $this->getExpirationTime(),
         ];
     }
 
@@ -163,6 +172,36 @@ class DownCommand extends Command
         }
 
         return null;
+    }
+
+    /**
+     * Get the UNIX timestamp after which maintenance mode should expire.
+     *
+     * @return int|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getExpirationTime()
+    {
+        $limit = $this->option('limit');
+
+        if (blank($limit)) {
+            return null;
+        }
+
+        try {
+            $expiresAt = is_numeric($limit)
+                ? Carbon::now()->addSeconds((int) $limit)
+                : Carbon::parse($limit);
+        } catch (Exception) {
+            $expiresAt = null;
+        }
+
+        if (is_null($expiresAt) || $expiresAt->isNowOrPast()) {
+            throw new InvalidArgumentException('The limit must be a number of seconds or a datetime in the future');
+        }
+
+        return $expiresAt->getTimestamp();
     }
 
     /**
