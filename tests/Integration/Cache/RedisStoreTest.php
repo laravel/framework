@@ -6,8 +6,10 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -330,6 +332,37 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    public function testFlushingManyTagsOnlyRemovesEntriesFromTheirOwnTag()
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not flush tags with a script.');
+        }
+
+        Cache::store('redis')->clear();
+
+        for ($i = 1; $i <= 10; $i++) {
+            Cache::store('redis')->tags(['people'])->put("person-{$i}", 'Sally', 300);
+        }
+
+        Cache::store('redis')->tags(['artist'])->put('person-11', 'John', 300);
+
+        $zremCalls = function () use ($connection) {
+            $info = $connection->info('commandstats');
+
+            return (int) Str::between(($info['Commandstats'] ?? $info)['cmdstat_zrem'] ?? 'calls=0,', 'calls=', ',');
+        };
+
+        $before = $zremCalls();
+
+        Cache::store('redis')->tags(['people', ...array_map(fn ($i) => "tag-{$i}", range(1, 99))])->flush();
+
+        $this->assertSame(10, $zremCalls() - $before);
+        $this->assertNull(Cache::store('redis')->tags(['people'])->get('person-1'));
+        $this->assertSame('John', Cache::store('redis')->tags(['artist'])->get('person-11'));
     }
 
     public function testLocksCanBeFlushed()
