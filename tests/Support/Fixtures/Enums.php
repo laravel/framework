@@ -18,3 +18,10 @@ enum TestStringBackedEnum: string
     case A = 'A';
     case B = 'B';
 }
+
+enum TestIntegerBackedEnum: int
+{
+    case minus_1 = -1;
+    case zero = 0;
+    case plus_1 = 1;
+}

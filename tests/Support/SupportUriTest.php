@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Support\Concerns\TestsInteractsWithDataContract;
 use PHPUnit\Framework\TestCase;
 
 class SupportUriTest extends TestCase
 {
+    use TestsInteractsWithDataContract;
+
     public function test_can_build_special_urls()
     {
         Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
@@ -326,6 +329,150 @@ class SupportUriTest extends TestCase
         $uri = new Uri('https://laravel.com/');
 
         $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
+
+    public function test_exists_method()
+    {
+        $this->assertDataExistsContract();
+        $this->assertDataExistsNestedContract();
+    }
+
+    public function test_has_method()
+    {
+        $this->assertDataHasContract();
+        $this->assertDataHasNestedContract();
+    }
+
+    public function test_has_any_method()
+    {
+        $this->assertDataHasAnyContract();
+        $this->assertDataHasAnyNestedContract();
+    }
+
+    public function test_when_has_method()
+    {
+        $this->assertDataWhenHasContract();
+        $this->assertDataWhenHasNestedContract();
+    }
+
+    public function test_filled_method()
+    {
+        $this->assertDataFilledContract();
+        $this->assertDataFilledNestedContract();
+    }
+
+    public function test_is_not_filled_method()
+    {
+        $this->assertDataIsNotFilledContract();
+        $this->assertDataIsNotFilledNestedContract();
+    }
+
+    public function test_any_filled_method()
+    {
+        $this->assertDataAnyFilledContract();
+        $this->assertDataAnyFilledNestedContract();
+    }
+
+    public function test_when_filled_method()
+    {
+        $this->assertDataWhenFilledContract();
+        $this->assertDataWhenFilledNestedContract();
+    }
+
+    public function test_when_enum_method()
+    {
+        $this->assertDataWhenEnumContract();
+    }
+
+    public function test_missing_method()
+    {
+        $this->assertDataMissingContract();
+        $this->assertDataMissingNestedContract();
+    }
+
+    public function test_when_missing_method()
+    {
+        $this->assertDataWhenMissingContract();
+        $this->assertDataWhenMissingNestedContract();
+    }
+
+    public function test_str_method()
+    {
+        $this->assertDataStrContract();
+    }
+
+    public function test_string_method()
+    {
+        $this->assertDataStringContract();
+    }
+
+    public function test_boolean_method()
+    {
+        $this->assertDataBooleanContract();
+    }
+
+    public function test_integer_method()
+    {
+        $this->assertDataIntegerContract();
+    }
+
+    public function test_float_method()
+    {
+        $this->assertDataFloatContract();
+    }
+
+    public function test_clamp_method()
+    {
+        $this->assertDataClampContract();
+    }
+
+    public function test_date_method()
+    {
+        $this->assertDataDateContract();
+    }
+
+    public function test_interval_method()
+    {
+        $this->assertDataIntervalContract();
+    }
+
+    public function test_enum_method()
+    {
+        $this->assertDataEnumContract();
+        $this->assertDataEnumNestedContract();
+    }
+
+    public function test_enums_method()
+    {
+        $this->assertDataEnumsContract();
+    }
+
+    public function test_array_method()
+    {
+        $this->assertDataArrayContract();
+    }
+
+    public function test_collect_method()
+    {
+        $this->assertDataCollectContract();
+        $this->assertDataCollectNestedContract();
+    }
+
+    public function test_only_method()
+    {
+        $this->assertDataOnlyContract();
+        $this->assertDataOnlyNestedContract();
+    }
+
+    public function test_except_method()
+    {
+        $this->assertDataExceptContract();
+        $this->assertDataExceptNestedContract();
+    }
+
+    protected static function arrayToDataFactory(array $data)
+    {
+        return Uri::of('https://laravel.com')->withQuery($data)->query();
     }
 }
 
