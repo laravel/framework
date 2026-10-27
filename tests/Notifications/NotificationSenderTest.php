@@ -312,6 +312,34 @@ class NotificationSenderTest extends TestCase
         $events->assertDispatched(NotificationSent::class);
     }
 
+    public function test_senders_sharing_an_event_dispatcher_register_one_failure_listener()
+    {
+        $manager = Mockery::mock(ChannelManager::class);
+        $bus = new BusFake(new BusDispatcher(new Container));
+        $events = new EventDispatcher;
+
+        foreach (range(1, 3) as $i) {
+            new NotificationSender($manager, $bus, $events);
+        }
+
+        $this->assertCount(1, $events->getListeners(NotificationFailed::class));
+    }
+
+    public function test_the_event_dispatcher_does_not_keep_a_sender_alive()
+    {
+        $manager = Mockery::mock(ChannelManager::class);
+        $bus = new BusFake(new BusDispatcher(new Container));
+        $events = new EventDispatcher;
+
+        $sender = new NotificationSender($manager, $bus, $events);
+        $reference = \WeakReference::create($sender);
+
+        unset($sender);
+        gc_collect_cycles();
+
+        $this->assertNull($reference->get());
+    }
+
     public function test_it_queue_overrides_queue_attribute()
     {
         $notification = new #[Queue('attribute-queue')] class extends Notification implements ShouldQueue

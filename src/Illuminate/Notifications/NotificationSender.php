@@ -20,6 +20,7 @@ use Illuminate\Support\Traits\Localizable;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
+use WeakMap;
 
 class NotificationSender
 {
@@ -61,6 +62,13 @@ class NotificationSender
     protected $failedEventWasDispatched = false;
 
     /**
+     * The number of NotificationFailed events each event dispatcher has dispatched.
+     *
+     * @var \WeakMap<\Illuminate\Contracts\Events\Dispatcher, int>|null
+     */
+    protected static $failedEventCounts;
+
+    /**
      * Create a new notification sender instance.
      *
      * @param  \Illuminate\Notifications\ChannelManager  $manager
@@ -75,7 +83,32 @@ class NotificationSender
         $this->locale = $locale;
         $this->manager = $manager;
 
-        $this->events->listen(NotificationFailed::class, fn () => $this->failedEventWasDispatched = true);
+        $this->countFailedEvents();
+    }
+
+    /**
+     * Count the NotificationFailed events dispatched by the event dispatcher.
+     *
+     * The listener is registered once per dispatcher and does not capture the sender, so a
+     * sender built for each request does not add a listener that keeps it alive.
+     *
+     * @return void
+     */
+    protected function countFailedEvents()
+    {
+        static::$failedEventCounts ??= new WeakMap;
+
+        if (isset(static::$failedEventCounts[$this->events])) {
+            return;
+        }
+
+        static::$failedEventCounts[$this->events] = 0;
+
+        $events = $this->events;
+
+        $this->events->listen(NotificationFailed::class, static function () use ($events) {
+            static::$failedEventCounts[$events]++;
+        });
     }
 
     /**
@@ -168,9 +201,13 @@ class NotificationSender
 
         $this->failedEventWasDispatched = false;
 
+        $failedEventsBeforeSending = static::$failedEventCounts[$this->events];
+
         try {
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
         } catch (Throwable $exception) {
+            $this->failedEventWasDispatched = static::$failedEventCounts[$this->events] > $failedEventsBeforeSending;
+
             if (! $this->failedEventWasDispatched) {
                 if ($exception instanceof HttpTransportException) {
                     $exception = new TransportException($exception->getMessage(), $exception->getCode());
