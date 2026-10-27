@@ -197,7 +197,7 @@ class RedisTaggedCache extends TaggedCache
         $prefix = $this->store->getPrefix();
 
         foreach ($this->tags->getNames() as $name) {
-            $entries = (new ($this->tags::class)($this->store, [$name]))->entries()
+            $entries = (new RedisTagSet($this->store, [$name]))->entries()
                 ->map(fn (string $key) => $prefix.$key)
                 ->chunk(1000);
 
