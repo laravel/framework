@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.70.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.70.2...12.x)
+
+## [v12.70.2](https://github.com/laravel/framework/compare/v12.70.1...v12.70.2) - 2026-10-27
+
+* [12.x] Cloud exceptions by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61934
+* [12.x] Cloud exceptions improvements by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/62186
 
 ## [v12.70.1](https://github.com/laravel/framework/compare/v12.70.0...v12.70.1) - 2026-10-21
 
