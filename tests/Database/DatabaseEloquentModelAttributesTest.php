@@ -92,6 +92,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertNull($model->getKeyName());
     }
 
+    public function test_disabled_primary_key_is_not_incrementing(): void
+    {
+        $model = new ModelWithoutPrimaryKeyAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
     public function test_primary_key_property_takes_precedence(): void
     {
         $model = new ModelWithPrimaryKeyAttributeAndProperty;
