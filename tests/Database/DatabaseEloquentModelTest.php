@@ -3191,26 +3191,17 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
-    public function testObjectCastsFailOnUnencodableData()
+    #[TestWith(['asarrayobjectAttribute'])]
+    #[TestWith(['ascollectionAttribute'])]
+    #[TestWith(['asFluentAttribute'])]
+    #[TestWith(['asEncryptedArrayObjectAttribute'])]
+    #[TestWith(['asEncryptedCollectionAttribute'])]
+    public function testObjectCastsFailOnUnencodableData(string $attribute)
     {
-        $attributes = [
-            'asarrayobjectAttribute',
-            'ascollectionAttribute',
-            'asFluentAttribute',
-            'asEncryptedArrayObjectAttribute',
-            'asEncryptedCollectionAttribute',
-        ];
+        $this->expectExceptionObject(new JsonEncodingException("Unable to encode attribute [{$attribute}] for model [Illuminate\\Tests\\Database\\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded."));
 
-        foreach ($attributes as $attribute) {
-            try {
-                $model = new EloquentModelCastingStub;
-                $model->{$attribute} = ['foo' => "b\xF8r"];
-
-                $this->fail("Expected a JsonEncodingException for [{$attribute}].");
-            } catch (JsonEncodingException $e) {
-                $this->assertSame("Unable to encode attribute [{$attribute}] for model [Illuminate\\Tests\\Database\\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.", $e->getMessage());
-            }
-        }
+        $model = new EloquentModelCastingStub;
+        $model->{$attribute} = ['foo' => "b\xF8r"];
     }
 
     public function testJsonCastingRespectsUnicodeOption()
