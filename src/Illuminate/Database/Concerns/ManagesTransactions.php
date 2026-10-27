@@ -92,11 +92,7 @@ trait ManagesTransactions
         // let the developer handle it in another way. We will decrement too.
         if ($this->causedByConcurrencyError($e) &&
             $this->transactions > 1) {
-            $this->transactions--;
-
-            $this->transactionsManager?->rollback(
-                $this->getName(), $this->transactions
-            );
+            $this->endTransactionsAt($this->transactions - 1);
 
             throw new DeadlockException($e->getMessage(), is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
@@ -231,11 +227,7 @@ trait ManagesTransactions
      */
     protected function handleCommitTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
     {
-        $this->transactions = max(0, $this->transactions - 1);
-
-        $this->transactionsManager?->rollback(
-            $this->getName(), $this->transactions
-        );
+        $this->endTransactionsAt(max(0, $this->transactions - 1));
 
         if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             $pdo = $this->getPdo();
@@ -284,11 +276,7 @@ trait ManagesTransactions
             $this->handleRollBackException($e);
         }
 
-        $this->transactions = $toLevel;
-
-        $this->transactionsManager?->rollback(
-            $this->getName(), $this->transactions
-        );
+        $this->endTransactionsAt($toLevel);
 
         $this->fireConnectionEvent('rollingBack');
     }
@@ -327,14 +315,25 @@ trait ManagesTransactions
     protected function handleRollBackException(Throwable $e)
     {
         if ($this->causedByLostConnection($e)) {
-            $this->transactions = 0;
-
-            $this->transactionsManager?->rollback(
-                $this->getName(), $this->transactions
-            );
+            $this->endTransactionsAt(0);
         }
 
         throw $e;
+    }
+
+    /**
+     * Set the transaction level and roll the transactions manager back to it.
+     *
+     * @param  int  $level
+     * @return void
+     */
+    protected function endTransactionsAt($level)
+    {
+        $this->transactions = $level;
+
+        $this->transactionsManager?->rollback(
+            $this->getName(), $this->transactions
+        );
     }
 
     /**

@@ -5,7 +5,10 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Database\DeadlockException;
+use Illuminate\Database\SQLiteConnection;
 use Mockery;
+use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -214,6 +217,67 @@ class DatabaseTransactionsTest extends TestCase
         $this->assertSame(0, $this->connection()->transactionLevel());
         $this->assertCount(0, $manager->getPendingTransactions());
         $this->assertFalse($afterCommitRan);
+        $this->assertTrue($rolledBack);
+    }
+
+    public function testNestedDeadlockRollsBackTheTransactionsManagerToTheOuterLevel()
+    {
+        $manager = new DatabaseTransactionsManager;
+        $this->connection()->setTransactionManager($manager);
+
+        $innerRolledBack = false;
+
+        $this->connection()->transaction(function () use ($manager, &$innerRolledBack) {
+            try {
+                $this->connection()->transaction(function () use (&$innerRolledBack) {
+                    $this->connection()->afterRollBack(function () use (&$innerRolledBack) {
+                        $innerRolledBack = true;
+                    });
+
+                    throw new PDOException('Deadlock found when trying to get lock');
+                });
+
+                $this->fail('The deadlock should have thrown.');
+            } catch (DeadlockException) {
+            }
+
+            $this->assertSame(1, $this->connection()->transactionLevel());
+            $this->assertCount(1, $manager->getPendingTransactions());
+            $this->assertTrue($innerRolledBack);
+        });
+
+        $this->assertSame(0, $this->connection()->transactionLevel());
+        $this->assertCount(0, $manager->getPendingTransactions());
+    }
+
+    public function testRollBackOnLostConnectionClearsTheTransactionsManager()
+    {
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->allows('beginTransaction')->andReturnTrue();
+        $pdo->allows('exec')->andReturn(0);
+        $pdo->expects('inTransaction')->andReturnTrue();
+        $pdo->expects('rollBack')->andThrow(new PDOException('server has gone away'));
+
+        $manager = new DatabaseTransactionsManager;
+        $connection = (new SQLiteConnection($pdo, config: ['name' => 'lost']))->setTransactionManager($manager);
+
+        $rolledBack = false;
+
+        $connection->beginTransaction();
+        $connection->afterRollBack(function () use (&$rolledBack) {
+            $rolledBack = true;
+        });
+
+        try {
+            $connection->rollBack();
+
+            $this->fail('The lost connection should have thrown.');
+        } catch (PDOException $e) {
+            $this->assertSame('server has gone away', $e->getMessage());
+        }
+
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertCount(0, $manager->getPendingTransactions());
         $this->assertTrue($rolledBack);
     }
 
