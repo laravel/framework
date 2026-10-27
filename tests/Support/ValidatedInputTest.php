@@ -132,21 +132,26 @@ class ValidatedInputTest extends TestCase
     public function test_string_method()
     {
         $this->assertDataStringContract();
+        $this->assertDataStringStrictContract();
     }
 
     public function test_boolean_method()
     {
         $this->assertDataBooleanContract();
+        $this->assertDataBooleanStrictContract();
+        $this->assertDataBooleanStrictNativeValuesContract();
     }
 
     public function test_integer_method()
     {
         $this->assertDataIntegerContract();
+        $this->assertDataIntegerStrictContract();
     }
 
     public function test_float_method()
     {
         $this->assertDataFloatContract();
+        $this->assertDataFloatStrictContract();
     }
 
     public function test_clamp_method()

@@ -489,6 +489,31 @@ trait TestsInteractsWithDataContract
         $this->assertSame('default', $data->string('unknown_key', 'default')->value());
     }
 
+    protected function assertDataStringStrictContract()
+    {
+        $data = static::arrayToDataFactory([
+            'int' => 123,
+            'float' => 1.5,
+            'str' => 'abc',
+            'empty_str' => '',
+            'array' => ['a', 'b'],
+        ]);
+
+        $this->assertSame('123', $data->string('int', 'default', true)->value());
+        $this->assertSame('1.5', $data->string('float', 'default', true)->value());
+        $this->assertSame('abc', $data->string('str', 'default', true)->value());
+        $this->assertSame('', $data->string('empty_str', 'default', true)->value());
+        $this->assertSame('default', $data->string('array', 'default', true)->value());
+        $this->assertSame('default', $data->string('unknown_key', 'default', true)->value());
+        $this->assertSame('', $data->string('array', strict: true)->value());
+
+        $this->assertInstanceOf(Stringable::class, $data->str('array', 'default', true));
+        $this->assertSame('abc', $data->str('str', 'default', true)->value());
+        $this->assertSame('default', $data->str('array', 'default', true)->value());
+
+        $this->assertSame('default', $data->string('array', fn () => 'default', true)->value());
+    }
+
     protected function assertDataBooleanContract()
     {
         $data = static::arrayToDataFactory([
@@ -516,6 +541,51 @@ trait TestsInteractsWithDataContract
         $this->assertTrue($data->boolean('some_undefined_key', true));
     }
 
+    protected function assertDataBooleanStrictContract()
+    {
+        $data = static::arrayToDataFactory([
+            'one' => '1',
+            'true' => 'true',
+            'on' => 'on',
+            'yes' => 'yes',
+            'raw_one' => 1,
+            'zero' => '0',
+            'false' => 'false',
+            'off' => 'off',
+            'no' => 'no',
+            'raw_zero' => 0,
+            'two' => '2',
+            'maybe' => 'maybe',
+            'empty_str' => '',
+            'whitespace' => '   ',
+            'array' => ['1'],
+        ]);
+
+        $this->assertTrue($data->boolean('one', null, true));
+        $this->assertTrue($data->boolean('true', null, true));
+        $this->assertTrue($data->boolean('on', null, true));
+        $this->assertTrue($data->boolean('yes', null, true));
+        $this->assertTrue($data->boolean('raw_one', null, true));
+        $this->assertFalse($data->boolean('zero', null, true));
+        $this->assertFalse($data->boolean('false', null, true));
+        $this->assertFalse($data->boolean('off', null, true));
+        $this->assertFalse($data->boolean('no', null, true));
+        $this->assertFalse($data->boolean('raw_zero', null, true));
+        $this->assertFalse($data->boolean('zero', true, true));
+
+        $this->assertNull($data->boolean('two', null, true));
+        $this->assertNull($data->boolean('maybe', null, true));
+        $this->assertNull($data->boolean('empty_str', null, true));
+        $this->assertNull($data->boolean('whitespace', null, true));
+        $this->assertNull($data->boolean('array', null, true));
+        $this->assertNull($data->boolean('unknown_key', null, true));
+        $this->assertTrue($data->boolean('maybe', true, true));
+        $this->assertFalse($data->boolean('maybe', strict: true));
+
+        $this->assertTrue($data->boolean('maybe', fn () => true, true));
+        $this->assertTrue($data->boolean('empty_str', fn () => true, true));
+    }
+
     protected function assertDataIntegerContract()
     {
         $data = static::arrayToDataFactory([
@@ -539,6 +609,49 @@ trait TestsInteractsWithDataContract
         $this->assertSame(2, $data->integer('underscore_notation'));
         $this->assertSame(0, $data->integer('unknown_key'));
         $this->assertSame(123456, $data->integer('unknown_key', 123456));
+    }
+
+    protected function assertDataIntegerStrictContract()
+    {
+        $data = static::arrayToDataFactory([
+            'int' => '123',
+            'raw_int' => 456,
+            'zero' => '0',
+            'negative' => '-5',
+            'signed' => '+5',
+            'space_padded' => ' 901 ',
+            'float' => '123.45',
+            'whole_float' => '1.0',
+            'zero_padded' => '078',
+            'mixed' => '1ab',
+            'underscore_notation' => '2_000',
+            'scientific_notation' => '1e3',
+            'nan' => 'nan',
+            'empty_str' => '',
+            'array' => ['1'],
+        ]);
+
+        $this->assertSame(123, $data->integer('int', null, true));
+        $this->assertSame(456, $data->integer('raw_int', null, true));
+        $this->assertSame(0, $data->integer('zero', 7, true));
+        $this->assertSame(-5, $data->integer('negative', null, true));
+        $this->assertSame(5, $data->integer('signed', null, true));
+        $this->assertSame(901, $data->integer('space_padded', null, true));
+
+        $this->assertNull($data->integer('float', null, true));
+        $this->assertNull($data->integer('whole_float', null, true));
+        $this->assertNull($data->integer('zero_padded', null, true));
+        $this->assertNull($data->integer('mixed', null, true));
+        $this->assertNull($data->integer('underscore_notation', null, true));
+        $this->assertNull($data->integer('scientific_notation', null, true));
+        $this->assertNull($data->integer('nan', null, true));
+        $this->assertNull($data->integer('empty_str', null, true));
+        $this->assertNull($data->integer('array', null, true));
+        $this->assertNull($data->integer('unknown_key', null, true));
+        $this->assertSame(7, $data->integer('mixed', 7, true));
+        $this->assertSame(0, $data->integer('mixed', strict: true));
+
+        $this->assertSame(7, $data->integer('mixed', fn () => 7, true));
     }
 
     protected function assertDataFloatContract()
@@ -566,6 +679,63 @@ trait TestsInteractsWithDataContract
         $this->assertSame(1e3, $data->float('scientific_notation'));
         $this->assertSame(0.0, $data->float('unknown_key'));
         $this->assertSame(123.456, $data->float('unknown_key', 123.456));
+    }
+
+    protected function assertDataFloatStrictContract()
+    {
+        $data = static::arrayToDataFactory([
+            'float' => '1.23',
+            'raw_float' => 45.6,
+            'int' => '123',
+            'raw_int' => 5,
+            'zero' => '0',
+            'negative' => '-1.5',
+            'decimal_only' => '.6',
+            'space_padded' => ' 90.1 ',
+            'scientific_notation' => '1e3',
+            'nan' => 'nan',
+            'infinity' => 'INF',
+            'mixed' => '1.ab',
+            'thousands' => '1,000',
+            'empty_str' => '',
+            'array' => ['1.5'],
+        ]);
+
+        $this->assertSame(1.23, $data->float('float', null, true));
+        $this->assertSame(45.6, $data->float('raw_float', null, true));
+        $this->assertSame(123.0, $data->float('int', null, true));
+        $this->assertSame(5.0, $data->float('raw_int', null, true));
+        $this->assertSame(0.0, $data->float('zero', 7.0, true));
+        $this->assertSame(-1.5, $data->float('negative', null, true));
+        $this->assertSame(.6, $data->float('decimal_only', null, true));
+        $this->assertSame(90.1, $data->float('space_padded', null, true));
+        $this->assertSame(1e3, $data->float('scientific_notation', null, true));
+
+        $this->assertNull($data->float('nan', null, true));
+        $this->assertNull($data->float('infinity', null, true));
+        $this->assertNull($data->float('mixed', null, true));
+        $this->assertNull($data->float('thousands', null, true));
+        $this->assertNull($data->float('empty_str', null, true));
+        $this->assertNull($data->float('array', null, true));
+        $this->assertNull($data->float('unknown_key', null, true));
+        $this->assertSame(7.5, $data->float('mixed', 7.5, true));
+        $this->assertSame(0.0, $data->float('mixed', strict: true));
+
+        $this->assertSame(7.5, $data->float('mixed', fn () => 7.5, true));
+    }
+
+    protected function assertDataBooleanStrictNativeValuesContract()
+    {
+        $data = static::arrayToDataFactory(['true' => true, 'false' => false]);
+
+        $this->assertSame('default', $data->string('true', 'default', true)->value());
+        $this->assertSame('default', $data->string('false', 'default', true)->value());
+        $this->assertNull($data->integer('true', null, true));
+        $this->assertNull($data->integer('false', null, true));
+        $this->assertNull($data->float('true', null, true));
+        $this->assertNull($data->float('false', null, true));
+        $this->assertTrue($data->boolean('true', null, true));
+        $this->assertFalse($data->boolean('false', null, true));
     }
 
     protected function assertDataClampContract()
