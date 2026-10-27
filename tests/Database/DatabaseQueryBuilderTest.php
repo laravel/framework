@@ -1929,6 +1929,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'greek']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'greek\', "body")) @@ plainto_tsquery(\'greek\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
