@@ -209,8 +209,6 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
      */
     public function class($classList)
     {
-        $classList = Arr::wrap($classList);
-
         return $this->merge(['class' => Arr::toCssClasses($classList)]);
     }
 
@@ -222,8 +220,6 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
      */
     public function style($styleList)
     {
-        $styleList = Arr::wrap($styleList);
-
         return $this->merge(['style' => Arr::toCssStyles($styleList)]);
     }
 
