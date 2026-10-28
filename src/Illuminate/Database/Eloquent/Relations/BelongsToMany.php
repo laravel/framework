@@ -734,7 +734,7 @@ class BelongsToMany extends Relation
         }
 
         try {
-            return tap($this->related->newQuery()->withoutGlobalScopes($this->query->removedScopes())->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
+            return tap($this->related->newQuery()->withoutGlobalScopes($this->query->removedScopes())->useWritePdo()->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
         } catch (UniqueConstraintViolationException $e) {
