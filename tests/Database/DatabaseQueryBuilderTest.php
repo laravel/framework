@@ -2381,28 +2381,28 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNull('items->id');
-        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = \'NULL\')', $builder->toSql());
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = _utf8mb4\'NULL\' collate utf8mb4_bin)', $builder->toSql());
     }
 
     public function testJsonWhereNotNullMysql()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNotNull('items->id');
-        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != _utf8mb4\'NULL\' collate utf8mb4_bin)', $builder->toSql());
     }
 
     public function testJsonWhereNullExpressionMysql()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNull(new Raw('items->id'));
-        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = \'NULL\')', $builder->toSql());
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = _utf8mb4\'NULL\' collate utf8mb4_bin)', $builder->toSql());
     }
 
     public function testJsonWhereNotNullExpressionMysql()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNotNull(new Raw('items->id'));
-        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != _utf8mb4\'NULL\' collate utf8mb4_bin)', $builder->toSql());
     }
 
     public function testArrayWhereNulls()
