@@ -126,6 +126,34 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
         ]);
     }
 
+    public function testUpdateWithOrderAndLimit()
+    {
+        DB::table('example')->insert([
+            ['name' => 'A', 'credits' => 30],
+            ['name' => 'B', 'credits' => 10],
+            ['name' => 'C', 'credits' => 40],
+            ['name' => 'D', 'credits' => 20],
+        ]);
+
+        DB::table('example')->orderBy('credits')->limit(2)->update(['title' => 'Low']);
+
+        $this->assertSame(['B', 'D'], DB::table('example')->where('title', 'Low')->orderBy('name')->pluck('name')->all());
+    }
+
+    public function testDeleteWithOrderAndLimit()
+    {
+        DB::table('example')->insert([
+            ['name' => 'A', 'credits' => 30],
+            ['name' => 'B', 'credits' => 10],
+            ['name' => 'C', 'credits' => 40],
+            ['name' => 'D', 'credits' => 20],
+        ]);
+
+        DB::table('example')->orderBy('credits')->limit(2)->delete();
+
+        $this->assertSame(['A', 'C'], DB::table('example')->orderBy('name')->pluck('name')->all());
+    }
+
     public static function jsonValuesDataProvider()
     {
         yield ['payload', ['Laravel', 'Founder'], ['Laravel', 'Founder']];

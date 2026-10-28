@@ -4866,6 +4866,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->limit(5)->offset(5)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? from (select top (5) * from [users] where [id] > ? order by [foo] desc) as [users]', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '>', 1)->orderBy('foo', 'desc')->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertMethod()
@@ -5196,6 +5201,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->expects('delete')->with('delete top (1) from [users] where [email] = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('delete')->with('delete [users] from (select top (1) * from [users] where [email] = ? order by [id] asc) as [users]', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
     }
