@@ -111,6 +111,40 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertFalse(Schema::hasView('private.foo'));
     }
 
+    public function testDropIndexOnSchemaQualifiedTable()
+    {
+        foreach (['public.table', 'private.table'] as $name) {
+            Schema::create($name, function (Blueprint $table) {
+                $table->string('name');
+                $table->index('name', 'table_name_index');
+            });
+        }
+
+        Schema::table('private.table', function (Blueprint $table) {
+            $table->dropIndex('table_name_index');
+        });
+
+        $this->assertTrue(Schema::hasIndex('public.table', 'table_name_index'));
+        $this->assertFalse(Schema::hasIndex('private.table', 'table_name_index'));
+    }
+
+    public function testRenameIndexOnSchemaQualifiedTable()
+    {
+        foreach (['public.table', 'private.table'] as $name) {
+            Schema::create($name, function (Blueprint $table) {
+                $table->string('name');
+                $table->index('name', 'table_name_index');
+            });
+        }
+
+        Schema::table('private.table', function (Blueprint $table) {
+            $table->renameIndex('table_name_index', 'renamed_index');
+        });
+
+        $this->assertTrue(Schema::hasIndex('public.table', 'table_name_index'));
+        $this->assertTrue(Schema::hasIndex('private.table', 'renamed_index'));
+    }
+
     public function testAddTableCommentOnNewTable()
     {
         Schema::create('public.posts', function (Blueprint $table) {
