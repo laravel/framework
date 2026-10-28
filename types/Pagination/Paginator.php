@@ -16,6 +16,7 @@ assertType('ArrayIterator<int, Post>', $paginator->getIterator());
 
 assertType('string|null', $paginator->fragment());
 assertType('Illuminate\Pagination\Paginator<int, Post>', $paginator->fragment('foo'));
+assertType('Illuminate\Contracts\Support\Htmlable', $paginator->links());
 
 $paginator->each(function ($post) {
     assertType('Post', $post);
