@@ -13,6 +13,7 @@ use Illuminate\JsonSchema\Types\ObjectType;
 use Illuminate\JsonSchema\Types\StringType;
 use Illuminate\JsonSchema\Types\UnionType;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DeserializerTest extends TestCase
@@ -545,6 +546,9 @@ class DeserializerTest extends TestCase
     {
         $type = JsonSchema::fromArray([
             'title' => 'Identifier',
+            'description' => 'A string or integer identifier',
+            'enum' => ['abc', 42],
+            'default' => 'abc',
             'anyOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],
@@ -554,10 +558,54 @@ class DeserializerTest extends TestCase
         $this->assertInstanceOf(AnyOfType::class, $type);
         $this->assertEquals([
             'title' => 'Identifier',
+            'description' => 'A string or integer identifier',
+            'enum' => ['abc', 42],
+            'default' => 'abc',
             'anyOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],
             ],
+        ], $type->toArray());
+    }
+
+    #[DataProvider('unsupportedAnyOfSiblingConstraints')]
+    public function test_it_rejects_unsupported_any_of_sibling_constraints(string $keyword, mixed $value, array $branches): void
+    {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            "Keywords [{$keyword}] are not supported alongside a JSON Schema \"anyOf\" composition."
+        ));
+
+        JsonSchema::fromArray([
+            $keyword => $value,
+            'anyOf' => $branches,
+        ]);
+    }
+
+    public static function unsupportedAnyOfSiblingConstraints(): array
+    {
+        return [
+            'type' => ['type', 'string', [['type' => 'string'], ['type' => 'integer']]],
+            'string length' => ['minLength', 5, [['type' => 'string'], ['type' => 'integer']]],
+            'numeric bound' => ['minimum', 1, [['type' => 'number'], ['type' => 'string']]],
+            'array items' => ['items', ['type' => 'integer'], [['type' => 'array'], ['type' => 'string']]],
+            'required properties' => ['required', ['name'], [['type' => 'object'], ['type' => 'string']]],
+            'additional properties' => ['additionalProperties', false, [['type' => 'object'], ['type' => 'string']]],
+        ];
+    }
+
+    public function test_it_preserves_sibling_constraints_when_normalizing_a_nullable_any_of(): void
+    {
+        $type = JsonSchema::fromArray([
+            'minLength' => 5,
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'null'],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'type' => ['string', 'null'],
+            'minLength' => 5,
         ], $type->toArray());
     }
 

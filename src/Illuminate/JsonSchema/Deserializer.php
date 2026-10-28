@@ -12,6 +12,18 @@ class Deserializer
     protected const MAX_NODES = 20000;
 
     /**
+     * The supported type-specific constraint keywords.
+     *
+     * @var array<int, string>
+     */
+    protected const TYPE_SPECIFIC_KEYWORDS = [
+        'minLength', 'maxLength', 'pattern', 'format',
+        'minimum', 'maximum', 'multipleOf',
+        'items', 'minItems', 'maxItems', 'uniqueItems',
+        'properties', 'required', 'additionalProperties',
+    ];
+
+    /**
      * The root schema being deserialized (used to resolve local $refs).
      *
      * @var array<string, mixed>
@@ -138,6 +150,16 @@ class Deserializer
 
         if ($nullable && count($branches) === 1) {
             return null;
+        }
+
+        $unsupported = array_values(array_intersect(
+            ['type', ...static::TYPE_SPECIFIC_KEYWORDS], array_keys($schema)
+        ));
+
+        if ($unsupported !== []) {
+            throw new InvalidArgumentException(
+                'Keywords ['.implode(', ', $unsupported).'] are not supported alongside a JSON Schema "anyOf" composition.'
+            );
         }
 
         $type = new Types\AnyOfType(array_map(
@@ -444,14 +466,7 @@ class Deserializer
      */
     protected function ensureUnionConstraintsAreSupported(array $schema): void
     {
-        $keywords = [
-            'minLength', 'maxLength', 'pattern', 'format',
-            'minimum', 'maximum', 'multipleOf',
-            'items', 'minItems', 'maxItems', 'uniqueItems',
-            'properties', 'required', 'additionalProperties',
-        ];
-
-        $unsupported = array_values(array_intersect($keywords, array_keys($schema)));
+        $unsupported = array_values(array_intersect(static::TYPE_SPECIFIC_KEYWORDS, array_keys($schema)));
 
         if ($unsupported !== []) {
             throw new InvalidArgumentException(
