@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\RefreshFlexibleCache;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
@@ -397,6 +399,100 @@ class RepositoryTest extends TestCase
         $this->assertSame('posts-refreshed', $posts->get('profile'));
 
         $usersLock->release();
+    }
+
+    public function testFlexibleCanRefreshStaleValuesOnTheQueue(): void
+    {
+        Queue::fake()->serializeAndRestore();
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::driver('array');
+
+        $cache->flexible('foo', [10, 20], fn () => 'original', queue: true);
+
+        Queue::assertNothingPushed();
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $value = $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: true);
+
+        $this->assertSame('original', $value);
+        $this->assertCount(0, defer());
+        Queue::assertPushed(RefreshFlexibleCache::class, 1);
+
+        $this->app->call([Queue::pushed(RefreshFlexibleCache::class)->first(), 'handle']);
+
+        $this->assertSame('refreshed', $cache->get('foo'));
+        $this->assertSame(946684811, $cache->get(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo'));
+    }
+
+    public function testFlexibleQueuedRefreshCanUseCustomQueue(): void
+    {
+        Queue::fake();
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::driver('array');
+
+        $cache->flexible('foo', [10, 20], fn () => 'original', queue: 'cache');
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: 'cache');
+
+        Queue::assertPushedOn('cache', RefreshFlexibleCache::class);
+    }
+
+    public function testFlexibleQueuedRefreshIsUnique(): void
+    {
+        Queue::fake();
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::driver('array');
+
+        $cache->flexible('foo', [10, 20], fn () => 'original', queue: true);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: true);
+        $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: true);
+
+        Queue::assertPushed(RefreshFlexibleCache::class, 1);
+    }
+
+    public function testFlexibleQueuedRefreshIsScopedToTagGroup(): void
+    {
+        Queue::fake()->serializeAndRestore();
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $users = Cache::driver('array')->tags(['users']);
+        $posts = Cache::driver('array')->tags(['posts']);
+
+        $users->flexible('profile', [10, 20], fn () => 'users');
+        $posts->flexible('profile', [10, 20], fn () => 'posts');
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $users->flexible('profile', [10, 20], fn () => 'users-refreshed', queue: true);
+        $posts->flexible('profile', [10, 20], fn () => 'posts-refreshed', queue: true);
+
+        Queue::assertPushed(RefreshFlexibleCache::class, 2);
+
+        Queue::pushed(RefreshFlexibleCache::class)->each(fn ($job) => $this->app->call([$job, 'handle']));
+
+        $this->assertSame('users-refreshed', $users->get('profile'));
+        $this->assertSame('posts-refreshed', $posts->get('profile'));
+    }
+
+    public function testFlexibleFallsBackToDeferWhenStoreHasNoName(): void
+    {
+        Queue::fake();
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::memo('array');
+
+        $cache->flexible('foo', [10, 20], fn () => 'original', queue: true);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: true);
+
+        Queue::assertNothingPushed();
+        $this->assertCount(1, defer());
     }
 }
 
