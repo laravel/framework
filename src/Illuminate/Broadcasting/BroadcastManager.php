@@ -19,6 +19,7 @@ use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
@@ -236,9 +237,27 @@ class BroadcastManager implements FactoryContract
             )
             ->pushOn($queue, $broadcastEvent);
 
-        $event instanceof ShouldRescue
-            ? $this->rescue($push)
-            : $push();
+        $context = $broadcastEvent instanceof UniqueBroadcastEvent && $this->app->bound(ContextRepository::class)
+            ? $this->app->make(ContextRepository::class)
+            : null;
+
+        $context?->addHidden([
+            'laravel_unique_job_cache_store' => $broadcastEvent->uniqueVia()->getName(),
+            'laravel_unique_job_key' => UniqueLock::getKey($broadcastEvent),
+            'laravel_unique_job_lock_owner' => $broadcastEvent->uniqueLockOwner ?? '',
+        ]);
+
+        try {
+            $event instanceof ShouldRescue
+                ? $this->rescue($push)
+                : $push();
+        } finally {
+            $context?->forgetHidden([
+                'laravel_unique_job_cache_store',
+                'laravel_unique_job_key',
+                'laravel_unique_job_lock_owner',
+            ]);
+        }
     }
 
     /**
