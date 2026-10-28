@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -72,5 +73,15 @@ class RefreshFlexibleCache implements ShouldQueue, ShouldBeUnique
     public function uniqueId()
     {
         return $this->store.':'.implode(',', $this->tags).':'.$this->key;
+    }
+
+    /**
+     * Get the cache repository that should hold the unique job lock.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function uniqueVia()
+    {
+        return Container::getInstance()->make(Factory::class)->store($this->store);
     }
 }

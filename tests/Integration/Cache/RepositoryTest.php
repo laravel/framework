@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\RefreshFlexibleCache;
 use Illuminate\Cache\Repository;
@@ -10,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
@@ -440,6 +442,7 @@ class RepositoryTest extends TestCase
         Queue::assertPushedOn('cache', RefreshFlexibleCache::class);
     }
 
+    #[WithConfig('cache.default', 'file')]
     public function testFlexibleQueuedRefreshIsUnique(): void
     {
         Queue::fake();
@@ -454,6 +457,7 @@ class RepositoryTest extends TestCase
         $cache->flexible('foo', [10, 20], fn () => 'refreshed', queue: true);
 
         Queue::assertPushed(RefreshFlexibleCache::class, 1);
+        $this->assertFalse($cache->lock(UniqueLock::getKey(Queue::pushed(RefreshFlexibleCache::class)->first()))->get());
     }
 
     public function testFlexibleQueuedRefreshIsScopedToTagGroup(): void
