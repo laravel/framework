@@ -5513,6 +5513,25 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testMariaDbUpdateWrappingJsonArray()
+    {
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MariaDbGrammar($connection);
+        $processor = new Processor;
+
+        $connection->expects($this->once())
+            ->method('update')
+            ->with(
+                'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_query(?, \'$\')) where `active` = ?',
+                [json_encode(['white', 'large']), 1]
+            );
+
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('active', 1)->update([
+            'meta->tags' => ['white', 'large'],
+        ]);
+    }
+
     public function testMySqlUpdateWrappingJsonPathArrayIndex()
     {
         $connection = $this->createMock(Connection::class);

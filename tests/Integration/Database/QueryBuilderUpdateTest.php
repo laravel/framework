@@ -50,6 +50,40 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
         ]);
     }
 
+    #[RequiresDatabase(['sqlite', 'mysql', 'mariadb', 'pgsql'])]
+    public function testUpdateJsonPathWithArray()
+    {
+        DB::table('example')->insert([
+            ['name' => 'Taylor Otwell', 'payload' => json_encode(['tags' => [], 'active' => true])],
+        ]);
+
+        DB::table('example')->update([
+            'payload->tags' => ['Laravel', 'Founder'],
+        ]);
+
+        $this->assertSame(
+            ['tags' => ['Laravel', 'Founder'], 'active' => true],
+            json_decode(DB::table('example')->value('payload'), true)
+        );
+    }
+
+    #[RequiresDatabase(['sqlite', 'mysql', 'mariadb', 'pgsql'])]
+    public function testUpdateJsonPathWithCollection()
+    {
+        DB::table('example')->insert([
+            ['name' => 'Taylor Otwell', 'payload' => json_encode(['tags' => [], 'active' => true])],
+        ]);
+
+        DB::table('example')->update([
+            'payload->tags' => collect(['Laravel', 'Founder']),
+        ]);
+
+        $this->assertSame(
+            ['tags' => ['Laravel', 'Founder'], 'active' => true],
+            json_decode(DB::table('example')->value('payload'), true)
+        );
+    }
+
     #[RequiresDatabase(['sqlite', 'mysql', 'mariadb'])]
     public function testSubqueryUpdate()
     {
