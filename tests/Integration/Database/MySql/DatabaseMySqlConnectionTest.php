@@ -86,14 +86,15 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
     }
 
     #[DataProvider('jsonWhereNullDataProvider')]
-    #[RequiresDatabase('mysql', '>=8.0')]
+    #[RequiresDatabase('mysql', '>=8.0.17')]
     public function testJsonWhereNullWithBinaryConnectionCollation($expected, $key, array $value = ['value' => 123])
     {
-        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+        if (DB::connection()->isMaria()) {
+            $this->markTestSkipped('utf8mb4_0900_bin is a MySQL collation.');
+        }
 
-        $connection = $this->app['config']->get('database.default');
-        $this->app['config']->set("database.connections.$connection.collation", 'utf8mb4_0900_bin');
-        DB::purge($connection);
+        DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
+        DB::statement('set names utf8mb4 collate utf8mb4_0900_bin');
 
         $this->assertSame($expected, DB::table(self::TABLE)->whereNull(self::JSON_COL.'->'.$key)->exists());
         $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
