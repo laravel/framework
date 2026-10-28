@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -815,12 +816,10 @@ class Worker
             return;
         }
 
-        if (! $this->cache->get('job-exceptions:'.$uuid)) {
-            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
-        }
+        $limiter = new RateLimiter($this->cache);
 
-        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
-            $this->cache->forget('job-exceptions:'.$uuid);
+        if ($maxExceptions <= $limiter->increment('job-exceptions:'.$uuid, Carbon::now()->addDay())) {
+            $limiter->clear('job-exceptions:'.$uuid);
 
             $this->failJob($job, $e);
         }
