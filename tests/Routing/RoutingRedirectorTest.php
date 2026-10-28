@@ -9,6 +9,7 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
@@ -30,6 +31,7 @@ class RoutingRedirectorTest extends TestCase
         $this->request->shouldReceive('route')->andReturn(true)->byDefault();
         $this->request->shouldReceive('ajax')->andReturn(false)->byDefault();
         $this->request->shouldReceive('expectsJson')->andReturn(false)->byDefault();
+        $this->request->shouldReceive('getSchemeAndHttpHost')->andReturn('http://foo.com')->byDefault();
         $this->request->headers = $this->headers;
 
         $this->url = Mockery::mock(UrlGenerator::class);
@@ -121,6 +123,36 @@ class RoutingRedirectorTest extends TestCase
         $this->url->expects('previous')->andReturn('http://foo.com/bar');
         $response = $this->redirect->back();
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
+    }
+
+    public static function differentOriginUrls()
+    {
+        return [
+            'different host' => ['http://bar.com/bar'],
+            'different scheme' => ['https://foo.com/bar'],
+            'different port' => ['http://foo.com:8080/bar'],
+        ];
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackRedirectToRootWhenPreviousUrlHasDifferentOrigin($previousUrl)
+    {
+        $this->url->expects('previous')->andReturn($previousUrl);
+
+        $response = $this->redirect->back();
+
+        $this->assertSame('/', $response->getTargetUrl());
+        $this->assertSame('/', $response->headers->get('Location'));
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackRedirectCanDisableSameOriginEnforcement($previousUrl)
+    {
+        $this->url->expects('previous')->andReturn($previousUrl);
+
+        $response = $this->redirect->back(enforceSameOrigin: false);
+
+        $this->assertSame($previousUrl, $response->getTargetUrl());
     }
 
     public function testAwayDoesntValidateTheUrl()
