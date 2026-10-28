@@ -162,7 +162,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     {
         $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
             return [
-                'pending_jobs' => $batch->pending_jobs,
+                'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs + 1,
                 'failed_job_ids' => json_encode(array_values(array_unique(array_merge((array) json_decode($batch->failed_job_ids, true), [$jobId])))),
             ];

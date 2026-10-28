@@ -269,10 +269,10 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function incrementFailedJobs(string $batchId, string $jobId)
     {
-        $update = 'SET failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId)';
+        $update = 'SET pending_jobs = pending_jobs - :dec, failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId)';
 
         if ($this->ttl !== null) {
-            $update = "SET failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId), #{$this->ttlAttribute} = :ttl";
+            $update = "SET pending_jobs = pending_jobs - :dec, failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId), #{$this->ttlAttribute} = :ttl";
         }
 
         $batch = $this->dynamoDbClient->updateItem(array_filter([
@@ -285,6 +285,7 @@ class DynamoBatchRepository implements BatchRepository
             'ExpressionAttributeValues' => array_filter([
                 ':jobId' => $this->marshaler->marshalValue([$jobId]),
                 ':inc' => ['N' => '1'],
+                ':dec' => ['N' => '1'],
                 ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
             ]),
             'ExpressionAttributeNames' => $this->ttlExpressionAttributeName(),
