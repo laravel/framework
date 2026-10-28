@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Contracts\Support\HasOnceHash;
 use Illuminate\Support\Once;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -140,6 +142,104 @@ class OnceTest extends TestCase
         }
 
         $this->assertSame($names, $results);
+    }
+
+    #[DataProvider('scalarAndObjectCallOrders')]
+    public function testObjectIdsDoNotCollideWithScalarValues(bool $objectFirst)
+    {
+        $instance = new class
+        {
+            public int $calls = 0;
+
+            public function type($value)
+            {
+                return once(function () use ($value) {
+                    $this->calls++;
+
+                    return get_debug_type($value);
+                });
+            }
+        };
+
+        $object = new stdClass;
+        $values = [$object, spl_object_id($object)];
+
+        if (! $objectFirst) {
+            $values = array_reverse($values);
+        }
+
+        foreach ([$values, $values] as $arguments) {
+            foreach ($arguments as $value) {
+                $this->assertSame(get_debug_type($value), $instance->type($value));
+            }
+        }
+
+        $this->assertSame(2, $instance->calls);
+    }
+
+    public function testObjectIdsDoNotCollideWhenCapturedVariablesChangeTypes()
+    {
+        $instance = new class
+        {
+            public function types($first, $second)
+            {
+                return once(fn () => [get_debug_type($first), get_debug_type($second)]);
+            }
+        };
+
+        $object = new stdClass;
+        $id = spl_object_id($object);
+
+        $this->assertSame(['stdClass', 'int'], $instance->types($object, $id));
+        $this->assertSame(['int', 'stdClass'], $instance->types($id, $object));
+        $this->assertSame(['stdClass', 'int'], $instance->types($object, $id));
+    }
+
+    #[DataProvider('scalarAndObjectCallOrders')]
+    public function testCustomObjectHashesDoNotCollideWithScalarValues(bool $objectFirst)
+    {
+        $instance = new class
+        {
+            public int $calls = 0;
+
+            public function type($value)
+            {
+                return once(function () use ($value) {
+                    $this->calls++;
+
+                    return get_debug_type($value);
+                });
+            }
+        };
+
+        $object = new class implements HasOnceHash
+        {
+            public function onceHash()
+            {
+                return 'shared-hash';
+            }
+        };
+
+        $values = [$object, $object->onceHash()];
+
+        if (! $objectFirst) {
+            $values = array_reverse($values);
+        }
+
+        foreach ([$values, $values] as $arguments) {
+            foreach ($arguments as $value) {
+                $this->assertSame(get_debug_type($value), $instance->type($value));
+            }
+        }
+
+        $this->assertSame(get_debug_type($object), $instance->type(clone $object));
+        $this->assertSame(2, $instance->calls);
+    }
+
+    public static function scalarAndObjectCallOrders()
+    {
+        yield 'object first' => [true];
+        yield 'scalar first' => [false];
     }
 
     public function testUsageOfThis()

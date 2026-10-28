@@ -86,14 +86,14 @@ class Onceable
         $uses = array_map(
             static function (mixed $argument) {
                 if ($argument instanceof HasOnceHash) {
-                    return $argument->onceHash();
+                    return ['hash' => $argument->onceHash()];
                 }
 
                 if (is_object($argument)) {
-                    return spl_object_id($argument);
+                    return ['object' => spl_object_id($argument)];
                 }
 
-                return $argument;
+                return ['value' => $argument];
             },
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
