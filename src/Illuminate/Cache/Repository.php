@@ -647,9 +647,10 @@ class Repository implements ArrayAccess, CacheContract
      * @param  (callable(): TCacheValue)  $callback
      * @param  array{ seconds?: int, owner?: string }|null  $lock
      * @param  bool  $alwaysDefer
+     * @param  bool|string  $queue
      * @return TCacheValue
      */
-    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
+    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false, $queue = false)
     {
         $key = enum_value($key);
 
@@ -669,26 +670,58 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
-            $this->store->lock(
-                "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
-                $lock['seconds'] ?? 0,
-                $lock['owner'] ?? null,
-            )->get(function () use ($key, $callback, $created, $ttl) {
-                if ($created !== $this->get(self::FLEXIBLE_CREATED_KEY_PREFIX.$key)) {
-                    return;
-                }
+        if ($queue && $this->getName()) {
+            dispatch(new RefreshFlexibleCache(
+                $this->getName(),
+                $key,
+                $ttl,
+                $callback,
+                $lock,
+                $created,
+                $this instanceof TaggedCache ? $this->getTags()->getNames() : [],
+                $this->getSeconds($ttl[1]),
+            ))->onQueue(is_string($queue) ? $queue : null);
 
-                $this->putMany([
-                    $key => value($callback),
-                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
-                ], $ttl[1]);
-            });
-        };
+            return $value;
+        }
 
-        defer($refresh, "illuminate:cache:flexible:{$this->itemKey($key)}", $alwaysDefer);
+        defer(
+            fn () => $this->refreshFlexible($key, $ttl, $callback, $lock, $created),
+            "illuminate:cache:flexible:{$this->itemKey($key)}",
+            $alwaysDefer,
+        );
 
         return $value;
+    }
+
+    /**
+     * Refresh a stale flexible cache value if it has not been refreshed since it was read.
+     *
+     * @internal
+     *
+     * @param  string  $key
+     * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
+     * @param  callable  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  mixed  $created
+     * @return void
+     */
+    public function refreshFlexible($key, $ttl, $callback, $lock, $created)
+    {
+        $this->store->lock(
+            "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
+            $lock['seconds'] ?? 0,
+            $lock['owner'] ?? null,
+        )->get(function () use ($key, $callback, $created, $ttl) {
+            if ($created !== $this->get(self::FLEXIBLE_CREATED_KEY_PREFIX.$key)) {
+                return;
+            }
+
+            $this->putMany([
+                $key => value($callback),
+                self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+            ], $ttl[1]);
+        });
     }
 
     /**
