@@ -2,21 +2,14 @@
 
 namespace Illuminate\Tests\Http;
 
-use Carbon\CarbonInterval;
-use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Illuminate\Tests\Http\Fixtures\TestEnum;
-use Illuminate\Tests\Http\Fixtures\TestEnumBacked;
-use Illuminate\Tests\Http\Fixtures\TestIntegerEnumBacked;
-use InvalidArgumentException;
+use Illuminate\Tests\Support\Concerns\TestsInteractsWithDataContract;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -27,10 +20,10 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-include_once 'Fixtures/Enums.php';
-
 class HttpRequestTest extends TestCase
 {
+    use TestsInteractsWithDataContract;
+
     public function testInstanceMethod()
     {
         $request = Request::create('');
@@ -363,277 +356,67 @@ class HttpRequestTest extends TestCase
 
     public function testHasMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertTrue($request->has('name'));
-        $this->assertTrue($request->has('age'));
-        $this->assertTrue($request->has('city'));
-        $this->assertFalse($request->has('foo'));
-        $this->assertFalse($request->has('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->has('name'));
-        $this->assertTrue($request->has('name', 'email'));
-        $this->assertTrue($request->has(['name', 'email']));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
-        $this->assertTrue($request->has('foo'));
-
-        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
-        $this->assertTrue($request->has('foo'));
-        $this->assertTrue($request->has('bar'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertTrue($request->has('foo.bar'));
-        $this->assertTrue($request->has('foo.baz'));
+        $this->assertDataHasContract();
+        $this->assertDataHasNestedContract();
     }
 
     public function testWhenHasMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-
-        $name = $age = $city = $foo = $bar = false;
-
-        $request->whenHas('name', function ($value) use (&$name) {
-            $name = $value;
-        });
-
-        $request->whenHas('age', function ($value) use (&$age) {
-            $age = $value;
-        });
-
-        $request->whenHas('city', function ($value) use (&$city) {
-            $city = $value;
-        });
-
-        $request->whenHas('foo', function () use (&$foo) {
-            $foo = 'test';
-        });
-
-        $request->whenHas('bar', function () use (&$bar) {
-            $bar = 'test';
-        }, function () use (&$bar) {
-            $bar = true;
-        });
-
-        $this->assertSame('Taylor', $name);
-        $this->assertSame('', $age);
-        $this->assertNull($city);
-        $this->assertFalse($foo);
-        $this->assertTrue($bar);
+        $this->assertDataWhenHasContract();
+        $this->assertDataWhenHasNestedContract();
     }
 
     public function testWhenFilledMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-
-        $name = $age = $city = $foo = $bar = false;
-
-        $request->whenFilled('name', function ($value) use (&$name) {
-            $name = $value;
-        });
-
-        $request->whenFilled('age', function ($value) use (&$age) {
-            $age = 'test';
-        });
-
-        $request->whenFilled('city', function ($value) use (&$city) {
-            $city = 'test';
-        });
-
-        $request->whenFilled('foo', function () use (&$foo) {
-            $foo = 'test';
-        });
-
-        $request->whenFilled('bar', function () use (&$bar) {
-            $bar = 'test';
-        }, function () use (&$bar) {
-            $bar = true;
-        });
-
-        $this->assertSame('Taylor', $name);
-        $this->assertFalse($age);
-        $this->assertFalse($city);
-        $this->assertFalse($foo);
-        $this->assertTrue($bar);
+        $this->assertDataWhenFilledContract();
+        $this->assertDataWhenFilledNestedContract();
     }
 
     public function testWhenEnumMethod()
     {
-        $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
-
-        $status = $invalid = $empty = $missing = $default = false;
-
-        $request->whenEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
-            $status = $value;
-        });
-
-        $request->whenEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
-            $invalid = $value;
-        });
-
-        $request->whenEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
-            $empty = $value;
-        });
-
-        $request->whenEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
-            $missing = $value;
-        }, function () use (&$default) {
-            $default = true;
-        });
-
-        $this->assertSame(TestEnumBacked::test, $status);
-        $this->assertFalse($invalid);
-        $this->assertFalse($empty);
-        $this->assertFalse($missing);
-        $this->assertTrue($default);
+        $this->assertDataWhenEnumContract();
     }
 
     public function testMissingMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertFalse($request->missing('name'));
-        $this->assertFalse($request->missing('age'));
-        $this->assertFalse($request->missing('city'));
-        $this->assertTrue($request->missing('foo'));
-        $this->assertTrue($request->missing('name', 'email'));
-        $this->assertTrue($request->missing(['name', 'email']));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertFalse($request->missing('name'));
-        $this->assertFalse($request->missing('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
-        $this->assertFalse($request->missing('foo'));
-
-        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
-        $this->assertFalse($request->missing('foo'));
-        $this->assertFalse($request->missing('bar'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertFalse($request->missing('foo.bar'));
-        $this->assertFalse($request->missing('foo.baz'));
+        $this->assertDataMissingContract();
+        $this->assertDataMissingNestedContract();
     }
 
     public function testWhenMissingMethod()
     {
-        $request = Request::create('/', 'GET', ['bar' => null]);
-
-        $name = $age = $city = $foo = $bar = true;
-
-        $request->whenMissing('name', function ($value) use (&$name) {
-            $name = 'Taylor';
-        });
-
-        $request->whenMissing('age', function ($value) use (&$age) {
-            $age = '';
-        });
-
-        $request->whenMissing('city', function ($value) use (&$city) {
-            $city = null;
-        });
-
-        $request->whenMissing('foo', function () use (&$foo) {
-            $foo = false;
-        });
-
-        $request->whenMissing('bar', function () use (&$bar) {
-            $bar = 'test';
-        }, function () use (&$bar) {
-            $bar = true;
-        });
-
-        $this->assertSame('Taylor', $name);
-        $this->assertSame('', $age);
-        $this->assertNull($city);
-        $this->assertFalse($foo);
-        $this->assertTrue($bar);
+        $this->assertDataWhenMissingContract();
+        $this->assertDataWhenMissingNestedContract();
     }
 
     public function testHasAnyMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertTrue($request->hasAny('name'));
-        $this->assertTrue($request->hasAny('age'));
-        $this->assertTrue($request->hasAny('city'));
-        $this->assertFalse($request->hasAny('foo'));
-        $this->assertTrue($request->hasAny('name', 'email'));
-        $this->assertTrue($request->hasAny(['name', 'email']));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->hasAny('name', 'email'));
-        $this->assertFalse($request->hasAny('surname', 'password'));
-        $this->assertFalse($request->hasAny(['surname', 'password']));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertTrue($request->hasAny('foo.bar'));
-        $this->assertTrue($request->hasAny('foo.baz'));
-        $this->assertFalse($request->hasAny('foo.bax'));
-        $this->assertTrue($request->hasAny(['foo.bax', 'foo.baz']));
+        $this->assertDataHasAnyContract();
+        $this->assertDataHasAnyNestedContract();
     }
 
     public function testFilledMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertTrue($request->filled('name'));
-        $this->assertFalse($request->filled('age'));
-        $this->assertFalse($request->filled('city'));
-        $this->assertFalse($request->filled('foo'));
-        $this->assertFalse($request->filled('name', 'email'));
-
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->filled('name'));
-        $this->assertTrue($request->filled('name', 'email'));
-        $this->assertTrue($request->filled(['name', 'email']));
-
-        // test arrays within query string
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
-        $this->assertTrue($request->filled('foo'));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
-        $this->assertTrue($request->filled('foo.bar'));
+        $this->assertDataFilledContract();
+        $this->assertDataFilledNestedContract();
     }
 
     public function testIsNotFilledMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertFalse($request->isNotFilled('name'));
-        $this->assertTrue($request->isNotFilled('age'));
-        $this->assertTrue($request->isNotFilled('city'));
-        $this->assertTrue($request->isNotFilled('foo'));
-        $this->assertFalse($request->isNotFilled(['name', 'email']));
-        $this->assertTrue($request->isNotFilled(['foo', 'age']));
-        $this->assertTrue($request->isNotFilled(['age', 'city']));
-
-        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz' => '0']]);
-        $this->assertFalse($request->isNotFilled('foo'));
-        $this->assertTrue($request->isNotFilled('foo.bar'));
-        $this->assertFalse($request->isNotFilled('foo.baz'));
+        $this->assertDataIsNotFilledContract();
+        $this->assertDataIsNotFilledNestedContract();
     }
 
     public function testFilledAnyMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+        $this->assertDataAnyFilledContract();
+        $this->assertDataAnyFilledNestedContract();
+    }
 
-        $this->assertTrue($request->anyFilled(['name']));
-        $this->assertTrue($request->anyFilled('name'));
-
-        $this->assertFalse($request->anyFilled(['age']));
-        $this->assertFalse($request->anyFilled('age'));
-
-        $this->assertFalse($request->anyFilled(['foo']));
-        $this->assertFalse($request->anyFilled('foo'));
-
-        $this->assertTrue($request->anyFilled(['age', 'name']));
-        $this->assertTrue($request->anyFilled('age', 'name'));
-
-        $this->assertTrue($request->anyFilled(['foo', 'name']));
-        $this->assertTrue($request->anyFilled('foo', 'name'));
-
-        $this->assertFalse($request->anyFilled(['age', 'city']));
-        $this->assertFalse($request->anyFilled('age', 'city'));
-
-        $this->assertFalse($request->anyFilled(['foo', 'bar']));
-        $this->assertFalse($request->anyFilled('foo', 'bar'));
+    public function testExistsMethod()
+    {
+        $this->assertDataExistsContract();
+        $this->assertDataExistsNestedContract();
     }
 
     public function testInputMethod()
@@ -661,346 +444,62 @@ class HttpRequestTest extends TestCase
         $this->assertSame([], $request->fluent('not_found')->toArray());
     }
 
+    public function testStrMethod()
+    {
+        $this->assertDataStrContract();
+    }
+
     public function testStringMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'int' => 123,
-            'int_str' => '456',
-            'float' => 123.456,
-            'float_str' => '123.456',
-            'float_zero' => 0.000,
-            'float_str_zero' => '0.000',
-            'str' => 'abc',
-            'empty_str' => '',
-            'null' => null,
-        ]);
-        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
-        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
-        $this->assertSame('123', $request->string('int')->value());
-        $this->assertSame('456', $request->string('int_str')->value());
-        $this->assertSame('123.456', $request->string('float')->value());
-        $this->assertSame('123.456', $request->string('float_str')->value());
-        $this->assertSame('0', $request->string('float_zero')->value());
-        $this->assertSame('0.000', $request->string('float_str_zero')->value());
-        $this->assertSame('', $request->string('empty_str')->value());
-        $this->assertSame('', $request->string('null')->value());
-        $this->assertSame('', $request->string('unknown_key')->value());
+        $this->assertDataStringContract();
     }
 
     public function testBooleanMethod()
     {
-        $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes' => 'yes']);
-        $this->assertTrue($request->boolean('checked'));
-        $this->assertTrue($request->boolean('download'));
-        $this->assertFalse($request->boolean('unchecked'));
-        $this->assertFalse($request->boolean('with_trashed'));
-        $this->assertFalse($request->boolean('some_undefined_key'));
-        $this->assertTrue($request->boolean('with_on'));
-        $this->assertTrue($request->boolean('with_yes'));
+        $this->assertDataBooleanContract();
     }
 
     public function testIntegerMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'int' => '123',
-            'raw_int' => 456,
-            'zero_padded' => '078',
-            'space_padded' => ' 901',
-            'nan' => 'nan',
-            'mixed' => '1ab',
-            'underscore_notation' => '2_000',
-            'null' => null,
-        ]);
-        $this->assertSame(123, $request->integer('int'));
-        $this->assertSame(456, $request->integer('raw_int'));
-        $this->assertSame(78, $request->integer('zero_padded'));
-        $this->assertSame(901, $request->integer('space_padded'));
-        $this->assertSame(0, $request->integer('nan'));
-        $this->assertSame(1, $request->integer('mixed'));
-        $this->assertSame(2, $request->integer('underscore_notation'));
-        $this->assertSame(123456, $request->integer('unknown_key', 123456));
-        $this->assertSame(0, $request->integer('null'));
-        $this->assertSame(0, $request->integer('null', 123456));
+        $this->assertDataIntegerContract();
     }
 
     public function testFloatMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'float' => '1.23',
-            'raw_float' => 45.6,
-            'decimal_only' => '.6',
-            'zero_padded' => '0.78',
-            'space_padded' => ' 90.1',
-            'nan' => 'nan',
-            'mixed' => '1.ab',
-            'scientific_notation' => '1e3',
-            'null' => null,
-        ]);
-        $this->assertSame(1.23, $request->float('float'));
-        $this->assertSame(45.6, $request->float('raw_float'));
-        $this->assertSame(.6, $request->float('decimal_only'));
-        $this->assertSame(0.78, $request->float('zero_padded'));
-        $this->assertSame(90.1, $request->float('space_padded'));
-        $this->assertSame(0.0, $request->float('nan'));
-        $this->assertSame(1.0, $request->float('mixed'));
-        $this->assertSame(1e3, $request->float('scientific_notation'));
-        $this->assertSame(123.456, $request->float('unknown_key', 123.456));
-        $this->assertSame(0.0, $request->float('null'));
-        $this->assertSame(0.0, $request->float('null', 123.456));
+        $this->assertDataFloatContract();
     }
 
     public function testArrayMethod()
     {
-        $request = Request::create('/', 'GET', []);
-        $this->assertIsArray($request->array());
-        $this->assertEmpty($request->array());
-
-        $request = Request::create('/', 'GET', [
-            'users' => [1, 2, 3],
-            'roles' => [4, 5, 6],
-            'email' => 'test@example.com',
-        ]);
-
-        $this->assertEmpty($request->array('missing'));
-        $this->assertEmpty($request->array(['missing']));
-        $this->assertEquals([1, 2, 3], $request->array('users'));
-        $this->assertEquals(['users' => [1, 2, 3]], $request->array(['users']));
-        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->array(['users', 'email']));
-
-        $this->assertEquals([
-            'users' => [1, 2, 3],
-            'roles' => [4, 5, 6],
-            'email' => 'test@example.com',
-        ], $request->array());
+        $this->assertDataArrayContract();
+        $this->assertDataArrayArrayableContract();
     }
 
     public function testCollectMethod()
     {
-        $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
-
-        $this->assertInstanceOf(Collection::class, $request->collect('users'));
-        $this->assertTrue($request->collect('developers')->isEmpty());
-        $this->assertEquals([1, 2, 3], $request->collect('users')->all());
-        $this->assertEquals(['users' => [1, 2, 3]], $request->collect()->all());
-
-        $request = Request::create('/', 'GET', ['text-payload']);
-        $this->assertEquals(['text-payload'], $request->collect()->all());
-
-        $request = Request::create('/', 'GET', ['email' => 'test@example.com']);
-        $this->assertEquals(['test@example.com'], $request->collect('email')->all());
-
-        $request = Request::create('/', 'GET', []);
-        $this->assertInstanceOf(Collection::class, $request->collect());
-        $this->assertTrue($request->collect()->isEmpty());
-
-        $request = Request::create('/', 'GET', ['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
-        $this->assertInstanceOf(Collection::class, $request->collect(['users']));
-        $this->assertTrue($request->collect(['developers'])->isEmpty());
-        $this->assertTrue($request->collect(['roles'])->isNotEmpty());
-        $this->assertEquals(['roles' => [4, 5, 6]], $request->collect(['roles'])->all());
-        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->collect(['users', 'email'])->all());
-        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $request->collect(['roles', 'foo']));
-        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
+        $this->assertDataCollectContract();
+        $this->assertDataCollectNestedContract();
     }
 
     public function testDateMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'as_null' => null,
-            'as_invalid' => 'invalid',
-
-            'as_datetime' => '20-01-01 16:30:25',
-            'as_format' => '1577896225',
-            'as_timezone' => '20-01-01 13:30:25',
-
-            'as_date' => '2020-01-01',
-            'as_time' => '16:30:25',
-        ]);
-
-        $current = Carbon::create(2020, 1, 1, 16, 30, 25);
-
-        $this->assertNull($request->date('as_null'));
-        $this->assertNull($request->date('doesnt_exists'));
-
-        $this->assertEquals($current, $request->date('as_datetime'));
-        $this->assertEquals($current->format('Y-m-d H:i:s P'), $request->date('as_format', 'U')->format('Y-m-d H:i:s P'));
-        $this->assertEquals($current, $request->date('as_timezone', null, 'America/Santiago'));
-
-        $this->assertTrue($request->date('as_date')->isSameDay($current));
-        $this->assertTrue($request->date('as_time')->isSameSecond('16:30:25'));
-    }
-
-    public function testDateMethodExceptionWhenValueInvalid()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $request = Request::create('/', 'GET', [
-            'date' => 'invalid',
-        ]);
-
-        $request->date('date');
-    }
-
-    public function testDateMethodExceptionWhenFormatInvalid()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $request = Request::create('/', 'GET', [
-            'date' => '20-01-01 16:30:25',
-        ]);
-
-        $request->date('date', 'invalid_format');
+        $this->assertDataDateContract();
     }
 
     public function testIntervalMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'as_null' => null,
-            'as_empty' => '',
-            'as_iso' => 'P1Y2M3DT4H5M6S',
-            'as_human' => '2 hours 30 minutes',
-            'as_seconds' => '90',
-            'as_minutes' => '45',
-        ]);
-
-        $this->assertNull($request->interval('as_null'));
-        $this->assertNull($request->interval('as_empty'));
-        $this->assertNull($request->interval('doesnt_exist'));
-
-        $interval = $request->interval('as_iso');
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-        $this->assertSame(1, $interval->years);
-        $this->assertSame(2, $interval->months);
-        $this->assertSame(3, $interval->dayz);
-        $this->assertSame(4, $interval->hours);
-        $this->assertSame(5, $interval->minutes);
-        $this->assertSame(6, $interval->seconds);
-
-        $interval = $request->interval('as_human');
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-        $this->assertSame(2, $interval->hours);
-        $this->assertSame(30, $interval->minutes);
-
-        $interval = $request->interval('as_seconds', 'second');
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-        $this->assertSame(90, $interval->seconds);
-
-        $this->assertSame(90, $request->interval('as_seconds', 'minute')->minutes);
-        $this->assertSame(90, $request->interval('as_seconds', 'hour')->hours);
-        $this->assertSame(90, $request->interval('as_seconds', 'day')->dayz);
-
-        $this->assertSame(45, $request->interval('as_minutes', Unit::Minute)->minutes);
-        $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
-    }
-
-    public function testIntervalMethodWithScientificNotationFloats()
-    {
-        $request = Request::create('/', 'GET', [
-            'small_float' => '0.000053',
-            'very_small' => '0.000001',
-            'scientific' => '5.3E-5',
-            'normal_float' => '1.5',
-            'integer' => '90',
-        ]);
-
-        // Small floats that PHP would render in scientific notation (e.g. 5.3E-5)
-        $interval = $request->interval('small_float', Unit::Millisecond);
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-
-        $interval = $request->interval('very_small', Unit::Second);
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-
-        // Scientific notation string passed directly
-        $interval = $request->interval('scientific', Unit::Millisecond);
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-
-        // Normal values should still work
-        $interval = $request->interval('normal_float', Unit::Hour);
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-        $this->assertSame(1, $interval->hours);
-
-        $interval = $request->interval('integer', Unit::Minute);
-        $this->assertInstanceOf(CarbonInterval::class, $interval);
-        $this->assertSame(90, $interval->minutes);
+        $this->assertDataIntervalContract();
     }
 
     public function testEnumMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'valid_enum_value' => 'test',
-            'invalid_enum_value' => 'invalid',
-            'empty_value_request' => '',
-            'string' => [
-                'minus_1' => '-1',
-                '0' => '0',
-                'plus_1' => '1',
-                'doesnt_exist' => '-1024',
-            ],
-            'int' => [
-                'minus_1' => -1,
-                '0' => 0,
-                'plus_1' => 1,
-                'doesnt_exist' => 1024,
-            ],
-        ]);
-
-        $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
-
-        $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
-        $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
-
-        $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
-
-        $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
-        $this->assertNull($request->enum('empty_value_request', TestEnumBacked::class));
-        $this->assertNull($request->enum('valid_enum_value', TestEnum::class));
-
-        $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('string.minus_1', TestIntegerEnumBacked::class));
-        $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('string.0', TestIntegerEnumBacked::class));
-        $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('string.plus_1', TestIntegerEnumBacked::class));
-        $this->assertNull($request->enum('string.doesnt_exist', TestIntegerEnumBacked::class));
-        $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('int.minus_1', TestIntegerEnumBacked::class));
-        $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('int.0', TestIntegerEnumBacked::class));
-        $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('int.plus_1', TestIntegerEnumBacked::class));
-        $this->assertNull($request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertDataEnumContract();
+        $this->assertDataEnumNestedContract();
     }
 
     public function testEnumsMethod()
     {
-        $request = Request::create('/', 'GET', [
-            'valid_enum_values' => ['test', 'test'],
-            'invalid_enum_values' => ['invalid', 'invalid'],
-            'empty_value_request' => [],
-            'string' => [
-                'minus_1' => ['-1', '0'],
-                '0' => '0',
-                'plus_1' => '1',
-                'doesnt_exist' => '-1024',
-            ],
-            'int' => [
-                'minus_1' => -1,
-                '0' => 0,
-                'plus_1' => 1,
-                'doesnt_exist' => 1024,
-            ],
-        ]);
-
-        $this->assertEmpty($request->enums('doesnt_exist', TestEnumBacked::class));
-
-        $this->assertEquals([TestEnumBacked::test, TestEnumBacked::test], $request->enums('valid_enum_values', TestEnumBacked::class));
-
-        $this->assertEmpty($request->enums('invalid_enum_value', TestEnumBacked::class));
-        $this->assertEmpty($request->enums('empty_value_request', TestEnumBacked::class));
-        $this->assertEmpty($request->enums('valid_enum_value', TestEnum::class));
-
-        $this->assertEquals([TestIntegerEnumBacked::minus_1, TestIntegerEnumBacked::zero], $request->enums('string.minus_1', TestIntegerEnumBacked::class));
-        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('string.0', TestIntegerEnumBacked::class));
-        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('string.plus_1', TestIntegerEnumBacked::class));
-        $this->assertEmpty($request->enums('string.doesnt_exist', TestIntegerEnumBacked::class));
-        $this->assertEquals([TestIntegerEnumBacked::minus_1], $request->enums('int.minus_1', TestIntegerEnumBacked::class));
-        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('int.0', TestIntegerEnumBacked::class));
-        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('int.plus_1', TestIntegerEnumBacked::class));
-        $this->assertEmpty($request->enums('int.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertDataEnumsContract();
     }
 
     public function testArrayAccess()
@@ -1082,21 +581,21 @@ class HttpRequestTest extends TestCase
 
     public function testOnlyMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
-        $this->assertEquals(['name' => 'Taylor', 'age' => null], $request->only('name', 'age', 'email'));
-
-        $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
-        $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
-        $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
-        $this->assertSame([], $request->only('developer.skills'));
+        $this->assertDataOnlyContract();
+        $this->assertDataOnlyNestedContract();
     }
 
     public function testExceptMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
-        $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
-        $this->assertSame([], $request->except('age', 'name'));
-        $this->assertSame([], $request->except(['age', 'name']));
+        $this->assertDataExceptContract();
+        $this->assertDataExceptNestedContract();
+    }
+
+    public function testNullValues()
+    {
+        $this->assertDataNullValuesContract();
+        $this->assertDataNullValuesIgnoreDefaultsContract();
+        $this->assertDataNestedNullValuesContract();
     }
 
     public function testQueryMethod()
@@ -2117,22 +1616,11 @@ class HttpRequestTest extends TestCase
 
     public function testItClampsValues()
     {
-        $request = Request::create('/', 'GET', [
-            'per_page' => 100,
-            'float' => 9.24,
-            'empty' => '',
-            'null' => null,
-            'string' => 'string',
-        ]);
+        $this->assertDataClampContract();
+    }
 
-        $this->assertSame(100, $request->clamp('per_page', 100, 101));
-        $this->assertSame(10, $request->clamp('per_page', -10, 10));
-        $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
-        $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
-        $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
-        $this->assertSame(9.24, $request->clamp('float', 1, 10));
-        $this->assertSame(15, $request->clamp('empty', 10, 100, 15));
-        $this->assertSame(15, $request->clamp('string', 10, 100, 15));
-        $this->assertSame(15, $request->clamp('null', 10, 100, 15));
+    protected static function arrayToDataFactory(array $data)
+    {
+        return Request::create('/', 'GET', $data);
     }
 }
