@@ -46,18 +46,20 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     {
         $when ??= fn () => true;
 
-        $this->forgetDuplicates();
+        while (! empty($this->callbacks)) {
+            $this->forgetDuplicates();
 
-        foreach ($this->callbacks as $index => $callback) {
-            if ($when($callback)) {
-                rescue($callback);
+            foreach ($this->callbacks as $index => $callback) {
+                if (($this->callbacks[$index] ?? null) !== $callback) {
+                    break;
+                }
+
+                unset($this->callbacks[$index]);
+
+                if ($when($callback)) {
+                    rescue($callback);
+                }
             }
-
-            unset($this->callbacks[$index]);
-        }
-
-        if (! empty($this->callbacks)) {
-            $this->invokeWhen($when);
         }
     }
 

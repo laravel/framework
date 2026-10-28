@@ -46,4 +46,110 @@ class DeferredCallbackTest extends TestCase
 
         $this->assertSame(['first', 'second'], $result);
     }
+
+    public function test_a_deferred_callback_can_cancel_a_pending_callback()
+    {
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+
+                defer()->forget('second');
+            }, 'first');
+
+            defer(function () use (&$result) {
+                $result[] = 'second';
+            }, 'second');
+
+            defer(function () use (&$result) {
+                $result[] = 'third';
+            }, 'third');
+        });
+
+        $this->get('/test');
+
+        $this->assertSame(['first', 'third'], $result);
+    }
+
+    public function test_callbacks_added_after_forgetting_the_running_callback_are_invoked()
+    {
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+
+                defer()->forget('first');
+
+                defer(function () use (&$result) {
+                    $result[] = 'third';
+                }, 'third');
+            }, 'first');
+
+            defer(function () use (&$result) {
+                $result[] = 'second';
+            }, 'second');
+        });
+
+        $this->get('/test');
+
+        $this->assertSame(['first', 'second', 'third'], $result);
+    }
+
+    public function test_counting_pending_callbacks_does_not_repeat_a_running_callback()
+    {
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+            });
+
+            defer(function () use (&$result) {
+                $result[] = 'second';
+
+                count(defer());
+            });
+
+            defer(function () use (&$result) {
+                $result[] = 'third';
+            });
+        });
+
+        $this->get('/test');
+
+        $this->assertSame(['first', 'second', 'third'], $result);
+    }
+
+    public function test_cancellation_preserves_callback_conditions_on_failed_requests()
+    {
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+
+                defer()->forget('second');
+            }, 'first')->always();
+
+            defer(function () use (&$result) {
+                $result[] = 'second';
+            }, 'second')->always();
+
+            defer(function () use (&$result) {
+                $result[] = 'third';
+            });
+
+            defer(function () use (&$result) {
+                $result[] = 'fourth';
+            })->always();
+
+            return response('', 500);
+        });
+
+        $this->get('/test')->assertStatus(500);
+
+        $this->assertSame(['first', 'fourth'], $result);
+    }
 }
