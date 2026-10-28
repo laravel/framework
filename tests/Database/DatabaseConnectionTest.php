@@ -227,6 +227,36 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1, $connection->transactionLevel());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testConnectionIsReestablishedAfterTheConnectionIsLostDuringRollBack()
+    {
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('rollBack')->willThrowException(new PDOException('server has gone away'));
+
+        $newPdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $newPdo->expects($this->once())->method('beginTransaction');
+
+        $connection = $this->getMockConnection([], $pdo);
+        $connection->setReconnector(fn ($connection) => $connection->setPdo($newPdo));
+
+        $connection->beginTransaction();
+
+        try {
+            $connection->rollBack();
+
+            $this->fail('A PDOException was not thrown.');
+        } catch (PDOException) {
+            $this->assertSame(0, $connection->transactionLevel());
+        }
+
+        $connection->beginTransaction();
+
+        $this->assertSame(1, $connection->transactionLevel());
+        $this->assertSame($newPdo, $connection->getPdo());
+    }
+
     public function testBeginTransactionMethodNeverRetriesIfWithinTransaction()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
