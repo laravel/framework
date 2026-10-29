@@ -822,6 +822,23 @@ class SessionStoreTest extends TestCase
         ]], $errors->getBags()['default']->getMessages());
     }
 
+    public function testValidationErrorsSurviveStartingTheSessionAgainAsJson()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->expects('read')->twice()->andReturn('');
+        $session->start();
+        $session->put('errors', (new ViewErrorBag)->put('default', new MessageBag([
+            'first_name' => ['Your first name is required'],
+        ])));
+
+        $session->start();
+
+        $errors = $session->get('errors');
+
+        $this->assertInstanceOf(ViewErrorBag::class, $errors);
+        $this->assertEquals(['first_name' => ['Your first name is required']], $errors->getBag('default')->getMessages());
+    }
+
     public function testItIsMacroable()
     {
         $this->getSession()->macro('foo', function () {

@@ -158,7 +158,7 @@ class Store implements Session
      */
     protected function marshalErrorBag()
     {
-        if ($this->serialization !== 'json' || $this->missing('errors')) {
+        if ($this->serialization !== 'json' || ! is_array($this->get('errors'))) {
             return;
         }
 
