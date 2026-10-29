@@ -1443,7 +1443,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return Double::for(PostgresBuilder::class);
+        return Double::for(PostgresBuilder::class)->passthru();
     }
 
     /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */
