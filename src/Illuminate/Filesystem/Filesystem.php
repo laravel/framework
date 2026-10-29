@@ -331,6 +331,10 @@ class Filesystem
      */
     public function move($path, $target)
     {
+        if ($this->hasDangerousStreamWrapper($path)) {
+            return false;
+        }
+
         return rename($path, $target);
     }
 
@@ -343,6 +347,10 @@ class Filesystem
      */
     public function copy($path, $target)
     {
+        if ($this->hasDangerousStreamWrapper($path)) {
+            return false;
+        }
+
         return copy($path, $target);
     }
 
