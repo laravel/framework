@@ -266,6 +266,25 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushedOn('redis', JobStub::class);
     }
 
+    public function testAssertPushedReceivesTheDelay()
+    {
+        $this->fake->push($this->job);
+        $this->fake->later(600, new JobToFakeStub);
+        $this->fake->bulk([new JobWithDelayAttributeStub]);
+
+        $this->fake->assertPushed(JobStub::class, fn ($job, $queue, $data, $delay) => $delay === null);
+        $this->fake->assertPushed(JobToFakeStub::class, fn ($job, $queue, $data, $delay) => $delay === 600);
+        $this->fake->assertPushed(JobWithDelayAttributeStub::class, fn ($job, $queue, $data, $delay) => $delay === 15);
+        $this->fake->assertNotPushed(JobToFakeStub::class, fn ($job, $queue, $data, $delay) => $delay === 60);
+    }
+
+    public function testAssertPushedOnReceivesTheDelay()
+    {
+        $this->fake->laterOn('redis', 600, new JobToFakeStub);
+
+        $this->fake->assertPushedOn('redis', JobToFakeStub::class, fn ($job, $queue, $data, $delay) => $delay === 600);
+    }
+
     public function testBulkRespectsRuntimeDelay()
     {
         $job = (new JobWithRuntimeDelayStub)->delay(30);

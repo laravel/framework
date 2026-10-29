@@ -394,7 +394,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->jobs[$job]))->filter(
-            fn ($data) => $callback($data['job'], $data['queue'], $data['data'])
+            fn ($data) => $callback($data['job'], $data['queue'], $data['data'], $data['delay'] ?? null)
         )->pluck('job');
     }
 
@@ -654,6 +654,20 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function push($job, $data = '', $queue = null)
     {
+        return $this->pushJob($job, $data, $queue);
+    }
+
+    /**
+     * Push a new job onto the queue with the given delay.
+     *
+     * @param  string|object  $job
+     * @param  mixed  $data
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return mixed
+     */
+    protected function pushJob($job, $data = '', $queue = null, $delay = null)
+    {
         $queue = enum_value($queue);
 
         foreach ($this->beforePushingCallbacks as $callback) {
@@ -670,6 +684,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
+                'delay' => $delay,
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
@@ -765,7 +780,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             ];
         }
 
-        return $this->push($job, $data, $queue);
+        return $this->pushJob($job, $data, $queue, $delay);
     }
 
     /**
