@@ -287,6 +287,18 @@ class CookieTest extends TestCase
         );
     }
 
+    public function testQueueWithNamedArguments(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue('foo', 'bar', 60, secure: true, sameSite: 'none');
+        $cookie = $cookieJar->queued('foo');
+
+        $this->assertSame('/', $cookie->getPath());
+        $this->assertNull($cookie->getDomain());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertSame('none', $cookie->getSameSite());
+    }
+
     public function testGetQueuedCookies(): void
     {
         $cookieJar = $this->getCreator();
