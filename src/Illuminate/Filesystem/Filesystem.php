@@ -331,7 +331,7 @@ class Filesystem
      */
     public function move($path, $target)
     {
-        if ($this->hasDangerousStreamWrapper($path)) {
+        if ($this->hasDangerousStreamWrapper($path) || $this->hasDangerousStreamWrapper($target)) {
             return false;
         }
 
@@ -347,7 +347,7 @@ class Filesystem
      */
     public function copy($path, $target)
     {
-        if ($this->hasDangerousStreamWrapper($path)) {
+        if ($this->hasDangerousStreamWrapper($path) || $this->hasDangerousStreamWrapper($target)) {
             return false;
         }
 

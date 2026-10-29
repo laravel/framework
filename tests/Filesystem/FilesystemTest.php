@@ -241,6 +241,30 @@ class FilesystemTest extends TestCase
         $this->assertFileDoesNotExist($target);
     }
 
+    public function testCopyReturnsFalseForPharUriTarget()
+    {
+        $files = new Filesystem;
+        $source = self::$tempDir.'/copy-source.txt';
+        file_put_contents($source, 'Hello World');
+
+        $this->assertFalse($files->copy($source, 'phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->copy($source, 'PHAR:///some/archive.phar/entry'));
+        $this->assertFileExists($source);
+        $this->assertSame('Hello World', file_get_contents($source));
+    }
+
+    public function testMoveReturnsFalseForPharUriTarget()
+    {
+        $files = new Filesystem;
+        $source = self::$tempDir.'/move-source.txt';
+        file_put_contents($source, 'Hello World');
+
+        $this->assertFalse($files->move($source, 'phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->move($source, 'PHAR:///some/archive.phar/entry'));
+        $this->assertFileExists($source);
+        $this->assertSame('Hello World', file_get_contents($source));
+    }
+
     #[RequiresPhpExtension('phar')]
     public function testFilesInsideTheRunningPharCanBeRead()
     {
