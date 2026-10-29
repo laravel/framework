@@ -14,12 +14,21 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
+use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class CallQueuedHandlerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Queue::requireEncryptedJobs(false);
+
+        parent::tearDown();
+    }
+
     public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
@@ -35,6 +44,22 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue($job->isDeleted());
 
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
+    }
+
+    public function testPlaintextPayloadIsRejectedWhenEncryptedJobsAreRequired()
+    {
+        Queue::requireEncryptedJobs();
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = new FakeJob;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Received a plaintext job payload while encrypted job payloads are required.');
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedHandlerTestJob),
+        ]);
     }
 
     public function testJobCanBeDispatchedThroughMiddleware()

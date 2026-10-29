@@ -72,6 +72,13 @@ abstract class Queue
     protected static $createPayloadCallbacks = [];
 
     /**
+     * Indicates if job payloads are required to be encrypted.
+     *
+     * @var bool
+     */
+    protected static $jobsShouldRequireEncryption = false;
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $queue
@@ -339,6 +346,27 @@ abstract class Queue
         } else {
             static::$createPayloadCallbacks[] = $callback;
         }
+    }
+
+    /**
+     * Indicate that job payloads must be encrypted, rejecting any plaintext payload a worker receives.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function requireEncryptedJobs($value = true)
+    {
+        static::$jobsShouldRequireEncryption = $value;
+    }
+
+    /**
+     * Determine if job payloads are required to be encrypted.
+     *
+     * @return bool
+     */
+    public static function requiresEncryptedJobs()
+    {
+        return static::$jobsShouldRequireEncryption;
     }
 
     /**

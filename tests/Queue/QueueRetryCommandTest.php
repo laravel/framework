@@ -10,6 +10,7 @@ use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Collection;
@@ -25,6 +26,8 @@ class QueueRetryCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Queue::requireEncryptedJobs(false);
+
         m::close();
     }
 
@@ -214,6 +217,23 @@ class QueueRetryCommandTest extends TestCase
         $failer->shouldReceive('forget')->once()->with('1');
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue], $events);
+    }
+
+    public function testRetryingAJobThrowsWhenEncryptedJobsAreRequiredAndPayloadIsPlaintext()
+    {
+        Queue::requireEncryptedJobs();
+
+        $failer = m::mock(FailedJobProviderInterface::class);
+        $queue = m::mock(QueueContract::class);
+
+        $job = $this->failedJob(id: '1', connection: 'database', queue: 'default');
+
+        $failer->shouldReceive('find')->once()->with('1')->andReturn($job);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Received a plaintext job payload while encrypted job payloads are required.');
+
+        $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue]);
     }
 
     public function testRetriesCollectionOfJobs()

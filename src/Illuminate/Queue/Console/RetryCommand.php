@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\JobRetryRequested;
+use Illuminate\Queue\Queue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -256,6 +257,10 @@ class RetryCommand extends Command
     protected function getInstanceFromPayload($payload)
     {
         if (str_starts_with($payload['data']['command'], 'O:')) {
+            if (Queue::requiresEncryptedJobs()) {
+                throw new RuntimeException('Received a plaintext job payload while encrypted job payloads are required.');
+            }
+
             return unserialize($payload['data']['command']);
         }
 

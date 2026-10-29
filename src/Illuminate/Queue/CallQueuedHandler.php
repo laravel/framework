@@ -113,6 +113,10 @@ class CallQueuedHandler
     protected function getCommand(array $data)
     {
         if (str_starts_with($data['command'], 'O:')) {
+            if (Queue::requiresEncryptedJobs()) {
+                throw new RuntimeException('Received a plaintext job payload while encrypted job payloads are required.');
+            }
+
             return unserialize($data['command']);
         }
 
