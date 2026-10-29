@@ -3,5 +3,5 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-# Services belong to the orb supervisor, not to the setup process or its snapshot.
+# Services belong to the orb supervisor, not to the setup process or its snapshot...
 amp orb services ensure
