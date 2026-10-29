@@ -7,7 +7,9 @@ use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
@@ -220,6 +222,14 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
+
+        if ($this->getConnection() instanceof MySqlConnection) {
+            return $this->connection->transaction(fn () => $this->table()->upsert(
+                ['key' => $key, 'value' => $value, 'expiration' => $expiration],
+                'key',
+                ['key' => new Expression($this->table()->getGrammar()->wrap('key'))],
+            ) > 0, 3);
+        }
 
         if (! $this->getConnection() instanceof SqlServerConnection) {
             return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;
