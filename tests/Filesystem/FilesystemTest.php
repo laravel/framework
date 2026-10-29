@@ -268,6 +268,40 @@ class FilesystemTest extends TestCase
         $this->assertSame('Hello from phar|false', exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($phar)));
     }
 
+    #[RequiresPhpExtension('phar')]
+    public function testFilesInsideTheRunningPharCanBeCopied()
+    {
+        $phar = self::$tempDir.'/copy-app.phar';
+        $copyOut = self::$tempDir.'/copied-from-phar.txt';
+
+        file_put_contents(self::$tempDir.'/copy-run.php', '<?php
+            require '.var_export(realpath(__DIR__.'/../../vendor/autoload.php'), true).';
+            require __DIR__."/Filesystem.php";
+
+            $files = new Illuminate\Filesystem\Filesystem;
+
+            $copied = $files->copy(Phar::running()."/file.txt", '.var_export($copyOut, true).');
+            $blocked = $files->copy("phar:///some/archive.phar/entry", '.var_export($copyOut.'.blocked', true).');
+
+            echo var_export($copied, true), "|", var_export($blocked, true);
+        ');
+
+        file_put_contents(self::$tempDir.'/copy-build.php', '<?php
+            $phar = new Phar('.var_export($phar, true).');
+            $phar->addFile('.var_export(realpath(__DIR__.'/../../src/Illuminate/Filesystem/Filesystem.php'), true).', "Filesystem.php");
+            $phar->addFile('.var_export(self::$tempDir.'/copy-run.php', true).', "run.php");
+            $phar->addFromString("file.txt", "Hello from phar");
+            $phar->setStub(\'<?php Phar::mapPhar("copy-app.phar"); require "phar://copy-app.phar/run.php"; __HALT_COMPILER();\');
+        ');
+
+        exec(escapeshellarg(PHP_BINARY).' -d phar.readonly=0 '.escapeshellarg(self::$tempDir.'/copy-build.php'));
+
+        $this->assertSame('true|false', exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($phar)));
+        $this->assertFileExists($copyOut);
+        $this->assertSame('Hello from phar', file_get_contents($copyOut));
+        $this->assertFileDoesNotExist($copyOut.'.blocked');
+    }
+
     public function testDeleteDirectory()
     {
         mkdir(self::$tempDir.'/foo');
