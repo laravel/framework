@@ -638,6 +638,35 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get multiple items from the cache, or execute the given Closure for the missing ones and store the results.
+     *
+     * @template TCacheValue
+     *
+     * @param  iterable<\UnitEnum|string>  $keys
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(array<int, string>): iterable<string, TCacheValue>  $callback
+     * @return array<string, TCacheValue|null>
+     */
+    public function rememberMany($keys, $ttl, Closure $callback)
+    {
+        $values = $this->many((new Collection($keys))->values()->all());
+
+        $missing = array_keys(array_filter($values, is_null(...)));
+
+        if ($missing === []) {
+            return $values;
+        }
+
+        $computed = (new Collection($callback($missing)))->only($missing)->all();
+
+        if ($computed !== []) {
+            $this->putMany($computed, $ttl);
+        }
+
+        return array_replace($values, $computed);
+    }
+
+    /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
      *
      * @template TCacheValue

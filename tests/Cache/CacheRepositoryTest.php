@@ -182,6 +182,70 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberManyOnlyComputesMissingKeys()
+    {
+        $repo = new Repository(new ArrayStore);
+        $repo->put('a', 'cached-a', 60);
+
+        $calls = [];
+
+        $result = $repo->rememberMany(['a', 'b', 'c'], 60, function ($missing) use (&$calls) {
+            $calls[] = $missing;
+
+            return ['b' => 'computed-b', 'c' => 'computed-c', 'd' => 'ignored'];
+        });
+
+        $this->assertSame(['a' => 'cached-a', 'b' => 'computed-b', 'c' => 'computed-c'], $result);
+        $this->assertSame([['b', 'c']], $calls);
+        $this->assertSame('computed-b', $repo->get('b'));
+        $this->assertFalse($repo->has('d'));
+
+        $result = $repo->rememberMany(collect(['c', 'a']), 60, fn () => $this->fail('The callback should not be called.'));
+
+        $this->assertSame(['c' => 'computed-c', 'a' => 'cached-a'], $result);
+    }
+
+    public function testRememberManyStoresComputedItemsWithTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('many')->with(['foo', 'bar'])->andReturn(['foo' => 'cached', 'bar' => null]);
+        $repo->getStore()->expects('putMany')->with(['bar' => 'baz'], 10);
+
+        $result = $repo->rememberMany(['foo', 'bar'], 10, fn () => ['bar' => 'baz']);
+
+        $this->assertSame(['foo' => 'cached', 'bar' => 'baz'], $result);
+    }
+
+    public function testRememberManyKeepsKeysTheCallbackDidNotReturnAsNull()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        $result = $repo->rememberMany(['foo', 'bar'], 60, fn () => ['foo' => 'baz']);
+
+        $this->assertSame(['foo' => 'baz', 'bar' => null], $result);
+        $this->assertFalse($repo->has('bar'));
+    }
+
+    public function testRememberManyAcceptsCollectionsFromTheCallback()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        $result = $repo->rememberMany(['foo', 'bar'], 60, fn ($missing) => collect($missing)->mapWithKeys(fn ($key) => [$key => strtoupper($key)]));
+
+        $this->assertSame(['foo' => 'FOO', 'bar' => 'BAR'], $result);
+        $this->assertSame('BAR', $repo->get('bar'));
+    }
+
+    public function testRememberManyTreatsFalsyValuesAsCached()
+    {
+        $repo = new Repository(new ArrayStore);
+        $repo->putMany(['foo' => false, 'bar' => 0, 'baz' => ''], 60);
+
+        $result = $repo->rememberMany(['foo', 'bar', 'baz'], 60, fn () => $this->fail('The callback should not be called.'));
+
+        $this->assertSame(['foo' => false, 'bar' => 0, 'baz' => ''], $result);
+    }
+
     public function testPuttingMultipleItemsInCache()
     {
         $repo = $this->getRepository();

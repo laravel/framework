@@ -31,3 +31,6 @@ assertType('array{36, bool}', $cache->rememberWithWarmth('cache', Carbon::now(),
 assertType('36', $cache->rememberForever('cache', function (): int {
     return 36;
 }));
+assertType('array<string, 36|null>', $cache->rememberMany(['foo', 'bar'], 60, function (array $missing): array {
+    return array_fill_keys($missing, 36);
+}));
