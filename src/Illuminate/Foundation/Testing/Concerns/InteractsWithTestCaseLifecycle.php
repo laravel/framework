@@ -212,6 +212,7 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestsDuringMaintenance::flushState();
         Prompt::flushState();
         Queue::createPayloadUsing(null);
+        Queue::requireEncryptedJobs(false);
         RegisterProviders::flushState();
         Response::flushState();
         Sleep::fake(false);
