@@ -1721,6 +1721,19 @@ return [
                 'description' => 'The configuration file or key to show',
             ],
         ],
+        'options' => [
+            [
+                'name' => 'show-sensitive',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Reveal sensitive values, which are masked by default',
+            ],
+        ],
     ],
     \Illuminate\Foundation\Console\ConsoleMakeCommand::class => [
         'name' => 'make:command',

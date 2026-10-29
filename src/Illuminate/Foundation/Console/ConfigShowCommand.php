@@ -14,7 +14,9 @@ class ConfigShowCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'config:show {config : The configuration file or key to show}';
+    protected $signature = 'config:show
+                    {config : The configuration file or key to show}
+                    {--show-sensitive : Reveal sensitive values, which are masked by default}';
 
     /**
      * The console command description.
@@ -54,7 +56,7 @@ class ConfigShowCommand extends Command
         $data = config($name);
 
         if (! is_array($data)) {
-            $this->title($name, $this->formatValue($data));
+            $this->title($name, $this->formatValue($this->maskSensitiveValue($name, $data)));
 
             return;
         }
@@ -64,7 +66,7 @@ class ConfigShowCommand extends Command
         foreach (Arr::dot($data) as $key => $value) {
             $this->components->twoColumnDetail(
                 $this->formatKey($key),
-                $this->formatValue($value)
+                $this->formatValue($this->maskSensitiveValue("{$name}.{$key}", $value))
             );
         }
     }
@@ -99,6 +101,35 @@ class ConfigShowCommand extends Command
                 $matches[2]
             ), $key
         );
+    }
+
+    /**
+     * Mask the given configuration value if its key or URL credentials mark it as sensitive.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function maskSensitiveValue($key, $value)
+    {
+        if ($this->option('show-sensitive') || ! is_string($value) || $value === '') {
+            return $value;
+        }
+
+        // List items such as app.previous_keys.0 are judged by the name of their parent key.
+        $name = Arr::last(explode('.', $key), fn ($segment) => ! is_numeric($segment), '');
+
+        if (preg_match('/key|secret|pass|token|credential|private|dsn|sasl/i', $name)) {
+            return '********';
+        }
+
+        $password = parse_url($value, PHP_URL_PASS);
+
+        if (is_string($password) && $password !== '') {
+            $value = str_replace(":{$password}@", ':********@', $value);
+        }
+
+        return preg_replace('/([?&]password=)[^&#]+/', '$1********', $value);
     }
 
     /**
