@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
@@ -216,6 +218,34 @@ class ScheduleRunCommandTest extends TestCase
                    $event->task->skippedBecauseOverlapping === true;
         });
         Event::assertNotDispatched(ScheduledTaskFailed::class);
+        $this->assertFalse($ran);
+    }
+
+    public function test_task_skipped_event_is_dispatched_when_task_ran_on_another_server()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskSkipped::class,
+        ]);
+
+        Carbon::setTestNow(Carbon::now()->startOfMinute());
+
+        $ran = false;
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->call(function () use (&$ran) {
+            $ran = true;
+        })->name('test')->onOneServer()->everyMinute();
+
+        $this->app->make(CacheSchedulingMutex::class)->create($task, Carbon::now());
+
+        $this->artisan('schedule:run');
+
+        Event::assertDispatched(ScheduledTaskSkipped::class, function ($event) use ($task) {
+            return $event->task === $task;
+        });
+        Event::assertNotDispatched(ScheduledTaskStarting::class);
+        Event::assertNotDispatched(ScheduledTaskFinished::class);
         $this->assertFalse($ran);
     }
 
