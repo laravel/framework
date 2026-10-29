@@ -1934,6 +1934,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'greek']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'greek\', "body")) @@ plainto_tsquery(\'greek\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
@@ -4852,6 +4857,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->returns(1);
         $result = $builder->from('users')->where('id', '=', 1)->limit(5)->offset(5)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? from (select top (5) * from [users] where [id] > ? order by [foo] desc) as [users]', ['foo', 'bar', 1])->returns(1);
+        $result = $builder->from('users')->where('id', '>', 1)->orderBy('foo', 'desc')->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertMethod()
@@ -5176,6 +5186,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->expects('delete')->with('delete top (1) from [users] where [email] = ?', ['foo'])->returns(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('delete')->with('delete [users] from (select top (1) * from [users] where [email] = ? order by [id] asc) as [users]', ['foo'])->returns(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
     }
@@ -5501,6 +5516,25 @@ class DatabaseQueryBuilderTest extends TestCase
             'meta->tags' => ['white', 'large'],
             'group_id' => new Raw('45'),
             'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testMariaDbUpdateWrappingJsonArray()
+    {
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MariaDbGrammar($connection);
+        $processor = new Processor;
+
+        $connection->expects($this->once())
+            ->method('update')
+            ->with(
+                'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_query(?, \'$\')) where `active` = ?',
+                [json_encode(['white', 'large']), 1]
+            );
+
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('active', 1)->update([
+            'meta->tags' => ['white', 'large'],
         ]);
     }
 

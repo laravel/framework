@@ -8,9 +8,11 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
@@ -475,6 +477,108 @@ class RedisStoreTest extends TestCase
 
         $this->assertTrue($store->flush());
         $this->assertNull($store->get('fizz'));
+    }
+
+    public function testFlushingManyTagsOnlyPassesEachEntrysOwnTagToTheScript()
+    {
+        $store = Cache::store('redis');
+        $connection = $store->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not flush tags with a script.');
+        }
+
+        $store->clear();
+
+        $prefix = $store->getPrefix();
+
+        $store->tags(['people'])->put('person-1', 'Sally', 300);
+        $store->tags(['people', 'artist'])->put('person-2', 'John', 300);
+        $store->tags(['artist'])->forever('person-3', 'Taylor');
+        $store->tags(['other'])->put('person-4', 'Abigail', 300);
+
+        $calls = [];
+
+        $connection->setEventDispatcher($this->app['events']);
+        $connection->listen(function (CommandExecuted $event) use (&$calls) {
+            if ($event->command === 'eval') {
+                [$numberOfKeys, $arguments] = is_array($event->parameters[1])
+                    ? [$event->parameters[2], $event->parameters[1]]
+                    : [$event->parameters[1], array_slice($event->parameters, 2)];
+
+                $calls[] = [
+                    'keys' => array_map(fn ($key) => Str::afterLast($key, ':'), array_slice($arguments, 0, $numberOfKeys)),
+                    'tags' => array_slice($arguments, $numberOfKeys + 1),
+                ];
+            }
+        });
+
+        $store->tags(['people', 'artist', 'empty-1', 'empty-2'])->flush();
+
+        $connection->unsetEventDispatcher();
+
+        $this->assertCount(2, $calls);
+        $this->assertEqualsCanonicalizing(['person-1', 'person-2'], $calls[0]['keys']);
+        $this->assertCount(1, $calls[0]['tags']);
+        $this->assertStringEndsWith('tag:people:entries', $calls[0]['tags'][0]);
+        $this->assertEqualsCanonicalizing(['person-2', 'person-3'], $calls[1]['keys']);
+        $this->assertCount(1, $calls[1]['tags']);
+        $this->assertStringEndsWith('tag:artist:entries', $calls[1]['tags'][0]);
+
+        $this->assertNull($store->tags(['people'])->get('person-1'));
+        $this->assertNull($store->tags(['people', 'artist'])->get('person-2'));
+        $this->assertNull($store->tags(['artist'])->get('person-3'));
+        $this->assertSame('Abigail', $store->tags(['other'])->get('person-4'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:people:entries'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:artist:entries'));
+        $this->assertSame(1, $connection->zcard($prefix.'tag:other:entries'));
+    }
+
+    public function testFlushingTagsWhileASharedKeyIsRewrittenLeavesNoLiveValueUnindexed()
+    {
+        $store = Cache::store('redis');
+        $connection = $store->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not flush tags with a script.');
+        }
+
+        $store->clear();
+
+        $prefix = $store->getPrefix();
+
+        $store->tags(['people', 'artist'])->forever('person', 'Sally');
+
+        $rewritten = false;
+
+        $connection->setEventDispatcher($this->app['events']);
+        $connection->listen(function (CommandExecuted $event) use ($store, &$rewritten) {
+            if ($event->command === 'eval' && ! $rewritten) {
+                $rewritten = true;
+
+                $store->tags(['people', 'artist'])->forever('person', 'John');
+            }
+        });
+
+        $store->tags(['people', 'artist'])->flush();
+
+        $connection->unsetEventDispatcher();
+
+        $this->assertTrue($rewritten);
+
+        $itemKey = $store->tags(['people', 'artist'])->taggedItemKey('person');
+
+        if ($store->tags(['people', 'artist'])->get('person') !== null) {
+            $this->assertContains($itemKey, $connection->zrange($prefix.'tag:people:entries', 0, -1));
+            $this->assertContains($itemKey, $connection->zrange($prefix.'tag:artist:entries', 0, -1));
+        }
+
+        $store->tags(['people'])->flush();
+        $store->tags(['artist'])->flush();
+
+        $this->assertNull($store->tags(['people', 'artist'])->get('person'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:people:entries'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:artist:entries'));
     }
 
     public function testLocksCanBeFlushed()

@@ -404,6 +404,13 @@ class SqlServerGrammar extends Grammar
         $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM sys.columns ';
         $sql .= "WHERE [object_id] = OBJECT_ID($tableName) AND [name] in ($columns) AND [default_object_id] <> 0;";
+
+        if ($command->name === 'dropColumn') {
+            $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + [name] + ';' ";
+            $sql .= 'FROM sys.check_constraints ';
+            $sql .= "WHERE [parent_object_id] = OBJECT_ID($tableName) AND COL_NAME([parent_object_id], [parent_column_id]) in ($columns);";
+        }
+
         $sql .= 'EXEC(@sql)';
 
         return $sql;

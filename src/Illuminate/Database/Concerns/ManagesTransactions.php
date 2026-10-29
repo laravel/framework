@@ -329,6 +329,8 @@ trait ManagesTransactions
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
 
+            $this->pdo = null;
+
             $this->transactionsManager?->rollback(
                 $this->getName(), $this->transactions
             );

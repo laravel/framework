@@ -431,7 +431,9 @@ trait InteractsWithData
      */
     public function array($key = null)
     {
-        return (array) (is_array($key) ? $this->only($key) : $this->data($key));
+        $value = is_array($key) ? $this->only($key) : $this->data($key);
+
+        return is_object($value) ? Arr::from($value) : (array) $value;
     }
 
     /**
