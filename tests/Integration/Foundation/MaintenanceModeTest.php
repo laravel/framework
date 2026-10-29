@@ -275,6 +275,25 @@ class MaintenanceModeTest extends TestCase
         Event::assertDispatched(MaintenanceModeEnabled::class);
     }
 
+    public function testDownCommandCreatesMaintenanceFileWhenUsingFileDriver()
+    {
+        $this->artisan(DownCommand::class)->assertSuccessful();
+
+        $this->assertFileExists(storage_path('framework/maintenance.php'));
+    }
+
+    public function testDownCommandDoesNotCreateMaintenanceFileWhenUsingCacheDriver()
+    {
+        $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
+            $this->app['cache'], 'array', 'framework:down'
+        ));
+
+        $this->artisan(DownCommand::class)->assertSuccessful();
+
+        $this->assertTrue($this->app->maintenanceMode()->active());
+        $this->assertFileDoesNotExist(storage_path('framework/maintenance.php'));
+    }
+
     public function testDispatchEventWhenMaintenanceModeIsDisabled()
     {
         file_put_contents(storage_path('framework/down'), json_encode([
