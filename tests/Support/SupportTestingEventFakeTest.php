@@ -79,6 +79,39 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
     }
 
+    public function testAssertDispatchedInOrder()
+    {
+        $this->fake->dispatch(new EventWithPropertiesStub('pending'));
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->dispatch(new EventWithPropertiesStub('paid'));
+        $this->fake->dispatch(EventStub::class);
+
+        $this->fake->assertDispatchedInOrder([
+            EventStub::class,
+            fn (EventWithPropertiesStub $event) => $event->status === 'paid',
+            EventStub::class,
+        ]);
+
+        try {
+            $this->fake->assertDispatchedInOrder([
+                fn (EventWithPropertiesStub $event) => $event->status === 'paid',
+                fn (EventWithPropertiesStub $event) => $event->status === 'pending',
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventWithPropertiesStub] event was not dispatched in the expected order.', $e->getMessage());
+        }
+    }
+
+    public function testAssertDispatchedInOrderCountsEachDispatchOnce()
+    {
+        $this->fake->dispatch(EventStub::class);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertDispatchedInOrder([EventStub::class, EventStub::class]);
+    }
+
     public function testAssertDispatchedTimes()
     {
         $this->fake->dispatch(EventStub::class);

@@ -47,6 +47,13 @@ class EventFake implements Dispatcher, Fake
     protected $events = [];
 
     /**
+     * All of the events that have been intercepted, in the order they were dispatched.
+     *
+     * @var array<int, array{string, array}>
+     */
+    protected $eventsInOrder = [];
+
+    /**
      * Create a new event fake instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
@@ -145,6 +152,33 @@ class EventFake implements Dispatcher, Fake
             $this->dispatched($event, $callback)->isNotEmpty(),
             "The expected [{$event}] event was not dispatched."
         );
+    }
+
+    /**
+     * Assert that the given events were dispatched in the given order.
+     *
+     * @param  array<int, string|\Closure>  $events
+     * @return void
+     */
+    public function assertDispatchedInOrder($events)
+    {
+        $position = 0;
+
+        foreach ($events as $event) {
+            [$event, $callback] = $event instanceof Closure
+                ? [$this->firstClosureParameterType($event), $event]
+                : [$event, fn () => true];
+
+            $found = false;
+
+            while (! $found && $position < count($this->eventsInOrder)) {
+                [$name, $arguments] = $this->eventsInOrder[$position++];
+
+                $found = $name === $event && $callback(...$arguments);
+            }
+
+            PHPUnit::assertTrue($found, "The expected [{$event}] event was not dispatched in the expected order.");
+        }
     }
 
     /**
@@ -366,10 +400,24 @@ class EventFake implements Dispatcher, Fake
     {
         if ($event instanceof ShouldDispatchAfterCommit && Container::getInstance()->bound('db.transactions')) {
             return Container::getInstance()->make('db.transactions')
-                ->addCallback(fn () => $this->events[$name][] = $arguments);
+                ->addCallback(fn () => $this->recordEvent($name, $arguments));
         }
 
+        $this->recordEvent($name, $arguments);
+    }
+
+    /**
+     * Record the given intercepted event.
+     *
+     * @param  string  $name
+     * @param  array  $arguments
+     * @return void
+     */
+    protected function recordEvent($name, $arguments)
+    {
         $this->events[$name][] = $arguments;
+
+        $this->eventsInOrder[] = [$name, $arguments];
     }
 
     /**
