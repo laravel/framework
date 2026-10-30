@@ -132,7 +132,7 @@ interface CursorPaginator
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function render($view = null, $data = []);
 }

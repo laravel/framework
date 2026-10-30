@@ -120,7 +120,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $file instanceof Rule ? $file : new self();
+        return $file instanceof Rule ? $file : new static;
     }
 
     /**

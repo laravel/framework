@@ -64,7 +64,7 @@ class HandleExceptions
      * @param  string  $message
      * @param  string  $file
      * @param  int  $line
-     * @return void
+     * @return false|void
      *
      * @throws \ErrorException
      */
@@ -74,6 +74,8 @@ class HandleExceptions
             $this->handleDeprecationError($message, $file, $line, $level);
         } elseif (error_reporting() & $level) {
             throw new ErrorException($message, 0, $level, $file, $line);
+        } else {
+            return false;
         }
     }
 

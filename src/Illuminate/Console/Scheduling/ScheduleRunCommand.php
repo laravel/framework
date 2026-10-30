@@ -165,6 +165,8 @@ class ScheduleRunCommand extends Command
         if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
+            $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
             $this->components->info(sprintf(
                 'Skipping [%s] because the command already ran on another server.', $event->getSummaryForDisplay()
             ));

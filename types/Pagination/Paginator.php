@@ -69,3 +69,9 @@ $throughPaginator->through(function ($post, $key): array {
 });
 
 assertType('Illuminate\Pagination\CursorPaginator<int, array{id: int, post: Post}>', $throughPaginator);
+
+/** @var \Illuminate\Contracts\Pagination\Paginator<int, Post> $paginatorContract */
+assertType('Illuminate\Contracts\Support\Htmlable', $paginatorContract->render());
+
+/** @var \Illuminate\Contracts\Pagination\CursorPaginator<int, Post> $cursorPaginatorContract */
+assertType('Illuminate\Contracts\Support\Htmlable', $cursorPaginatorContract->render());
