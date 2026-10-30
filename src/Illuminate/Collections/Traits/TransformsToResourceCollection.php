@@ -41,7 +41,7 @@ trait TransformsToResourceCollection
             return new ResourceCollection($this);
         }
 
-        $model = $this->items[0] ?? null;
+        $model = $this->first();
 
         if (! is_object($model)) {
             throw new LogicException('Resource collection guesser expects the collection to contain objects.');
