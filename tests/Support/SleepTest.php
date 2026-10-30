@@ -45,6 +45,27 @@ class SleepTest extends TestCase
     }
 
     #[RequiresPhpExtension('pcntl')]
+    public function testItKeepsSleepingWhenInterruptedBySignalDuringTheLastSecond()
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => null);
+        pcntl_alarm(1);
+        usleep(500_000);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(1)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+        }
+
+        $this->assertEqualsWithDelta(1, $elapsed, 0.1);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
     public function testItStopsSleepingWhenInterruptedAfterResumingWasStopped()
     {
         pcntl_async_signals(true);

@@ -351,9 +351,9 @@ class Sleep
             if ($seconds > 0) {
                 $wakeAt = hrtime(true) + $seconds * 1_000_000_000;
 
-                if (sleep($seconds) !== 0) {
-                    $this->resumeAfterSignal($wakeAt);
-                }
+                sleep($seconds);
+
+                $this->resumeAfterSignal($wakeAt);
 
                 $remaining = $remaining->subSeconds($seconds);
             }
@@ -369,7 +369,8 @@ class Sleep
     /**
      * Sleep until the given hrtime, resuming after each signal unless resuming was stopped.
      *
-     * The clock is used instead of sleep()'s return value, which is always 192 on Windows.
+     * The clock is used instead of sleep()'s return value, which is always 192 on Windows
+     * and drops the fraction on Linux, so a signal during the last second returns 0.
      *
      * @param  int  $wakeAt
      * @return void
