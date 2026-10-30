@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Closure;
 use Illuminate\Cache\Events\CacheFailedOver;
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
@@ -136,7 +137,7 @@ class FailoverStore extends TaggableStore implements CanFlushLocks, LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+        return new FailoverLock(fn ($callback) => $this->attemptOnStores($callback), $name, $seconds, $owner);
     }
 
     /**
@@ -148,7 +149,7 @@ class FailoverStore extends TaggableStore implements CanFlushLocks, LockProvider
      */
     public function restoreLock($name, $owner)
     {
-        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+        return $this->lock($name, 0, $owner);
     }
 
     /**
@@ -251,12 +252,25 @@ class FailoverStore extends TaggableStore implements CanFlushLocks, LockProvider
      */
     protected function attemptOnAllStores(string $method, array $arguments)
     {
+        return $this->attemptOnStores(fn ($store) => $store->{$method}(...$arguments));
+    }
+
+    /**
+     * Attempt the given callback on each store until one succeeds.
+     *
+     * @param  \Closure(\Illuminate\Contracts\Cache\Repository): mixed  $callback
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function attemptOnStores(Closure $callback)
+    {
         [$lastException, $failedCaches] = [null, []];
 
         try {
             foreach ($this->stores as $store) {
                 try {
-                    return $this->store($store)->{$method}(...$arguments);
+                    return $callback($this->store($store));
                 } catch (Throwable $e) {
                     $lastException = $e;
 
