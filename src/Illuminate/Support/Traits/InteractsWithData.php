@@ -245,61 +245,98 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
+     * @param  bool  $strict
      * @return \Illuminate\Support\Stringable
      */
-    public function str($key, $default = null)
+    public function str($key, $default = null, $strict = false)
     {
-        return $this->string($key, $default);
+        return $this->string($key, $default, $strict);
     }
 
     /**
      * Retrieve data from the instance as a Stringable instance.
      *
+     * When strict, values that are not strings, numbers, or Stringable objects return the default.
+     *
      * @param  string  $key
      * @param  mixed  $default
+     * @param  bool  $strict
      * @return \Illuminate\Support\Stringable
      */
-    public function string($key, $default = null)
+    public function string($key, $default = null, $strict = false)
     {
-        return new Stringable($this->data($key, $default));
+        $value = $this->data($key, $default);
+
+        if ($strict && ! is_string($value) && ! is_int($value) && ! is_float($value) && ! $value instanceof \Stringable) {
+            $value = value($default);
+        }
+
+        return new Stringable($value);
     }
 
     /**
      * Retrieve data as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     * When strict, values other than "1", "true", "on", "yes", "0", "false", "off", and "no" return the default.
      *
      * @param  string|null  $key
      * @param  bool  $default
+     * @param  bool  $strict
      * @return bool
      */
-    public function boolean($key = null, $default = false)
+    public function boolean($key = null, $default = false, $strict = false)
     {
+        if ($strict) {
+            return $this->isNotFilled($key)
+                ? value($default)
+                : filter_var($this->data($key), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? value($default);
+        }
+
         return filter_var($this->data($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
      * Retrieve data as an integer value.
      *
+     * When strict, values that are not valid integers return the default.
+     *
      * @param  string  $key
      * @param  int  $default
+     * @param  bool  $strict
      * @return int
      */
-    public function integer($key, $default = 0)
+    public function integer($key, $default = 0, $strict = false)
     {
-        return (int) $this->data($key, $default);
+        $value = $this->data($key, $default);
+
+        // FILTER_VALIDATE_INT returns 1 for true, but false for false, so we need to check for a bool first
+        if ($strict && (is_bool($value) || filter_var($value, FILTER_VALIDATE_INT) === false)) {
+            return value($default);
+        }
+
+        return (int) $value;
     }
 
     /**
      * Retrieve data as a float value.
      *
+     * When strict, values that are not valid numbers return the default.
+     *
      * @param  string  $key
      * @param  float  $default
+     * @param  bool  $strict
      * @return float
      */
-    public function float($key, $default = 0.0)
+    public function float($key, $default = 0.0, $strict = false)
     {
-        return (float) $this->data($key, $default);
+        $value = $this->data($key, $default);
+
+        if ($strict && (is_bool($value) || filter_var($value, FILTER_VALIDATE_FLOAT) === false)) {
+            return value($default);
+        }
+
+        return (float) $value;
     }
 
     /**
