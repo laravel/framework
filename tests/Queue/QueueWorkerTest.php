@@ -905,10 +905,11 @@ class QueueWorkerTest extends TestCase
     }
 
     #[RequiresPhpExtension('pcntl')]
-    #[TestWith([SIGTERM, 1])]
-    #[TestWith([SIGUSR2, 2])]
-    public function testOnlyTerminationSignalsStopAnInterruptedSleepFromResuming(int $signal, int $expectedSeconds)
+    #[TestWith(['SIGTERM', 1])]
+    #[TestWith(['SIGUSR2', 2])]
+    public function testOnlyTerminationSignalsStopAnInterruptedSleepFromResuming(string $signalName, int $expectedSeconds)
     {
+        $signal = constant($signalName);
         $worker = $this->getWorker('default', ['queue' => []]);
         (fn () => $this->listenForSignals())->call($worker);
 
