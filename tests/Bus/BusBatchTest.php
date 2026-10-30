@@ -15,6 +15,7 @@ use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -33,6 +34,8 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Laravel\SerializableClosure\Exceptions\InvalidSignatureException;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -120,6 +123,8 @@ class BusBatchTest extends TestCase
         }
 
         Container::setInstance(null);
+
+        SerializableClosure::setSecretKey(null);
 
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
@@ -760,6 +765,22 @@ class BusBatchTest extends TestCase
             [serialize($options), $options],
             [base64_encode(serialize($options)), $options],
         ];
+    }
+
+    public function test_options_that_cannot_be_unserialized_are_reported()
+    {
+        $handler = Mockery::spy(ExceptionHandler::class);
+        Container::getInstance()->instance(ExceptionHandler::class, $handler);
+
+        SerializableClosure::setSecretKey('old-key');
+
+        $batch = $this->createTestBatch(Mockery::mock(Factory::class));
+
+        SerializableClosure::setSecretKey('new-key');
+
+        $this->assertSame([], $batch->fresh()->options);
+
+        $handler->shouldHaveReceived('report')->once()->with(Mockery::type(InvalidSignatureException::class));
     }
 
     protected function createTestBatch($queue, $allowFailures = false)
