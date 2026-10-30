@@ -94,6 +94,7 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'no healthy tablet available',
             'transaction pool connection limit exceeded',
             'SSL operation failed with code 5',
+            'vttablet: rpc error: code = Canceled desc = QueryList.TerminateAll()',
 
             // PlanetScale PostgreSQL / pg_bouncer related things...
             'no primary available for branch',
