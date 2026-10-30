@@ -32,10 +32,12 @@ use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -900,6 +902,35 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->assertReported(fn (Exception $reported) => $reported->getMessage() === 'Failed to interrupt.');
 
         $this->events->assertDispatchedOnce(JobTimedOut::class);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[TestWith([SIGTERM, 1])]
+    #[TestWith([SIGUSR2, 2])]
+    public function testOnlyTerminationSignalsStopAnInterruptedSleepFromResuming(int $signal, int $expectedSeconds)
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+        (fn () => $this->listenForSignals())->call($worker);
+
+        pcntl_signal(SIGALRM, fn () => pcntl_signal_get_handler($signal)($signal));
+        pcntl_alarm(1);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(2)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+
+            foreach ([SIGALRM, SIGQUIT, SIGTERM, SIGINT, SIGUSR2, SIGCONT] as $registered) {
+                pcntl_signal($registered, SIG_DFL);
+            }
+
+            pcntl_async_signals(false);
+            Sleep::stopResumingAfterSignals(false);
+        }
+
+        $this->assertEqualsWithDelta($expectedSeconds, $elapsed, 0.1);
     }
 
     /**

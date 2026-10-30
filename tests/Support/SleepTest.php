@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Sleep;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -23,27 +24,45 @@ class SleepTest extends TestCase
         $this->assertEqualsWithDelta(1, $end - $start, 0.03);
     }
 
+    #[RequiresPhpExtension('pcntl')]
     public function testItKeepsSleepingWhenInterruptedBySignal()
     {
-        if (! function_exists('pcntl_alarm')) {
-            $this->markTestSkipped('The pcntl extension is required.');
-        }
-
         pcntl_async_signals(true);
         pcntl_signal(SIGALRM, fn () => null);
-
-        // Schedule a signal that will interrupt the sleep after one second.
         pcntl_alarm(1);
 
-        $start = microtime(true);
-        Sleep::for(2)->seconds();
-        $elapsed = microtime(true) - $start;
+        try {
+            $start = microtime(true);
+            Sleep::for(2)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+        }
 
-        pcntl_alarm(0);
-        pcntl_signal(SIGALRM, SIG_DFL);
-        pcntl_async_signals(false);
+        $this->assertEqualsWithDelta(2, $elapsed, 0.1);
+    }
 
-        $this->assertGreaterThanOrEqual(2, round($elapsed, 1));
+    #[RequiresPhpExtension('pcntl')]
+    public function testItStopsSleepingWhenInterruptedAfterResumingWasStopped()
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => Sleep::stopResumingAfterSignals());
+        pcntl_alarm(1);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(2)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+            Sleep::stopResumingAfterSignals(false);
+        }
+
+        $this->assertEqualsWithDelta(1, $elapsed, 0.1);
     }
 
     public function testCallbacksMayBeExecutedUsingThen()
