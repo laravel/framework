@@ -124,12 +124,14 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationEnded::class, function ($event) {
             return $event->method === 'up'
                 && $event->migration instanceof Migration
-                && $event->name === '2014_10_12_000000_create_members_table';
+                && $event->name === '2014_10_12_000000_create_members_table'
+                && is_float($event->duration);
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
             return $event->method === 'down'
                 && $event->migration instanceof Migration
-                && $event->name === '2014_10_12_000000_create_members_table';
+                && $event->name === '2014_10_12_000000_create_members_table'
+                && is_float($event->duration);
         });
     }
 
