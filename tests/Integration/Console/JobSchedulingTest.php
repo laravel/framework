@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Queue\PreparesForDispatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Queue;
@@ -106,6 +107,25 @@ class JobSchedulingTest extends TestCase
         Queue::assertPushedOn('fallback-queue', JobWithoutDefaultQueue::class);
         Queue::connection('some-queue')->assertPushedOn('some-queue', JobWithoutDefaultConnection::class);
     }
+
+    public function testJobQueuingRespectsPrepareForDispatch(): void
+    {
+        Queue::fake();
+
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
+        $scheduler = $this->app->make(Schedule::class);
+
+        $scheduler->job(new JobPreparingForDispatch(false))->name('')->everyMinute();
+        $scheduler->job(new JobPreparingForDispatch(true), 'ready-queue')->name('')->everyMinute();
+
+        $events = $scheduler->events();
+        foreach ($events as $event) {
+            $event->run($this->app);
+        }
+
+        Queue::assertPushedOn('ready-queue', JobPreparingForDispatch::class);
+        Queue::assertPushedTimes(JobPreparingForDispatch::class, 1);
+    }
 }
 
 class JobWithDefaultQueue implements ShouldQueue
@@ -146,4 +166,18 @@ class JobWithDefaultConnection implements ShouldQueue
 class JobWithoutDefaultConnection implements ShouldQueue
 {
     use Queueable, InteractsWithQueue;
+}
+
+class JobPreparingForDispatch implements ShouldQueue, PreparesForDispatch
+{
+    use Queueable, InteractsWithQueue;
+
+    public function __construct(public bool $ready)
+    {
+    }
+
+    public function prepareForDispatch()
+    {
+        return $this->ready;
+    }
 }

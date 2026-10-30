@@ -11,6 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Queue\PreparesForDispatch;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
@@ -226,6 +227,10 @@ class Schedule
         $this->events[] = $event = new CallbackEvent(
             $this->eventMutex, function () use ($job, $queue, $connection) {
                 $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+
+                if ($job instanceof PreparesForDispatch && $job->prepareForDispatch() === false) {
+                    return;
+                }
 
                 if ($job instanceof ShouldQueue) {
                     $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
