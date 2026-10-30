@@ -10,6 +10,7 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Carbon;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
@@ -1114,6 +1115,58 @@ class RoutingUrlGeneratorTest extends TestCase
         $request = Request::create('http://www.foo.com/foo?expires[]=99999999999');
 
         $this->assertFalse($url->signatureHasNotExpired($request));
+    }
+
+    public function testExpiredSignedUrlIsRejectedWhenExpiresIsMissingFromParsedQuery()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $routes->add(new Route(['GET'], 'foo/{id}', ['as' => 'foo', function () {
+            //
+        }]));
+
+        Carbon::setTestNow(Carbon::now()->subHours(2));
+        $signed = $url->temporarySignedRoute('foo', 3600, ['id' => 5]);
+        Carbon::setTestNow();
+
+        parse_str(parse_url($signed, PHP_URL_QUERY), $query);
+
+        // PHP drops query parameters beyond "max_input_vars", so a padded URL can push
+        // "expires" out of the parsed query while it remains in the raw query string.
+        $request = Request::create('http://www.foo.com/foo/5?signature='.$query['signature']);
+        $request->server->set('QUERY_STRING', str_repeat('signature&', 999).'signature='.$query['signature'].'&expires='.$query['expires']);
+
+        $this->assertNull($request->query('expires'));
+        $this->assertTrue($url->hasCorrectSignature($request));
+        $this->assertFalse($url->signatureHasNotExpired($request));
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedUrlWithMalformedOrDuplicateExpiresIsRejected()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $future = Carbon::now()->addHour()->getTimestamp();
+
+        $this->assertTrue($url->signatureHasNotExpired(Request::create('http://www.foo.com/foo')));
+        $this->assertTrue($url->signatureHasNotExpired(Request::create("http://www.foo.com/foo?expires={$future}")));
+        $this->assertTrue($url->signatureHasNotExpired(Request::create("http://www.foo.com/foo?expire%73={$future}")));
+
+        $this->assertFalse($url->signatureHasNotExpired(Request::create('http://www.foo.com/foo?expires=')));
+        $this->assertFalse($url->signatureHasNotExpired(Request::create('http://www.foo.com/foo?expires')));
+        $this->assertFalse($url->signatureHasNotExpired(Request::create('http://www.foo.com/foo?expires=-1')));
+        $this->assertFalse($url->signatureHasNotExpired(Request::create("http://www.foo.com/foo?expires={$future}abc")));
+        $this->assertFalse($url->signatureHasNotExpired(Request::create("http://www.foo.com/foo?expires=1&expires={$future}")));
+        $this->assertFalse($url->signatureHasNotExpired(Request::create("http://www.foo.com/foo?expires=1&expire%73={$future}")));
     }
 
     public function testMissingNamedRouteResolution()

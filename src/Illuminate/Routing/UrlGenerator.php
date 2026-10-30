@@ -469,7 +469,7 @@ class UrlGenerator implements UrlGeneratorContract
             ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
             : '/'.$request->path();
 
-        $queryString = (new Stringable((string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'))))->explode('&')
+        $queryString = (new Stringable($this->rawQueryString($request)))->explode('&')
             ->reject(function ($parameter) use ($ignoreQuery) {
                 $parameter = Str::before($parameter, '=');
 
@@ -505,13 +505,39 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function signatureHasNotExpired(Request $request)
     {
-        $expires = $request->query('expires');
+        // The expiration must be read from the same raw query string the signature is
+        // verified against. PHP's parsed query may silently drop parameters beyond
+        // the "max_input_vars" limit, which would make the URL appear permanent.
+        $expires = null;
 
-        if ($expires !== null && ! is_string($expires)) {
-            return false;
+        foreach (explode('&', $this->rawQueryString($request)) as $parameter) {
+            [$key, $value] = array_pad(explode('=', $parameter, 2), 2, null);
+
+            $key = urldecode($key);
+
+            if ($key !== 'expires' && ! str_starts_with($key, 'expires[')) {
+                continue;
+            }
+
+            if ($key !== 'expires' || $expires !== null || $value === null || ! ctype_digit(urldecode($value))) {
+                return false;
+            }
+
+            $expires = (int) urldecode($value);
         }
 
-        return ! ($expires && Carbon::now()->getTimestamp() > $expires);
+        return $expires === null || Carbon::now()->getTimestamp() <= $expires;
+    }
+
+    /**
+     * Get the raw, unparsed query string for the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    protected function rawQueryString(Request $request)
+    {
+        return (string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'));
     }
 
     /**
