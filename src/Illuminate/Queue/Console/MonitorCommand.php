@@ -22,6 +22,7 @@ class MonitorCommand extends Command
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
                        {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}
+                       {--max-wait= : The maximum number of seconds the oldest pending job can wait before an event is dispatched}
                        {--json : Output the queue size as JSON}';
 
     /**
@@ -104,10 +105,25 @@ class MonitorCommand extends Command
                 'pending' => $this->manager->connection($connection)->pendingSize($queue),
                 'delayed' => $this->manager->connection($connection)->delayedSize($queue),
                 'reserved' => $this->manager->connection($connection)->reservedSize($queue),
-                'oldest_pending' => $this->manager->connection($connection)->creationTimeOfOldestPendingJob($queue),
-                'status' => $size >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
+                'oldest_pending' => $oldestPending = $this->manager->connection($connection)->creationTimeOfOldestPendingJob($queue),
+                'status' => $size >= $this->option('max') || $this->waitedTooLong($oldestPending)
+                    ? '<fg=yellow;options=bold>ALERT</>'
+                    : '<fg=green;options=bold>OK</>',
             ];
         });
+    }
+
+    /**
+     * Determine if the oldest pending job has been waiting longer than allowed.
+     *
+     * @param  int|null  $oldestPending
+     * @return bool
+     */
+    protected function waitedTooLong($oldestPending)
+    {
+        return ! is_null($this->option('max-wait'))
+            && ! is_null($oldestPending)
+            && Carbon::now()->getTimestamp() - $oldestPending >= $this->option('max-wait');
     }
 
     /**
@@ -158,6 +174,7 @@ class MonitorCommand extends Command
                     $queue['connection'],
                     $queue['queue'],
                     $queue['size'],
+                    $queue['oldest_pending'] ? Carbon::now()->getTimestamp() - $queue['oldest_pending'] : null,
                 )
             );
         }

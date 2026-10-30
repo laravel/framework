@@ -3726,6 +3726,17 @@ return [
                 'description' => 'The maximum number of jobs that can be on the queue before an event is dispatched',
             ],
             [
+                'name' => 'max-wait',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'The maximum number of seconds the oldest pending job can wait before an event is dispatched',
+            ],
+            [
                 'name' => 'json',
                 'shortcut' => null,
                 'negatable' => false,
