@@ -439,9 +439,13 @@ class Migrator
             if (method_exists($migration, $method)) {
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method, $name));
 
+                $startedAt = microtime(true);
+
                 $this->runMethod($connection, $migration, $method);
 
-                $this->fireMigrationEvent(new MigrationEnded($migration, $method, $name));
+                $this->fireMigrationEvent(new MigrationEnded(
+                    $migration, $method, $name, round((microtime(true) - $startedAt) * 1000, 2)
+                ));
             }
         };
 
