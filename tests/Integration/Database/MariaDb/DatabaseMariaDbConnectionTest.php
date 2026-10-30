@@ -131,6 +131,25 @@ class DatabaseMariaDbConnectionTest extends MariaDbTestCase
         $this->assertSame($count, DB::table(self::TABLE)->whereJsonContainsKey($column)->count());
     }
 
+    public function testLastCommitReadAfterWrite()
+    {
+        if (! DB::scalar('select @@log_bin')) {
+            $this->markTestSkipped('Commit IDs require log_bin = ON.');
+        }
+
+        $first = DB::getLastCommitId();
+        DB::table(self::TABLE)->insert([self::JSON_COL => '{"commit":"read-after-write"}']);
+        $second = DB::getLastCommitId();
+        $merged = DB::mergeCommitIds([$second, $first]);
+
+        $this->assertNotSame($first, $second);
+        $this->assertSame($second, $merged);
+        $this->assertTrue(DB::hasCommitId($first));
+        $this->assertTrue(DB::hasCommitId($second));
+        $this->assertTrue(DB::hasCommitId($merged));
+        $this->assertFalse(DB::hasCommitId('4294967295-4294967295-18446744073709551615'));
+    }
+
     public static function jsonContainsKeyDataProvider()
     {
         return [

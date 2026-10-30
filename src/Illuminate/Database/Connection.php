@@ -1899,6 +1899,45 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the ID of the last committed transaction.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getLastCommitId()
+    {
+        throw new RuntimeException('The database connection does not support retrieving the last commit ID.');
+    }
+
+    /**
+     * Calculate the commit ID for a set of commit IDs that includes all of them.
+     *
+     * @param  string[]  $values
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function mergeCommitIds(array $values)
+    {
+        throw new RuntimeException('The database connection does not support managing commit IDs.');
+    }
+
+    /**
+     * Determine if the given commit ID has been applied.
+     *
+     * @param  string  $value
+     * @param  int  $wait
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function hasCommitId(string $value, int $wait = 0)
+    {
+        throw new RuntimeException('The database connection does not support checking a commit ID.');
+    }
+
+    /**
      * Register a connection resolver.
      *
      * @param  string  $driver
