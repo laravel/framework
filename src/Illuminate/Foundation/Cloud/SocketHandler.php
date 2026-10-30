@@ -16,8 +16,7 @@ class SocketHandler extends BaseHandler
         try {
             parent::write($record);
         } catch (Throwable $e) {
-            // PHP keeps a socket's "timed_out" flag set after a write times out, so
-            // reusing the socket would fail every later write. Reconnect instead.
+            // PHP keeps a socket's "timed_out" flag set after a write times out, reconnect...
             $this->closeSocket();
 
             throw $e;
