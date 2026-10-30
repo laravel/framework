@@ -10,13 +10,18 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        PostgresBuilder::defaultTimePrecision(0);
+    }
+
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -101,7 +106,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
     {
         $builder = $this->getBuilder();
-        $builder->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
 
         $blueprint = new Blueprint($this->getConnection(builder: $builder), 'users');
         $blueprint->id()->from(100);
@@ -221,6 +225,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('drop index "foo"', $statements[0]);
     }
 
+    public function testDropIndexOnSchemaQualifiedTable()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'tenant.users');
+        $blueprint->dropIndex(['email']);
+        $blueprint->dropIndex('foo');
+        $blueprint->dropIndex('other.bar');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(3, $statements);
+        $this->assertSame('drop index "tenant"."tenant_users_email_index"', $statements[0]);
+        $this->assertSame('drop index "tenant"."foo"', $statements[1]);
+        $this->assertSame('drop index "other"."bar"', $statements[2]);
+    }
+
     public function testDropSpatialIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'geo');
@@ -229,6 +247,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('drop index "geo_coordinates_spatialindex"', $statements[0]);
+    }
+
+    public function testDropVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->dropVectorIndex(['embeddings']);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "posts_embeddings_vectorindex"', $statements[0]);
     }
 
     public function testDropForeign()
@@ -290,6 +318,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter index "foo" rename to "bar"', $statements[0]);
+    }
+
+    public function testRenameIndexOnSchemaQualifiedTable()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'tenant.users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter index "tenant"."foo" rename to "bar"', $statements[0]);
     }
 
     public function testAddingPrimaryKey()
@@ -1252,7 +1290,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_foo');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
@@ -1261,7 +1299,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_bar');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
@@ -1343,7 +1381,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getServerVersion')->once()->andReturn('12.0.0');
+        $connection->expects('getServerVersion')->andReturn('12.0.0');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
@@ -1355,7 +1393,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumnsOnLegacyServer()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getServerVersion')->once()->andReturn('8.0.2');
+        $connection->expects('getServerVersion')->andReturn('8.0.2');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
@@ -1366,23 +1404,34 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertStringNotContainsString('a.attgenerated', $statement);
     }
 
+    public function testAddUsingKeywordToColumnOnChange()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'currency_rates');
+        $blueprint->date('name')->using('name::date')->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertSame(
+            'alter table "currency_rates" alter column "name" type date using name::date, alter column "name" set not null, alter column "name" drop default, alter column "name" drop identity if exists',
+            $statements[0]
+        );
+    }
+
     protected function getConnection(
         ?PostgresGrammar $grammar = null,
         ?PostgresBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function getGrammar(?Connection $connection = null)
@@ -1392,7 +1441,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(PostgresBuilder::class);
+        return mock(PostgresBuilder::class)->makePartial();
     }
 
     /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */

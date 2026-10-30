@@ -13,13 +13,17 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void failing(mixed $callback)
  * @method static void starting(mixed $callback)
  * @method static void stopping(mixed $callback)
+ * @method static void whenJobRunsLongerThan(\DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold, callable $handler)
  * @method static void route(array|string $class, \UnitEnum|string|null $queue = null, \UnitEnum|string|null $connection = null)
+ * @method static void forward(array|\UnitEnum|string $queue, \UnitEnum|string|null $to = null, \UnitEnum|string|null $connection = null)
  * @method static bool connected(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(\UnitEnum|string|null $name = null)
- * @method static void pause(string $connection, string $queue)
- * @method static void pauseFor(string $connection, string $queue, \DateTimeInterface|\DateInterval|int $ttl)
- * @method static void resume(string $connection, string $queue)
- * @method static bool isPaused(string $connection, string $queue)
+ * @method static void pause(\UnitEnum|string $connection, \UnitEnum|string $queue)
+ * @method static void pauseFor(\UnitEnum|string $connection, \UnitEnum|string $queue, \DateTimeInterface|\DateInterval|int $ttl)
+ * @method static void pauseAll()
+ * @method static void resume(\UnitEnum|string $connection, \UnitEnum|string $queue)
+ * @method static void resumeAll()
+ * @method static bool isPaused(\UnitEnum|string $connection, \UnitEnum|string $queue)
  * @method static array getPausedQueues(string $connection, array $queues)
  * @method static void withoutInterruptionPolling()
  * @method static void extend(string $driver, \Closure $resolver)
@@ -29,6 +33,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static string getName(string|null $connection = null)
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()
  * @method static \Illuminate\Queue\QueueManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
+ * @method static void createPayloadUsing(callable|null $callback)
  * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
  * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static int size(string|null $queue = null)
@@ -48,27 +53,30 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static mixed getJobTries(mixed $job)
  * @method static mixed getJobBackoff(mixed $job)
  * @method static mixed getJobExpiration(mixed $job)
- * @method static void createPayloadUsing(callable|null $callback)
  * @method static array getConfig()
  * @method static \Illuminate\Queue\Queue setConfig(array $config)
  * @method static \Illuminate\Container\Container getContainer()
  * @method static void setContainer(\Illuminate\Container\Container $container)
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake except(array|string $jobsToBeQueued)
- * @method static void assertPushed(string|\Closure $job, callable|int|null $callback = null)
+ * @method static void assertPushed(string|\Closure $job, callable|array|int|null $callback = null)
  * @method static void assertPushedTimes(string $job, int $times = 1)
  * @method static void assertPushedOnce(string $job)
- * @method static void assertPushedOn(\UnitEnum|string $queue, string|\Closure $job, callable|null $callback = null)
+ * @method static void assertPushedOn(\UnitEnum|string $queue, string|\Closure $job, callable|array|null $callback = null)
  * @method static void assertPushedWithChain(string $job, array $expectedChain = [], callable|null $callback = null)
  * @method static void assertPushedWithoutChain(string $job, callable|null $callback = null)
  * @method static void assertClosurePushed(callable|int|null $callback = null)
  * @method static void assertClosureNotPushed(callable|null $callback = null)
- * @method static void assertNotPushed(string|\Closure $job, callable|null $callback = null)
+ * @method static void assertNotPushed(string|\Closure $job, callable|array|null $callback = null)
  * @method static void assertCount(int $expectedCount)
  * @method static void assertNothingPushed()
- * @method static \Illuminate\Support\Collection pushed(string $job, callable|null $callback = null)
+ * @method static \Illuminate\Support\Collection pushed(string $job, callable|array|null $callback = null)
  * @method static \Illuminate\Support\Collection pushedRaw(null|\Closure $callback = null)
  * @method static \Illuminate\Support\Collection listenersPushed(string $listenerClass, \Closure|null $callback = null)
  * @method static bool hasPushed(string $job)
+ * @method static int totalSize()
+ * @method static int totalPendingSize()
+ * @method static int totalDelayedSize()
+ * @method static int totalReservedSize()
  * @method static \Illuminate\Support\Collection pendingJobs(\UnitEnum|string|null $queue = null)
  * @method static \Illuminate\Support\Collection delayedJobs(\UnitEnum|string|null $queue = null)
  * @method static \Illuminate\Support\Collection reservedJobs(\UnitEnum|string|null $queue = null)
@@ -76,10 +84,14 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Support\Collection allDelayedJobs()
  * @method static \Illuminate\Support\Collection allReservedJobs()
  * @method static bool shouldFakeJob(object $job)
+ * @method static void reserve(\Closure|string|object $job, \UnitEnum|string|null $queue = null)
  * @method static array pushedJobs()
  * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static void releaseUniqueJobLocks()
+ * @method static void clearReserved()
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake beforePushing(callable $callback)
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake afterPushing(callable $callback)
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue
@@ -138,11 +150,13 @@ class Queue extends Facade
     {
         $originalQueueManager = static::getFacadeRoot();
 
-        static::fake($jobsToFake);
+        $fake = static::fake($jobsToFake);
 
         try {
             return $callable();
         } finally {
+            $fake->releaseUniqueJobLocks();
+
             static::swap($originalQueueManager);
         }
     }
@@ -158,11 +172,13 @@ class Queue extends Facade
     {
         $originalQueueManager = static::getFacadeRoot();
 
-        static::fakeExcept($jobsToAllow);
+        $fake = static::fakeExcept($jobsToAllow);
 
         try {
             return $callable();
         } finally {
+            $fake->releaseUniqueJobLocks();
+
             static::swap($originalQueueManager);
         }
     }

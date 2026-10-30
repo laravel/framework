@@ -254,7 +254,7 @@ class Exception
     /**
      * Get the application's route parameters context.
      *
-     * @return array<string, mixed>|null
+     * @return string|null
      */
     public function applicationRouteParametersContext()
     {

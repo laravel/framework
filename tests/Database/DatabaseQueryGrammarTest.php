@@ -6,7 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -14,8 +14,9 @@ class DatabaseQueryGrammarTest extends TestCase
 {
     public function testWhereRawReturnsStringWhenExpressionPassed()
     {
-        $builder = m::mock(Builder::class);
-        $grammar = new Grammar(m::mock(Connection::class));
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $grammar = new Grammar($connection);
+        $builder = new Builder($connection, $grammar);
         $reflection = new ReflectionClass($grammar);
         $method = $reflection->getMethod('whereRaw');
         $expressionArray = ['sql' => new Expression('select * from "users"')];
@@ -27,8 +28,9 @@ class DatabaseQueryGrammarTest extends TestCase
 
     public function testWhereRawReturnsStringWhenStringPassed()
     {
-        $builder = m::mock(Builder::class);
-        $grammar = new Grammar(m::mock(Connection::class));
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $grammar = new Grammar($connection);
+        $builder = new Builder($connection, $grammar);
         $reflection = new ReflectionClass($grammar);
         $method = $reflection->getMethod('whereRaw');
         $stringArray = ['sql' => 'select * from "users"'];
@@ -40,11 +42,9 @@ class DatabaseQueryGrammarTest extends TestCase
 
     public function testCompileOrdersAcceptsExpression()
     {
-        $builder = m::mock(Builder::class);
-        $grammar = new Grammar(m::mock(Connection::class));
-
-        // compileOrders() calls $query->getGrammar() → return our $grammar
-        $builder->shouldReceive('getGrammar')->andReturn($grammar);
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $grammar = new Grammar($connection);
+        $builder = new Builder($connection, $grammar);
 
         $orders = [
             ['sql' => new Expression('length("name") desc')], // mimics orderByRaw(DB::raw(...))
@@ -59,9 +59,9 @@ class DatabaseQueryGrammarTest extends TestCase
 
     public function testCompileOrdersAcceptsExpressionWithPlaceholders()
     {
-        $builder = m::mock(Builder::class);
-        $grammar = new Grammar(m::mock(Connection::class));
-        $builder->shouldReceive('getGrammar')->andReturn($grammar);
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $grammar = new Grammar($connection);
+        $builder = new Builder($connection, $grammar);
 
         $orders = [
             ['sql' => new Expression('field(status, ?, ?) asc')],

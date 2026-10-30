@@ -2,15 +2,19 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
+use Illuminate\Tests\Validation\Fixtures\PureEnum;
+use Illuminate\Tests\Validation\Fixtures\StringStatus;
+use Illuminate\Tests\Validation\Fixtures\Values;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class ValidationInRuleTest extends TestCase
 {
@@ -88,5 +92,23 @@ class ValidationInRuleTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'foo'], ['x' => ['required', Rule::in('foo', 'bar')]]);
         $this->assertTrue($v->passes());
+    }
+
+    #[TestWith([' 1', false])]
+    #[TestWith(['1 ', false])]
+    #[TestWith(["\t1", false])]
+    #[TestWith(["1\n", false])]
+    #[TestWith(['01', false])]
+    #[TestWith(['+1', false])]
+    #[TestWith(['1.0', false])]
+    #[TestWith(['1e0', false])]
+    #[TestWith(['1', true])]
+    public function testInRuleIsNotLoosyBypassed(mixed $value, bool $expectation)
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => $value], ['x' => ['in:1,2,3']]);
+
+        $this->assertSame($expectation, $v->passes());
     }
 }

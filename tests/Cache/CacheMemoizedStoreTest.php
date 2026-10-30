@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Cache;
 
 use BadMethodCallException;
+use Illuminate\Cache\ApcStore;
+use Illuminate\Cache\ApcWrapper;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\MemoizedStore;
 use Illuminate\Cache\NullStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheMemoizedStoreTest extends TestCase
@@ -38,13 +38,8 @@ class CacheMemoizedStoreTest extends TestCase
     {
         $this->expectException(BadMethodCallException::class);
 
-        $stub = m::mock(Store::class);
+        $stub = new ApcStore(new ApcWrapper);
         (new MemoizedStore('test', new Repository($stub)))->flushLocks();
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testHasSeparateLockStoreDelegatestoUnderlyingStore(): void

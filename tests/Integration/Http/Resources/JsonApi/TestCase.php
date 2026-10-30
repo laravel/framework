@@ -18,8 +18,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     use LazilyRefreshDatabase;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         Model::shouldBeStrict(true);

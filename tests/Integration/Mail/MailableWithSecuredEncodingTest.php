@@ -122,5 +122,45 @@ TABLE, false);
             'Visit <span>https://laravel.com/docs</span> to browse the documentation',
             '<em>Hi</em> Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
         ];
+
+        yield ['\[Laravel](https://laravel.com)', '<em>Hi</em> [Laravel](https://laravel.com)'];
+
+        yield ['!\[Laravel](https://laravel.com)', '<em>Hi</em> ![Laravel](https://laravel.com)'];
+    }
+
+    #[WithMigration]
+    #[DataProvider('markdownEncodedLinkTextTemplateDataProvider')]
+    public function testItCanAssertMarkdownEncodedStringUsingTemplateWithLinkText($given, $expected)
+    {
+        $user = UserFactory::new()->create([
+            'name' => $given,
+        ]);
+
+        $mailable = new class($user) extends Mailable
+        {
+            public $theme = 'taylor';
+
+            public function __construct(public User $user)
+            {
+                //
+            }
+
+            public function build()
+            {
+                return $this->markdown('link-with-template');
+            }
+        };
+
+        $mailable->assertSeeInHtml($expected, false);
+        $mailable->assertDontSeeInHtml('https://example.com"', false);
+    }
+
+    public static function markdownEncodedLinkTextTemplateDataProvider()
+    {
+        yield ['Taylor', '<a href="https://laravel.com">Taylor</a>'];
+
+        yield ['Taylor](https://example.com)', '<a href="https://laravel.com">Taylor](https://example.com)</a>'];
+
+        yield ['Taylor\](https://example.com)', '<a href="https://laravel.com">Taylor](https://example.com)</a>'];
     }
 }

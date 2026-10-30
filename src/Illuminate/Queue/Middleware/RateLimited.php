@@ -99,7 +99,9 @@ class RateLimited
                     ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
                     : false;
             }
+        }
 
+        foreach ($limits as $limit) {
             $this->limiter->hit($limit->key, $limit->decaySeconds);
         }
 

@@ -25,7 +25,7 @@ class JsonApiRequest extends Request
     {
         if (is_null($this->cachedSparseFields)) {
             $this->cachedSparseFields = (new Collection($this->array('fields')))
-                ->transform(fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
+                ->transform(fn ($fieldsets) => ! is_string($fieldsets) || empty($fieldsets) ? [] : explode(',', $fieldsets))
                 ->all();
         }
 
@@ -50,7 +50,7 @@ class JsonApiRequest extends Request
     public function sparseIncluded(?string $key = null): ?array
     {
         if (is_null($this->cachedSparseIncluded)) {
-            $included = (string) $this->string('include', '');
+            $included = is_string($included = $this->input('include')) ? $included : '';
 
             $this->cachedSparseIncluded = (new Collection(empty($included) ? [] : explode(',', $included)))
                 ->transform(function ($item) {
@@ -78,7 +78,7 @@ class JsonApiRequest extends Request
                         return null;
                     }
 
-                    $item = implode('.', Arr::take(explode('.', $item), JsonApiResource::$maxRelationshipDepth - 1));
+                    $item = implode('.', Arr::take(explode('.', $item), max(0, JsonApiResource::$maxRelationshipDepth - 1)));
 
                     return ! empty($item) ? $item : null;
                 })->filter()->all();

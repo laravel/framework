@@ -5,13 +5,18 @@ namespace Illuminate\Foundation\Cloud;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Contracts\Encryption\StringEncrypter;
-use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Queue\Failed\CountableFailedJobProvider;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Iterator;
 use RuntimeException;
+use Throwable;
 
 class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJobProvider, PrunableFailedJobProvider
 {
@@ -36,6 +41,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
         protected FailedJobProviderInterface $failer,
         protected Events $events,
         protected StringEncrypter $encrypter,
+        protected ?ExceptionReporter $reporter = null,
     ) {
         //
     }
@@ -69,7 +75,19 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             'started_at' => $processingJobDetails['started_at']->toDateTimeString('microsecond'),
             'attempts' => $processingJobDetails['attempts'],
             'payload' => $payload,
-            'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
+            'exception_preview' => mb_substr(
+                string: $exception->getMessage()
+                    ? $exception::class.': '.$exception->getMessage().' in '.$exception->getFile().':'.$exception->getLine()
+                    : $exception::class.' in '.$exception->getFile().':'.$exception->getLine(),
+                start: 0,
+                length: 1001,
+                encoding: 'UTF-8',
+            ),
+            'job_name' => (json_decode($payload, associative: true) ?? [])['displayName'] ?? '',
+            'exception' => (string) $exception,
+            ...$this->reporter === null ? [] : [
+                'exception_id' => $this->reporter->exceptionId($exception),
+            ],
         ]);
 
         $this->queue->finishProcessingJob(timestamp: $timestamp);
@@ -103,8 +121,6 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
      *
      * @param  mixed  $id
      * @return object|null
-     *
-     * @throws \JsonException
      */
     public function find($id)
     {
@@ -112,13 +128,79 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             return $this->failer->find($id);
         }
 
-        $response = Http::connectTimeout(10)
-            ->timeout(10)
-            ->retry(3, 1000, fn ($exception) => $exception instanceof ConnectionException)
-            ->throw()
-            ->get($id);
+        $iterator = $this->failedJobsIterator($id);
 
-        return $this->loadedFailedJobs[$id] = json_decode($this->encrypter->decryptString($response->body()), flags: JSON_THROW_ON_ERROR);
+        return new LazyCollection(static fn () => yield from $iterator);
+    }
+
+    /**
+     * Build an iterator for the failed jobs from the given URL.
+     */
+    protected function failedJobsIterator(string $url): Iterator
+    {
+        $payload = $this->resolveFailedJobsPayload($url);
+
+        while ($job = array_shift($payload->data)) {
+            $key = $payload->links->self.':'.$job->id;
+
+            $this->loadedFailedJobs[$key] = $job;
+
+            yield $key => $job;
+
+            if ($payload->data === [] && $payload->links->next !== null) {
+                $payload = $this->resolveFailedJobsPayload($payload->links->next);
+            }
+        }
+    }
+
+    /**
+     * Resolve the failed jobs payload for the given URL.
+     *
+     * @return object{data: list<object>, links: object{self: string, next: string|null}}
+     */
+    protected function resolveFailedJobsPayload(string $url): object
+    {
+        $response = $this->fetchFailedJobs($url);
+
+        $payload = json_decode(
+            json: $this->encrypter->decryptString($response->body()),
+            associative: false,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        return match ($response->header('Cloud-Payload-Version')) {
+            '1' => $payload,
+            '' => literal(
+                data: [$payload],
+                links: literal(
+                    self: $url,
+                    next: null,
+                ),
+            ),
+            default => throw new RuntimeException('Unsupported payload version: '.$response->header('Cloud-Payload-Version')),
+        };
+    }
+
+    /**
+     * Fetch the failed jobs from the given URL.
+     */
+    protected function fetchFailedJobs(string $url): Response
+    {
+        return Http::withoutGlobalConfiguration(fn () => Http::connectTimeout(10)
+            ->timeout(10)
+            ->retry(10, fn ($attempt) => 500 * (2 ** ($attempt - 1)), when: function (Throwable $e) {
+                if ($e instanceof RequestException && $e->response->status() === 403) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->withHeaders([
+                'Cloud-Payload-Version' => '1',
+                'Cloud-Encryption-Cipher' => Config::get('app.cipher'),
+            ])
+            ->throw()
+            ->get($url));
     }
 
     /**
@@ -137,23 +219,24 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             return false;
         }
 
-        $this->events->emit([
+        unset($this->loadedFailedJobs[$id]);
+
+        return $this->events->emit([
             '_cloud_event' => 'failed_job',
             'id' => $job->id,
             'queue' => $job->queue,
             'retried_at' => CarbonImmutable::now('UTC')->toDateTimeString('microsecond'),
         ]);
-
-        return true;
     }
 
     /**
-     * Flush all of the failed jobs from storage.
+     * Flush the failed jobs from storage.
      *
      * @param  int|null  $hours
+     * @param  string|null  $queue
      * @return void
      */
-    public function flush($hours = null)
+    public function flush($hours = null, $queue = null)
     {
         $this->failer->flush(...func_get_args());
     }

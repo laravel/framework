@@ -9,7 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -63,6 +63,34 @@ class DatabaseLockTest extends DatabaseTestCase
         $this->assertTrue($otherLock->get());
 
         $otherLock->release();
+    }
+
+    public function testLockCannotBeAcquiredWhileHeldInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+
+        DB::transaction(function () {
+            $this->assertFalse(Cache::driver('database')->lock('foo')->get());
+
+            $this->assertSame(1, DB::table('cache_locks')->count());
+        });
+
+        $lock->release();
+    }
+
+    public function testExpiredLockCanBeAcquiredInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDay()->getTimestamp()]);
+
+        DB::transaction(function () {
+            $otherLock = Cache::driver('database')->lock('foo');
+            $this->assertTrue($otherLock->get());
+
+            $otherLock->release();
+        });
     }
 
     public function testIsLocked()
@@ -132,12 +160,14 @@ class DatabaseLockTest extends DatabaseTestCase
         $firstLock->release();
     }
 
-    public function testExpiredLockCannotBeRefreshedByPreviousOwner()
+    public function testExpiredLockCannotBeRefreshedByPreviousOwner(): void
     {
+        Carbon::setTestNow($now = Carbon::now());
+
         $lock = Cache::driver('database')->lock('foo', 10);
         $this->assertTrue($lock->get());
 
-        DB::table('cache_locks')->update(['expiration' => now()->subDay()->getTimestamp()]);
+        DB::table('cache_locks')->update(['expiration' => $now->subDay()->getTimestamp()]);
 
         $this->assertFalse($lock->refresh(20));
     }
@@ -146,14 +176,14 @@ class DatabaseLockTest extends DatabaseTestCase
     #[TestWith(['Table does not exist', 1146, false])]
     public function testIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrenyError)
     {
-        $connection = m::mock(Connection::class);
-        $insertBuilder = m::mock(Builder::class);
-        $deleteBuilder = m::mock(Builder::class);
+        $connection = Mockery::mock(Connection::class);
+        $insertBuilder = Mockery::mock(Builder::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
 
-        $insertBuilder->shouldReceive('insert')->once()->andReturn(true);
+        $insertBuilder->expects('insertOrIgnore')->andReturn(1);
 
-        $deleteBuilder->shouldReceive('where')->with('expiration', '<=', m::any())->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('delete')->once()->andThrow(
+        $deleteBuilder->expects('where')->with('expiration', '<=', Mockery::any())->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
             new QueryException(
                 'mysql',
                 'delete from cache_locks where expiration <= ?',
@@ -162,7 +192,8 @@ class DatabaseLockTest extends DatabaseTestCase
             )
         );
 
-        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $deleteBuilder);
+        $connection->allows('transactionLevel')->andReturn(0);
+        $connection->expects('table')->times(2)->with('cache_locks')->andReturn($insertBuilder, $deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 0, lottery: [1, 1]);
 
@@ -174,18 +205,52 @@ class DatabaseLockTest extends DatabaseTestCase
         }
     }
 
+    #[TestWith([1, true])]
+    #[TestWith([0, false])]
+    public function testAcquireThrowsConcurrencyExceptionInsideTransaction(int $transactionLevel, bool $shouldThrow)
+    {
+        $connection = Mockery::mock(Connection::class);
+        $insertBuilder = Mockery::mock(Builder::class);
+        $updateBuilder = Mockery::mock(Builder::class);
+
+        $insertBuilder->expects('insertOrIgnore')->andThrow(
+            new QueryException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('Deadlock found when trying to get lock', 1213)
+            )
+        );
+
+        $updateBuilder->allows('where')->andReturnSelf();
+        $updateBuilder->allows('update')->andReturn(1);
+
+        $connection->allows('transactionLevel')->andReturn($transactionLevel);
+        $connection->allows('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, lottery: null);
+
+        if ($shouldThrow) {
+            $this->expectException(QueryException::class);
+            $this->expectExceptionMessage('Deadlock found when trying to get lock');
+            $lock->acquire();
+        } else {
+            $this->assertTrue($lock->acquire());
+        }
+    }
+
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
     #[TestWith(['Table does not exist', 1146, false])]
     public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
     {
-        $connection = m::mock(Connection::class);
-        $deleteBuilder = m::mock(Builder::class);
+        $connection = Mockery::mock(Connection::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
 
         $owner = 'owner-123';
 
-        $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('where')->with('owner', $owner)->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('delete')->once()->andThrow(
+        $deleteBuilder->expects('where')->with('key', 'foo')->andReturnSelf();
+        $deleteBuilder->expects('where')->with('owner', $owner)->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
             new QueryException(
                 'mysql',
                 'delete from cache_locks where key = ? and owner = ?',
@@ -194,7 +259,8 @@ class DatabaseLockTest extends DatabaseTestCase
             )
         );
 
-        $connection->shouldReceive('table')->with('cache_locks')->andReturn($deleteBuilder);
+        $connection->allows('transactionLevel')->andReturn(0);
+        $connection->expects('table')->with('cache_locks')->andReturn($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner); // same owner...
 
@@ -205,5 +271,58 @@ class DatabaseLockTest extends DatabaseTestCase
             $this->expectExceptionMessage($message);
             $lock->release();
         }
+    }
+
+    public function testPruneThrowsConcurrencyExceptionInsideTransaction()
+    {
+        $connection = Mockery::mock(Connection::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
+
+        $deleteBuilder->expects('where')->with('expiration', '<=', Mockery::any())->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
+            new QueryException(
+                'mysql',
+                'delete from cache_locks where expiration <= ?',
+                [],
+                new PDOException('Deadlock found when trying to get lock', 1213)
+            )
+        );
+
+        $connection->allows('transactionLevel')->andReturn(1);
+        $connection->expects('table')->with('cache_locks')->andReturn($deleteBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Deadlock found when trying to get lock');
+        $lock->pruneExpiredLocks();
+    }
+
+    public function testReleaseThrowsConcurrencyExceptionInsideTransaction()
+    {
+        $connection = Mockery::mock(Connection::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
+
+        $owner = 'owner-123';
+
+        $deleteBuilder->expects('where')->with('key', 'foo')->andReturnSelf();
+        $deleteBuilder->expects('where')->with('owner', $owner)->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
+            new QueryException(
+                'mysql',
+                'delete from cache_locks where key = ? and owner = ?',
+                ['foo', $owner],
+                new PDOException('Serialization failure: 1213 Deadlock', 40001)
+            )
+        );
+
+        $connection->allows('transactionLevel')->andReturn(1);
+        $connection->expects('table')->with('cache_locks')->andReturn($deleteBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Serialization failure: 1213 Deadlock');
+        $lock->release();
     }
 }

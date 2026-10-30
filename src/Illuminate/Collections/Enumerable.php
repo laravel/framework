@@ -834,7 +834,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the items with the specified keys.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null  $keys
      * @return static
      */
     public function only($keys);
@@ -890,6 +890,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return TReduceInitial|TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null);
+
+    /**
+     * Reduce the collection to a single value by mutating an initial value.
+     *
+     * @template TReduceIntoInitial
+     *
+     * @param  TReduceIntoInitial  $initial
+     * @param  callable(TReduceIntoInitial, TValue, TKey): void  $callback
+     * @return TReduceIntoInitial
+     */
+    public function reduceInto($initial, callable $callback);
 
     /**
      * Reduce the collection to multiple aggregate values.
@@ -1051,6 +1062,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function chunkWhile(callable $callback);
 
     /**
+     * Chunk the collection into chunks by comparing adjacent values using the given key or callback.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string  $key
+     * @return static<int, static<TKey, TValue>>
+     */
+    public function chunkBy($key);
+
+    /**
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
      * @param  int  $numberOfGroups
@@ -1189,8 +1208,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  \Closure|string|int|array<array-key, string>|null  $value
+     * @param  \Closure|string|null  $key
      * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null);
@@ -1311,7 +1330,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
 
     /**
      * Get the collection of items as pretty print formatted JSON.
-     *
      *
      * @param  int  $options
      * @return string

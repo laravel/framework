@@ -33,6 +33,13 @@ trait CanBeOneOfMany
     protected $oneOfManySubQuery;
 
     /**
+     * The model of the query the one of many subselect is currently being joined to.
+     *
+     * @var \Illuminate\Database\Eloquent\Model|null
+     */
+    protected $oneOfManyJoinModel;
+
+    /**
      * Add constraints for inner join subselect for one of many relationships.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<*>  $query
@@ -193,7 +200,7 @@ trait CanBeOneOfMany
      */
     protected function newOneOfManySubQuery($groupBy, $columns = null, $aggregate = null)
     {
-        $subQuery = $this->query->getModel()
+        $subQuery = (clone $this->query->getModel())
             ->newQuery()
             ->withoutGlobalScopes($this->removedScopes());
 
@@ -230,15 +237,19 @@ trait CanBeOneOfMany
      */
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
     {
-        $parent->beforeQuery(function ($parent) use ($subQuery, $on) {
+        $parent->beforeQuery(function ($query) use ($parent, $subQuery, $on) {
             $subQuery->applyBeforeQueryCallbacks();
 
-            $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
+            $query->joinSub($subQuery, $this->relationName, function ($join) use ($parent, $on) {
+                $this->oneOfManyJoinModel = $parent->getModel();
+
                 foreach ($on as $onColumn) {
                     $join->on($this->qualifySubSelectColumn($onColumn.'_aggregate'), '=', $this->qualifyRelatedColumn($onColumn));
                 }
 
                 $this->addOneOfManyJoinSubQueryConstraints($join);
+
+                $this->oneOfManyJoinModel = null;
             });
         });
     }
@@ -297,7 +308,7 @@ trait CanBeOneOfMany
      */
     protected function qualifyRelatedColumn($column)
     {
-        return $this->query->getModel()->qualifyColumn($column);
+        return ($this->oneOfManyJoinModel ?? $this->query->getModel())->qualifyColumn($column);
     }
 
     /**
@@ -307,7 +318,9 @@ trait CanBeOneOfMany
      */
     protected function guessRelationship()
     {
-        return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
+        $relation = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
+
+        return str_contains($relation, '{closure') ? $this->query->getModel()->getTable() : $relation;
     }
 
     /**

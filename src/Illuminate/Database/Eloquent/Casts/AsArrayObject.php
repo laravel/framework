@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 
 class AsArrayObject implements Castable
 {
@@ -15,8 +16,12 @@ class AsArrayObject implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
+            public function __construct(protected array $arguments)
+            {
+            }
+
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
@@ -30,7 +35,15 @@ class AsArrayObject implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Json::encode($value)];
+                if (is_null($value) && in_array('nullable', $this->arguments, true)) {
+                    return [$key => null];
+                }
+
+                if (($json = Json::encode($value)) === false) {
+                    throw JsonEncodingException::forAttribute($model, $key, json_last_error_msg());
+                }
+
+                return [$key => $json];
             }
 
             public function serialize($model, string $key, $value, array $attributes)
@@ -38,5 +51,15 @@ class AsArrayObject implements Castable
                 return $value->getArrayCopy();
             }
         };
+    }
+
+    /**
+     * Specify that a null value assigned to the attribute should be persisted as a native SQL NULL instead of the JSON "null" literal.
+     *
+     * @return string
+     */
+    public static function nullable()
+    {
+        return static::class.':nullable';
     }
 }

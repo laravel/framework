@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Notifications\Events\NotificationSkipped;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
@@ -158,8 +159,14 @@ class NotificationSender
         }
 
         if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
+            $this->events->dispatch(
+                new NotificationSkipped($notifiable, $notification, $channel)
+            );
+
             return;
         }
+
+        $this->failedEventWasDispatched = false;
 
         try {
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
@@ -308,5 +315,18 @@ class NotificationSender
         }
 
         return $notifiables;
+    }
+
+    /**
+     * Set the locale to be used when sending notifications.
+     *
+     * @param  string|null  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 }

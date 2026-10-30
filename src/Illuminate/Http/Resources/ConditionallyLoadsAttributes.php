@@ -225,7 +225,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenNull($value, $default = new MissingValue)
     {
-        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+        $arguments = func_num_args() === 1 ? [$value] : [$value, $default];
 
         return $this->when(is_null($value), ...$arguments);
     }
@@ -239,7 +239,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenNotNull($value, $default = new MissingValue)
     {
-        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+        $arguments = func_num_args() === 1 ? [$value] : [$value, $default];
 
         return $this->when(! is_null($value), ...$arguments);
     }

@@ -5,15 +5,21 @@ namespace Illuminate\Tests\Routing;
 use BadMethodCallException;
 use FooController;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
-use Mockery as m;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class RouteRegistrarTest extends TestCase
 {
@@ -24,9 +30,10 @@ class RouteRegistrarTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $container = new Container;
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
-        $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
+        $this->router = new Router(new Dispatcher, $container);
     }
 
     public function testMiddlewareFluentRegistration()
@@ -214,6 +221,15 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('saved', Request::create('users', 'POST'));
         $this->seeMiddleware('post-middleware');
+    }
+
+    public function testCanRegisterQueryRouteWithControllerAction()
+    {
+        $this->router->middleware('query-middleware')
+            ->query('users', RouteRegistrarControllerStub::class.'@index');
+
+        $this->seeResponse('controller', Request::create('users', 'QUERY'));
+        $this->seeMiddleware('query-middleware');
     }
 
     public function testCanRegisterAnyRouteWithClosureAction()
@@ -521,8 +537,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testRegisteringNonApprovedAttributesThrows()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.');
+        $this->expectExceptionObject(new BadMethodCallException('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.'));
 
         $this->router->domain('foo')->unsupportedMethod('bar')->group(function ($router) {
             //
@@ -658,7 +673,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testRouteMetadataAttributeRequiresArray()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [metadata] expects an array.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [metadata] expects an array.'));
 
         (new RouteRegistrar($this->router))->attribute('metadata', 'invalid');
     }
@@ -1257,6 +1272,26 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereUlidRegistration()
+    {
+        $this->router->get('/{foo}')->whereUlid('foo');
+
+        $this->assertTrue($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FAV', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FA', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FAI', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/81ARZ3NDEKTSV4RRFFQ69G5FAV', 'GET')));
+    }
+
+    public function testWhereUuidRegistration()
+    {
+        $this->router->get('/{foo}')->whereUuid('foo');
+
+        $this->assertTrue($this->getRoute()->matches(Request::create('/2cd90b6d-3c34-4a0a-9d0d-9d0b7b1a2e6f', 'GET')));
+        $this->assertTrue($this->getRoute()->matches(Request::create('/2CD90B6D-3C34-4A0A-9D0D-9D0B7B1A2E6F', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/2cd90b6d3c344a0a9d0d9d0b7b1a2e6f', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/2cd90b6d-3c34-4a0a-9d0d-9d0b7b1a2e6', 'GET')));
+    }
+
     public function testWhereInRegistration()
     {
         $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
@@ -1439,6 +1474,14 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanSetRouteNameWithNonCallableControllerActionArray()
+    {
+        $this->router->name('users.missing')->get('users', [RouteRegistrarControllerStub::class, 'missing']);
+
+        $this->assertSame('users.missing', $this->getRoute()->getName());
+        $this->assertSame(RouteRegistrarControllerStub::class.'@missing', ltrim($this->getRoute()->getAction('uses'), '\\'));
+    }
+
     public function testCanSetRouteNameUsingStringBackedEnum()
     {
         $this->router->name(RouteNameEnum::UserIndex)->get('users', fn () => 'all-users');
@@ -1448,7 +1491,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCannotSetRouteNameUsingIntegerBackedEnum()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [name] expects a string backed enum.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [name] expects a string backed enum.'));
 
         $this->router->name(IntegerEnum::One)->get('users', fn () => 'all-users');
     }
@@ -1462,7 +1505,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCannotSetRouteDomainUsingIntegerBackedEnum()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
 
         $this->router->domain(IntegerEnum::One)->get('users', fn () => 'all-users');
     }

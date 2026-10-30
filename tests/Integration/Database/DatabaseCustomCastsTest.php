@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -86,6 +87,23 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         );
     }
 
+    public function test_as_html_string_is_serialized_as_string()
+    {
+        $model = new class extends Model
+        {
+            protected $casts = ['body' => AsHtmlString::class];
+        };
+
+        $model->body = '<b>Taylor</b>';
+
+        $this->assertSame(['body' => '<b>Taylor</b>'], $model->toArray());
+        $this->assertSame('{"body":"<b>Taylor<\\/b>"}', $model->toJson());
+
+        $model->body = null;
+
+        $this->assertSame(['body' => null], $model->toArray());
+    }
+
     public function test_custom_casting_using_create()
     {
         $model = TestEloquentModelWithCustomCasts::create([
@@ -152,6 +170,68 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             ],
             $model->array_object_json->toArray()
         );
+    }
+
+    public function test_default_casts_still_persist_null_as_json_null_literal()
+    {
+        $model = new TestEloquentModelWithCustomCastsNullable();
+        $model->array_object_json = null;
+        $model->save();
+
+        $this->assertSame('null', $model->getRawOriginal('array_object_json'));
+
+        $this->assertFalse(
+            TestEloquentModelWithCustomCastsNullable::whereNull('array_object_json')->exists()
+        );
+    }
+
+    public function test_nullable_class_casts_persist_real_null()
+    {
+        $model = new TestEloquentModelWithNullableCustomCasts();
+
+        $model->array_object = null;
+        $model->array_object_json = null;
+        $model->collection = null;
+
+        $model->save();
+
+        $this->assertNull($model->getRawOriginal('array_object'));
+        $this->assertNull($model->getRawOriginal('array_object_json'));
+        $this->assertNull($model->getRawOriginal('collection'));
+
+        $this->assertTrue(
+            TestEloquentModelWithNullableCustomCasts::whereNull('array_object_json')->exists()
+        );
+
+        $model = $model->fresh();
+
+        $this->assertNull($model->array_object);
+        $this->assertNull($model->array_object_json);
+        $this->assertNull($model->collection);
+
+        $model->array_object_json = ['name' => 'Taylor'];
+        $model->save();
+
+        $this->assertEquals(['name' => 'Taylor'], $model->fresh()->array_object_json->toArray());
+    }
+
+    public function test_as_collection_nullable_with_custom_collection_class()
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::nullable(CustomCollection::class),
+        ]);
+
+        $model->collection = null;
+        $this->assertNull($model->getAttributes()['collection']);
+
+        $model->setRawAttributes(['collection' => json_encode(['foo' => 'bar'])]);
+
+        /** @var \Illuminate\Tests\Integration\Database\CustomCollection $collection */
+        $collection = $model->collection;
+
+        $this->assertInstanceOf(CustomCollection::class, $collection);
+        $this->assertSame('bar', $collection->first());
     }
 
     public function test_as_collection_with_map_into()
@@ -260,6 +340,38 @@ class TestEloquentModelWithCustomCastsNullable extends Model
         'collection' => AsCollection::class,
         'stringable' => AsStringable::class,
     ];
+}
+
+class TestEloquentModelWithNullableCustomCasts extends Model
+{
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'test_eloquent_model_with_custom_casts_nullables';
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var string[]
+     */
+    protected $guarded = [];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts()
+    {
+        return [
+            'array_object' => AsArrayObject::nullable(),
+            'array_object_json' => AsArrayObject::nullable(),
+            'collection' => AsCollection::nullable(),
+            'stringable' => AsStringable::class,
+        ];
+    }
 }
 
 class FluentWithCallback extends Fluent

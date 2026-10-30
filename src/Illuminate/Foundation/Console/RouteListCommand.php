@@ -15,18 +15,29 @@ use Illuminate\Support\Stringable;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
 #[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'route:list';
+    protected $signature = 'route:list
+                    {--json : Output the route list as JSON}
+                    {--method= : Filter the routes by method}
+                    {--action= : Filter the routes by action}
+                    {--name= : Filter the routes by name}
+                    {--domain= : Filter the routes by domain}
+                    {--middleware= : Filter the routes by middleware}
+                    {--path= : Only show routes matching the given path pattern}
+                    {--except-path= : Do not display the routes matching the given path pattern}
+                    {--r|reverse : Reverse the ordering of the routes}
+                    {--sort=uri : The column (domain, method, uri, name, action, middleware, definition) to sort by}
+                    {--except-vendor : Do not display routes defined by vendor packages}
+                    {--only-vendor : Only display routes defined by vendor packages}';
 
     /**
      * The console command description.
@@ -66,6 +77,7 @@ class RouteListCommand extends Command
         'GET' => 'blue',
         'HEAD' => '#6C7280',
         'OPTIONS' => '#6C7280',
+        'QUERY' => '#6C7280',
         'POST' => 'yellow',
         'PUT' => 'yellow',
         'PATCH' => 'yellow',
@@ -96,11 +108,15 @@ class RouteListCommand extends Command
         }
 
         if (! $this->router->getRoutes()->count()) {
-            return $this->components->error("Your application doesn't have any routes.");
+            return $this->option('json')
+                ? $this->output->writeln('[]')
+                : $this->components->error("Your application doesn't have any routes.");
         }
 
         if (empty($routes = $this->getRoutes())) {
-            return $this->components->error("Your application doesn't have any routes matching the given criteria.");
+            return $this->option('json')
+                ? $this->output->writeln('[]')
+                : $this->components->error("Your application doesn't have any routes matching the given criteria.");
         }
 
         $this->displayRoutes($routes);
@@ -394,7 +410,7 @@ class RouteListCommand extends Command
         $routes = $routes->map(
             fn ($route) => array_merge($route, [
                 'action' => $this->formatActionForCli($route),
-                'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
+                'method' => $route['method'] === implode('|', Router::$verbs) ? 'ANY' : $route['method'],
                 'uri' => $route['domain'] ? ($route['domain'].'/'.ltrim($route['uri'], '/')) : $route['uri'],
             ]),
         );
@@ -484,7 +500,7 @@ class RouteListCommand extends Command
         $actionClass = explode('@', $action)[0];
 
         if (class_exists($actionClass) && str_starts_with((new ReflectionClass($actionClass))->getFilename(), base_path('vendor'))) {
-            $actionCollection = new Collection(explode('\\', $action));
+            $actionCollection = (new Stringable($action))->explode('\\');
 
             return $name.$actionCollection->take(2)->implode('\\').'   '.$actionCollection->last();
         }
@@ -531,28 +547,5 @@ class RouteListCommand extends Command
     public static function resolveTerminalWidthUsing($resolver)
     {
         static::$terminalWidthResolver = $resolver;
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
-            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
-            ['action', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by action'],
-            ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
-            ['domain', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by domain'],
-            ['middleware', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by middleware'],
-            ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
-            ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
-            ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
-            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, definition) to sort by', 'uri'],
-            ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
-            ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
-        ];
     }
 }

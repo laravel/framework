@@ -242,6 +242,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function string($key, $default = null): string
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_string($value)) {
@@ -263,6 +265,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function integer($key, $default = null): int
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (is_int($value)) {
@@ -288,6 +292,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function float($key, $default = null): float
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (is_float($value)) {
@@ -313,6 +319,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function boolean($key, $default = null): bool
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_bool($value)) {
@@ -335,6 +343,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function array($key, $default = null): array
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_array($value)) {
@@ -661,7 +671,7 @@ class Repository implements ArrayAccess, CacheContract
 
         $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
             $this->store->lock(
-                "illuminate:cache:flexible:lock:{$key}",
+                "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
             )->get(function () use ($key, $callback, $created, $ttl) {
@@ -676,7 +686,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        defer($refresh, "illuminate:cache:flexible:{$key}", $alwaysDefer);
+        defer($refresh, "illuminate:cache:flexible:{$this->itemKey($key)}", $alwaysDefer);
 
         return $value;
     }
@@ -692,7 +702,13 @@ class Repository implements ArrayAccess, CacheContract
     {
         $key = enum_value($key);
 
-        return $this->store->touch($this->itemKey($key), $this->getSeconds($ttl));
+        $seconds = $this->getSeconds($ttl);
+
+        if ($seconds <= 0) {
+            return $this->forget($key);
+        }
+
+        return $this->store->touch($this->itemKey($key), $seconds);
     }
 
     /**
@@ -796,7 +812,6 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * Flush all locks from the cache store.
-     *
      *
      * @throws \BadMethodCallException
      */

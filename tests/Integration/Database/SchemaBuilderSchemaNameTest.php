@@ -216,9 +216,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertEquals(['id', 'title', 'name', 'count'], $schema->getColumnListing('my_schema.table'));
         $this->assertEquals(['id', 'name', 'count', 'title'], $schema->getColumnListing('my_table'));
         $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
+        $this->assertStringContainsString('default schema name', $schema->getColumn('my_schema.table', 'name')['default']);
         $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'title')['default']);
+        $this->assertStringContainsString('default schema title', $schema->getColumn('my_schema.table', 'title')['default']);
         $this->assertStringContainsString('default name', collect($schema->getColumns('my_table'))->firstWhere('name', 'name')['default']);
+        $this->assertStringContainsString('default name', $schema->getColumn('my_table', 'name')['default']);
         $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
+        $this->assertStringContainsString('default title', $schema->getColumn('my_table', 'title')['default']);
     }
 
     #[DataProvider('connectionProvider')]

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -62,7 +63,15 @@ class AsCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Json::encode($value)];
+                if (is_null($value) && in_array('nullable', $this->arguments, true)) {
+                    return [$key => null];
+                }
+
+                if (($json = Json::encode($value)) === false) {
+                    throw JsonEncodingException::forAttribute($model, $key, json_last_error_msg());
+                }
+
+                return [$key => $json];
             }
         };
     }
@@ -92,5 +101,21 @@ class AsCollection implements Castable
         }
 
         return static::class.':'.implode(',', [$class, $map]);
+    }
+
+    /**
+     * Specify that a null value assigned to the attribute should be persisted as a native SQL NULL instead of the JSON "null" literal.
+     *
+     * @param  class-string|null  $class
+     * @param  array{class-string, string}|class-string|null  $map
+     * @return string
+     */
+    public static function nullable($class = null, $map = null)
+    {
+        if (is_array($map) && is_callable($map)) {
+            $map = $map[0].'@'.$map[1];
+        }
+
+        return static::class.':'.implode(',', [$class, $map, 'nullable']);
     }
 }

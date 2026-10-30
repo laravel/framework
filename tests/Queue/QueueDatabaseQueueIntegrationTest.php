@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Queue;
@@ -105,8 +108,6 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->drop('jobs');
-
-        parent::tearDown();
     }
 
     /**
@@ -154,6 +155,69 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->assertEquals(1, $database_record->attempts, 'Job attempts not updated in the database!');
         $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
+    }
+
+    public function testJobIsNotFailedWhenReservingItThrowsAConcurrencyError()
+    {
+        $this->connection()->table('jobs')->insert($this->availableJob());
+
+        $this->connection()->statement("create trigger reserve_job before update on jobs begin select raise(abort, 'database is locked'); end");
+
+        $this->container->instance(DispatcherContract::class, $this->container['events']);
+
+        $failed = 0;
+        $this->container['events']->listen(JobFailed::class, function () use (&$failed) {
+            $failed++;
+        });
+
+        try {
+            $this->queue->pop('default');
+
+            $this->fail('The exception was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('database is locked', $e->getMessage());
+        }
+
+        $this->assertSame(1, $this->connection()->table('jobs')->count());
+        $this->assertSame(0, $failed);
+    }
+
+    public function testJobIsFailedWhenReservingItThrowsAnotherError()
+    {
+        $this->connection()->table('jobs')->insert($this->availableJob());
+
+        $this->connection()->statement("create trigger reserve_job before update on jobs begin select raise(abort, 'attempts out of range'); end");
+
+        $this->container->instance(DispatcherContract::class, $this->container['events']);
+
+        $failed = 0;
+        $this->container['events']->listen(JobFailed::class, function () use (&$failed) {
+            $failed++;
+        });
+
+        try {
+            $this->queue->pop('default');
+
+            $this->fail('The exception was not thrown.');
+        } catch (QueryException) {
+            //
+        }
+
+        $this->assertSame(0, $this->connection()->table('jobs')->count());
+        $this->assertSame(1, $failed);
+    }
+
+    protected function availableJob()
+    {
+        return [
+            'id' => 1,
+            'queue' => 'default',
+            'payload' => json_encode(['uuid' => (string) Str::uuid(), 'job' => 'foo', 'data' => []]),
+            'attempts' => 0,
+            'reserved_at' => null,
+            'available_at' => Carbon::now()->subSecond()->getTimestamp(),
+            'created_at' => Carbon::now()->getTimestamp(),
+        ];
     }
 
     /**

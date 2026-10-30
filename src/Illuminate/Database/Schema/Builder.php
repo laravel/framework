@@ -32,7 +32,7 @@ class Builder
     /**
      * The Blueprint resolver callback.
      *
-     * @var \Closure(\Illuminate\Database\Connection, string, \Closure|null): \Illuminate\Database\Schema\Blueprint
+     * @var (\Closure(\Illuminate\Database\Connection, string, \Closure|null): \Illuminate\Database\Schema\Blueprint)|null
      */
     protected $resolver;
 
@@ -285,13 +285,7 @@ class Builder
     {
         $tableColumns = array_map(strtolower(...), $this->getColumnListing($table));
 
-        foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($columns, fn ($column) => in_array(strtolower($column), $tableColumns));
     }
 
     /**
@@ -391,6 +385,24 @@ class Builder
     }
 
     /**
+     * Get the column for a given table.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return array{name: string, type: string, type_name: string, collation: string|null, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}
+     */
+    public function getColumn($table, $column)
+    {
+        foreach ($this->getColumns($table) as $value) {
+            if (strtolower($value['name']) === strtolower($column)) {
+                return $value;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Get the columns for a given table.
      *
      * @param  string  $table
@@ -450,6 +462,8 @@ class Builder
     public function hasIndex($table, $index, $type = null)
     {
         $type = is_null($type) ? $type : strtolower($type);
+
+        $index = is_string($index) ? strtolower($index) : $index;
 
         foreach ($this->getIndexes($table) as $value) {
             $typeMatches = is_null($type)

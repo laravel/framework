@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphConstrainTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphConstrainTest extends DatabaseTestCase
@@ -61,15 +63,32 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $this->assertTrue($comments[2]->commentable->video_visible);
         $this->assertNull($comments[3]->commentable);
     }
-}
 
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
+    public function testMorphConstraintsWithMorphMap()
     {
-        return $this->morphTo();
+        Relation::morphMap(['post' => Post::class, 'video' => Video::class]);
+
+        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'post']);
+        Comment::where('commentable_type', Video::class)->update(['commentable_type' => 'video']);
+
+        try {
+            $comments = Comment::query()
+                ->with(['commentable' => function (MorphTo $morphTo) {
+                    $morphTo->constrain([
+                        'post' => fn ($query) => $query->where('post_visible', true),
+                        'video' => fn ($query) => $query->where('video_visible', true),
+                    ]);
+                }])
+                ->orderBy('id')
+                ->get();
+
+            $this->assertTrue($comments[0]->commentable->post_visible);
+            $this->assertNull($comments[1]->commentable);
+            $this->assertTrue($comments[2]->commentable->video_visible);
+            $this->assertNull($comments[3]->commentable);
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 }
 

@@ -9,7 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
@@ -39,7 +41,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * All of the channels to send the notification to.
      *
-     * @var array
+     * @var array|null
      */
     public $channels;
 
@@ -77,6 +79,20 @@ class SendQueuedNotifications implements ShouldQueue
     public bool $deleteWhenMissingModels = false;
 
     /**
+     * Indicates if the job should be marked as failed on timeout.
+     *
+     * @var bool
+     */
+    public $failOnTimeout = false;
+
+    /**
+     * Indicates if worker crashes should count towards the maximum exceptions.
+     *
+     * @var bool
+     */
+    public $countCrashesAsExceptions = false;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
@@ -92,6 +108,8 @@ class SendQueuedNotifications implements ShouldQueue
         $this->timeout = $this->getAttributeValue($notification, Timeout::class, 'timeout');
         $this->maxExceptions = $this->getAttributeValue($notification, MaxExceptions::class, 'maxExceptions');
         $this->deleteWhenMissingModels = $this->getAttributeValue($notification, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false;
+        $this->failOnTimeout = $this->getAttributeValue($notification, FailOnTimeout::class, 'failOnTimeout') ?? false;
+        $this->countCrashesAsExceptions = $this->getAttributeValue($notification, CountCrashesAsExceptions::class, 'countCrashesAsExceptions') ?? false;
 
         if ($notification instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;

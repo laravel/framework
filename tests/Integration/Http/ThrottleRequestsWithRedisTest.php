@@ -78,6 +78,21 @@ class ThrottleRequestsWithRedisTest extends TestCase
         });
     }
 
+    public function testItReturnsRemainingAttemptsHeaderWhenResponseIsNotCounted()
+    {
+        $this->ifRedisAvailable(function () {
+            RateLimiter::for('throttle-not-found', function (Request $request) {
+                return Limit::perMinute(5)->after(fn ($response) => $response->status() === 404);
+            });
+            Route::get('/', fn () => 'ok')->middleware(ThrottleRequestsWithRedis::using('throttle-not-found'));
+
+            $this->get('/')
+                ->assertOk()
+                ->assertHeader('X-RateLimit-Limit', 5)
+                ->assertHeader('X-RateLimit-Remaining', 5);
+        });
+    }
+
     public function testItReturnsConfiguredResponseWhenUsingAfterLimit(): void
     {
         $this->ifRedisAvailable(function () {

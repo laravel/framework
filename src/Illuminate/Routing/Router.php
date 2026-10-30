@@ -124,7 +124,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * The registered custom implicit binding callback.
      *
-     * @var array
+     * @var callable|null
      */
     protected $implicitBindingCallback;
 
@@ -133,7 +133,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @var string[]
      */
-    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'QUERY'];
 
     /**
      * Create a new Router instance.
@@ -218,6 +218,18 @@ class Router implements BindingRegistrar, RegistrarContract
     public function options($uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
+    }
+
+    /**
+     * Register a new QUERY route with the router.
+     *
+     * @param  string  $uri
+     * @param  array|string|callable|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function query($uri, $action = null)
+    {
+        return $this->addRoute('QUERY', $uri, $action);
     }
 
     /**
@@ -749,6 +761,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function dispatch(Request $request)
     {
         $this->currentRequest = $request;
+        $this->current = null;
 
         return $this->dispatchToRoute($request);
     }
@@ -861,15 +874,17 @@ class Router implements BindingRegistrar, RegistrarContract
                         return false;
                     }
 
-                    if (in_array($name, $excluded, true)) {
+                    $class = explode(':', $name, 2)[0];
+
+                    if (in_array($name, $excluded, true) || in_array($class, $excluded, true)) {
                         return true;
                     }
 
-                    if (! class_exists($name)) {
+                    if (! class_exists($class)) {
                         return false;
                     }
 
-                    $reflection = new ReflectionClass($name);
+                    $reflection = new ReflectionClass($class);
 
                     return (new Collection($excluded))->contains(
                         fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
@@ -1307,13 +1322,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $names = is_array($name) ? $name : func_get_args();
 
-        foreach ($names as $value) {
-            if (! $this->routes->hasNamedRoute($value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($names, fn ($value) => $this->routes->hasNamedRoute($value));
     }
 
     /**
@@ -1368,13 +1377,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function uses(...$patterns)
     {
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($patterns, fn ($pattern) => Str::is($pattern, $this->currentRouteAction()));
     }
 
     /**

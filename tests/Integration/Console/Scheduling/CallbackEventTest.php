@@ -6,16 +6,25 @@ use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Stringable;
-use Mockery as m;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Orchestra\Testbench\TestCase;
 
 class CallbackEventTest extends TestCase
 {
+    private EventMutex $mutex;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->mutex = new FakeEventMutex;
+    }
+
     public function testDefaultResultIsSuccess()
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
         }))->onSuccess(function () use (&$success) {
             $success = true;
         })->onFailure(function () use (&$success) {
@@ -31,7 +40,7 @@ class CallbackEventTest extends TestCase
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
             return false;
         }))->onSuccess(function () use (&$success) {
             $success = true;
@@ -48,7 +57,7 @@ class CallbackEventTest extends TestCase
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
             throw new Exception;
         }))->onSuccess(function () use (&$success) {
             $success = true;
@@ -66,7 +75,7 @@ class CallbackEventTest extends TestCase
 
     public function testExceptionBubbles()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = new CallbackEvent($this->mutex, function () {
             throw new Exception;
         });
 
@@ -75,11 +84,39 @@ class CallbackEventTest extends TestCase
         $event->run($this->app);
     }
 
+    public function testExceptionIsNotRethrownOnSubsequentRuns()
+    {
+        $runs = 0;
+        $success = null;
+
+        $event = (new CallbackEvent($this->mutex, function () use (&$runs) {
+            if (++$runs === 1) {
+                throw new Exception('First run failed.');
+            }
+        }))->onSuccess(function () use (&$success) {
+            $success = true;
+        })->onFailure(function () use (&$success) {
+            $success = false;
+        });
+
+        try {
+            $event->run($this->app);
+        } catch (Exception) {
+        }
+
+        $this->assertFalse($success);
+
+        $event->run($this->app);
+
+        $this->assertSame(2, $runs);
+        $this->assertTrue($success);
+    }
+
     public function testOnSuccessCallbackCanReceiveEvent()
     {
         $callbackEvent = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
         }))->onSuccess(function (CallbackEvent $event) use (&$callbackEvent) {
             $callbackEvent = $event;
         });
@@ -93,7 +130,7 @@ class CallbackEventTest extends TestCase
     {
         $callbackEvent = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
             return false;
         }))->onFailure(function (CallbackEvent $event) use (&$callbackEvent) {
             $callbackEvent = $event;
@@ -109,7 +146,7 @@ class CallbackEventTest extends TestCase
         $callbackEvent = null;
         $outputValue = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent($this->mutex, function () {
         }))->onSuccess(function (Stringable $output, CallbackEvent $event) use (&$callbackEvent, &$outputValue) {
             $callbackEvent = $event;
             $outputValue = (string) $output;

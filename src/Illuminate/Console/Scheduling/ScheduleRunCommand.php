@@ -113,10 +113,6 @@ class ScheduleRunCommand extends Command
 
         $events = $this->schedule->dueEvents($this->laravel);
 
-        if ($events->contains->isRepeatable()) {
-            $this->clearInterruptSignal();
-        }
-
         $paused = $this->isPaused();
 
         foreach ($events as $event) {
@@ -215,7 +211,11 @@ class ScheduleRunCommand extends Command
                     throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
                 }
             } catch (Throwable $e) {
-                $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
+                $this->dispatcher->dispatch(new ScheduledTaskFailed(
+                    $event,
+                    $e,
+                    round(microtime(true) - $start, 2)
+                ));
 
                 $this->handler->report($e);
             }
@@ -310,20 +310,6 @@ class ScheduleRunCommand extends Command
      */
     protected function shouldInterrupt()
     {
-        if (! Schedule::$interruptible) {
-            return false;
-        }
-
-        return $this->cache->get('illuminate:schedule:interrupt', false);
-    }
-
-    /**
-     * Ensure the interrupt signal is cleared.
-     *
-     * @return void
-     */
-    protected function clearInterruptSignal()
-    {
-        $this->cache->forget('illuminate:schedule:interrupt');
+        return $this->schedule->hasBeenInterruptedSince($this->startedAt);
     }
 }

@@ -55,6 +55,14 @@ class RateLimitedWithRedis extends RateLimited
             }
         }
 
+        foreach ($limits as $limit) {
+            if (! $this->acquire($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+                return $this->shouldRelease
+                    ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
+                    : false;
+            }
+        }
+
         return $next($job);
     }
 
@@ -76,7 +84,30 @@ class RateLimitedWithRedis extends RateLimited
             $redis, $key, $maxAttempts, $decaySeconds
         );
 
-        return tap(! $limiter->acquire(), function () use ($key, $limiter) {
+        return tap($limiter->tooManyAttempts(), function () use ($key, $limiter) {
+            $this->decaysAt[$key] = $limiter->decaysAt;
+        });
+    }
+
+    /**
+     * Acquire a slot for the given key.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
+     * @return bool
+     */
+    protected function acquire($key, $maxAttempts, $decaySeconds)
+    {
+        $redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
+
+        $limiter = new DurationLimiter(
+            $redis, $key, $maxAttempts, $decaySeconds
+        );
+
+        return tap($limiter->acquire(), function () use ($key, $limiter) {
             $this->decaysAt[$key] = $limiter->decaysAt;
         });
     }

@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Middleware;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;

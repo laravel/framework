@@ -68,8 +68,6 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('contracts');
         $this->schema()->drop('positions');
-
-        parent::tearDown();
     }
 
     public function testItLoadsAHasOneThroughRelationWithCustomKeys()
@@ -78,6 +76,21 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $contract = HasOneThroughTestPosition::first()->contract;
 
         $this->assertSame('A title', $contract->title);
+    }
+
+    public function testIsMethod()
+    {
+        $otherPosition = HasOneThroughTestPosition::create(['id' => 1, 'name' => 'Engineer', 'shortname' => 'eng']);
+        $position = HasOneThroughTestPosition::create(['id' => 2, 'name' => 'President', 'shortname' => 'ps']);
+        $user = $position->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+        $otherUser = $otherPosition->user()->create(['id' => 2, 'email' => 'abigailotwell@gmail.com', 'position_short' => 'eng']);
+        $contract = $user->contract()->create(['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+        $otherContract = $otherUser->contract()->create(['title' => 'Another title', 'body' => 'Another body', 'email' => 'abigailotwell@gmail.com']);
+
+        $this->assertTrue($position->contract()->is($contract));
+        $this->assertFalse($position->contract()->is($otherContract));
+        $this->assertTrue($otherPosition->contract()->isNot($contract));
+        $this->assertFalse($otherPosition->contract()->isNot($otherContract));
     }
 
     public function testItLoadsADefaultHasOneThroughRelation()
@@ -132,8 +145,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
     public function testFirstOrFailThrowsAnException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].'));
 
         HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
@@ -284,6 +296,19 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $this->assertSame('ps', $position->shortname);
         $this->assertSame('A title', $position->contract->title);
+    }
+
+    public function testTouch()
+    {
+        $this->seedData();
+        $position = HasOneThroughTestPosition::first();
+
+        HasOneThroughTestContract::query()->update(['updated_at' => '2000-01-01 00:00:00']);
+        $this->assertSame('2000-01-01 00:00:00', HasOneThroughTestContract::first()->updated_at->format('Y-m-d H:i:s'));
+
+        $position->contract()->touch();
+
+        $this->assertNotSame('2000-01-01 00:00:00', HasOneThroughTestContract::first()->fresh()->updated_at->format('Y-m-d H:i:s'));
     }
 
     /**

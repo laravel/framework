@@ -18,11 +18,10 @@ class TestCachesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance($container = new Container);
 
         Facade::setFacadeApplication($container);
+        ParallelTestingFacade::clearResolvedInstance();
 
         $container->singleton('config', fn () => new Config([
             'cache' => [
@@ -57,8 +56,6 @@ class TestCachesTest extends TestCase
         };
 
         (new ReflectionProperty($instance::class, 'originalCachePrefix'))->setValue(null, null);
-
-        parent::tearDown();
     }
 
     #[DataProvider('cachePrefixes')]
@@ -122,7 +119,8 @@ class TestCachesTest extends TestCase
 
         $_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE'] = 1;
 
-        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks(new class { });
+        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks(new class {
+        });
 
         $this->assertSame('myapp_cache_', Container::getInstance()['config']->get('cache.prefix'));
 

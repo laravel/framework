@@ -28,7 +28,7 @@ class RateLimiterTest extends TestCase
     {
         $reflectedLimitersProperty = new ReflectionProperty(RateLimiter::class, 'limiters');
 
-        $rateLimiter = new RateLimiter($this->createMock(Cache::class));
+        $rateLimiter = new RateLimiter($this->createStub(Cache::class));
         $rateLimiter->for($name, fn () => Limit::perMinute(100));
 
         $limiters = $reflectedLimitersProperty->getValue($rateLimiter);
@@ -65,6 +65,15 @@ class RateLimiterTest extends TestCase
 
         $this->assertNotSame($limiterForUser1[0]->key, $limiterForUser2[0]->key);
         $this->assertNotSame($limiterForUser1[1]->key, $limiterForUser2[1]->key);
+    }
+
+    public function testMacroable(): void
+    {
+        RateLimiter::macro('foo', fn () => 'bar');
+
+        $rateLimiter = new RateLimiter($this->createStub(Cache::class));
+
+        $this->assertSame('bar', $rateLimiter->foo());
     }
 }
 

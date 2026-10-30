@@ -42,7 +42,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * The locale of the message.
      *
-     * @var string
+     * @var string|null
      */
     public $locale;
 
@@ -91,28 +91,28 @@ class Mailable implements MailableContract, Renderable
     /**
      * The Markdown template for the message (if applicable).
      *
-     * @var string
+     * @var string|null
      */
     public $markdown;
 
     /**
      * The HTML to use for the message.
      *
-     * @var string
+     * @var string|null
      */
     protected $html;
 
     /**
      * The view to use for the message.
      *
-     * @var string
+     * @var string|null
      */
     public $view;
 
     /**
      * The plain text view to use for the message.
      *
-     * @var string
+     * @var string|null
      */
     public $textView;
 
@@ -596,7 +596,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the locale of the message.
      *
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return $this
      */
     public function locale($locale)
@@ -616,7 +616,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = static function ($message) use ($level) {
             $message->priority($level);
         };
 
@@ -787,7 +787,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  object|array|string  $address
      * @param  string|null  $name
-     * @return array
+     * @return array|\Illuminate\Support\Collection
      */
     protected function addressesToArray($address, $name)
     {
@@ -1101,7 +1101,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach a file to the message from storage.
      *
-     * @param  string  $disk
+     * @param  string|null  $disk
      * @param  string  $path
      * @param  string|null  $name
      * @param  array  $options
@@ -1137,7 +1137,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the mailable has the given attachment from a specific storage disk.
      *
-     * @param  string  $disk
+     * @param  string|null  $disk
      * @param  string  $path
      * @param  string|null  $name
      * @param  array  $options
@@ -1548,8 +1548,6 @@ class Mailable implements MailableContract, Renderable
     /**
      * Assert the mailable has the given attachment.
      *
-     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function assertHasNoAttachments()
@@ -1757,7 +1755,7 @@ class Mailable implements MailableContract, Renderable
 
         $headers = $this->headers();
 
-        $this->withSymfonyMessage(function ($message) use ($headers) {
+        $this->withSymfonyMessage(static function ($message) use ($headers) {
             if ($headers->messageId) {
                 $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
             }

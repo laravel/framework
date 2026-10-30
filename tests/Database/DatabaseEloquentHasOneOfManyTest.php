@@ -56,6 +56,18 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
             $table->dateTime('published_at');
             $table->foreignId('user_id');
         });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->foreignId('parent_id')->nullable();
+            $table->integer('score')->default(0);
+        });
+
+        $this->schema()->create('soft_deleting_comments', function ($table) {
+            $table->increments('id');
+            $table->foreignId('parent_id')->nullable();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -65,12 +77,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Eloquent::clearBootedModels();
         $this->schema()->drop('users');
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
-
-        parent::tearDown();
+        $this->schema()->drop('comments');
+        $this->schema()->drop('soft_deleting_comments');
     }
 
     public function testItGuessesRelationName()
@@ -83,6 +96,22 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $model = HasOneOfManyTestModel::make();
         $this->assertSame('logins_of_many', $model->logins()->getRelationName());
+    }
+
+    public function testItUsesTheTableNameWhenOfManyIsCalledInsideAClosure()
+    {
+        HasOneOfManyTestUser::resolveRelationUsing('first_login_from_closure', function ($user) {
+            return $user->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'min');
+        });
+
+        $user = HasOneOfManyTestUser::create();
+        $first = $user->logins()->create();
+        $user->logins()->create();
+
+        $this->assertTrue($first->is($user->first_login_from_closure));
+        $this->assertTrue($first->is(HasOneOfManyTestUser::with('first_login_from_closure')->first()->first_login_from_closure));
+        $this->assertCount(1, HasOneOfManyTestUser::has('first_login_from_closure')->get());
+        $this->assertSame('logins_of_many', $user->first_login_from_closure()->getRelationName());
     }
 
     public function testRelationNameCanBeSet()
@@ -154,8 +183,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
     public function testItFailsWhenUsingInvalidAggregate()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX'));
         $user = HasOneOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }
@@ -296,6 +324,41 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         })->exists();
 
         $this->assertFalse($found);
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelation()
+    {
+        $first = HasOneOfManyTestComment::create();
+        $second = HasOneOfManyTestComment::create();
+        $first->replies()->create();
+        $second->replies()->create();
+
+        $this->assertEquals([$first->id, $second->id], HasOneOfManyTestComment::has('latestReply')->pluck('id')->all());
+        $this->assertEquals([1, 1, 0, 0], HasOneOfManyTestComment::withCount('latestReply')->pluck('latest_reply_count')->all());
+        $this->assertEquals([3, 4], HasOneOfManyTestComment::doesntHave('latestReply')->pluck('id')->all());
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelationWithAggregateColumn()
+    {
+        $first = HasOneOfManyTestComment::create();
+        $second = HasOneOfManyTestComment::create();
+        $first->replies()->create(['score' => 5]);
+        $first->replies()->create(['score' => 3]);
+        $second->replies()->create(['score' => 1]);
+
+        $this->assertEquals([$first->id], HasOneOfManyTestComment::whereHas('topReply', fn ($query) => $query->where('score', 5))->pluck('id')->all());
+        $this->assertEquals([1, 1, 0, 0, 0], HasOneOfManyTestComment::withCount('topReply')->pluck('top_reply_count')->all());
+    }
+
+    public function testExistenceQueriesOnSelfReferencingRelationWithSoftDeletes()
+    {
+        $first = HasOneOfManyTestSoftDeletingComment::create();
+        $second = HasOneOfManyTestSoftDeletingComment::create();
+        $first->replies()->create();
+        $second->replies()->create()->delete();
+
+        $this->assertEquals([$first->id], HasOneOfManyTestSoftDeletingComment::has('latestReply')->pluck('id')->all());
+        $this->assertEquals([1, 0, 0], HasOneOfManyTestSoftDeletingComment::withCount('latestReply')->pluck('latest_reply_count')->all());
     }
 
     public function testHasCount()
@@ -701,4 +764,45 @@ class HasOneOfManyTestPrice extends Eloquent
     public $timestamps = false;
     protected $fillable = ['published_at'];
     protected $casts = ['published_at' => 'datetime'];
+}
+
+class HasOneOfManyTestComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function replies()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function latestReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->latestOfMany();
+    }
+
+    public function topReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->ofMany('score', 'max');
+    }
+}
+
+class HasOneOfManyTestSoftDeletingComment extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $table = 'soft_deleting_comments';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function replies()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function latestReply()
+    {
+        return $this->hasOne(self::class, 'parent_id')->latestOfMany();
+    }
 }

@@ -23,9 +23,22 @@ class CacheDynamoDbStoreTest extends TestCase
                 && str_contains($dynamo->args['UpdateExpression'], 'SET')
         );
 
-        $this->assertTrue(
-            $ttl === $dynamo->args['ExpressionAttributeValues'][':expiry']['N']
+        $this->assertSame(
+            $ttl, $dynamo->args['ExpressionAttributeValues'][':expiry']['N']
             - $dynamo->args['ExpressionAttributeValues'][':now']['N']
+        );
+    }
+
+    public function testManyMethodPreservesNumericKeys(): void
+    {
+        $dynamo = new TestDynamo;
+        $dynamo->batchGetItemResponse = ['Responses' => ['table' => [
+            ['key' => ['S' => '10'], 'value' => ['S' => serialize('Taylor')]],
+        ]]];
+
+        $this->assertSame(
+            [10 => 'Taylor', 20 => null],
+            (new DynamoDbStore($dynamo, 'table'))->many([10, 20])
         );
     }
 }
@@ -33,6 +46,8 @@ class CacheDynamoDbStoreTest extends TestCase
 class TestDynamo extends DynamoDbClient
 {
     public array $args;
+
+    public array $batchGetItemResponse = [];
 
     public function __construct()
     {
@@ -43,5 +58,12 @@ class TestDynamo extends DynamoDbClient
         $this->args = $args;
 
         return true;
+    }
+
+    public function batchGetItem(array $args): array
+    {
+        $this->args = $args;
+
+        return $this->batchGetItemResponse;
     }
 }

@@ -51,9 +51,13 @@ class PhpRedisConnector implements Connector
     {
         $options = array_merge($options, $clusterOptions, Arr::pull($config, 'options', []));
 
-        return new PhpRedisClusterConnection($this->createRedisClusterInstance(
+        $connector = fn () => $this->createRedisClusterInstance(
             array_map($this->buildClusterConnectionString(...), $config), $options
-        ));
+        );
+
+        return new PhpRedisClusterConnection($connector(), $connector, array_merge($config, [
+            'command_retries' => (int) Arr::get($options, 'command_retries', 0),
+        ]));
     }
 
     /**

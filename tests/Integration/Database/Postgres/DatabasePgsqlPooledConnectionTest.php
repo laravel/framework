@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\Postgres;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -41,6 +42,35 @@ class DatabasePgsqlPooledConnectionTest extends PostgresTestCase
         $this->assertIsBool(DB::connection('pgsql')->getSchemaBuilder()->hasTable('migrations'));
     }
 
+    public function testEloquentModelsStayOnTheDirectConnection()
+    {
+        $direct = DB::connection('pgsql::direct');
+        $schema = $direct->getSchemaBuilder();
+
+        $schema->dropIfExists('pooled_direct_models');
+
+        try {
+            $direct->transaction(function () use ($schema) {
+                $schema->create('pooled_direct_models', function ($table) {
+                    $table->id();
+                    $table->string('name');
+                });
+
+                // Every model the builder produces has to keep the routing, whether it is created
+                // or hydrated. The table only exists inside this transaction, so anything falling
+                // back to the pooled connection can neither write to it nor read it back.
+                $created = PooledDirectModel::on('pgsql::direct')->create(['name' => 'direct']);
+                $retrieved = PooledDirectModel::on('pgsql::direct')->first();
+
+                $this->assertSame('pgsql::direct', $created->getConnectionName());
+                $this->assertSame('pgsql::direct', $retrieved->getConnectionName());
+                $this->assertSame('direct', $retrieved->name);
+            });
+        } finally {
+            $schema->dropIfExists('pooled_direct_models');
+        }
+    }
+
     public function testPooledConnectionCanBindBooleansWithEmulatedPrepares()
     {
         $schema = DB::connection('pgsql::direct')->getSchemaBuilder();
@@ -63,4 +93,13 @@ class DatabasePgsqlPooledConnectionTest extends PostgresTestCase
             $schema->dropIfExists('pooled_boolean_bindings');
         }
     }
+}
+
+class PooledDirectModel extends Model
+{
+    protected $table = 'pooled_direct_models';
+
+    protected $guarded = [];
+
+    public $timestamps = false;
 }

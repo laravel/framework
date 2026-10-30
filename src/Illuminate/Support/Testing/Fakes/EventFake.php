@@ -16,7 +16,7 @@ use ReflectionFunction;
 
 class EventFake implements Dispatcher, Fake
 {
-    use ForwardsCalls, ReflectsClosures;
+    use ForwardsCalls, MatchesProperties, ReflectsClosures;
 
     /**
      * The original event dispatcher.
@@ -128,7 +128,7 @@ class EventFake implements Dispatcher, Fake
      * Assert if an event was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $event
-     * @param  callable|int|null  $callback
+     * @param  callable|array<string, mixed>|int|null  $callback
      * @return void
      */
     public function assertDispatched($event, $callback = null)
@@ -142,7 +142,7 @@ class EventFake implements Dispatcher, Fake
         }
 
         PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() > 0,
+            $this->dispatched($event, $callback)->isNotEmpty(),
             "The expected [{$event}] event was not dispatched."
         );
     }
@@ -183,7 +183,7 @@ class EventFake implements Dispatcher, Fake
      * Determine if an event was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $event
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertNotDispatched($event, $callback = null)
@@ -226,7 +226,7 @@ class EventFake implements Dispatcher, Fake
      * Get all of the events matching a truth-test callback.
      *
      * @param  string  $event
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function dispatched($event, $callback = null)
@@ -235,7 +235,7 @@ class EventFake implements Dispatcher, Fake
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->events[$event]))->filter(
             fn ($arguments) => $callback(...$arguments)
@@ -347,12 +347,11 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToFake))
-            ->filter(function ($event) use ($eventName, $payload) {
+            ->contains(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                     ? $event($eventName, $payload)
                     : $event === $eventName;
-            })
-            ->isNotEmpty();
+            });
     }
 
     /**
@@ -387,12 +386,11 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToDispatch))
-            ->filter(function ($event) use ($eventName, $payload) {
+            ->contains(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                     ? $event($eventName, $payload)
                     : $event === $eventName;
-            })
-            ->isNotEmpty();
+            });
     }
 
     /**

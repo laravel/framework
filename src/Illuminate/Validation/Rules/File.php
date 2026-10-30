@@ -33,14 +33,14 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * The minimum size in kilobytes that the file can be.
      *
-     * @var null|int
+     * @var null|int|float
      */
     protected $minimumFileSize = null;
 
     /**
      * The maximum size in kilobytes that the file can be.
      *
-     * @var null|int
+     * @var null|int|float
      */
     protected $maximumFileSize = null;
 
@@ -120,7 +120,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $file instanceof Rule ? $file : new self();
+        return $file instanceof Rule ? $file : new static;
     }
 
     /**

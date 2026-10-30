@@ -8,8 +8,6 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'cache:clear')]
 class ClearCommand extends Command
@@ -17,11 +15,14 @@ class ClearCommand extends Command
     use Prohibitable;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'cache:clear';
+    protected $signature = 'cache:clear
+                    {store? : The name of the store you would like to clear}
+                    {--tags= : The cache tags you would like to clear}
+                    {--locks : Only clear cache locks}';
 
     /**
      * The console command description.
@@ -166,30 +167,5 @@ class ClearCommand extends Command
     protected function tags()
     {
         return array_filter(explode(',', $this->option('tags') ?? ''));
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
-            ['locks', null, InputOption::VALUE_NONE, 'Only clear cache locks'],
-        ];
     }
 }

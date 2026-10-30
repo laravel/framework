@@ -36,7 +36,7 @@ class MaintenanceModeBypassCookie
 
         return is_array($payload) &&
             is_numeric($payload['expires_at'] ?? null) &&
-            isset($payload['mac']) &&
+            is_string($payload['mac'] ?? null) &&
             hash_equals(hash_hmac('sha256', $payload['expires_at'], $key), $payload['mac']) &&
             (int) $payload['expires_at'] >= Carbon::now()->getTimestamp();
     }

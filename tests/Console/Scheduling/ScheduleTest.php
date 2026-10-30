@@ -9,8 +9,9 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
-use Mockery as m;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
+use Illuminate\Tests\Queue\Fixtures\JobToTestWithSchedule;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -22,13 +23,10 @@ final class ScheduleTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->container = new Container;
         Container::setInstance($this->container);
-        $eventMutex = m::mock(EventMutex::class);
-        $this->container->instance(EventMutex::class, $eventMutex);
-        $schedulingMutex = m::mock(SchedulingMutex::class);
+        $this->container->instance(EventMutex::class, new FakeEventMutex);
+        $schedulingMutex = Mockery::mock(SchedulingMutex::class);
         $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }
 
@@ -115,5 +113,37 @@ final class ScheduleTest extends TestCase
 
         $this->assertSame(['team' => 'platform'], $events[0]->attributes);
         $this->assertSame([], $events[1]->attributes);
+    }
+
+    public function testEventsDoNotRunOnOneServerByDefault(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->command('inspire')->everyMinute();
+
+        $this->assertFalse($schedule->events()[0]->onOneServer);
+    }
+
+    public function testEveryEventMayRunOnOneServer(): void
+    {
+        Schedule::alwaysOnOneServer();
+
+        try {
+            $schedule = new Schedule();
+
+            $schedule->command('inspire')->everyMinute();
+            $schedule->job(JobToTestWithSchedule::class)->daily();
+            $schedule->call(fn () => null)->name('prune')->hourly();
+            $schedule->call(fn () => null)->hourly();
+
+            [$command, $job, $closure, $unnamedClosure] = $schedule->events();
+
+            $this->assertTrue($command->onOneServer);
+            $this->assertTrue($job->onOneServer);
+            $this->assertTrue($closure->onOneServer);
+            $this->assertFalse($unnamedClosure->onOneServer);
+        } finally {
+            Schedule::alwaysOnOneServer(false);
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route patch(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route delete(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route options(string $uri, array|string|callable|null $action = null)
+ * @method static \Illuminate\Routing\Route query(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route any(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route fallback(array|string|callable|null $action)
  * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 302)

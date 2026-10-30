@@ -25,8 +25,6 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->dropIfExists((new PendingAttributesModel)->getTable());
-
-        parent::tearDown();
     }
 
     public function testAddsAttributes(): void
@@ -68,7 +66,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
 
         $model = $query->make();
 
-        $this->assertSame(true, $model->is_admin);
+        $this->assertTrue($model->is_admin);
         $this->assertSame('First', $model->first_name);
         $this->assertSame('Last', $model->last_name);
         $this->assertSame(PendingAttributesEnum::internal, $model->type);
@@ -97,7 +95,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
 
         $model = PendingAttributesModel::first();
 
-        $this->assertSame(true, $model->is_admin);
+        $this->assertTrue($model->is_admin);
         $this->assertSame('First', $model->first_name);
         $this->assertSame('Last', $model->last_name);
         $this->assertSame(PendingAttributesEnum::internal, $model->type);

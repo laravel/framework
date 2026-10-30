@@ -119,7 +119,11 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     {
         Event::fake();
 
-        Model::handleLazyLoadingViolationUsing(function ($model, $key) {
+        $callbackException = null;
+
+        Model::handleLazyLoadingViolationUsing(function ($model, $key, $exception) use (&$callbackException) {
+            $callbackException = $exception;
+
             event(new ViolatedLazyLoadingEvent($model, $key));
         });
 
@@ -131,12 +135,13 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models[0]->modelTwos;
 
         Event::assertDispatched(ViolatedLazyLoadingEvent::class);
+        $this->assertInstanceOf(LazyLoadingViolationException::class, $callbackException);
+        $this->assertSame(EloquentStrictLoadingTestModel1::class, $callbackException->model);
     }
 
     public function testStrictModeWithOverriddenHandlerOnLazyLoading()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Violated');
+        $this->expectExceptionObject(new RuntimeException('Violated'));
 
         EloquentStrictLoadingTestModel1WithCustomHandler::create();
         EloquentStrictLoadingTestModel1WithCustomHandler::create();

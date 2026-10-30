@@ -13,8 +13,6 @@ class DatabaseEloquentWithCastsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $db = new DB;
 
         $db->addConnection([
@@ -77,6 +75,16 @@ class DatabaseEloquentWithCastsTest extends TestCase
             ->createOrFirst(['time' => '07:30']);
 
         $this->assertSame($time1->id, $time2->id);
+    }
+
+    public function testWithCastsOnClonedQueryDoesNotAffectOriginalQuery()
+    {
+        Time::create(['time' => '07:30']);
+
+        $query = Time::query();
+
+        $this->assertIsString($query->clone()->withCasts(['time' => 'string'])->first()->time);
+        $this->assertInstanceOf(Carbon::class, $query->first()->time);
     }
 
     public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()

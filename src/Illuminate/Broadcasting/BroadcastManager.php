@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Broadcasting\Mercure\CreatesMercureDrivers;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
@@ -21,6 +22,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
@@ -37,7 +39,7 @@ use function Illuminate\Support\enum_value;
  */
 class BroadcastManager implements FactoryContract
 {
-    use ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
+    use CreatesMercureDrivers, ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -190,7 +192,8 @@ class BroadcastManager implements FactoryContract
         if ($event instanceof ShouldBroadcastNow ||
             (is_object($event) &&
              method_exists($event, 'shouldBroadcastNow') &&
-             $event->shouldBroadcastNow())) {
+             $event->shouldBroadcastNow()) ||
+            $this->broadcastsToSynchronousMercureConnections($event)) {
             $dispatch = fn () => $this->app->make(BusDispatcherContract::class)
                 ->dispatchNow(new BroadcastEvent(clone $event));
 
@@ -218,6 +221,8 @@ class BroadcastManager implements FactoryContract
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
 
             if ($this->mustBeUniqueAndCannotAcquireLock($broadcastEvent)) {
+                $this->app->make('events')->dispatch(new UniqueJobSkipped($broadcastEvent));
+
                 return;
             }
         }
@@ -451,7 +456,7 @@ class BroadcastManager implements FactoryContract
      * Get the connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {

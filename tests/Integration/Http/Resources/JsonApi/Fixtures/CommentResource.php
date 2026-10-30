@@ -18,6 +18,6 @@ class CommentResource extends JsonApiResource
      */
     public $relationships = [
         'posts',
-        'commenter' => UserApiResource::class,
+        'commenter' => UserResource::class,
     ];
 }

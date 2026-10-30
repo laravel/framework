@@ -69,7 +69,7 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
     {
         $user = ModelWithoutUuidPrimaryKey::create();
 
-        $this->assertTrue(is_int($user->id));
+        $this->assertIsInt($user->id);
         $this->assertTrue(Str::isUuid($user->foo));
         $this->assertTrue(Str::isUuid($user->bar));
     }
@@ -109,7 +109,7 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $user->saveQuietly();
 
-        $this->assertTrue(is_int($user->id));
+        $this->assertIsInt($user->id);
         $this->assertTrue(Str::isUuid($user->foo));
         $this->assertTrue(Str::isUuid($user->bar));
     }

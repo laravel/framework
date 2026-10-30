@@ -62,6 +62,12 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = $this->find($key);
 
+        if ($key instanceof Model) {
+            $key = $key->getKey();
+        }
+
+        $key = $key instanceof Arrayable ? $key->toArray() : $key;
+
         if (is_array($key) && count($result) === count(array_unique($key))) {
             return $result;
         } elseif (! is_array($key) && ! is_null($result)) {
@@ -221,7 +227,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        if ($this->isNotEmpty()) {
+        if ($this->isNotEmpty() && ! empty($relations)) {
             $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
             foreach ($query->getEagerLoads() as $key => $value) {
@@ -251,7 +257,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path for models of the given type if it is not already eager loaded.
      *
-     * @param  array<int, <string, class-string>>  $tuples
+     * @param  array<int, array<string, class-string>>  $tuples
      * @return void
      */
     public function loadMissingRelationshipChain(array $tuples)
@@ -260,8 +266,8 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $this->filter(function ($model) use ($relation, $class) {
             return ! is_null($model) &&
-                ! $model->relationLoaded($relation) &&
-                $model::class === $class;
+                $model::class === $class &&
+                ! $model->relationLoaded($relation);
         })->load($relation);
 
         if (empty($tuples)) {
@@ -306,7 +312,9 @@ class Collection extends BaseCollection implements QueueableCollection
             $models = $models->collapse();
         }
 
-        $this->loadMissingRelation(new static($models), $path);
+        $models->groupBy(fn ($model) => $model::class)->each(
+            fn ($models) => $this->loadMissingRelation(new static($models), $path)
+        );
     }
 
     /**
@@ -321,7 +329,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->load(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }
@@ -338,7 +348,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->loadCount(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }
@@ -794,6 +806,39 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Retrieve duplicate items from the collection.
+     *
+     * @param  (callable(TModel): mixed)|string|null  $callback
+     * @param  bool  $strict
+     * @return \Illuminate\Support\Collection<array-key, mixed>|static
+     */
+    #[\Override]
+    public function duplicates($callback = null, $strict = false)
+    {
+        if (! is_null($callback)) {
+            return $this->toBase()->duplicates($callback, $strict);
+        }
+
+        return parent::duplicates($callback, $strict);
+    }
+
+    /**
+     * Retrieve duplicate items from the collection using strict comparison.
+     *
+     * @param  (callable(TModel): mixed)|string|null  $callback
+     * @return \Illuminate\Support\Collection<array-key, mixed>|static
+     */
+    #[\Override]
+    public function duplicatesStrict($callback = null)
+    {
+        if (! is_null($callback)) {
+            return $this->toBase()->duplicatesStrict($callback);
+        }
+
+        return parent::duplicatesStrict($callback);
+    }
+
+    /**
      * Get the comparison function to detect duplicates.
      *
      * @return callable(TModel, TModel): bool
@@ -937,7 +982,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
+        if ($this->contains(fn ($model) => ! $model instanceof $class)) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 

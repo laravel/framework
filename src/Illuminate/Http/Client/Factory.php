@@ -17,6 +17,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonException;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * @mixin \Illuminate\Http\Client\PendingRequest
@@ -155,9 +156,30 @@ class Factory
     }
 
     /**
+     * Execute a callback while requests are created without global middleware or global options.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
+     */
+    public function withoutGlobalConfiguration(Closure $callback)
+    {
+        [$middleware, $options] = [$this->globalMiddleware, $this->globalOptions];
+
+        [$this->globalMiddleware, $this->globalOptions] = [[], []];
+
+        try {
+            return $callback();
+        } finally {
+            [$this->globalMiddleware, $this->globalOptions] = [$middleware, $options];
+        }
+    }
+
+    /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -172,9 +194,9 @@ class Factory
     /**
      * Create a new PSR-7 response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
-     * @param  array<string, mixed>  $headers
+     * @param  array  $headers
      * @return \GuzzleHttp\Psr7\Response
      *
      * @throws \InvalidArgumentException
@@ -191,8 +213,8 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        if (! is_string($body) && ! is_null($body)) {
-            throw new InvalidArgumentException('HTTP fake response body must be a string, array, or null.');
+        if (! is_string($body) && ! is_null($body) && (! is_resource($body) || get_resource_type($body) !== 'stream') && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
         }
 
         return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
@@ -263,9 +285,9 @@ class Factory
     /**
      * Create a new RequestException instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
-     * @param  array<string, mixed>  $headers
+     * @param  array  $headers
      * @return \Illuminate\Http\Client\RequestException
      */
     public static function failedRequest($body = null, $status = 200, $headers = [])
@@ -474,7 +496,7 @@ class Factory
     public function assertSent($callback)
     {
         PHPUnit::assertTrue(
-            $this->recorded($callback)->count() > 0,
+            $this->recorded($callback)->isNotEmpty(),
             'An expected request was not recorded.'
         );
     }
@@ -509,8 +531,8 @@ class Factory
      */
     public function assertNotSent($callback)
     {
-        PHPUnit::assertFalse(
-            $this->recorded($callback)->count() > 0,
+        PHPUnit::assertTrue(
+            $this->recorded($callback)->isEmpty(),
             'Unexpected request was recorded.'
         );
     }
@@ -557,7 +579,7 @@ class Factory
     /**
      * Get a collection of the request / response pairs matching the given truth test.
      *
-     * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable  $callback
+     * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable|null  $callback
      * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     public function recorded($callback = null)

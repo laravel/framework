@@ -24,11 +24,32 @@ class SqliteSchemaState extends SchemaState
 
         $migrations = preg_replace('/CREATE TABLE sqlite_.+?\);[\r\n]+/is', '', $process->getOutput());
 
+        $migrations = $this->removeShadowTables($migrations);
+
         $this->files->put($path, $migrations.PHP_EOL);
 
         if ($this->hasMigrationTable()) {
             $this->appendMigrationData($path);
         }
+    }
+
+    /**
+     * Remove the shadow tables of virtual tables from the given schema dump.
+     *
+     * @param  string  $schema
+     * @return string
+     */
+    protected function removeShadowTables(string $schema)
+    {
+        $shadowTables = (new Collection(
+            $this->connection->selectFromWriteConnection('pragma main.table_list')
+        ))->where('type', 'shadow')->pluck('name');
+
+        foreach ($shadowTables as $name) {
+            $schema = preg_replace('/^CREATE TABLE IF NOT EXISTS ([\'"])'.preg_quote($name, '/').'\1[^;]*+;\R/m', '', $schema);
+        }
+
+        return $schema;
     }
 
     /**

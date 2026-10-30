@@ -45,8 +45,6 @@ class RepositoryTest extends TestCase
                 'b.c' => 'd',
             ],
         ]);
-
-        parent::setUp();
     }
 
     public function testGetValueWhenKeyContainDot()

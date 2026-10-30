@@ -5,7 +5,6 @@ namespace Illuminate\Support\Testing\Fakes;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -151,7 +150,7 @@ class BatchFake extends Batch
     #[\Override]
     public function cancel(?Throwable $exception = null)
     {
-        $this->cancelledAt = Carbon::now();
+        $this->cancelledAt = CarbonImmutable::now();
     }
 
     /**

@@ -8,20 +8,42 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Mockery as m;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 class EventPingTest extends TestCase
 {
     public function testPingRescuesTransferExceptions()
     {
-        $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->once()
-            ->with(m::type(ServerException::class));
+        $handler = new class implements ExceptionHandler
+        {
+            public array $reported = [];
+
+            public function report(Throwable $e)
+            {
+                $this->reported[] = $e;
+            }
+
+            public function shouldReport(Throwable $e)
+            {
+                return true;
+            }
+
+            public function render($request, Throwable $e)
+            {
+                //
+            }
+
+            public function renderForConsole($output, Throwable $e)
+            {
+                //
+            }
+        };
+
+        $this->swap(ExceptionHandler::class, $handler);
 
         $httpMock = new HttpClient([
             'handler' => HandlerStack::create(
@@ -31,7 +53,7 @@ class EventPingTest extends TestCase
 
         $this->swap(HttpClient::class, $httpMock);
 
-        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $thenCalled = false;
 
@@ -44,5 +66,7 @@ class EventPingTest extends TestCase
         $event->callAfterCallbacks($this->app->make(Container::class));
 
         $this->assertTrue($thenCalled);
+        $this->assertCount(1, $handler->reported);
+        $this->assertInstanceOf(ServerException::class, $handler->reported[0]);
     }
 }

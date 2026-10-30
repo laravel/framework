@@ -41,12 +41,12 @@ class DumpCommand extends Command
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
+     * @return int
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
         if ($this->isProhibited()) {
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         $connection = $connections->connection($database = $this->input->getOption('database'));
@@ -70,6 +70,8 @@ class DumpCommand extends Command
         }
 
         $this->components->info($info.' successfully.');
+
+        return Command::SUCCESS;
     }
 
     /**

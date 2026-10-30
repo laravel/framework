@@ -55,6 +55,10 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
             unset($this->callbacks[$index]);
         }
+
+        if (! empty($this->callbacks)) {
+            $this->invokeWhen($when);
+        }
     }
 
     /**

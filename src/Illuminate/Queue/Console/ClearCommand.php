@@ -7,10 +7,9 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'queue:clear')]
 class ClearCommand extends Command
@@ -18,18 +17,21 @@ class ClearCommand extends Command
     use ConfirmableTrait, Prohibitable;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'queue:clear';
+    protected $signature = 'queue:clear
+                    {connection? : The name of the queue connection to clear}
+                    {--queue= : The names of the queues to clear}
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Delete all of the jobs from the specified queue';
+    protected $description = 'Delete all of the jobs from the specified queues';
 
     /**
      * Execute the console command.
@@ -38,9 +40,11 @@ class ClearCommand extends Command
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return 1;
+        if (
+            $this->isProhibited() ||
+            ! $this->confirmToProceed()
+        ) {
+            return self::FAILURE;
         }
 
         $connection = $this->argument('connection')
@@ -53,17 +57,24 @@ class ClearCommand extends Command
 
         $queue = $this->laravel['queue']->connection($connection);
 
-        if ($queue instanceof ClearableQueue) {
-            $count = $queue->clear($queueName);
-
-            $this->components->info('Cleared '.$count.' '.Str::plural('job', $count).' from the ['.$queueName.'] queue');
-        } else {
+        if (! $queue instanceof ClearableQueue) {
             $this->components->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        $queues = (new Stringable($queueName))->explode(',')
+            ->map(fn ($queue) => trim($queue))
+            ->filter()
+            ->unique();
+
+        $count = $queues->reduce(fn ($carry, $name) => $carry + $queue->clear($name), 0);
+
+        $this->components->info(
+            sprintf('Cleared %s %s from the [%s] %s', $count, Str::plural('job', $count), $queues->implode(', '), Str::plural('queue', $queues->count()))
+        );
+
+        return self::SUCCESS;
     }
 
     /**
@@ -75,33 +86,8 @@ class ClearCommand extends Command
     protected function getQueue($connection)
     {
         return $this->option('queue') ?: $this->laravel['config']->get(
-            "queue.connections.{$connection}.queue", 'default'
+            "queue.connections.{$connection}.queue",
+            'default'
         );
-    }
-
-    /**
-     *  Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['connection', InputArgument::OPTIONAL, 'The name of the queue connection to clear'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['queue', null, InputOption::VALUE_OPTIONAL, 'The name of the queue to clear'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
-        ];
     }
 }

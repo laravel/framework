@@ -6,11 +6,13 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
@@ -23,6 +25,8 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
 use SortDirection;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -126,6 +130,7 @@ class Builder implements BuilderContract
         'insert',
         'insertgetid',
         'insertorignore',
+        'insertorignorereturning',
         'insertusing',
         'insertorignoreusing',
         'max',
@@ -213,7 +218,7 @@ class Builder implements BuilderContract
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
+        if (is_object($scope)) {
             $scope = get_class($scope);
         }
 
@@ -327,6 +332,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "or where" clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function orWhereKey($id)
+    {
+        return $this->where(fn (self $query) => $query->whereKey($id), null, null, 'or');
+    }
+
+    /**
+     * Add an "or where not" clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function orWhereKeyNot($id)
+    {
+        return $this->where(fn (self $query) => $query->whereKeyNot($id), null, null, 'or');
+    }
+
+    /**
      * Exclude the given models from the query results.
      *
      * @param  iterable|mixed  $models
@@ -410,6 +437,12 @@ class Builder implements BuilderContract
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            $this->query->whereNot($column, $operator, $value, $boolean);
+
+            return $this;
+        }
+
         return $this->where($column, $operator, $value, $boolean.' not');
     }
 
@@ -429,13 +462,17 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|null  $column
      * @return $this
      */
     public function latest($column = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
+                $column = $this->qualifyColumn($column);
+            }
         }
 
         $this->query->latest($column);
@@ -446,13 +483,17 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|null  $column
      * @return $this
      */
     public function oldest($column = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
+                $column = $this->qualifyColumn($column);
+            }
         }
 
         $this->query->oldest($column);
@@ -621,6 +662,8 @@ class Builder implements BuilderContract
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) !== count(array_unique($id))) {
                 throw (new ModelNotFoundException)->setModel(
                     get_class($this->model), array_diff($id, $result->modelKeys())
@@ -762,7 +805,7 @@ class Builder implements BuilderContract
      */
     public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
     {
-        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+        return tap($this->firstOrCreate($attributes, array_merge($extra, [$column => $default])), function ($instance) use ($column, $step, $extra) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->increment($column, $step, $extra);
             }
@@ -968,7 +1011,7 @@ class Builder implements BuilderContract
         // We want to do a relationship query without any constraints so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
-        $relation = Relation::noConstraints(function () use ($name) {
+        $relation = Relation::noConstraintsForRelation(function () use ($name) {
             try {
                 return $this->getModel()->newInstance()->$name();
             } catch (BadMethodCallException) {
@@ -1057,10 +1100,12 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
-            $model = $this->newModelInstance()->newFromBuilder($record);
+        $instance = $this->newModelInstance();
 
-            return $this->applyAfterQueryCallbacks($this->newModelInstance()->newCollection([$model]))->first();
+        return $this->applyScopes()->query->cursor()->map(function ($record) use ($instance) {
+            $model = $instance->newFromBuilder($record);
+
+            return $this->applyAfterQueryCallbacks($instance->newCollection([$model]))->first();
         })->reject(fn ($model) => is_null($model));
     }
 
@@ -1105,6 +1150,16 @@ class Builder implements BuilderContract
                 return $this->model->newFromBuilder([$column => $value])->{$column};
             })
         );
+    }
+
+    /**
+     * Get an array of primary keys from the query result.
+     *
+     * @return array<int, array-key>
+     */
+    public function modelKeys()
+    {
+        return $this->pluck($this->model->getQualifiedKeyName())->all();
     }
 
     /**
@@ -1246,7 +1301,7 @@ class Builder implements BuilderContract
     public function forceCreate(array $attributes)
     {
         return $this->model::unguarded(function () use ($attributes) {
-            return $this->newModelInstance()->create($attributes);
+            return $this->newModelInstance()->create(array_merge($this->pendingAttributes, $attributes));
         });
     }
 
@@ -1734,7 +1789,7 @@ class Builder implements BuilderContract
         if ($callback instanceof Closure) {
             $eagerLoad = $this->parseWithRelations([$relations => $callback]);
         } else {
-            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? array_filter(func_get_args()) : $relations);
         }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
@@ -1872,7 +1927,7 @@ class Builder implements BuilderContract
      */
     protected function combineConstraints(array $constraints)
     {
-        return function ($builder) use ($constraints) {
+        return static function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
                 $builder = $constraint($builder) ?? $builder;
             }
@@ -1907,6 +1962,8 @@ class Builder implements BuilderContract
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 return $query instanceof BelongsToMany
+                    || $query instanceof HasOneOrManyThrough
+                    || ($query instanceof SupportsPartialRelations && $query->isOneOfMany())
                     ? $query->getRelated()->qualifyColumn($column)
                     : $column;
             }, explode(',', explode(':', $name)[1])));
@@ -1975,7 +2032,7 @@ class Builder implements BuilderContract
      */
     public function withCasts($casts)
     {
-        $this->model->mergeCasts($casts);
+        $this->model = (clone $this->model)->mergeCasts($casts);
 
         return $this;
     }
@@ -2153,6 +2210,16 @@ class Builder implements BuilderContract
     {
         $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
 
+        if (! is_null($alias = $this->getTableAlias())) {
+            if (! str_contains($column, '.')) {
+                return $alias.'.'.$column;
+            }
+
+            if (str_starts_with($column, $table = $this->model->getTable().'.')) {
+                return $alias.'.'.substr($column, strlen($table));
+            }
+        }
+
         return $this->model->qualifyColumn($column);
     }
 
@@ -2164,7 +2231,29 @@ class Builder implements BuilderContract
      */
     public function qualifyColumns($columns)
     {
-        return $this->model->qualifyColumns($columns);
+        $qualified = [];
+
+        foreach ($columns as $key => $column) {
+            $qualified[$key] = $this->qualifyColumn($column);
+        }
+
+        return $qualified;
+    }
+
+    /**
+     * Get the alias given to the query's table, if any.
+     *
+     * @return string|null
+     */
+    protected function getTableAlias()
+    {
+        if (! is_string($this->query->from)) {
+            return null;
+        }
+
+        $segments = preg_split('/\s+as\s+/i', $this->query->from);
+
+        return count($segments) > 1 ? array_last($segments) : null;
     }
 
     /**

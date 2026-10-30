@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Foundation\Exceptions\Renderer;
+namespace Illuminate\Tests\Integration\Foundation\Exceptions;
 
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -47,7 +47,7 @@ class RenderBladeFilesTest extends TestCase
 
         $html = (string) $this->app['view']->file($path, ['frame' => $frame])->render();
 
-        $this->assertStringContainsString('data-tippy-content="', $html);
+        $this->assertStringContainsString('data-tippy-html-content="', $html);
         $this->assertStringNotContainsString('<br', $html);
     }
 

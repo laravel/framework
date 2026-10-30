@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
-use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSQLiteBuilderTest extends TestCase
@@ -27,26 +27,21 @@ class DatabaseSQLiteBuilderTest extends TestCase
     {
         Container::setInstance(null);
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testCreateDatabase()
     {
-        $connection = m::mock(Connection::class);
-        $connection->shouldReceive('getSchemaGrammar')->once();
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
 
         $builder = new SQLiteBuilder($connection);
 
-        File::shouldReceive('put')
-            ->once()
+        File::expects('put')
             ->with('my_temporary_database_a', '')
             ->andReturn(20); // bytes
 
         $this->assertTrue($builder->createDatabase('my_temporary_database_a'));
 
-        File::shouldReceive('put')
-            ->once()
+        File::expects('put')
             ->with('my_temporary_database_b', '')
             ->andReturn(false);
 
@@ -55,34 +50,28 @@ class DatabaseSQLiteBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = m::mock(Connection::class);
-        $connection->shouldReceive('getSchemaGrammar')->once();
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
 
         $builder = new SQLiteBuilder($connection);
 
-        File::shouldReceive('exists')
-            ->once()
+        File::expects('exists')
             ->andReturn(true);
 
-        File::shouldReceive('delete')
-            ->once()
+        File::expects('delete')
             ->with('my_temporary_database_b')
             ->andReturn(true);
 
         $this->assertTrue($builder->dropDatabaseIfExists('my_temporary_database_b'));
 
-        File::shouldReceive('exists')
-            ->once()
+        File::expects('exists')
             ->andReturn(false);
 
         $this->assertTrue($builder->dropDatabaseIfExists('my_temporary_database_c'));
 
-        File::shouldReceive('exists')
-            ->once()
+        File::expects('exists')
             ->andReturn(true);
 
-        File::shouldReceive('delete')
-            ->once()
+        File::expects('delete')
             ->with('my_temporary_database_c')
             ->andReturn(false);
 

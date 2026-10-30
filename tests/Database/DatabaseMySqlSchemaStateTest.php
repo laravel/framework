@@ -7,6 +7,7 @@ use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use Pdo\Mysql;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -14,6 +15,7 @@ use Symfony\Component\Process\Process;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     #[DataProvider('provider')]
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
@@ -138,6 +140,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testExecuteDumpProcessForDepth()
     {
         $mockProcess = $this->createMock(Process::class);
@@ -146,7 +149,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
             new Exception('column-statistics')
         );
 
-        $mockOutput = $this->createMock(\stdClass::class);
+        $mockOutput = $this->createStub(\stdClass::class);
         $mockVariables = [];
 
         $schemaState = $this->getMockBuilder(MySqlSchemaState::class)
@@ -156,8 +159,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
 
         $schemaState->method('makeProcess')->willReturn($mockProcess);
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Dump execution exceeded maximum depth of 30.');
+        $this->expectExceptionObject(new Exception('Dump execution exceeded maximum depth of 30.'));
 
         // test executeDumpProcess
         $method = new ReflectionMethod(get_class($schemaState), 'executeDumpProcess');

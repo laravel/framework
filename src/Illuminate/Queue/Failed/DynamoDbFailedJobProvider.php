@@ -71,7 +71,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
                 'payload' => ['S' => $payload],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $failedAt->getTimestamp()],
-                'expires_at' => ['N' => (string) $failedAt->addDays(7)->getTimestamp()],
+                'expires_at' => ['N' => (string) $failedAt->addWeek()->getTimestamp()],
             ],
         ]);
 
@@ -82,7 +82,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * Get the IDs of all of the failed jobs.
      *
      * @param  string|null  $queue
-     * @return array
+     * @return list<string|int>
      */
     public function ids($queue = null)
     {
@@ -95,7 +95,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Get a list of all of the failed jobs.
      *
-     * @return array
+     * @return list<object>
      */
     public function all()
     {
@@ -178,14 +178,15 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     }
 
     /**
-     * Flush all of the failed jobs from storage.
+     * Flush the failed jobs from storage.
      *
      * @param  int|null  $hours
+     * @param  string|null  $queue
      * @return void
      *
      * @throws \Exception
      */
-    public function flush($hours = null)
+    public function flush($hours = null, $queue = null)
     {
         throw new Exception("DynamoDb failed job storage may not be flushed. Please use DynamoDb's TTL features on your expires_at attribute.");
     }

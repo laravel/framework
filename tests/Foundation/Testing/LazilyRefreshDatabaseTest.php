@@ -4,10 +4,12 @@ namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Testing\Attributes\WithoutMigrationEvents;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery as m;
+use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
+use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -62,23 +64,21 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsRefreshedOnInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
-
-        $kernel->shouldReceive('call')
-            ->once()
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ]);
+        $kernel = new ConsoleKernelSpy;
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshDatabase();
         $this->app->make('db')->select('select 1');
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testDatabaseIsNotRefreshedWithoutInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->never();
@@ -91,18 +91,46 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testNonDefaultConnectionTriggersRefresh()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
-
-        $kernel->shouldReceive('call')
-            ->once()
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ]);
+        $kernel = new ConsoleKernelSpy;
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshDatabase();
 
         $this->app->make('db')->connection('testing2')->select('select 1');
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
+    }
+
+    #[WithoutMigrationEvents]
+    public function testMigrationQueriesAreNotDispatchedToTheTestMethod()
+    {
+        $database = $this->app->make('db');
+
+        $this->app->instance(ConsoleKernelContract::class, new class($database) extends ConsoleKernelSpy
+        {
+            public function __construct(protected $database)
+            {
+            }
+
+            public function call($command, array $parameters = [], $outputBuffer = null)
+            {
+                $this->database->connection('testing')->select('select 2');
+
+                return parent::call($command, $parameters, $outputBuffer);
+            }
+        });
+
+        $queries = [];
+
+        $database->listen(function ($query) use (&$queries) {
+            $queries[] = $query->sql;
+        });
+
+        $this->refreshDatabase();
+        $database->connection('testing')->select('select 1');
+
+        $this->assertSame(['select 1'], $queries);
     }
 }

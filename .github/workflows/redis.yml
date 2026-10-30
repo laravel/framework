@@ -12,11 +12,12 @@ permissions:
 
 jobs:
   redis:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
 
     services:
       redis:
-        image: redis:7.0
+        image: redis:${{ matrix.redis }}
         ports:
           - 6379:6379
         options: --entrypoint redis-server
@@ -25,32 +26,20 @@ jobs:
       fail-fast: true
       matrix:
         client: ["phpredis", "predis"]
+        redis: ["7.0", "8.0"]
 
-    name: Redis (${{ matrix.client}}) Driver
+    name: Redis:${{ matrix.redis }} (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute Cache tests
         run: vendor/bin/phpunit tests/Integration/Cache
@@ -66,8 +55,41 @@ jobs:
           REDIS_CLIENT: ${{ matrix.client }}
           QUEUE_CONNECTION: redis
 
+  redis-unit:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+
+    services:
+      redis:
+        image: redis:${{ matrix.redis }}
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+      matrix:
+        redis: ["7.0", "8.0"]
+
+    name: Redis:${{ matrix.redis }} unit testing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Execute Redis tests
+        run: vendor/bin/phpunit tests/Redis
+
   redis-cluster:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
 
     strategy:
       fail-fast: true
@@ -78,37 +100,37 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-      - name: Create Redis Cluster
+      - name: Install Redis Server
         run: |
           sudo apt update
           sudo apt-get install -y --fix-missing redis-server
           sudo service redis-server stop
-          redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
-          redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
-          redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
-          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+          mkdir -p /tmp/redis-7000 /tmp/redis-7001 /tmp/redis-7002
+          redis-server --daemonize yes --port 7000 --dir /tmp/redis-7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
+          redis-server --daemonize yes --port 7001 --dir /tmp/redis-7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
+          redis-server --daemonize yes --port 7002 --dir /tmp/redis-7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
+
+      - name: Create Redis Cluster
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        with:
+          timeout_seconds: 30
+          max_attempts: 5
+          retry_wait_seconds: 5
+          retry_on: error
+          command: |
+            redis-cli -h 127.0.0.1 -p 7000 ping
+            redis-cli -h 127.0.0.1 -p 7001 ping
+            redis-cli -h 127.0.0.1 -p 7002 ping
+            redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4

@@ -5,21 +5,28 @@ namespace Illuminate\Tests\Filesystem;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -45,8 +52,6 @@ class FilesystemAdapterTest extends TestCase
         $filesystem->deleteDirectory(basename($this->tempDir));
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
-
-        parent::tearDown();
     }
 
     public function testResponse()
@@ -68,7 +73,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
         $files->shouldReceive('mimeType')->never();
 
         $files->response('file.txt', null, [
@@ -80,7 +85,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
         $files->shouldReceive('size')->never();
 
         $files->response('file.txt', null, [
@@ -92,7 +97,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
         $files->shouldReceive('fallbackName')->never();
@@ -138,6 +143,15 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
     }
 
+    public function testDownloadFilenameWithoutAsciiEquivalent()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $response = $files->download('file.txt', '請求書');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertSame('attachment; filename=___; filename*=utf-8\'\'%E8%AB%8B%E6%B1%82%E6%9B%B8', $response->headers->get('content-disposition'));
+    }
+
     public function testExists()
     {
         $this->filesystem->write('file.txt', 'Hello World');
@@ -175,6 +189,57 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
+    #[TestWith(['../../../.env'])]
+    #[TestWith(['..\..\..\.env'])]
+    #[TestWith(['/../../../.env'])]
+    #[TestWith(['..'])]
+    #[TestWith(['foo/../../../.env'])]
+    public function testPathRejectsTraversalOutsideOfTheRoot($path)
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+        ]);
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystemAdapter->path($path);
+    }
+
+    public function testPathRejectsTraversalOutsideOfThePrefix()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+            'prefix' => 'scoped',
+        ]);
+
+        $this->assertSame(
+            $this->tempDir.DIRECTORY_SEPARATOR.'scoped'.DIRECTORY_SEPARATOR.'file.txt',
+            $filesystemAdapter->path('file.txt')
+        );
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystemAdapter->path('../file.txt');
+    }
+
+    public function testPathResolvesRelativeSegmentsTheSameWayTheDriverDoes()
+    {
+        $this->filesystem->write('foo/bar.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+        ]);
+
+        $expected = $this->tempDir.DIRECTORY_SEPARATOR.'foo/bar.txt';
+
+        $this->assertSame($expected, $filesystemAdapter->path('foo/bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('/foo/bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('foo/./bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('foo/baz/../bar.txt'));
+
+        $this->assertSame('Hello World', $filesystemAdapter->get('foo/baz/../bar.txt'));
+        $this->assertSame('Hello World', file_get_contents($filesystemAdapter->path('foo/baz/../bar.txt')));
+    }
+
     public function testGet()
     {
         $this->filesystem->write('file.txt', 'Hello World');
@@ -200,6 +265,18 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.json', '{"foo":');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->json('file.json'));
+    }
+
+    public function testImage()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $this->filesystem->write('photo.jpg', file_get_contents($file->getRealPath()));
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $image = $filesystemAdapter->image('photo.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame([100, 100], $image->dimensions());
     }
 
     public function testMimeTypeNotDetected()
@@ -275,6 +352,92 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+    }
+
+    public function testCopyToDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
+        ]));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->copyToDisk('backup', 'file.txt');
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/file.txt');
+    }
+
+    public function testMoveToDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
+        ]));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/copy.txt');
+    }
+
+    public function testCopyToDiskRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => $filesystemAdapter,
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk('local', 'file.txt');
+    }
+
+    public function testCopyToDiskWithFilesystem()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->copyToDisk(new FilesystemAdapter($backupFilesystem, $backupAdapter), 'file.txt');
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/file.txt');
+    }
+
+    public function testMoveToDiskWithFilesystem()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->moveToDisk(new FilesystemAdapter($backupFilesystem, $backupAdapter), 'file.txt', 'copy.txt');
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/copy.txt');
+    }
+
+    public function testCopyToDiskWithFilesystemRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt');
     }
 
     public function testStream()
@@ -552,16 +715,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
-
-        $exceptionHandler->shouldReceive('report')
-            ->once()
-            ->andReturnUsing(function (UnableToReadFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to read file from location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -574,22 +728,15 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToReadFile) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToReadFile $e) => str_contains($e->getMessage(), 'Unable to read file from location: foo.txt.'));
     }
 
     public function testReportExceptionsForReadStream()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
-
-        $exceptionHandler->shouldReceive('report')
-            ->once()
-            ->andReturnUsing(function (UnableToReadFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to read file from location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -602,22 +749,15 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToReadFile) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToReadFile $e) => str_contains($e->getMessage(), 'Unable to read file from location: foo.txt.'));
     }
 
     public function testReportExceptionsForPut()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
-
-        $exceptionHandler->shouldReceive('report')
-            ->once()
-            ->andReturnUsing(function (UnableToWriteFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to write file at location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -636,22 +776,15 @@ class FilesystemAdapterTest extends TestCase
         } finally {
             chmod(__DIR__.'/tmp/foo.txt', 0600);
         }
+
+        $exceptionHandler->assertReported(fn (UnableToWriteFile $e) => str_contains($e->getMessage(), 'Unable to write file at location: foo.txt.'));
     }
 
     public function testReportExceptionsForMimeType()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
-
-        $exceptionHandler->shouldReceive('report')
-            ->once()
-            ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
-                $this->assertStringContainsString(
-                    'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -666,6 +799,8 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToRetrieveMetadata) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToRetrieveMetadata $e) => str_contains($e->getMessage(), 'Unable to retrieve the mime_type for file at location: unknown.mime-type.'));
     }
 
     public function testGetAllFiles()
@@ -821,10 +956,38 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
     }
 
+    public function testProvidesTemporaryUploadUrlsForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
     public function testProvidesTemporaryUploadUrlsForAdapterWithoutTemporaryUploadUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
+    public function testAssertEmpty()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->assertEmpty();
+    }
+
+    public function testAssertEmptyFailsWhenDiskContainsFiles()
+    {
+        $this->filesystem->write('foo/file.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectExceptionObject(new ExpectationFailedException('Disk is not empty.'));
+
+        $filesystemAdapter->assertEmpty();
     }
 }

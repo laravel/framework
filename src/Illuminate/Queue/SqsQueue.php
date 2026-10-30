@@ -2,13 +2,18 @@
 
 namespace Illuminate\Queue;
 
+use Aws\Command;
+use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
+use function Illuminate\Support\enum_value;
 
 class SqsQueue extends Queue implements QueueContract, ClearableQueue
 {
@@ -18,6 +23,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @var int
      */
     const MAX_SQS_PAYLOAD_SIZE = 1048576;
+
+    /**
+     * The maximum number of messages allowed per SendMessageBatch request.
+     *
+     * @var int
+     */
+    const MAX_MESSAGES_PER_BATCH = 10;
 
     /**
      * The cache key prefix for extended SQS payloads.
@@ -90,7 +102,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -114,7 +126,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the number of pending jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function pendingSize($queue = null)
@@ -124,13 +136,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessages'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessages'] ?? 0);
     }
 
     /**
      * Get the number of delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function delayedSize($queue = null)
@@ -140,13 +152,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0);
     }
 
     /**
      * Get the number of reserved jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function reservedSize($queue = null)
@@ -156,13 +168,53 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessagesNotVisible'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessagesNotVisible'] ?? 0);
+    }
+
+    /**
+     * Get the number of jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return 0;
     }
 
     /**
      * Get the pending jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function pendingJobs($queue = null): Collection
@@ -173,7 +225,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the delayed jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function delayedJobs($queue = null): Collection
@@ -184,7 +236,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the reserved jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function reservedJobs($queue = null): Collection
@@ -227,7 +279,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * Not supported by SQS, returns null.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int|null
      */
     public function creationTimeOfOldestPendingJob($queue = null)
@@ -241,14 +293,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $queue ?: $this->default, $data),
+            $this->createPayload($job, enum_value($queue) ?: $this->default, $data),
             $queue,
             null,
             function ($payload, $queue) use ($job) {
@@ -261,7 +313,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -282,14 +334,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $queue ?: $this->default, $data, $delay),
+            $this->createPayload($job, enum_value($queue) ?: $this->default, $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) use ($job) {
@@ -299,84 +351,183 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the queueable options from the job.
-     *
-     * @param  mixed  $job
-     * @param  string|null  $queue
-     * @param  string  $payload
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     * @return array{DelaySeconds?: int, MessageGroupId?: string, MessageDeduplicationId?: string}
-     */
-    public function getQueueableOptions($job, $queue, $payload, $delay = null): array
-    {
-        // Make sure we have a queue name to properly determine if it's a FIFO queue...
-        $queue ??= $this->default;
-
-        $isObject = is_object($job);
-        $isFifo = str_ends_with((string) $queue, '.fifo');
-
-        $options = [];
-
-        // DelaySeconds cannot be used with FIFO queues. AWS will return an error...
-        if (! empty($delay) && ! $isFifo) {
-            $options['DelaySeconds'] = $this->secondsUntil($delay);
-        }
-
-        // If the job is a string job on a standard queue, there are no more options...
-        if (! $isObject && ! $isFifo) {
-            return $options;
-        }
-
-        $transformToString = fn ($value) => (string) $value;
-
-        // The message group ID is required for FIFO queues and is optional for
-        // standard queues. Job objects contain a group ID. With string jobs
-        // sent to FIFO queues, assign these to the same message group ID.
-        $messageGroupId = null;
-
-        if ($isObject) {
-            $messageGroupId = transform($job->messageGroup ?? (method_exists($job, 'messageGroup') ? $job->messageGroup() : null), $transformToString);
-        } elseif ($isFifo) {
-            $messageGroupId = transform($queue, $transformToString);
-        }
-
-        $options['MessageGroupId'] = $messageGroupId;
-
-        // The message deduplication ID is only valid for FIFO queues. Every job
-        // without the method will be considered unique. To use content-based
-        // deduplication enable it in AWS and have the method return empty.
-        $messageDeduplicationId = null;
-
-        if ($isFifo) {
-            $messageDeduplicationId = match (true) {
-                $isObject && isset($job->deduplicator) && is_callable($job->deduplicator) => transform(call_user_func($job->deduplicator, $payload, $queue), $transformToString),
-                $isObject && method_exists($job, 'deduplicationId') => transform($job->deduplicationId($payload, $queue), $transformToString),
-                default => (string) Str::orderedUuid(),
-            };
-        }
-
-        $options['MessageDeduplicationId'] = $messageDeduplicationId;
-
-        return array_filter($options);
-    }
-
-    /**
-     * Push an array of jobs onto the queue.
+     * Push an array of jobs onto the queue using the SendMessageBatch API.
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        foreach ((array) $jobs as $job) {
-            if (isset($job->delay)) {
-                $this->later($job->delay, $job, $data, $queue);
-            } else {
-                $this->push($job, $data, $queue);
+        $queue = enum_value($queue);
+
+        $jobs = array_values((array) $jobs);
+
+        if (empty($jobs)) {
+            return;
+        }
+
+        [$afterCommit, $immediate] = $this->partitionJobsByAfterCommit($jobs);
+
+        if (! empty($immediate)) {
+            $this->sendBatchedMessages($this->prepareBatchMessages($immediate, $data, $queue), $queue);
+        }
+
+        if (! empty($afterCommit)) {
+            foreach ($afterCommit as $job) {
+                $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
+            }
+
+            $messages = $this->prepareBatchMessages($afterCommit, $data, $queue);
+
+            $this->container->make('db.transactions')->addCallback(
+                fn () => $this->sendBatchedMessages($messages, $queue),
+            );
+        }
+    }
+
+    /**
+     * Create the payload for each of the given jobs.
+     *
+     * Payloads are created at dispatch time, even for jobs deferred until after the transaction commits.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return array<int, array{job: mixed, delay: mixed, payload: string}>
+     */
+    protected function prepareBatchMessages(array $jobs, $data, $queue)
+    {
+        return (new Collection($jobs))
+            ->map(function ($job) use ($data, $queue) {
+                $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+                return [
+                    'job' => $job,
+                    'delay' => $delay,
+                    'payload' => $this->createPayload($job, enum_value($queue) ?: $this->default, $data, $delay),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Build entries, raise queueing events, dispatch chunks, and raise queued events with SQS message IDs.
+     *
+     * @param  array  $messages
+     * @param  string|null  $queue
+     * @return void
+     *
+     * @throws \Aws\Sqs\Exception\SqsException
+     * @throws \Throwable
+     */
+    protected function sendBatchedMessages(array $messages, $queue)
+    {
+        $entries = [];
+
+        foreach ($messages as $id => $message) {
+            $this->raiseJobQueueingEvent($queue, $message['job'], $message['payload'], $message['delay']);
+
+            $entries[$id] = $this->prepareSendMessageBatchEntry($id, $message, $queue);
+        }
+
+        $queueUrl = $this->getQueue($queue);
+
+        // Dispatch chunks and stop at the first failure so later messages cannot arrive ahead of unsent ones...
+        foreach ($this->chunkBatchEntries($entries) as $chunk) {
+            $result = $this->sqs->sendMessageBatch([
+                'QueueUrl' => $queueUrl,
+                'Entries' => $chunk,
+            ]);
+
+            foreach ($result['Successful'] ?? [] as $success) {
+                if (! isset($messages[$success['Id']])) {
+                    continue;
+                }
+
+                $message = $messages[$success['Id']];
+
+                $this->raiseJobQueuedEvent(
+                    $queue, $success['MessageId'], $message['job'], $message['payload'], $message['delay']
+                );
+            }
+
+            // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException...
+            if (! empty($result['Failed'])) {
+                $failure = $result['Failed'][0];
+
+                throw new SqsException(
+                    sprintf(
+                        'SQS SendMessageBatch rejected [%d] of [%d] messages. First failure [%s]: %s',
+                        count($result['Failed']),
+                        count($chunk),
+                        $failure['Code'] ?? 'Unknown',
+                        $failure['Message'] ?? '',
+                    ),
+                    new Command('SendMessageBatch', ['QueueUrl' => $queueUrl, 'Entries' => $chunk]),
+                    [
+                        'code' => $failure['Code'] ?? null,
+                        'message' => $failure['Message'] ?? null,
+                        'result' => $result,
+                    ],
+                );
             }
         }
+    }
+
+    /**
+     * Build the SendMessageBatch entry for a single prepared message.
+     *
+     * The entry Id maps each Successful or Failed result returned by SQS back to its job.
+     *
+     * @param  int  $id
+     * @param  array{job: mixed, delay: mixed, payload: string}  $message
+     * @param  string|null  $queue
+     * @return array
+     */
+    protected function prepareSendMessageBatchEntry($id, array $message, $queue)
+    {
+        ['job' => $job, 'delay' => $delay, 'payload' => $payload] = $message;
+
+        return [
+            'Id' => (string) $id,
+            'MessageBody' => $this->willOverflow($payload) ? $this->overflow($payload) : $payload,
+            ...$this->getQueueableOptions($job, $queue, $payload, $delay),
+        ];
+    }
+
+    /**
+     * Chunk batch entries respecting both the 10-message and cumulative payload-size limits enforced by SendMessageBatch.
+     *
+     * @param  array  $entries
+     * @return array
+     */
+    protected function chunkBatchEntries(array $entries)
+    {
+        [$chunks, $currentChunk, $currentBytes] = [[], [], 0];
+
+        foreach ($entries as $item) {
+            $bytes = strlen($item['MessageBody']);
+
+            $wouldExceedCount = count($currentChunk) >= static::MAX_MESSAGES_PER_BATCH;
+            $wouldExceedBytes = $currentBytes + $bytes > static::MAX_SQS_PAYLOAD_SIZE;
+
+            if (! empty($currentChunk) && ($wouldExceedCount || $wouldExceedBytes)) {
+                $chunks[] = $currentChunk;
+                $currentChunk = [];
+                $currentBytes = 0;
+            }
+
+            $currentChunk[] = $item;
+            $currentBytes += $bytes;
+        }
+
+        if (! empty($currentChunk)) {
+            $chunks[] = $currentChunk;
+        }
+
+        return $chunks;
     }
 
     /**
@@ -419,9 +570,77 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the queueable options from the job.
+     *
+     * @param  mixed  $job
+     * @param  string|null  $queue
+     * @param  string  $payload
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return array{DelaySeconds?: int, MessageGroupId?: string, MessageDeduplicationId?: string}
+     */
+    public function getQueueableOptions($job, $queue, $payload, $delay = null): array
+    {
+        // Make sure we have a queue name to properly determine if it's a FIFO queue...
+        $queue = $this->resolveQueue(enum_value($queue) ?? $this->default);
+
+        $isObject = is_object($job);
+        $isFifo = str_ends_with((string) $queue, '.fifo');
+
+        $options = [];
+
+        // DelaySeconds cannot be used with FIFO queues. AWS will return an error...
+        if (! empty($delay) && ! $isFifo) {
+            $options['DelaySeconds'] = $this->secondsUntil($delay);
+        }
+
+        // If the job is a string job on a standard queue, there are no more options...
+        if (! $isObject && ! $isFifo) {
+            return $options;
+        }
+
+        $transformToString = fn ($value) => (string) $value;
+
+        // The message group ID is required for FIFO queues and is optional for
+        // standard queues. Job objects contain a group ID. With string jobs
+        // sent to FIFO queues, assign these to the same message group ID.
+        $messageGroupId = null;
+
+        if ($isObject) {
+            $messageGroupId = transform($job->messageGroup ?? (method_exists($job, 'messageGroup') ? $job->messageGroup() : null), $transformToString);
+        }
+
+        if ($isFifo && is_null($messageGroupId)) {
+            $messageGroupId = transform($queue, $transformToString);
+        }
+
+        $options['MessageGroupId'] = $messageGroupId;
+
+        // The message deduplication ID is only valid for FIFO queues. Every job
+        // without the method will be considered unique. To use content-based
+        // deduplication enable it in AWS and have the method return empty.
+        $messageDeduplicationId = null;
+
+        if ($isFifo) {
+            $messageDeduplicationId = match (true) {
+                $isObject && isset($job->deduplicator) && is_callable($job->deduplicator) => transform(
+                    call_user_func($job->deduplicator, $payload, $queue), $transformToString
+                ),
+                $isObject && method_exists($job, 'deduplicationId') => transform(
+                    $job->deduplicationId($payload, $queue), $transformToString
+                ),
+                default => (string) Str::orderedUuid(),
+            };
+        }
+
+        $options['MessageDeduplicationId'] = $messageDeduplicationId;
+
+        return array_filter($options);
+    }
+
+    /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
@@ -464,12 +683,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return string
      */
     public function getQueue($queue)
     {
-        $queue = $queue ?: $this->default;
+        $queue = $this->resolveQueue(enum_value($queue) ?: $this->default);
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
             ? $this->suffixQueue($queue, $this->suffix)

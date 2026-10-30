@@ -8,13 +8,6 @@ use RuntimeException;
 
 class LotteryTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Lottery::determineResultNormally();
-
-        parent::tearDown();
-    }
-
     public function testItCanWin()
     {
         $wins = false;
@@ -141,15 +134,13 @@ class LotteryTest extends TestCase
         $result = Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
         $this->assertSame('winner', $result);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Missing key in sequence.');
+        $this->expectExceptionObject(new RuntimeException('Missing key in sequence.'));
         Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
     }
 
     public function testItThrowsForFloatsOverOne()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Float must not be greater than 1.');
+        $this->expectExceptionObject(new RuntimeException('Float must not be greater than 1.'));
 
         new Lottery(1.1);
     }

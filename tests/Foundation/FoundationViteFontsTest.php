@@ -28,6 +28,7 @@ class FoundationViteFontsTest extends TestCase
         $this->cleanHotFile();
         $this->cleanHotFile(__DIR__.'/custom-hot-dir/hot');
         app(Vite::class)->flush();
+        (new ViteFonts)->flush();
 
         parent::tearDown();
     }
@@ -349,8 +350,7 @@ class FoundationViteFontsTest extends TestCase
 
         file_put_contents(public_path('build/fonts-manifest.json'), 'not-valid-json{');
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('not valid JSON');
+        $this->expectExceptionObject(new ViteException('not valid JSON'));
 
         app(Vite::class)->fonts();
     }
@@ -359,8 +359,7 @@ class FoundationViteFontsTest extends TestCase
     {
         $this->makeFontsManifest(['version' => 99, 'families' => []]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unsupported font manifest version [99]. Supported versions: 1.');
+        $this->expectExceptionObject(new ViteException('Unsupported font manifest version [99]. Supported versions: 1.'));
 
         app(Vite::class)->fonts();
     }
@@ -369,8 +368,7 @@ class FoundationViteFontsTest extends TestCase
     {
         $this->makeFontsManifest(['style' => ['inline' => ''], 'families' => []]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('missing the [version] key');
+        $this->expectExceptionObject(new ViteException('missing the [version] key'));
 
         app(Vite::class)->fonts();
     }
@@ -379,8 +377,7 @@ class FoundationViteFontsTest extends TestCase
     {
         $this->makeFontsManifest(['version' => 1]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('missing the [families] key');
+        $this->expectExceptionObject(new ViteException('missing the [families] key'));
 
         app(Vite::class)->fonts();
     }
@@ -389,8 +386,7 @@ class FoundationViteFontsTest extends TestCase
     {
         $this->makeFontsManifest();
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate font CSS file');
+        $this->expectExceptionObject(new ViteException('Unable to locate font CSS file'));
 
         app(Vite::class)->fonts();
     }
@@ -406,8 +402,7 @@ class FoundationViteFontsTest extends TestCase
             ],
         ]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Font alias [display] is not defined in the font manifest. Available aliases: sans.');
+        $this->expectExceptionObject(new ViteException('Font alias [display] is not defined in the font manifest. Available aliases: sans.'));
 
         app(Vite::class)->fonts(['display']);
     }
@@ -425,8 +420,7 @@ class FoundationViteFontsTest extends TestCase
             ],
         ]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] is missing the [alias] key');
+        $this->expectExceptionObject(new ViteException('preload entry [0] is missing the [alias] key'));
 
         app(Vite::class)->fonts();
     }
@@ -444,8 +438,7 @@ class FoundationViteFontsTest extends TestCase
             ],
         ]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] for alias [sans] is missing the [file] key');
+        $this->expectExceptionObject(new ViteException('preload entry [0] for alias [sans] is missing the [file] key'));
 
         app(Vite::class)->fonts();
     }
@@ -464,8 +457,7 @@ class FoundationViteFontsTest extends TestCase
             ],
         ]);
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] for alias [sans] is missing the [url] key');
+        $this->expectExceptionObject(new ViteException('preload entry [0] for alias [sans] is missing the [url] key'));
 
         app(Vite::class)->fonts();
     }
@@ -585,8 +577,7 @@ class FoundationViteFontsTest extends TestCase
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('keyed by alias');
+        $this->expectExceptionObject(new ViteException('keyed by alias'));
 
         app(Vite::class)->fonts(['sans']);
     }
@@ -607,8 +598,7 @@ class FoundationViteFontsTest extends TestCase
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('keyed by alias');
+        $this->expectExceptionObject(new ViteException('keyed by alias'));
 
         app(Vite::class)->fonts(['sans']);
     }

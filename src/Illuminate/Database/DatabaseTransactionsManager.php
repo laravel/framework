@@ -158,11 +158,17 @@ class DatabaseTransactionsManager
      */
     protected function removeAllTransactionsForConnection($connection)
     {
-        if ($this->currentTransaction) {
-            for ($currentTransaction = $this->currentTransaction[$connection] ?? null; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
-                $currentTransaction->executeCallbacksForRollback();
-            }
+        $transactions = $this->committedTransactions->filter(
+            fn ($transaction) => $transaction->connection == $connection
+        );
+
+        for ($transaction = $this->currentTransaction[$connection] ?? null; isset($transaction); $transaction = $transaction->parent) {
+            $transactions->push($transaction);
         }
+
+        $transactions
+            ->sortByDesc(fn ($transaction) => $transaction->level)
+            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
 
         $this->currentTransaction[$connection] = null;
 
@@ -194,6 +200,8 @@ class DatabaseTransactionsManager
         $removedTransactions->each(
             fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
         );
+
+        $removedTransactions->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
     }
 
     /**

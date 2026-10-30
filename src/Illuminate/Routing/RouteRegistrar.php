@@ -18,6 +18,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route post(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route query(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\RouteRegistrar as(string $value)
  * @method \Illuminate\Routing\RouteRegistrar can(\UnitEnum|string  $ability, array|string $models = [])
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
@@ -60,7 +61,7 @@ class RouteRegistrar
      * @var string[]
      */
     protected $passthru = [
-        'get', 'post', 'put', 'patch', 'delete', 'options', 'any',
+        'get', 'post', 'put', 'patch', 'delete', 'options', 'query', 'any',
     ];
 
     /**
@@ -285,7 +286,7 @@ class RouteRegistrar
 
         if (is_array($action) &&
             array_is_list($action) &&
-            Reflector::isCallable($action)) {
+            Reflector::isCallable($action, true)) {
             if (strncmp($action[0], '\\', 1)) {
                 $action[0] = '\\'.$action[0];
             }

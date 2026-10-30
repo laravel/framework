@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as BaseCollection;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -201,6 +204,22 @@ abstract class HasOneOrManyThrough extends Relation
     }
 
     /**
+     * Find a related model by its primary key or return a new instance of the related model.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
+     */
+    public function findOrNew($id, $columns = ['*'])
+    {
+        if (is_null($instance = $this->find($id, $columns))) {
+            $instance = $this->related->newInstance();
+        }
+
+        return $instance;
+    }
+
+    /**
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
@@ -209,7 +228,7 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = $this->where($this->qualifyRelatedAttributes($attributes))->first())) {
             return $instance;
         }
 
@@ -225,7 +244,7 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function firstOrCreate(array $attributes = [], Closure|array $values = [])
     {
-        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
+        if (! is_null($instance = (clone $this)->where($this->qualifyRelatedAttributes($attributes))->first())) {
             return $instance;
         }
 
@@ -246,8 +265,42 @@ abstract class HasOneOrManyThrough extends Relation
         try {
             return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values))));
         } catch (UniqueConstraintViolationException $exception) {
-            return $this->where($attributes)->first() ?? throw $exception;
+            return $this->where($this->qualifyRelatedAttributes($attributes))->first() ?? throw $exception;
         }
+    }
+
+    /**
+     * Get the first record matching the attributes, including trashed records, and restore it. If the record is not found, create it.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TRelatedModel
+     */
+    public function restoreOrCreate(array $attributes = [], Closure|array $values = [])
+    {
+        $this->withTrashed();
+
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) {
+            $instance->restore();
+        });
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, find the matching record, including trashed records, and restore it.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TRelatedModel
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
+     */
+    public function createOrRestore(array $attributes = [], Closure|array $values = [])
+    {
+        $this->withTrashed();
+
+        return tap($this->createOrFirst($attributes, $values), function ($instance) {
+            $instance->restore();
+        });
     }
 
     /**
@@ -262,6 +315,38 @@ abstract class HasOneOrManyThrough extends Relation
         return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->fill($values)->save();
+            }
+        });
+    }
+
+    /**
+     * Qualify the given attribute keys with the related model's table.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function qualifyRelatedAttributes(array $attributes)
+    {
+        return (new BaseCollection($attributes))
+            ->mapWithKeys(fn ($value, $key) => [$this->related->qualifyColumn($key) => $value])
+            ->all();
+    }
+
+    /**
+     * Create a related record matching the attributes, or increment the existing record.
+     *
+     * @param  array  $attributes
+     * @param  string  $column
+     * @param  int|float  $default
+     * @param  int|float  $step
+     * @param  array  $extra
+     * @return TRelatedModel
+     */
+    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
+    {
+        return tap($this->firstOrCreate($attributes, array_merge($extra, [$column => $default])), function ($instance) use ($column, $step, $extra) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->increment($column, $step, $extra);
             }
         });
     }
@@ -405,6 +490,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -442,6 +529,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -532,6 +621,40 @@ abstract class HasOneOrManyThrough extends Relation
         }
 
         return array_merge($columns, [$this->getQualifiedFirstKeyName().' as laravel_through_key']);
+    }
+
+    /**
+     * Touch all of the related models for the relationship.
+     *
+     * @return void
+     */
+    public function touch()
+    {
+        $model = $this->getRelated();
+
+        if ($model::isIgnoringTouch()) {
+            return;
+        }
+
+        $columns = [
+            $model->getUpdatedAtColumn() => $model->freshTimestampString(),
+        ];
+
+        if (count($ids = $this->allRelatedIds()) > 0) {
+            $this->getRelated()->newQueryWithoutRelationships()->whereIn(
+                $this->related->getQualifiedKeyName(), $ids
+            )->update($columns);
+        }
+    }
+
+    /**
+     * Get all of the IDs for the related models.
+     *
+     * @return \Illuminate\Support\Collection<int, int|string>
+     */
+    public function allRelatedIds()
+    {
+        return $this->pluck($this->related->getQualifiedKeyName());
     }
 
     /**
@@ -626,6 +749,28 @@ abstract class HasOneOrManyThrough extends Relation
                 }
             }
         });
+    }
+
+    /**
+     * Run a map over each item while chunking.
+     *
+     * @template TReturn
+     *
+     * @param  callable(TRelatedModel): TReturn  $callback
+     * @param  int  $count
+     * @return \Illuminate\Support\Collection<int, TReturn>
+     */
+    public function chunkMap(callable $callback, $count = 1000)
+    {
+        $collection = new BaseCollection;
+
+        $this->chunk($count, function ($items) use ($collection, $callback) {
+            $items->each(function ($item) use ($collection, $callback) {
+                $collection->push($callback($item));
+            });
+        });
+
+        return $collection;
     }
 
     /**

@@ -57,8 +57,8 @@ class SupportMessageBagTest extends TestCase
     public function testMessageBagsCanConvertToArrays()
     {
         $container = new MessageBag([
-            Collection::make(['foo', 'bar']),
-            Collection::make(['baz', 'qux']),
+            new Collection(['foo', 'bar']),
+            new Collection(['baz', 'qux']),
         ]);
         $this->assertSame([['foo', 'bar'], ['baz', 'qux']], $container->getMessages());
     }

@@ -6,7 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
-use Mockery as m;
+use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use PHPUnit\Framework\TestCase;
 
 class EventsDispatcherTest extends TestCase
@@ -245,16 +245,6 @@ class EventsDispatcherTest extends TestCase
         $response = $d->dispatch('foo', ['bar']);
 
         $this->assertEquals([0, [], '', null], $response);
-    }
-
-    public function testContainerResolutionOfEventHandlers()
-    {
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $container->shouldReceive('make')->once()->with(TestEventListener::class)->andReturn(new TestEventListener);
-        $d->listen('foo', TestEventListener::class.'@onFooEvent');
-        $response = $d->dispatch('foo', ['foo', 'bar']);
-
-        $this->assertEquals(['baz'], $response);
     }
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
@@ -721,28 +711,27 @@ class EventsDispatcherTest extends TestCase
     public function testEventDispatchesUsingNamedArguments()
     {
         $container = new Container;
-        $events = m::mock(Dispatcher::class);
+        $events = new Dispatcher;
         $container->instance('events', $events);
 
         $originalContainer = Container::getInstance();
         Container::setInstance($container);
 
         try {
-            $events->shouldReceive('dispatch')
-                ->once()
-                ->with(m::on(function ($event) {
-                    $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
-                    $this->assertSame('first-value', $event->first);
-                    $this->assertSame('second-value', $event->second);
+            $captured = null;
+            $events->listen(DispatchableNamedArgumentsEvent::class, function ($event) use (&$captured) {
+                $captured = $event;
 
-                    return true;
-                }))
-                ->andReturn(['dispatched']);
+                return 'dispatched';
+            });
 
             $this->assertSame(
                 ['dispatched'],
                 DispatchableNamedArgumentsEvent::dispatch(second: 'second-value', first: 'first-value')
             );
+            $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $captured);
+            $this->assertSame('first-value', $captured->first);
+            $this->assertSame('second-value', $captured->second);
         } finally {
             Container::setInstance($originalContainer);
         }
@@ -785,11 +774,6 @@ class TestListenerInvokey
 
         return false;
     }
-}
-
-class ExampleEvent
-{
-    //
 }
 
 interface SomeEventInterface

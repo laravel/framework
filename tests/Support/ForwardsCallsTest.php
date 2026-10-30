@@ -25,16 +25,14 @@ class ForwardsCallsTest extends TestCase
 
     public function testMissingForwardedCallThrowsCorrectError()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()');
+        $this->expectExceptionObject(new BadMethodCallException('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()'));
 
         (new ForwardsCallsOne)->missingMethod('foo', 'bar');
     }
 
     public function testMissingAlphanumericForwardedCallThrowsCorrectError()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()');
+        $this->expectExceptionObject(new BadMethodCallException('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()'));
 
         (new ForwardsCallsOne)->this1_shouldWork_too('foo', 'bar');
     }
@@ -49,8 +47,7 @@ class ForwardsCallsTest extends TestCase
 
     public function testThrowBadMethodCallException()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()');
+        $this->expectExceptionObject(new BadMethodCallException('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()'));
 
         (new ForwardsCallsOne)->throwTestException('test');
     }

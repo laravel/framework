@@ -241,8 +241,7 @@ abstract class Component
             $reflection = new ReflectionClass($this);
 
             static::$propertyCache[$class] = (new Collection($reflection->getProperties(ReflectionProperty::IS_PUBLIC)))
-                ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-                ->reject(fn (ReflectionProperty $property) => $this->shouldIgnore($property->getName()))
+                ->reject(fn (ReflectionProperty $property) => $property->isStatic() || $this->shouldIgnore($property->getName()))
                 ->map(fn (ReflectionProperty $property) => $property->getName())
                 ->all();
         }
@@ -299,7 +298,7 @@ abstract class Component
      * Create an invokable, toStringable variable for the given component method.
      *
      * @param  string  $method
-     * @return \Illuminate\View\InvokableComponentVariable
+     * @return \Illuminate\View\InvokableComponentVariable<mixed>
      */
     protected function createInvokableVariable(string $method)
     {

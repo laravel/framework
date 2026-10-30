@@ -136,28 +136,30 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function configureFromAttributes()
     {
-        $reflection = new ReflectionClass($this);
-
-        if ($reflection->getAttributes(StopOnFirstFailure::class) !== []) {
+        if ($this->nearestClassWithAttribute([StopOnFirstFailure::class], ['stopOnFirstFailure'])) {
             $this->stopOnFirstFailure = true;
         }
 
-        $redirectTo = $reflection->getAttributes(RedirectTo::class);
+        $reflection = $this->nearestClassWithAttribute(
+            [RedirectTo::class, RedirectToRoute::class], ['redirect', 'redirectRoute', 'redirectAction']
+        );
 
-        if ($redirectTo !== []) {
-            $this->redirect = $redirectTo[0]->newInstance()->url;
+        if ($reflection) {
+            $redirectTo = $reflection->getAttributes(RedirectTo::class);
+
+            if ($redirectTo !== []) {
+                $this->redirect = $redirectTo[0]->newInstance()->url;
+            }
+
+            $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
+
+            if ($redirectToRoute !== []) {
+                $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
+            }
         }
 
-        $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
-
-        if ($redirectToRoute !== []) {
-            $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
-        }
-
-        $errorBag = $reflection->getAttributes(ErrorBag::class);
-
-        if ($errorBag !== []) {
-            $this->errorBag = $errorBag[0]->newInstance()->name;
+        if ($reflection = $this->nearestClassWithAttribute([ErrorBag::class], ['errorBag'])) {
+            $this->errorBag = $reflection->getAttributes(ErrorBag::class)[0]->newInstance()->name;
         }
     }
 
@@ -214,10 +216,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function shouldFailOnUnknownFields(): bool
     {
-        $failOnUnknownFields = (new ReflectionClass($this))->getAttributes(FailOnUnknownFields::class);
+        $reflection = $this->nearestClassWithAttribute([FailOnUnknownFields::class]);
 
-        return $failOnUnknownFields !== []
-            ? $failOnUnknownFields[0]->newInstance()->value
+        return $reflection
+            ? $reflection->getAttributes(FailOnUnknownFields::class)[0]->newInstance()->value
             : static::$globalFailOnUnknownFields;
     }
 
@@ -233,13 +235,41 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         $input = $this->isJson() ? $this->json()->all() : $this->request->all();
 
-        foreach (array_keys(Arr::dot($input)) as $inputKey) {
+        $input = Arr::except($input, ['_token', '_method']);
+
+        foreach ($this->dotInputKeys($input) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
+                $inputKey = str_replace('\.', '.', $inputKey);
+
                 $validator->errors()->add($inputKey, trans('validation.prohibited', [
                     'attribute' => str_replace('_', ' ', $inputKey),
                 ]));
             }
         }
+    }
+
+    /**
+     * Flatten the given input's keys into dot notation, escaping literal dots within keys.
+     *
+     * @param  array  $input
+     * @param  string  $prefix
+     * @return array
+     */
+    protected function dotInputKeys(array $input, string $prefix = ''): array
+    {
+        $keys = [];
+
+        foreach ($input as $key => $value) {
+            $key = $prefix.str_replace('.', '\.', (string) $key);
+
+            if (is_array($value) && $value !== []) {
+                $keys = array_merge($keys, $this->dotInputKeys($value, $key.'.'));
+            } else {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
     }
 
     /**
@@ -262,7 +292,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             }
 
             if (str_contains($ruleKey, '*')) {
-                $pattern = '/^'.str_replace('\*', '[^.]+', preg_quote($ruleKey, '/')).'$/';
+                $pattern = '/^'.str_replace('\*', '(?:[^.\\\\]|\\\\.)+', preg_quote($ruleKey, '/')).'$/';
 
                 if (preg_match($pattern, $inputKey)) {
                     return true;
@@ -382,6 +412,35 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Get the nearest class in the request's hierarchy that applies any of the given attributes.
+     *
+     * @param  array<int, class-string>  $attributes
+     * @param  array<int, string>  $properties
+     * @return \ReflectionClass<\Illuminate\Foundation\Http\FormRequest>|null
+     */
+    protected function nearestClassWithAttribute(array $attributes, array $properties = [])
+    {
+        $reflection = new ReflectionClass($this);
+
+        do {
+            foreach ($attributes as $attribute) {
+                if ($reflection->getAttributes($attribute) !== []) {
+                    return $reflection;
+                }
+            }
+
+            foreach ($properties as $property) {
+                if ($reflection->hasProperty($property) &&
+                    $reflection->getProperty($property)->class === $reflection->name) {
+                    return null;
+                }
+            }
+        } while (($reflection = $reflection->getParentClass()) && $reflection->name !== self::class);
+
+        return null;
     }
 
     /**

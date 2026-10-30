@@ -253,6 +253,121 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(['default', 1], $callbacks[1]);
     }
 
+    public function testRollbackExecutesCallbacksForCommittedSavepointsWhenOuterRollsBack()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['default', 2], ['default', 1]], $callbacks);
+    }
+
+    public function testRollbackExecutesCallbacksInDeepestFirstOrderAcrossCommittedAndOpenBranches()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['committed', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+
+        $manager->begin('default', 2);
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['open', 3];
+        });
+
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['open', 3], ['committed', 2], ['default', 1]], $callbacks);
+    }
+
+    public function testRollbackExecutesCallbacksInDeepestFirstOrderAcrossCommittedBranches()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['first', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['second', 2];
+        });
+
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['second', 3];
+        });
+
+        $manager->commit('default', 3, 2);
+        $manager->commit('default', 2, 1);
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['second', 3], ['first', 2], ['second', 2]], $callbacks);
+    }
+
+    public function testPartialRollbackExecutesCallbacksForCommittedDescendantSavepoints()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 2];
+        });
+
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 3];
+        });
+
+        $manager->commit('default', 3, 2);
+        $manager->rollback('default', 1);
+
+        $this->assertSame([['default', 3], ['default', 2]], $callbacks);
+    }
+
     public function testRollbackExecutesOnlyCallbacksOfTheConnection()
     {
         $callbacks = [];

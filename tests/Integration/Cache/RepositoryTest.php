@@ -329,6 +329,75 @@ class RepositoryTest extends TestCase
         $this->assertSame(['foo' => null, 'bar' => null, 'baz' => null], $cache->many([TestCacheKey::FOO, TestCacheKey::BAR, TestCacheKey::BAZ]));
         $this->assertSame(['foo' => 'default', 'qux' => 'default'], $cache->getMultiple([TestCacheKey::FOO, TestCacheKey::QUX], 'default'));
     }
+
+    public function testFlexibleDeferLabelIsScopedToTagGroup(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $users = Cache::driver('array')->tags(['users']);
+        $posts = Cache::driver('array')->tags(['posts']);
+
+        // Populate both tagged caches with the same raw key.
+        $users->flexible('profile', [10, 20], fn () => 'users');
+        $posts->flexible('profile', [10, 20], fn () => 'posts');
+
+        $this->assertCount(0, defer());
+
+        // Advance past the "fresh" TTL — both entries are now stale.
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $users->flexible('profile', [10, 20], fn () => 'users-refreshed');
+        $posts->flexible('profile', [10, 20], fn () => 'posts-refreshed');
+
+        // Each tagged cache must register its own deferred callback. Before the
+        // fix, both calls produced the same defer label so one would be silently
+        // dropped by DeferredCallbackCollection::forgetDuplicates(), leaving only
+        // one refresh in the queue instead of two.
+        $this->assertCount(2, defer());
+
+        defer()->invoke();
+
+        $this->assertSame('users-refreshed', $users->get('profile'));
+        $this->assertSame('posts-refreshed', $posts->get('profile'));
+    }
+
+    public function testFlexibleLockIsScopedToTagGroup(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $store = Cache::driver('array');
+        $users = $store->tags(['users']);
+        $posts = $store->tags(['posts']);
+
+        // Populate both tagged caches with the same raw key.
+        $users->flexible('profile', [10, 20], fn () => 'users');
+        $posts->flexible('profile', [10, 20], fn () => 'posts');
+
+        // Make both stale.
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $users->flexible('profile', [10, 20], fn () => 'users-refreshed');
+        $posts->flexible('profile', [10, 20], fn () => 'posts-refreshed');
+
+        $this->assertCount(2, defer());
+
+        // Acquire the scoped lock that the users-tag refresh closure would use.
+        // Before the fix, both tagged caches shared the same lock key so this
+        // lock would also block the posts refresh — they are now independent.
+        $usersLockKey = 'illuminate:cache:flexible:lock:'.$users->taggedItemKey('profile');
+        $usersLock = $store->lock($usersLockKey);
+        $this->assertTrue($usersLock->acquire());
+
+        defer()->invoke();
+
+        // The users refresh was skipped because its lock was held.
+        $this->assertSame('users', $users->get('profile'));
+
+        // The posts refresh ran independently because its lock key is different.
+        $this->assertSame('posts-refreshed', $posts->get('profile'));
+
+        $usersLock->release();
+    }
 }
 
 enum TestCacheKey: string

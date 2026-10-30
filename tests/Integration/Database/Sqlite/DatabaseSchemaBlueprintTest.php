@@ -496,8 +496,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping foreign keys by name.');
+        $this->expectExceptionObject(new RuntimeException('This database driver does not support dropping foreign keys by name.'));
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign('something');

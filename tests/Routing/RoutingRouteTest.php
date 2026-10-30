@@ -38,6 +38,7 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -45,10 +46,19 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnexpectedValueException;
 
-include_once __DIR__.'/Enums.php';
+include_once __DIR__.'/Fixtures/Enums.php';
 
 class RoutingRouteTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ResourceRegistrar::singularParameters();
+        ResourceRegistrar::setParameters();
+        ResourceRegistrar::verbs(['create' => 'create', 'edit' => 'edit']);
+
+        parent::tearDown();
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
@@ -218,6 +228,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareWithParametersCanBeSkipped()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('two', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/bar', ['middleware' => RoutingTestMiddlewareGroupTwo::class.':taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/baz', ['middleware' => 'two:taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware('two');
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
     public function testMiddlewareCanBeSkippedFromResources()
     {
         $router = $this->getRouter();
@@ -316,8 +343,7 @@ class RoutingRouteTest extends TestCase
 
     public function testFluentRouting()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Route for [foo/bar] has no action.');
+        $this->expectExceptionObject(new LogicException('Route for [foo/bar] has no action.'));
 
         $router = $this->getRouter();
         $router->get('foo/bar')->uses(function () {
@@ -388,8 +414,7 @@ class RoutingRouteTest extends TestCase
 
     public function testMiddlewareGroupsCannotReferenceItself()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('[web] middleware group is referencing itself.');
+        $this->expectExceptionObject(new LogicException('[web] middleware group is referencing itself.'));
 
         $router = $this->getRouter();
         $router->get('foo/bar', ['middleware' => 'web', function () {
@@ -526,6 +551,41 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $router->dispatch(Request::create('foo/bar/baz', 'GET'))->getContent();
+    }
+
+    public function testQueryRoutesAreDispatched()
+    {
+        $router = $this->getRouter();
+        $router->query('products/search', function () use ($router) {
+            return $router->getCurrentRequest()->input('name');
+        });
+
+        $request = Request::create('products/search', 'QUERY', ['name' => 'taylor']);
+
+        $this->assertSame('taylor', $router->dispatch($request)->getContent());
+        $this->assertSame(['QUERY'], $router->getRoutes()->getRoutes()[0]->methods());
+    }
+
+    public function testQueryRoutesReceiveJsonBody()
+    {
+        $router = $this->getRouter();
+        $router->query('products/search', function () use ($router) {
+            return $router->getCurrentRequest()->input('filters.name');
+        });
+
+        $request = Request::create('products/search', 'QUERY', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['filters' => ['name' => 'taylor']]));
+
+        $this->assertSame('taylor', $router->dispatch($request)->getContent());
+    }
+
+    public function testAnyRoutesRespondToQueryRequests()
+    {
+        $router = $this->getRouter();
+        $router->any('foo', function () {
+            return 'hello';
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo', 'QUERY'))->getContent());
     }
 
     public function testOptionsResponsesAreGeneratedByDefault()
@@ -772,6 +832,27 @@ class RoutingRouteTest extends TestCase
             return $age;
         });
         $this->assertSame('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testCurrentRouteIsResetWhenTheNextRequestDoesNotMatch()
+    {
+        $router = $this->getRouter();
+        $router->get('invoices/{invoice}', fn ($invoice) => $invoice)->name('invoices.show');
+
+        $this->assertSame('123', $router->dispatch(Request::create('invoices/123', 'GET'))->getContent());
+        $this->assertSame('invoices.show', $router->currentRouteName());
+
+        try {
+            $router->dispatch(Request::create('missing', 'GET'));
+
+            $this->fail('A NotFoundHttpException should have been thrown.');
+        } catch (NotFoundHttpException) {
+            //
+        }
+
+        $this->assertNull($router->current());
+        $this->assertNull($router->currentRouteName());
+        $this->assertFalse($router->is('invoices.show'));
     }
 
     public function testRoutesDontMatchNonMatchingDomain()
@@ -1067,8 +1148,7 @@ class RoutingRouteTest extends TestCase
 
     public function testModelBindingWithNullReturn()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].'));
 
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
@@ -1250,7 +1330,7 @@ class RoutingRouteTest extends TestCase
     public function testRouteGroupingFromFile()
     {
         $router = $this->getRouter();
-        $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
+        $router->group(['prefix' => 'api'], __DIR__.'/Fixtures/routes.php');
 
         $route = last($router->getRoutes()->get());
         $request = Request::create('api/users', 'GET');
@@ -1432,8 +1512,7 @@ class RoutingRouteTest extends TestCase
 
     public function testInvalidActionException()
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].');
+        $this->expectExceptionObject(new UnexpectedValueException('Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].'));
 
         $router = $this->getRouter();
         $router->get('/', ['uses' => RouteTestControllerStub::class]);
@@ -2000,12 +2079,12 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
     {
-        include_once 'Enums.php';
+        include_once 'Fixtures/Enums.php';
 
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+            'uses' => function (?\Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum $bar = null) {
                 $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
             },
         ]);
@@ -2067,6 +2146,21 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('foo/bar', 'GET'));
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNotInstanceOf(JsonResponse::class, $response);
+    }
+
+    public function testRedirectResponseCanBeReturnedAsResponsable(): void
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function (): Responsable {
+            return new RedirectResponse('/destination', 303, ['X-Test' => 'value']);
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(303, $response->getStatusCode());
+        $this->assertSame('/destination', $response->headers->get('Location'));
+        $this->assertSame('value', $response->headers->get('X-Test'));
     }
 
     public function testJsonResponseIsReturned()
@@ -2162,8 +2256,7 @@ class RoutingRouteTest extends TestCase
 
     public function testRouteRedirectExceptionWhenMissingExpectedParameters()
     {
-        $this->expectException(UrlGenerationException::class);
-        $this->expectExceptionMessage('Missing required parameter for [Route: laravel_route_redirect_destination] [URI: users/{user}] [Missing parameter: user].');
+        $this->expectExceptionObject(new UrlGenerationException('Missing required parameter for [Route: laravel_route_redirect_destination] [URI: users/{user}] [Missing parameter: user].'));
 
         $container = new Container;
         $router = new Router(new Dispatcher, $container);
@@ -2313,7 +2406,7 @@ class RoutingRouteTest extends TestCase
 
         try {
             $route->run();
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             //
         }
 
@@ -2727,10 +2820,10 @@ class ExampleMiddleware implements ExampleMiddlewareContract
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class RoutingTestOnTenant
+final readonly class RoutingTestOnTenant
 {
     public function __construct(
-        public readonly RoutingTestTenant $tenant
+        public RoutingTestTenant $tenant
     ) {
     }
 }

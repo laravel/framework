@@ -38,7 +38,7 @@ trait Queueable
     /**
      * The job deduplicator callback the job should use to generate the deduplication ID.
      *
-     * @var \Laravel\SerializableClosure\SerializableClosure|null
+     * @var \Laravel\SerializableClosure\SerializableClosure|callable|null
      */
     public $deduplicator;
 
@@ -48,6 +48,13 @@ trait Queueable
      * @var string
      */
     public $debounceOwner = '';
+
+    /**
+     * The owner of the unique job lock.
+     *
+     * @var string
+     */
+    public $uniqueLockOwner = '';
 
     /**
      * The number of seconds before the job should be made available.

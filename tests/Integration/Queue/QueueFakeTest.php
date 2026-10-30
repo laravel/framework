@@ -17,25 +17,25 @@ class QueueFakeTest extends TestCase
     public function testFakeFor()
     {
         Queue::fakeFor(function () {
-            Queue::push(new TestJob);
-            Queue::assertPushed(TestJob::class);
+            Queue::push(new QueueFakeTestJob);
+            Queue::assertPushed(QueueFakeTestJob::class);
         });
     }
 
     public function testFakeExceptFor()
     {
         Queue::fakeExceptFor(function () {
-            Queue::push(new TestJob);
-            Queue::push(new OtherTestJob);
+            Queue::push(new QueueFakeTestJob);
+            Queue::push(new QueueFakeOtherTestJob);
 
-            Queue::assertNotPushed(TestJob::class);
-            Queue::assertPushed(OtherTestJob::class);
-        }, [TestJob::class]);
+            Queue::assertNotPushed(QueueFakeTestJob::class);
+            Queue::assertPushed(QueueFakeOtherTestJob::class);
+        }, [QueueFakeTestJob::class]);
     }
 
     public function testFakeExcept()
     {
-        $fake = Queue::fakeExcept([TestJob::class]);
+        $fake = Queue::fakeExcept([QueueFakeTestJob::class]);
 
         $this->assertInstanceOf(QueueFake::class, $fake);
     }
@@ -59,7 +59,7 @@ class QueueFakeTest extends TestCase
     }
 }
 
-class TestJob
+class QueueFakeTestJob
 {
     use Queueable;
 
@@ -69,7 +69,7 @@ class TestJob
     }
 }
 
-class OtherTestJob
+class QueueFakeOtherTestJob
 {
     use Queueable;
 

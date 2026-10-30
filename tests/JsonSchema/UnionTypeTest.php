@@ -70,16 +70,14 @@ class UnionTypeTest extends TestCase
 
     public function test_it_rejects_an_unsupported_member_name(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported JSON Schema type [wat] in a multi-type union.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported JSON Schema type [wat] in a multi-type union.'));
 
         JsonSchema::union(['string', 'wat']);
     }
 
     public function test_it_rejects_a_non_string_member(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported JSON Schema type [123] in a multi-type union.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported JSON Schema type [123] in a multi-type union.'));
 
         JsonSchema::union(['string', 123]);
     }

@@ -60,25 +60,25 @@ class JobSchedulingTest extends TestCase
             $event->run($this->app);
         }
 
-        $this->assertSame(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
+        $this->assertCount(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'test-connection';
-        })->count());
+        }));
 
-        $this->assertSame(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
+        $this->assertCount(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'foo';
-        })->count());
+        }));
 
-        $this->assertSame(0, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
+        $this->assertCount(0, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === null;
-        })->count());
+        }));
 
-        $this->assertSame(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
+        $this->assertCount(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
             return $job->connection === null;
-        })->count());
+        }));
 
-        $this->assertSame(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
+        $this->assertCount(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'bar';
-        })->count());
+        }));
     }
 
     public function testJobQueuingRespectsQueueRoutes(): void

@@ -6,7 +6,6 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\Mail\Fixtures\GreetingMailable;
 use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsWithLocaleTest extends TestCase
@@ -76,6 +76,40 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertStringContainsString('bonjour',
             app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
+    }
+
+    public function testMailIsSentWithFacadeSelectedLocaleAfterAnotherNotificationWasSent()
+    {
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        NotificationFacade::send($user, new GreetingMailNotification);
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
+
+        $messages = app('mailer')->getSymfonyTransport()->messages();
+
+        $this->assertStringContainsString('hello', $messages[0]->toString());
+        $this->assertStringContainsString('bonjour', $messages[1]->toString());
+    }
+
+    public function testFacadeSelectedLocaleIsNotUsedForLaterNotifications()
+    {
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
+        NotificationFacade::send($user, new GreetingMailNotification);
+        $user->notify(new GreetingMailNotification);
+
+        $messages = app('mailer')->getSymfonyTransport()->messages();
+
+        $this->assertStringContainsString('bonjour', $messages[0]->toString());
+        $this->assertStringNotContainsString('bonjour', $messages[1]->toString());
+        $this->assertStringNotContainsString('bonjour', $messages[2]->toString());
     }
 
     public function testMailIsSentWithNotificationSelectedLocale()
@@ -142,8 +176,6 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertTrue($this->app->isLocale('en'));
 
         $this->assertSame('en', Carbon::getLocale());
-
-        Carbon::setTestNow();
     }
 
     public function testLocaleIsSentWithNotifiablePreferredLocale()
@@ -273,13 +305,5 @@ class GreetingMailNotificationWithMailable extends Notification
     {
         return (new GreetingMailable)
             ->to($notifiable->email);
-    }
-}
-
-class GreetingMailable extends Mailable
-{
-    public function build()
-    {
-        return $this->view('greeting');
     }
 }

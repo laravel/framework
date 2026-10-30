@@ -34,7 +34,7 @@ class FluentPromise implements PromiseInterface
     }
 
     #[\Override]
-    public function resolve($value): void
+    public function resolve($value = null): void
     {
         $this->guzzlePromise->resolve($value);
     }

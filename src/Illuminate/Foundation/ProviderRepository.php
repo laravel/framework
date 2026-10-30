@@ -99,7 +99,7 @@ class ProviderRepository
     /**
      * Determine if the manifest should be compiled.
      *
-     * @param  array  $manifest
+     * @param  array|null  $manifest
      * @param  array  $providers
      * @return bool
      */

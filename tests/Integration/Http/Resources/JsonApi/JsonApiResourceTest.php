@@ -2,9 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
@@ -421,6 +426,130 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
+    public function testItCanResolveNestedRelationshipThroughClosureReturningResourceCollection()
+    {
+        $user = User::factory()->create();
+
+        $publicPost = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $privatePost = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $publicComment = Comment::factory()->create([
+            'content' => 'public',
+            'post_id' => $publicPost->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $privateComment = Comment::factory()->create([
+            'content' => 'private',
+            'post_id' => $privatePost->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $response = $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertJsonPath('data.relationships.posts.data.0.id', (string) $publicPost->getKey())
+            ->assertJsonPath('included.0.relationships.comments.data.0.id', (string) $publicComment->getKey());
+
+        $this->assertFalse(collect($response->json('included'))->contains(
+            fn ($included) => $included['type'] === 'comments' && $included['id'] === (string) $privateComment->getKey()
+        ));
+    }
+
+    public function testItIgnoresNestedIncludesThatAreNotResourceRelationships()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Comment::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'user_id' => $otherUser->getKey(),
+        ]);
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'comments.truncate']))
+            ->assertOk()
+            ->assertJsonCount(1, 'included');
+
+        $this->assertSame(2, Comment::count());
+    }
+
+    public function testItIgnoresDeeplyNestedIncludesThatAreNotResourceRelationships()
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create();
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments.truncate']))
+            ->assertOk()
+            ->assertJsonCount(2, 'included');
+
+        $this->assertSame(2, Comment::count());
+    }
+
+    public function testItEagerLoadsNestedIncludesForAllRelatedModelsAtOnce()
+    {
+        $user = User::factory()->create();
+
+        $posts = Post::factory()->count(3)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        foreach ($posts as $post) {
+            Comment::factory()->create([
+                'post_id' => $post->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
+        }
+
+        DB::enableQueryLog();
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertOk()
+            ->assertJsonCount(6, 'included');
+
+        // One query for the user, one for the posts and one for the comments of all posts...
+        $this->assertCount(3, DB::getQueryLog());
+    }
+
+    public function testItResolvesEachRelationshipClosureOnceWhenIncludingNestedRelationships()
+    {
+        $user = User::factory()->create();
+
+        $posts = Post::factory()->count(2)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        foreach ($posts as $post) {
+            Comment::factory()->create([
+                'content' => 'public',
+                'post_id' => $post->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
+        }
+
+        PostResource::$commentsResolutionCount = 0;
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertJsonPath('data.relationships.posts.data.0.id', (string) $posts[0]->getKey());
+
+        // The "comments" closure should be resolved once per included post, not multiple times...
+        $this->assertSame(2, PostResource::$commentsResolutionCount);
+    }
+
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()
     {
         $now = $this->freezeSecond();
@@ -674,6 +803,36 @@ class JsonApiResourceTest extends TestCase
                 ],
             ])
             ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
+    public function testAttributesCanBeConditionallyMerged()
+    {
+        Route::get('things-with-merged-attributes/{id}', function ($id) {
+            return new class(['id' => (int) $id, 'name' => 'test', 'secret' => 'hidden', 'notes' => 'internal']) extends ArrayBackedJsonApiResource
+            {
+                public function toAttributes(Request $request)
+                {
+                    return [
+                        'name' => $this->resource['name'],
+                        $this->mergeWhen(false, ['secret' => $this->resource['secret']]),
+                        $this->mergeWhen(true, ['notes' => $this->resource['notes']]),
+                    ];
+                }
+            };
+        });
+
+        $this->getJson('/things-with-merged-attributes/99')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => '99',
+                    'type' => 'things',
+                    'attributes' => [
+                        'name' => 'test',
+                        'notes' => 'internal',
+                    ],
+                ],
+            ]);
     }
 
     public function testSameModelWithTheSameResourceTypeIsDeduplicated()

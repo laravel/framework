@@ -12,16 +12,16 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
 {
-    use ReadsQueueAttributes, ResolvesQueueRoutes;
+    use ReadsClassAttributes, ResolvesQueueRoutes;
 
     /**
      * The container implementation.

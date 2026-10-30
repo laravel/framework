@@ -38,14 +38,30 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
+            $table->softDeletes();
         });
 
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
             $table->string('title')->unique();
+            $table->string('slug')->nullable();
+            $table->integer('views')->default(0);
             $table->timestamps();
         });
+    }
+
+    public function testEagerLoadingSpecificColumns()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $team = Team::create(['owner_id' => $user->id]);
+        $mate = User::create(['name' => 'John', 'team_id' => $team->id]);
+
+        $user = User::with('teamMates:id,name')->find($user->id);
+
+        $this->assertCount(1, $user->teamMates);
+        $this->assertSame($mate->id, $user->teamMates[0]->id);
+        $this->assertSame('John', $user->teamMates[0]->name);
     }
 
     public function testBasicCreateAndRetrieve()
@@ -135,6 +151,16 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertCount(1, $users);
     }
 
+    public function testCloneKeepsTheRelationQuery()
+    {
+        $team = Team::create();
+        User::create(['name' => Str::random()]);
+        $user = User::create(['name' => Str::random(), 'team_id' => $team->id]);
+        $article = Article::create(['user_id' => $user->id, 'title' => Str::random()]);
+
+        $this->assertEquals([$article->id], $team->articles()->clone()->get()->modelKeys());
+    }
+
     public function testHasSameParentAndThroughParentTable()
     {
         Category::create();
@@ -148,6 +174,22 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $categories = Category::has('subProducts')->get();
 
         $this->assertEquals([1], $categories->pluck('id')->all());
+    }
+
+    public function testHasOneOfManySameParentAndThroughParentTable()
+    {
+        Category::create();
+        Category::create();
+        Category::create(['parent_id' => 1]);
+        Category::create(['parent_id' => 2]);
+
+        $oldest = Product::create(['category_id' => 3]);
+        $latest = Product::create(['category_id' => 3]);
+
+        $this->assertEquals([1], Category::has('latestSubProduct')->pluck('id')->all());
+        $this->assertEquals([1], Category::whereHas('latestSubProduct', fn ($query) => $query->whereKey($latest->id))->pluck('id')->all());
+        $this->assertEquals([], Category::whereHas('latestSubProduct', fn ($query) => $query->whereKey($oldest->id))->pluck('id')->all());
+        $this->assertEquals([1 => 1, 2 => 0, 3 => 0, 4 => 0], Category::withCount('latestSubProduct')->pluck('latest_sub_product_count', 'id')->all());
     }
 
     public function testFirstOrNewOnMissingRecord()
@@ -214,6 +256,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertTrue($team->is($mate->team));
         $this->assertSame('Adam Wathan', $mate->name);
         $this->assertSame('adam', $mate->slug);
+    }
+
+    public function testFirstOrCreateWithColumnThatAlsoExistsOnIntermediateTable()
+    {
+        $team = Team::create();
+        $user = $team->members()->create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $article = Article::create(['user_id' => $user->id, 'title' => 'Laravel', 'slug' => 'laravel']);
+
+        $this->assertTrue($article->is($team->articles()->firstOrNew(['slug' => 'laravel'])));
+        $this->assertTrue($article->is($team->articles()->firstOrCreate(['slug' => 'laravel'])));
+
+        $updated = $team->articles()->updateOrCreate(['slug' => 'laravel'], ['views' => 5]);
+
+        $this->assertTrue($article->is($updated));
+        $this->assertEquals(5, $article->fresh()->views);
+
+        $created = $team->articles()->firstOrCreate(['slug' => 'eloquent'], ['user_id' => $user->id, 'title' => 'Eloquent']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertSame('eloquent', $created->fresh()->slug);
     }
 
     public function testFirstOrCreateRegressionIssue()
@@ -369,6 +431,23 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('jane-slug', $jane->fresh()->slug);
     }
 
+    public function testIncrementOrCreateIncrementsTheRelatedModel()
+    {
+        $team = Team::create();
+
+        $jane = User::create(['name' => 'Jane']);
+        $john = User::create(['name' => 'John', 'team_id' => $team->id]);
+
+        $johnsArticle = Article::create(['user_id' => $john->id, 'title' => 'foo']);
+        $janesArticle = Article::create(['user_id' => $jane->id, 'title' => 'bar']);
+
+        $article = $team->articles()->incrementOrCreate(['title' => 'foo'], 'views');
+
+        $this->assertTrue($article->is($johnsArticle));
+        $this->assertEquals(1, $johnsArticle->fresh()->views);
+        $this->assertEquals(0, $janesArticle->fresh()->views);
+    }
+
     public function testCanReplicateModelLoadedThroughHasManyThrough()
     {
         $team = Team::create();
@@ -382,6 +461,21 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $newArticle = $article->replicate();
         $newArticle->title .= ' v2';
         $newArticle->save();
+    }
+
+    public function testRestoreWithSoftDeletingThroughParent()
+    {
+        $category = Category::create();
+        $subCategory = Category::create(['parent_id' => $category->id]);
+        $product = Product::create(['category_id' => $subCategory->id]);
+
+        $category->subProducts()->delete();
+
+        $this->assertTrue($product->fresh()->trashed());
+
+        $category->subProducts()->onlyTrashed()->restore();
+
+        $this->assertFalse($product->fresh()->trashed());
     }
 
     public function testOne(): void
@@ -506,10 +600,17 @@ class Category extends Model
     {
         return $this->hasManyThrough(Product::class, self::class, 'parent_id');
     }
+
+    public function latestSubProduct()
+    {
+        return $this->hasOneThrough(Product::class, self::class, 'parent_id')->latestOfMany();
+    }
 }
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
     protected $guarded = [];
 }

@@ -30,6 +30,57 @@ class PredisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Scan all keys based on options.
+     *
+     * @param  mixed  $cursor
+     * @param  array  $options
+     * @return array|false
+     */
+    public function scan($cursor = 0, $options = [])
+    {
+        return $this->command('scan', [$cursor ?? 0, $options]);
+    }
+
+    /**
+     * Scan the given sorted set for all values based on options.
+     *
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
+     * @return array|false
+     */
+    public function zscan($key, $cursor = 0, $options = [])
+    {
+        return $this->command('zscan', [$key, $cursor ?? 0, $options]);
+    }
+
+    /**
+     * Scan the given hash for all values based on options.
+     *
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
+     * @return array|false
+     */
+    public function hscan($key, $cursor = 0, $options = [])
+    {
+        return $this->command('hscan', [$key, $cursor ?? 0, $options]);
+    }
+
+    /**
+     * Scan the given set for all values based on options.
+     *
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
+     * @return array|false
+     */
+    public function sscan($key, $cursor = 0, $options = [])
+    {
+        return $this->command('sscan', [$key, $cursor ?? 0, $options]);
+    }
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels

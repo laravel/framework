@@ -4,8 +4,8 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Stringable;
 use LogicException;
 
 class PostgresGrammar extends Grammar
@@ -287,7 +287,7 @@ class PostgresGrammar extends Grammar
     {
         $column = $command->column;
 
-        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column).($column->using ? ' using '.$column->using : '')];
 
         foreach ($this->modifiers as $modifier) {
             if ($modifier === 'Collate') {
@@ -626,7 +626,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropIndex(Blueprint $blueprint, Fluent $command)
     {
-        return "drop index {$this->wrap($command->index)}";
+        return "drop index {$this->wrapIndex($blueprint, $command->index)}";
     }
 
     /**
@@ -649,6 +649,18 @@ class PostgresGrammar extends Grammar
      * @return string
      */
     public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
+     * Compile a drop vector index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropVectorIndex(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileDropIndex($blueprint, $command);
     }
@@ -691,9 +703,25 @@ class PostgresGrammar extends Grammar
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('alter index %s rename to %s',
-            $this->wrap($command->from),
+            $this->wrapIndex($blueprint, $command->from),
             $this->wrap($command->to)
         );
+    }
+
+    /**
+     * Wrap an index name, qualifying it with the schema of the blueprint's table.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  string  $index
+     * @return string
+     */
+    protected function wrapIndex(Blueprint $blueprint, $index)
+    {
+        [$schema] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
+
+        return $schema && ! str_contains($index, '.')
+            ? $this->wrapValue($schema).'.'.$this->wrap($index)
+            : $this->wrap($index);
     }
 
     /**
@@ -758,7 +786,7 @@ class PostgresGrammar extends Grammar
     public function escapeNames($names)
     {
         return array_map(
-            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            fn ($name) => (new Stringable($name))->explode('.')->map($this->wrapValue(...))->implode('.'),
             $names
         );
     }

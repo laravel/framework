@@ -4,6 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Reflector;
 
+use function Illuminate\Support\enum_value;
+
 trait ManagesAttributes
 {
     /**
@@ -23,7 +25,7 @@ trait ManagesAttributes
     /**
      * The timezone the date should be evaluated on.
      *
-     * @var \DateTimeZone|string
+     * @var \DateTimeZone|string|null
      */
     public $timezone;
 
@@ -134,12 +136,14 @@ trait ManagesAttributes
     /**
      * Limit the environments the command should run in.
      *
-     * @param  mixed  $environments
+     * @param  \UnitEnum|string|array  $environments
      * @return $this
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
+        $this->environments = array_map(
+            enum_value(...), is_array($environments) ? $environments : func_get_args()
+        );
 
         return $this;
     }

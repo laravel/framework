@@ -40,6 +40,35 @@ LUA;
     }
 
     /**
+     * Get the Lua script for pushing an array of jobs onto the queue.
+     *
+     * KEYS[1] - The queue to push the jobs onto, for example: queues:foo
+     * KEYS[2] - The notification list for the queue we are pushing jobs onto, for example: queues:foo:notify
+     * ARGV    - The job payloads
+     *
+     * @return string
+     */
+    public static function bulkPush()
+    {
+        return <<<'LUA'
+-- Push the jobs onto the queue in chunks of 100...
+for i = 1, #ARGV, 100 do
+    redis.call('rpush', KEYS[1], unpack(ARGV, i, math.min(i+99, #ARGV)))
+end
+
+-- Push a notification for every job that was pushed...
+local notifications = {}
+for i = 1, math.min(#ARGV, 100) do
+    notifications[i] = 1
+end
+
+for i = 1, #ARGV, 100 do
+    redis.call('rpush', KEYS[2], unpack(notifications, 1, math.min(100, #ARGV - i + 1)))
+end
+LUA;
+    }
+
+    /**
      * Get the Lua script for pushing delayed jobs onto the queue.
      *
      * KEYS[1] - The delayed queue to push the job onto, for example: queues:foo:delayed

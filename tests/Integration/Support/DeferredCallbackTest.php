@@ -2,11 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Queue\Fixtures\TestSyncJob;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -29,14 +27,23 @@ class DeferredCallbackTest extends TestCase
 
         $this->assertTrue($executed);
     }
-}
 
-class TestSyncJob implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public function handle(): void
+    public function test_callbacks_deferred_within_a_deferred_callback_are_invoked()
     {
-        //
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+
+                defer(function () use (&$result) {
+                    $result[] = 'second';
+                });
+            });
+        });
+
+        $this->get('/test');
+
+        $this->assertSame(['first', 'second'], $result);
     }
 }

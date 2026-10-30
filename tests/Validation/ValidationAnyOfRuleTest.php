@@ -115,6 +115,29 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testAssociativeArrayValueAgainstPlainRules()
+    {
+        $rule = Rule::anyOf([
+            ['string', 'email'],
+            ['string', 'alpha_dash', 'min:6'],
+        ]);
+
+        $validator = new Validator(resolve('translator'), [
+            'username' => ['x' => 1],
+        ], ['username' => ['required', $rule]]);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'username' => 'taylor@laravel.com',
+        ], ['username' => ['required', $rule]]);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'data' => ['x' => 1],
+        ], ['data' => Rule::anyOf(['string', 'array'])]);
+        $this->assertTrue($validator->passes());
+    }
+
     public function testTaggedUnionObjects()
     {
         $validator = new Validator(resolve('translator'), [
@@ -377,8 +400,6 @@ class ValidationAnyOfRuleTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = Container::getInstance();
         $container->bind('translator', function () {
             return new Translator(
@@ -398,7 +419,5 @@ class ValidationAnyOfRuleTest extends TestCase
         Container::setInstance(null);
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 }

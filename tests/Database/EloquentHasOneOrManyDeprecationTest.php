@@ -2,13 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Mockery as m;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class EloquentHasOneOrManyDeprecationTest extends TestCase
@@ -27,10 +30,6 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
         $model1->id = 1;
         $model2 = new HasOneOrManyDeprecationModelStub;
         $model2->id = null;
-
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
-            return new Collection($array);
-        });
 
         $models = $relation->match([$model1, $model2], new Collection([$result1, $result2]), 'foo');
 
@@ -58,34 +57,27 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
 
     protected function getHasManyRelation(): HasMany
     {
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $builder = m::mock(Builder::class, [$queryBuilder]);
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-
-        return new HasMany($builder, $parent, 'table.foreign_key', 'id');
+        return new HasMany($this->newBuilder(), $this->newParent(), 'table.foreign_key', 'id');
     }
 
     protected function getHasOneRelation(): HasOne
     {
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $builder = m::mock(Builder::class, [$queryBuilder]);
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        return new HasOne($this->newBuilder(), $this->newParent(), 'table.foreign_key', 'id');
+    }
 
-        return new HasOne($builder, $parent, 'table.foreign_key', 'id');
+    protected function newBuilder(): Builder
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+
+        return (new Builder(new QueryBuilder($connection, new Grammar($connection), new Processor)))->setModel(new HasOneOrManyDeprecationModelStub);
+    }
+
+    protected function newParent(): Model
+    {
+        $parent = new HasOneOrManyDeprecationModelStub;
+        $parent->id = 1;
+
+        return $parent;
     }
 }
 

@@ -431,18 +431,18 @@ assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\L
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy(static fn ($user) => NamedDigit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy(static fn ($user) => NumberedDigit::One));
 
-assertType("Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<'bar', User>>", $collection->keyBy(fn ($user) => 'bar')->groupBy(function ($user) {
+assertType("Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<string, User>>", $collection->keyBy(fn ($user) => 'bar')->groupBy(function ($user) {
     return 'foo';
 }, preserveKeys: true));
 
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy('name'));
-assertType("Illuminate\Support\LazyCollection<'foo', User>", $collection->keyBy(function ($user, $int) {
+assertType('Illuminate\Support\LazyCollection<string, User>', $collection->keyBy(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return 'foo';
 }));
-assertType("Illuminate\Support\LazyCollection<0, User>", $collection->keyBy(static fn ($user): int => 0));
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->keyBy(static fn ($user): int => 0));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => Digit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => NamedDigit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => NumberedDigit::One));
@@ -723,6 +723,9 @@ assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollec
     return true;
 }));
 
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunkBy(fn ($user) => $user->getKey()));
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunkBy('name'));
+
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sort(function ($userA, $userB) {
     assertType('User', $userA);
     assertType('User', $userB);
@@ -990,36 +993,35 @@ $zoo = new LazyZoo();
 $coll = $zoo->getWithoutZebras();
 
 assertType('Illuminate\Support\LazyCollection<int, LazyAnimal>', $coll);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->average);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->avg);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->contains);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->doesntContain);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->each);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->every);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->filter);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->first);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->flatMap);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->groupBy);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->keyBy);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->last);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->map);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->max);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->min);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->partition);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->percentage);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->reject);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->skipUntil);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->skipWhile);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->some);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->sortBy);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->sortByDesc);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->sum);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->takeUntil);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->takeWhile);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->unique);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->unless);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->until);
-assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->when);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'average', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->average);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'avg', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->avg);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'contains', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->contains);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'doesntContain', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->doesntContain);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'each', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->each);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'every', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->every);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'filter', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->filter);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'first', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->first);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'flatMap', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->flatMap);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'groupBy', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->groupBy);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'keyBy', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->keyBy);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'last', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->last);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'map', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->map);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'max', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->max);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'min', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->min);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'partition', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->partition);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'percentage', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->percentage);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'reject', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->reject);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'skipUntil', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->skipUntil);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'skipWhile', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->skipWhile);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'some', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->some);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'sortBy', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->sortBy);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'sortByDesc', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->sortByDesc);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'sum', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->sum);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'takeUntil', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->takeUntil);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'takeWhile', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->takeWhile);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'unique', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->unique);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'unless', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->unless);
+assertType("Illuminate\Support\HigherOrderCollectionProxy<'when', LazyAnimal, Illuminate\Support\LazyCollection<int, LazyAnimal>>", $coll->when);
 
 enum Digit
 {

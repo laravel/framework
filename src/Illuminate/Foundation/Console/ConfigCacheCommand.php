@@ -14,11 +14,11 @@ use Throwable;
 class ConfigCacheCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'config:cache';
+    protected $signature = 'config:cache';
 
     /**
      * The console command description.
@@ -61,7 +61,7 @@ class ConfigCacheCommand extends Command
 
         $configPath = $this->laravel->getCachedConfigPath();
 
-        $this->files->put(
+        $this->files->replace(
             $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
         );
 

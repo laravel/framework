@@ -15,8 +15,6 @@ class ValidationRequiredUnlessRuleTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->translator = new Translator(new ArrayLoader, 'en');
     }
 

@@ -12,6 +12,6 @@ class ViewPhpEngineTest extends TestCase
     {
         $engine = new PhpEngine(new Filesystem);
         $this->assertSame('Hello World
-', $engine->get(__DIR__.'/fixtures/basic.php'));
+', $engine->get(__DIR__.'/Fixtures/basic.php'));
     }
 }

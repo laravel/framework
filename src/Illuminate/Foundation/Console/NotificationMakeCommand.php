@@ -4,11 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
@@ -20,11 +19,14 @@ class NotificationMakeCommand extends GeneratorCommand
     use CreatesMatchingTest;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:notification';
+    protected $signature = 'make:notification
+                    {name : The name of the notification}
+                    {--f|force : Create the class even if the notification already exists}
+                    {--m|markdown= : Create a new Markdown template for the notification}';
 
     /**
      * The console command description.
@@ -40,6 +42,13 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected $type = 'Notification';
 
+    #[\Override]
+    protected function configureDefaults(): void
+    {
+        // Default to false to distinguish "not passed" from "passed with no value"...
+        $this->getDefinition()->getOption('markdown')->setDefault(false);
+    }
+
     /**
      * Execute the console command.
      *
@@ -51,7 +60,7 @@ class NotificationMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('markdown')) {
+        if ($this->option('markdown') !== false) {
             $this->writeMarkdownTemplate();
         }
     }
@@ -70,7 +79,7 @@ class NotificationMakeCommand extends GeneratorCommand
         }
 
         $path = $this->viewPath(
-            str_replace('.', $separator, $this->option('markdown')).'.blade.php'
+            str_replace('.', $separator, $this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -92,8 +101,8 @@ class NotificationMakeCommand extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        if ($this->option('markdown')) {
-            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
+        if ($this->option('markdown') !== false) {
+            $class = str_replace(['DummyView', '{{ view }}'], $this->getView(), $class);
         }
 
         return $class;
@@ -106,7 +115,7 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('markdown')
+        return $this->option('markdown') !== false
             ? $this->resolveStubPath('/stubs/markdown-notification.stub')
             : $this->resolveStubPath('/stubs/notification.stub');
     }
@@ -151,27 +160,26 @@ class NotificationMakeCommand extends GeneratorCommand
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
         if ($wantsMarkdownView) {
-            $defaultMarkdownView = (new Collection(explode('/', str_replace('\\', '/', $this->argument('name')))))
-                ->map(fn ($path) => Str::kebab($path))
-                ->prepend('mail')
-                ->implode('.');
-
-            $markdownView = text('What should the markdown view be named?', default: $defaultMarkdownView);
+            $markdownView = text('What should the markdown view be named?', default: $this->getView());
 
             $input->setOption('markdown', $markdownView);
         }
     }
 
     /**
-     * Get the console command options.
+     * Get the view name.
      *
-     * @return array
+     * @return string
      */
-    protected function getOptions()
+    protected function getView()
     {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
-        ];
+        if ($view = $this->option('markdown')) {
+            return $view;
+        }
+
+        return (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
+            ->map(fn ($path) => Str::kebab($path))
+            ->prepend('mail')
+            ->implode('.');
     }
 }

@@ -20,6 +20,15 @@ class ValidationNumericRuleTest extends TestCase
         $this->assertSame('numeric', (string) $rule);
     }
 
+    public function testStrictRule()
+    {
+        $rule = Rule::numeric(strict: true);
+        $this->assertSame('numeric:strict', (string) $rule);
+
+        $rule = new Numeric(strict: true);
+        $this->assertSame('numeric:strict', (string) $rule);
+    }
+
     public function testBetweenRule()
     {
         $rule = Rule::numeric()->between(1, 10);

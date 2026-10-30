@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Rules;
+namespace Illuminate\Tests\Validation;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
@@ -27,6 +27,18 @@ class ValidationDateRuleTest extends TestCase
         $this->assertSame('date_format:d/m/Y', (string) $rule);
     }
 
+    /**
+     * Test the date equality constraint.
+     */
+    public function testDateEqualsRule()
+    {
+        $rule = Rule::date()->equals('2024-01-01');
+        $this->assertSame('date|date_equals:2024-01-01', (string) $rule);
+
+        $rule = Rule::date()->format('d/m/Y')->equals(Carbon::parse('2024-01-01'));
+        $this->assertSame('date_format:d/m/Y|date_equals:01/01/2024', (string) $rule);
+    }
+
     public function testAfterTodayRule()
     {
         $rule = Rule::date()->afterToday();
@@ -43,6 +55,24 @@ class ValidationDateRuleTest extends TestCase
 
         $rule = Rule::date()->todayOrBefore();
         $this->assertSame('date|before_or_equal:today', (string) $rule);
+    }
+
+    public function testPastRule()
+    {
+        $rule = Rule::date()->past();
+        $this->assertSame('date|before:now', (string) $rule);
+
+        $rule = Rule::date()->nowOrPast();
+        $this->assertSame('date|before_or_equal:now', (string) $rule);
+    }
+
+    public function testFutureRule()
+    {
+        $rule = Rule::date()->future();
+        $this->assertSame('date|after:now', (string) $rule);
+
+        $rule = Rule::date()->nowOrFuture();
+        $this->assertSame('date|after_or_equal:now', (string) $rule);
     }
 
     public function testAfterSpecificDateRule()

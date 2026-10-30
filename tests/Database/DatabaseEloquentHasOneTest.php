@@ -2,13 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Contracts\Database\Query\Expression;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Mockery as m;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneTest extends TestCase
@@ -23,11 +26,11 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $this->related->expects('newInstance')->andReturn($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -40,11 +43,11 @@ class DatabaseEloquentHasOneTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $this->related->expects('newInstance')->andReturn($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -59,11 +62,11 @@ class DatabaseEloquentHasOneTest extends TestCase
             $newModel->username = $parentModel->username;
         });
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $this->related->expects('newInstance')->andReturn($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -78,11 +81,11 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $relation = $this->getRelation()->withDefault($attributes);
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $this->related->expects('newInstance')->andReturn($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -91,58 +94,11 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
-    public function testMakeMethodDoesNotSaveNewModel()
-    {
-        $relation = $this->getRelation();
-        $instance = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'newInstance', 'setAttribute'])->getMock();
-        $relation->getRelated()->shouldReceive('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
-        $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
-        $instance->expects($this->never())->method('save');
-
-        $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
-    }
-
-    public function testSaveMethodSetsForeignKeyOnModel()
-    {
-        $relation = $this->getRelation();
-        $mockModel = $this->getMockBuilder(Model::class)->onlyMethods(['save'])->getMock();
-        $mockModel->expects($this->once())->method('save')->willReturn(true);
-        $result = $relation->save($mockModel);
-
-        $attributes = $result->getAttributes();
-        $this->assertEquals(1, $attributes['foreign_key']);
-    }
-
-    public function testCreateMethodProperlyCreatesNewModel()
-    {
-        $relation = $this->getRelation();
-        $created = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'getKey', 'setAttribute'])->getMock();
-        $created->expects($this->once())->method('save')->willReturn(true);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
-        $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
-
-        $this->assertEquals($created, $relation->create(['name' => 'taylor']));
-    }
-
-    public function testForceCreateMethodProperlyCreatesNewModel()
-    {
-        $relation = $this->getRelation();
-        $attributes = ['name' => 'taylor', $relation->getForeignKeyName() => $relation->getParentKey()];
-
-        $created = m::mock(Model::class);
-        $created->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
-
-        $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($created);
-
-        $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
-        $this->assertEquals(1, $created->getAttribute('foreign_key'));
-    }
-
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = m::mock(Model::class);
-        $model->shouldReceive('setRelation')->once()->with('foo', null);
+        $model = Mockery::mock(Model::class);
+        $model->expects('setRelation')->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
         $this->assertEquals([$model], $models);
@@ -150,15 +106,15 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testEagerConstraintsAreProperlyAdded()
     {
-        $relation = $this->getRelation();
-        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.foreign_key', [1, 2]);
+        $relation = $this->getRelationWithRealQuery();
         $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasOneModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertSame('select * from "eloquent_has_one_model_stubs" where "table"."foreign_key" = ? and "table"."foreign_key" is not null and "table"."foreign_key" in (1, 2)', $relation->toSql());
+        $this->assertSame([1], $relation->getBindings());
     }
 
     public function testModelsAreProperlyMatchedToParents()
@@ -197,133 +153,37 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testRelationCountQueryCanBeBuilt()
     {
-        $relation = $this->getRelation();
-        $builder = m::mock(Builder::class);
+        $relation = $this->getRelationWithRealQuery();
 
-        $baseQuery = m::mock(BaseBuilder::class);
-        $baseQuery->from = 'one';
-        $parentQuery = m::mock(BaseBuilder::class);
-        $parentQuery->from = 'two';
+        $query = $relation->getRelationExistenceCountQuery($this->newBuilder('one'), $this->newBuilder('two'));
 
-        $builder->shouldReceive('getQuery')->once()->andReturn($baseQuery);
-        $builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
-
-        $builder->shouldReceive('select')->once()->with(m::type(Expression::class))->andReturnSelf();
-        $relation->getParent()->shouldReceive('qualifyColumn')->andReturn('table.id');
-        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
-        $baseQuery->shouldReceive('setBindings')->once()->with([], 'select');
-
-        $relation->getRelationExistenceCountQuery($builder, $builder);
+        $this->assertSame('select count(*) from "one" where "eloquent_has_one_model_stubs"."id" = "table"."foreign_key"', $query->toSql());
     }
 
-    public function testIsNotNull()
+    protected function newBuilder($table = null)
     {
-        $relation = $this->getRelation();
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $builder = (new Builder(new BaseBuilder($connection, new Grammar($connection), new Processor)))->setModel(new EloquentHasOneModelStub);
 
-        $this->related->shouldReceive('getTable')->never();
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is(null));
+        return $table ? $builder->from($table) : $builder;
     }
 
-    public function testIsModel()
+    protected function getRelationWithRealQuery()
     {
-        $relation = $this->getRelation();
+        $parent = new EloquentHasOneModelStub;
+        $parent->id = 1;
 
-        $this->related->shouldReceive('getTable')->once()->andReturn('table');
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
-        $model->shouldReceive('getTable')->once()->andReturn('table');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithStringRelatedKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getTable')->once()->andReturn('table');
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('1');
-        $model->shouldReceive('getTable')->once()->andReturn('table');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsNotModelWithNullRelatedKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getTable')->never();
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(null);
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherRelatedKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getTable')->never();
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(2);
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherTable()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getTable')->once()->andReturn('table');
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
-        $model->shouldReceive('getTable')->once()->andReturn('table.two');
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherConnection()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getTable')->once()->andReturn('table');
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
-        $model->shouldReceive('getTable')->once()->andReturn('table');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('connection.two');
-
-        $this->assertFalse($relation->is($model));
+        return new HasOne($this->newBuilder(), $parent, 'table.foreign_key', 'id');
     }
 
     protected function getRelation()
     {
-        $this->builder = m::mock(Builder::class);
+        $this->builder = Mockery::mock(Builder::class);
         $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $this->related = m::mock(Model::class);
+        $this->related = Mockery::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
-        $this->parent = m::mock(Model::class);
+        $this->parent = Mockery::mock(Model::class);
         $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');

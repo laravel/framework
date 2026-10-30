@@ -109,6 +109,10 @@ class MessageSelector
      */
     public function getPluralIndex($locale, $number)
     {
+        if (is_numeric($number)) {
+            $number = abs($number);
+        }
+
         switch ($locale) {
             case 'az':
             case 'az_AZ':

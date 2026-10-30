@@ -6,17 +6,20 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'migrate:status')]
 class StatusCommand extends BaseCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'migrate:status';
+    protected $signature = 'migrate:status
+                    {--database= : The database connection to use}
+                    {--pending= : Only list pending migrations}
+                    {--path=* : The path(s) to the migrations files to use}
+                    {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}';
 
     /**
      * The console command description.
@@ -44,6 +47,15 @@ class StatusCommand extends BaseCommand
         $this->migrator = $migrator;
     }
 
+    #[\Override]
+    protected function configureDefaults(): void
+    {
+        // Defaults to false (not null) so that handle() can distinguish "not passed
+        // at all" from "passed with no value", which can't be expressed as a literal
+        // boolean default in the signature above.
+        $this->getDefinition()->getOption('pending')->setDefault(false);
+    }
+
     /**
      * Execute the console command.
      *
@@ -55,7 +67,7 @@ class StatusCommand extends BaseCommand
             if (! $this->migrator->repositoryExists()) {
                 $this->components->error('Migration table not found.');
 
-                return 1;
+                return self::FAILURE;
             }
 
             $ran = $this->migrator->getRepository()->getRan();
@@ -99,16 +111,20 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
+        $hasPending = false;
+
         return (new Collection($this->getAllMigrationFiles()))
-            ->map(function ($migration) use ($ran, $batches) {
+            ->map(function ($migration) use ($ran, $batches, &$hasPending) {
                 $migrationName = $this->migrator->getMigrationName($migration);
 
-                $status = in_array($migrationName, $ran)
-                    ? '<fg=green;options=bold>Ran</>'
-                    : '<fg=yellow;options=bold>Pending</>';
-
                 if (in_array($migrationName, $ran)) {
-                    $status = '['.$batches[$migrationName].'] '.$status;
+                    $status = '['.$batches[$migrationName].'] <fg=green;options=bold>Ran</>';
+                } elseif (! $hasPending && $this->migrator->shouldSkip($migration)) {
+                    $status = '<fg=gray;options=bold>Skipped</>';
+                } else {
+                    $hasPending = true;
+
+                    $status = '<fg=yellow;options=bold>Pending</>';
                 }
 
                 return [$migrationName, $status];
@@ -123,20 +139,5 @@ class StatusCommand extends BaseCommand
     protected function getAllMigrationFiles()
     {
         return $this->migrator->getMigrationFiles($this->getMigrationPaths());
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
-            ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations', false],
-            ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
-            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
-        ];
     }
 }

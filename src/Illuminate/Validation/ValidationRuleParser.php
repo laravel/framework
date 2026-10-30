@@ -5,11 +5,13 @@ namespace Illuminate\Validation;
 use Closure;
 use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Numeric;
@@ -95,7 +97,7 @@ class ValidationRuleParser
         }
 
         if (is_object($rule)) {
-            if ($rule instanceof Date || $rule instanceof Numeric || $rule instanceof StringRule) {
+            if ($rule instanceof ArrayRule || $rule instanceof Date || $rule instanceof Numeric || $rule instanceof StringRule) {
                 return explode('|', (string) $rule);
             }
 
@@ -105,7 +107,7 @@ class ValidationRuleParser
         $rules = [];
 
         foreach ($rule as $value) {
-            if ($value instanceof Date || $value instanceof Numeric || $value instanceof StringRule) {
+            if ($value instanceof ArrayRule || $value instanceof Date || $value instanceof Numeric || $value instanceof StringRule) {
                 $rules = array_merge($rules, explode('|', (string) $value));
             } else {
                 $rules[] = $this->prepareRule($value, $attribute);
@@ -134,6 +136,7 @@ class ValidationRuleParser
 
         if (! is_object($rule) ||
             $rule instanceof RuleContract ||
+            $rule instanceof ParameterizedRule ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -176,11 +179,13 @@ class ValidationRuleParser
                             [$attribute => [$key]]
                         );
 
-                        $results = $this->mergeRules($results, $compiled->rules);
+                        foreach ($compiled->rules as $compiledAttribute => $compiledRules) {
+                            $this->mergeRulesForAttributeInto($results, $compiledAttribute, $compiledRules);
+                        }
                     } else {
                         $this->implicitAttributes[$attribute][] = $key;
 
-                        $results = $this->mergeRules($results, $key, $rule);
+                        $this->mergeRulesForAttributeInto($results, $key, $rule);
                     }
                 }
             }
@@ -222,13 +227,26 @@ class ValidationRuleParser
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules)
     {
+        $this->mergeRulesForAttributeInto($results, $attribute, $rules);
+
+        return $results;
+    }
+
+    /**
+     * Merge additional rules into a given attribute by reference.
+     *
+     * @param  array  $results
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return void
+     */
+    private function mergeRulesForAttributeInto(&$results, $attribute, $rules)
+    {
         $merge = head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
             isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute], $attribute) : [], $merge
         );
-
-        return $results;
     }
 
     /**
@@ -239,6 +257,10 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
+        if ($rule instanceof ParameterizedRule) {
+            $rule = $rule->toArray();
+        }
+
         if ($rule instanceof RuleContract || $rule instanceof CompilableRules) {
             return [$rule, []];
         }

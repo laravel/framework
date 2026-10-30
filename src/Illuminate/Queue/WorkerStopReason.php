@@ -13,4 +13,19 @@ enum WorkerStopReason: string
     case QueueEmptyFor = 'empty_for';
     case ReceivedRestartSignal = 'restart_signal';
     case TimedOut = 'timed_out';
+
+    public function description(): string
+    {
+        return match ($this) {
+            self::Interrupted => 'Interrupted',
+            self::LostConnection => 'Lost connection',
+            self::MaxJobsExceeded => 'Maximum jobs exceeded',
+            self::MaxMemoryExceeded => 'Memory limit exceeded',
+            self::MaxTimeExceeded => 'Maximum run time exceeded',
+            self::QueueEmpty => 'Queue empty',
+            self::QueueEmptyFor => 'Queue empty for the configured duration',
+            self::ReceivedRestartSignal => 'Received restart signal',
+            self::TimedOut => 'Job timed out',
+        };
+    }
 }

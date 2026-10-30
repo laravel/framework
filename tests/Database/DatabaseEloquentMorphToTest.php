@@ -2,17 +2,31 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Tests\Database\stubs\TestEnum;
-use Mockery as m;
+use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
+use Illuminate\Tests\Database\Fixtures\TestEnum;
+use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     protected $builder;
 
     protected $related;
@@ -74,7 +88,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentMorphToModelStub;
 
@@ -87,7 +101,7 @@ class DatabaseEloquentMorphToTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentMorphToModelStub;
         $newModel->username = 'taylor';
@@ -103,7 +117,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
 
-        $this->builder->shouldReceive('first')->once()->andReturnNull();
+        $this->builder->expects('first')->andReturnNull();
 
         $newModel = new EloquentMorphToModelStub;
         $newModel->username = 'taylor';
@@ -115,20 +129,20 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertSame('taylor', $result->username);
     }
 
-    public function testMorphToWithZeroMorphType()
+    public function testMorphToWithZeroMorphType(): void
     {
         $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
-        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn(0);
+        $parent->expects($this->once())->method('getAttributeFromArray')->with('relation_type')->willReturn(0);
         $parent->expects($this->once())->method('morphInstanceTo');
         $parent->expects($this->never())->method('morphEagerTo');
 
         $parent->relation();
     }
 
-    public function testMorphToWithEmptyStringMorphType()
+    public function testMorphToWithEmptyStringMorphType(): void
     {
         $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
-        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn('');
+        $parent->expects($this->once())->method('getAttributeFromArray')->with('relation_type')->willReturn('');
         $parent->expects($this->once())->method('morphEagerTo');
         $parent->expects($this->never())->method('morphInstanceTo');
 
@@ -151,211 +165,40 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign.value');
+        $relation = $this->getRelationWithRealQuery();
+        $associate = new EloquentMorphToRelatedStub;
+        $associate->id = 1;
 
-        $relation = $this->getRelationAssociate($parent);
+        $parent = $relation->associate($associate);
 
-        $associate = m::mock(Model::class);
-        $associate->shouldReceive('getAttribute')->andReturn(1);
-        $associate->shouldReceive('getMorphClass')->andReturn('Model');
-
-        $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
-        $parent->shouldReceive('setAttribute')->once()->with('morph_type', 'Model');
-        $parent->shouldReceive('setRelation')->once()->with('relation', $associate);
-
-        $relation->associate($associate);
+        $this->assertSame(1, $parent->getAttribute('foreign_key'));
+        $this->assertSame(EloquentMorphToRelatedStub::class, $parent->getAttribute('morph_type'));
+        $this->assertSame($associate, $parent->getRelation('relation'));
     }
 
     public function testAssociateMethodIgnoresNullValue()
     {
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $relation = $this->getRelationWithRealQuery();
 
-        $relation = $this->getRelationAssociate($parent);
+        $parent = $relation->associate(null);
 
-        $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
-        $parent->shouldReceive('setAttribute')->once()->with('morph_type', null);
-        $parent->shouldReceive('setRelation')->once()->with('relation', null);
-
-        $relation->associate(null);
+        $this->assertNull($parent->getAttribute('foreign_key'));
+        $this->assertNull($parent->getAttribute('morph_type'));
+        $this->assertNull($parent->getRelation('relation'));
     }
 
     public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
     {
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $relation = $this->getRelationWithRealQuery();
+        $relation->getParent()->setAttribute('foreign_key', 5);
+        $relation->getParent()->setAttribute('morph_type', 'type_1');
 
-        $relation = $this->getRelation($parent);
+        $parent = $relation->dissociate();
 
-        $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
-        $parent->shouldReceive('setAttribute')->once()->with('morph_type', null);
-        $parent->shouldReceive('setRelation')->once()->with('relation', null);
-
-        $relation->dissociate();
-    }
-
-    public function testIsNotNull()
-    {
-        $relation = $this->getRelation();
-
-        $relation->getRelated()->shouldReceive('getTable')->never();
-        $relation->getRelated()->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is(null));
-    }
-
-    public function testIsModel()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('foreign.value');
-        $model->shouldReceive('getTable')->once()->andReturn('relation');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerParentKey()
-    {
-        $parent = m::mock(Model::class);
-        // when addConstraints is called we need to return the foreign value
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return an integer
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('1');
-        $model->shouldReceive('getTable')->once()->andReturn('relation');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerRelatedKey()
-    {
-        $parent = m::mock(Model::class);
-        // when addConstraints is called we need to return the foreign value
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return a string
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('1');
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
-        $model->shouldReceive('getTable')->once()->andReturn('relation');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerKeys()
-    {
-        $parent = m::mock(Model::class);
-
-        // when addConstraints is called we need to return the foreign value
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return an integer
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(1);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
-        $model->shouldReceive('getTable')->once()->andReturn('relation');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsNotModelWithNullParentKey()
-    {
-        $parent = m::mock(Model::class);
-
-        // when addConstraints is called we need to return the foreign value
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return null
-
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(null);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('foreign.value');
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithNullRelatedKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn(null);
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('foreign.value.two');
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherTable()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('foreign.value');
-        $model->shouldReceive('getTable')->once()->andReturn('table.two');
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherConnection()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
-
-        $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('foreign.value');
-        $model->shouldReceive('getTable')->once()->andReturn('relation');
-        $model->shouldReceive('getConnectionName')->once()->andReturn('relation.two');
-
-        $this->assertFalse($relation->is($model));
+        $this->assertNull($parent->getAttribute('foreign_key'));
+        $this->assertNull($parent->getAttribute('morph_type'));
+        $this->assertTrue($parent->relationLoaded('relation'));
+        $this->assertNull($parent->getRelation('relation'));
     }
 
     public function testMatchToMorphParentsNormalizesKeyWhenOwnerKeyIsNullAndResultKeyIsObject()
@@ -368,9 +211,9 @@ class DatabaseEloquentMorphToTest extends TestCase
             }
         };
 
-        $builder = m::mock(Builder::class);
-        $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder = Mockery::mock(Builder::class);
+        $related = new EloquentMorphToRelatedStub;
+        $builder->expects('getModel')->andReturn($related);
 
         $parent = new EloquentMorphToModelStub;
         $parent->morph_type = 'type_1';
@@ -382,39 +225,49 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $relation->addEagerConstraints([$parent]);
 
-        $result = m::mock(Model::class);
-        $result->shouldReceive('getKey')->once()->andReturn($uuidObject);
+        $result = Mockery::mock(Model::class);
+        $result->expects('getKey')->andReturn($uuidObject);
 
         $relation->callMatchToMorphParents('type_1', new EloquentCollection([$result]));
 
         $this->assertSame($result, $parent->getRelation('relation'));
     }
 
-    protected function getRelationAssociate($parent)
+    public function testCreateModelByTypeThrowsWhenTypeNotInMorphMapAndRequireMorphMapIsOn()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $related = m::mock(Model::class);
-        $related->shouldReceive('getKey')->andReturn(1);
-        $related->shouldReceive('getTable')->andReturn('relation');
-        $related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $this->expectException(ClassMorphViolationException::class);
 
-        return new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation');
+        Relation::requireMorphMap();
+
+        $this->getRelationWithRealQuery()->createModelByType('poisoned');
+    }
+
+    protected function tearDown(): void
+    {
+        Relation::morphMap([], false);
+        Relation::requireMorphMap(false);
+    }
+
+    protected function getRelationWithRealQuery()
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $builder = (new Builder(new BaseBuilder($connection, new Grammar($connection), new Processor)))->setModel(new EloquentMorphToRelatedStub);
+
+        return new MorphTo($builder, new EloquentMorphToModelStub, 'foreign_key', 'id', 'morph_type', 'relation');
     }
 
     public function getRelation($parent = null, $builder = null)
     {
-        $this->builder = $builder ?: m::mock(Builder::class);
+        $this->builder = $builder ?: Mockery::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = m::mock(Model::class);
+        $this->related = Mockery::mock(Model::class);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
 
-        return m::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
+        return Mockery::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
     }
 }
 

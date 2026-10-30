@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Support\HtmlString;
 
 class AsHtmlString implements Castable
@@ -16,7 +17,7 @@ class AsHtmlString implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class implements CastsAttributes, SerializesCastableAttributes
         {
             public function get($model, $key, $value, $attributes)
             {
@@ -24,6 +25,11 @@ class AsHtmlString implements Castable
             }
 
             public function set($model, $key, $value, $attributes)
+            {
+                return isset($value) ? (string) $value : null;
+            }
+
+            public function serialize($model, $key, $value, $attributes)
             {
                 return isset($value) ? (string) $value : null;
             }

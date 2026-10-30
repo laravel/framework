@@ -44,7 +44,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     /**
      * The name of the connection that should be used for locks.
      *
-     * @var string
+     * @var string|null
      */
     protected $lockConnection;
 
@@ -367,13 +367,20 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 
         $prefix = $connectionPrefix.$this->getPrefix();
 
-        return (new LazyCollection(function () use ($connection, $chunkSize, $prefix, $defaultCursorValue) {
+        // PhpRedis adds the connection prefix to the pattern itself when "SCAN_PREFIX" is enabled...
+        $match = $connection instanceof PhpRedisConnection &&
+            defined('Redis::SCAN_PREFIX') &&
+            $connection->client()->getOption(\Redis::OPT_SCAN) === \Redis::SCAN_PREFIX
+                ? $this->getPrefix().'tag:*:entries'
+                : $prefix.'tag:*:entries';
+
+        return (new LazyCollection(function () use ($connection, $chunkSize, $match, $defaultCursorValue) {
             $cursor = $defaultCursorValue;
 
             do {
                 $scanResult = $connection->scan(
                     $cursor,
-                    ['match' => $prefix.'tag:*:entries', 'count' => $chunkSize]
+                    ['match' => $match, 'count' => $chunkSize]
                 );
 
                 if (! is_array($scanResult)) {
@@ -395,7 +402,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
                 foreach ($tagsChunk as $tag) {
                     yield $tag;
                 }
-            } while (((string) $cursor) !== $defaultCursorValue);
+            } while (((string) $cursor) !== ((string) $defaultCursorValue));
         }))->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
     }
 

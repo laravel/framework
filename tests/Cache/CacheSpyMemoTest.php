@@ -8,7 +8,7 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
-use Mockery as m;
+use Mockery;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -16,8 +16,6 @@ class CacheSpyMemoTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = new Container;
 
         $container->instance('config', new ConfigRepository([
@@ -40,8 +38,6 @@ class CacheSpyMemoTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function test_cache_spy_works_with_memoized_cache()
@@ -62,7 +58,7 @@ class CacheSpyMemoTest extends TestCase
 
         $this->assertSame('bar', $value);
 
-        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, m::type(Closure::class));
+        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Mockery::type(Closure::class));
     }
 
     public function test_cache_spy_tracks_remember_calls_on_memoized_cache()
@@ -72,7 +68,7 @@ class CacheSpyMemoTest extends TestCase
         $memoizedCache = Cache::memo();
         $memoizedCache->remember('key', 60, fn () => 'bar');
 
-        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, m::type(Closure::class));
+        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Mockery::type(Closure::class));
     }
 
     public function test_cache_spy_memo_returns_spied_repository()

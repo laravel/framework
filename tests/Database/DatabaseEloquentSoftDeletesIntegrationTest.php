@@ -13,7 +13,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -21,8 +21,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $db = new DB;
 
         $db->addConnection([
@@ -94,13 +92,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
-
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
-
-        parent::tearDown();
     }
 
     /**
@@ -115,6 +109,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
         $this->assertEquals(2, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(1));
+    }
+
+    public function testSoftDeletesAreNotRetrievedWhenTableIsAliased()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::from('users as u')->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+        $this->assertCount(2, SoftDeletesTestUser::from('users as u')->withTrashed()->get());
+        $this->assertCount(1, SoftDeletesTestUser::from('users as u')->withTrashed()->withoutTrashed()->get());
+        $this->assertEquals(1, SoftDeletesTestUser::from('users as u')->onlyTrashed()->first()->id);
     }
 
     public function testSoftDeletesAreNotRetrievedFromBaseQuery()
@@ -230,8 +237,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
             public function newModelQuery()
             {
-                return m::spy(parent::newModelQuery(), function (MockInterface $mock) {
-                    $mock->shouldReceive('forceDelete')->andThrow(new Exception());
+                return Mockery::spy(parent::newModelQuery(), function (MockInterface $mock) {
+                    $mock->expects('forceDelete')->andThrow(new Exception());
                 });
             }
         };

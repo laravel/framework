@@ -11,9 +11,10 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use WeakReference;
 
 class MailMailableTest extends TestCase
 {
@@ -577,7 +578,7 @@ class MailMailableTest extends TestCase
 
     public function testMailablePriorityGetsSent(): void
     {
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -594,11 +595,35 @@ class MailMailableTest extends TestCase
         $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
     }
 
+    public function testMailableIsReleasedWithoutGarbageCollectionAfterSettingPriority(): void
+    {
+        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+
+        gc_disable();
+
+        try {
+            $mailable = new WelcomeMailableStub;
+            $mailable->to('hello@laravel.com');
+            $mailable->from('taylor@laravel.com');
+            $mailable->html('test content');
+            $mailable->priority(1);
+
+            $mailer->send($mailable);
+
+            $reference = WeakReference::create($mailable);
+            unset($mailable);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
+    }
+
     public function testMailableMetadataGetsSent(): void
     {
         $this->stubMailer();
 
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -655,7 +680,7 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasMetadata('total', 1670));
 
         $this->stubMailer();
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->send($mailable);
@@ -672,7 +697,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1111,6 +1136,8 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachmentFromStorage(): void
     {
+        $this->stubMailer();
+
         $mailable = new class() extends Mailable
         {
             public function build()
@@ -1169,7 +1196,7 @@ class MailMailableTest extends TestCase
 
     public function testMailableHeadersGetSent(): void
     {
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1189,6 +1216,29 @@ class MailMailableTest extends TestCase
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('x-custom-header'));
         $this->assertSame('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
         $this->assertSame('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
+    }
+
+    public function testMailableIsReleasedWithoutGarbageCollectionAfterSendingWithHeaders(): void
+    {
+        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+
+        gc_disable();
+
+        try {
+            $mailable = new MailableHeadersStub;
+            $mailable->to('hello@laravel.com');
+            $mailable->from('taylor@laravel.com');
+            $mailable->html('test content');
+
+            $mailer->send($mailable);
+
+            $reference = WeakReference::create($mailable);
+            unset($mailable);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
     }
 
     public function testMailableAttributesInBuild(): void

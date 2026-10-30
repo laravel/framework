@@ -4,10 +4,13 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
@@ -71,6 +74,27 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertInstanceOf(Video::class, $comments[1]->getRelation('commentable'));
     }
 
+    public function testWithMorphLoadingWithMorphMap()
+    {
+        Relation::morphMap(['post' => Post::class]);
+
+        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'post']);
+
+        try {
+            $comments = Comment::query()
+                ->with(['commentable' => function (MorphTo $morphTo) {
+                    $morphTo->morphWith(['post' => ['user']]);
+                }])
+                ->orderBy('id')
+                ->get();
+
+            $this->assertInstanceOf(Post::class, $comments[0]->commentable);
+            $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+        } finally {
+            Relation::morphMap([], false);
+        }
+    }
+
     public function testWithMorphLoadingWithSingleRelation()
     {
         $comments = Comment::query()
@@ -123,16 +147,6 @@ class Action extends Model
     }
 }
 
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
 class Post extends Model
 {
     public $timestamps = false;
@@ -149,10 +163,4 @@ class User extends Model
     use SoftDeletes;
 
     public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }

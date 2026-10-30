@@ -124,13 +124,7 @@ class Gate implements GateContract
     {
         $abilities = is_array($ability) ? $ability : func_get_args();
 
-        foreach ($abilities as $ability) {
-            if (! isset($this->abilities[enum_value($ability)])) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($abilities, fn ($ability) => isset($this->abilities[enum_value($ability)]));
     }
 
     /**
@@ -687,25 +681,38 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
+
+        $policy = $this->getPolicyFromAttribute($class, includeParents: true);
+
+        if (! is_null($policy)) {
+            return $this->resolvePolicy($policy);
+        }
     }
 
     /**
      * Get the policy class from the class attribute.
      *
      * @param  class-string<*>  $class
+     * @param  bool  $includeParents
      * @return class-string<*>|null
      */
-    protected function getPolicyFromAttribute(string $class): ?string
+    protected function getPolicyFromAttribute(string $class, bool $includeParents = false): ?string
     {
         if (! class_exists($class)) {
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UsePolicy::class);
+        $reflection = new ReflectionClass($class);
 
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        do {
+            $attributes = $reflection->getAttributes(UsePolicy::class);
+
+            if ($attributes !== []) {
+                return $attributes[0]->newInstance()->class;
+            }
+        } while ($includeParents && $reflection = $reflection->getParentClass());
+
+        return null;
     }
 
     /**
@@ -864,7 +871,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        return new static(
+        $gate = new static(
             $this->container,
             fn () => $user,
             $this->abilities,
@@ -873,6 +880,10 @@ class Gate implements GateContract
             $this->afterCallbacks,
             $this->guessPolicyNamesUsingCallback,
         );
+
+        $gate->defaultDenialResponse = $this->defaultDenialResponse;
+
+        return $gate;
     }
 
     /**

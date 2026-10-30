@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use App\Http\Middleware\PreventRequestsDuringMaintenance as AppPreventRequestsDuringMaintenance;
-use DateTimeInterface;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
@@ -74,7 +73,7 @@ class DownCommand extends Command
                 $e->getMessage(),
             ));
 
-            return 1;
+            return self::FAILURE;
         }
     }
 
@@ -157,9 +156,7 @@ class DownCommand extends Command
 
         if (is_string($retry) && ! empty($retry)) {
             try {
-                $date = Carbon::parse($retry);
-
-                return $date->format(DateTimeInterface::RFC7231);
+                return Carbon::parse($retry)->toRfc7231String();
             } catch (Exception) {
                 return null;
             }

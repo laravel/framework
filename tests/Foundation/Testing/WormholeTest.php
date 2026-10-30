@@ -10,13 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Date::useDefault();
-
-        parent::tearDown();
-    }
-
     public function testCanTravelBackToPresent()
     {
         // Preserve the timelines we want to compare the reality with...

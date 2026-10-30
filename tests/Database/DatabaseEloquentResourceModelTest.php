@@ -6,6 +6,7 @@ use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
 use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceModelTest extends TestCase
@@ -21,8 +22,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].');
+        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].'));
 
         $model = new EloquentResourceTestResourceModel();
         $model->toResource();

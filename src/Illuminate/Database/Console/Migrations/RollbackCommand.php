@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Database\Migrations\Migrator;
@@ -54,9 +53,8 @@ class RollbackCommand extends BaseCommand
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return Command::FAILURE;
+        if ($this->isProhibited() || ! $this->confirmToProceed()) {
+            return self::FAILURE;
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
@@ -69,7 +67,7 @@ class RollbackCommand extends BaseCommand
             );
         });
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

@@ -42,6 +42,20 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where binary" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBinary(Builder $query, $where)
+    {
+        $where['operator'] = ($where['not'] ? '!=' : '=').' binary';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Compile a "where like" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -287,7 +301,11 @@ class MySqlGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
-        return 'json_overlaps('.$field.', '.$value.$path.')';
+        if ($path !== '') {
+            $field = 'json_extract('.$field.$path.')';
+        }
+
+        return 'json_overlaps('.$field.', '.$value.')';
     }
 
     /**
@@ -466,7 +484,7 @@ class MySqlGrammar extends Grammar
         if (is_bool($value)) {
             $value = $value ? 'true' : 'false';
         } elseif (is_array($value)) {
-            $value = 'cast(? as json)';
+            $value = $this->compileJsonValueCast('?');
         } else {
             $value = $this->parameter($value);
         }

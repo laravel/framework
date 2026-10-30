@@ -28,7 +28,6 @@ abstract class QueueTestCase extends TestCase
         $this->driver = $app['config']->get('queue.default', 'sync');
     }
 
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {

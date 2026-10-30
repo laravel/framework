@@ -62,13 +62,12 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
     protected function tearDown(): void
     {
+        Eloquent::clearBootedModels();
         $this->schema()->drop('users');
         $this->schema()->drop('intermediates');
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
-
-        parent::tearDown();
     }
 
     public function testItGuessesRelationName(): void
@@ -102,6 +101,12 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $user = HasOneThroughOfManyTestUser::create();
         $relation = $user->latest_login();
         $this->assertSame('select "logins".* from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" inner join (select MAX("logins"."id") as "id_aggregate", "intermediates"."user_id" from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" where "intermediates"."user_id" = ? group by "intermediates"."user_id") as "latest_login" on "latest_login"."id_aggregate" = "logins"."id" and "latest_login"."user_id" = "intermediates"."user_id" where "intermediates"."user_id" = ?', $relation->getQuery()->toSql());
+    }
+
+    public function testCorrectLatestOfManyExistenceQuery(): void
+    {
+        $query = HasOneThroughOfManyTestUser::has('latest_login');
+        $this->assertSame('select * from "users" where exists (select * from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" inner join (select MAX("logins"."id") as "id_aggregate", "intermediates"."user_id" from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" group by "intermediates"."user_id") as "latest_login" on "latest_login"."id_aggregate" = "logins"."id" and "latest_login"."user_id" = "intermediates"."user_id" where "users"."id" = "intermediates"."user_id")', $query->toSql());
     }
 
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery(): void
@@ -157,8 +162,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
     public function testItFailsWhenUsingInvalidAggregate(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX'));
         $user = HasOneThroughOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }
@@ -329,6 +333,19 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
         $this->assertFalse($user->latest_login()->is($login1));
         $this->assertTrue($user->latest_login()->is($login2));
+    }
+
+    public function testIsMethodComparesTheFarParent(): void
+    {
+        $otherUser = HasOneThroughOfManyTestUser::create();
+        $user = HasOneThroughOfManyTestUser::create();
+        $login = $user->intermediates()->create()->logins()->create();
+        $otherLogin = $otherUser->intermediates()->create()->logins()->create();
+
+        $this->assertTrue($user->latest_login()->is($login));
+        $this->assertFalse($user->latest_login()->is($otherLogin));
+        $this->assertTrue($otherUser->latest_login()->is($otherLogin));
+        $this->assertFalse($otherUser->latest_login()->is($login));
     }
 
     public function testIsNotMethod(): void

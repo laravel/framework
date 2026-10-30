@@ -151,6 +151,12 @@ function test(
         assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>', $query);
     }));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereMorphedTo($post->taggable(), new Post()));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereBelongsTo($post));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereBelongsTo(Post::query()->get()));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->orWhereBelongsTo(Post::query()->get()));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereAttachedTo($post));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereAttachedTo(Post::query()->get()));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->orWhereAttachedTo(Post::query()->get()));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->whereNotMorphedTo($post->taggable(), new Post()));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->orWhereMorphedTo($post->taggable(), new Post()));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->orWhereNotMorphedTo($post->taggable(), new Post()));

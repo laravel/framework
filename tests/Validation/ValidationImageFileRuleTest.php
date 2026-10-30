@@ -10,6 +10,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
@@ -114,6 +115,22 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
+    public function testDefaultReturnsImageFileInstance()
+    {
+        $this->assertInstanceOf(ImageFile::class, ImageFile::default());
+
+        $this->fails(
+            ImageFile::default(),
+            UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!'),
+            ['validation.image'],
+        );
+
+        $this->passes(
+            ImageFile::default(),
+            UploadedFile::fake()->image('foo.png'),
+        );
+    }
+
     protected function fails($rule, $values, $messages)
     {
         $this->assertValidationRules($rule, $values, false, $messages);
@@ -166,8 +183,6 @@ class ValidationImageFileRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 }
 

@@ -250,6 +250,10 @@ abstract class Factory
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
 
+        if ($this->count < 1) {
+            return [];
+        }
+
         return array_map(function () use ($attributes, $parent) {
             return $this->state($attributes)->getExpandedAttributes($parent);
         }, range(1, $this->count));
@@ -493,6 +497,10 @@ abstract class Factory
         $madeCollection = $made instanceof Collection
             ? $made
             : $this->newModel()->newCollection([$made]);
+
+        if ($madeCollection->isEmpty()) {
+            return;
+        }
 
         $model = $madeCollection->first();
 

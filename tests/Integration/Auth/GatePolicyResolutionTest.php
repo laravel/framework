@@ -87,6 +87,31 @@ class GatePolicyResolutionTest extends TestCase
 
         $this->assertInstanceOf(PostPolicy::class, Gate::getPolicyFor(Post::class));
     }
+
+    public function testPolicyGivenByAttributeIsInheritedByChildClasses(): void
+    {
+        $this->assertInstanceOf(PostPolicy::class, Gate::getPolicyFor(ChildPost::class));
+        $this->assertInstanceOf(PostPolicy::class, Gate::getPolicyFor(GrandchildPost::class));
+    }
+
+    public function testPolicyGivenByAttributeOnChildClassOverridesParentAttribute(): void
+    {
+        $this->assertInstanceOf(AudioPostPolicy::class, Gate::getPolicyFor(AudioPost::class));
+    }
+
+    public function testRegisteredPolicyTakesPrecedenceOverInheritedAttribute(): void
+    {
+        Gate::policy(ChildPost::class, AudioPostPolicy::class);
+
+        $this->assertInstanceOf(AudioPostPolicy::class, Gate::getPolicyFor(ChildPost::class));
+    }
+
+    public function testGuessedPolicyTakesPrecedenceOverInheritedAttribute(): void
+    {
+        Gate::guessPolicyNamesUsing(fn () => [AuthenticationTestUserPolicy::class]);
+
+        $this->assertInstanceOf(AuthenticationTestUserPolicy::class, Gate::getPolicyFor(ChildPost::class));
+    }
 }
 
 #[UsePolicy(PostPolicy::class)]
@@ -94,6 +119,23 @@ class Post extends Model
 {
 }
 
+class ChildPost extends Post
+{
+}
+
+class GrandchildPost extends ChildPost
+{
+}
+
+#[UsePolicy(AudioPostPolicy::class)]
+class AudioPost extends Post
+{
+}
+
 class PostPolicy
+{
+}
+
+class AudioPostPolicy
 {
 }

@@ -4,11 +4,13 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration]
+#[WithEnv('APP_KEY', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class SerializableClosureV1QueueTest extends TestCase
 {
     use RefreshDatabase;
@@ -21,7 +23,6 @@ class SerializableClosureV1QueueTest extends TestCase
 
         tap($app->make('config'), function ($config) {
             $config->set([
-                'app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF',
                 'queue.default' => 'database',
             ]);
         });

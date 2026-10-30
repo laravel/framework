@@ -207,7 +207,7 @@ class Reflector
             $reflectionBackedEnum = new ReflectionEnum($backedEnumClass);
 
             return $reflectionBackedEnum->isBacked()
-                && $reflectionBackedEnum->getBackingType()->getName() == 'string';
+                && $reflectionBackedEnum->getBackingType()->getName() === 'string';
         }
 
         return false;

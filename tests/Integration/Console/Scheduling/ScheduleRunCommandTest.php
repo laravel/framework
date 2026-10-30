@@ -17,19 +17,6 @@ use ReflectionProperty;
 
 class ScheduleRunCommandTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Carbon::setTestNow(Carbon::now());
-    }
-
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     /**
      * @throws BindingResolutionException
      */
@@ -59,7 +46,8 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertDispatched(ScheduledTaskFailed::class, function ($event) use ($task) {
             return $event->task === $task &&
-                   $event->exception->getMessage() === 'Scheduled command [exit 1] failed with exit code [1].';
+                   $event->exception->getMessage() === 'Scheduled command [exit 1] failed with exit code [1].' &&
+                   is_float($event->runtime);
         });
     }
 
@@ -272,7 +260,7 @@ class ScheduleRunCommandTest extends TestCase
         $reflection = new ReflectionProperty($command, 'startedAt');
         $startedAt = $reflection->getValue($command);
 
-        $originalTimestamp = $startedAt->timestamp;
+        $originalTimestamp = $startedAt->getTimestamp();
         $originalMicro = $startedAt->micro;
 
         // Call repeatEvents with an empty collection so it exits immediately
@@ -285,7 +273,7 @@ class ScheduleRunCommandTest extends TestCase
 
         // startedAt should not have been mutated to end of minute
         $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
-        $this->assertEquals($originalTimestamp, $startedAtAfter->timestamp);
+        $this->assertEquals($originalTimestamp, $startedAtAfter->getTimestamp());
         $this->assertEquals($originalMicro, $startedAtAfter->micro);
     }
 }

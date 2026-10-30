@@ -176,6 +176,23 @@ trait ResponseTrait
     }
 
     /**
+     * Expire multiple cookies when sending the response.
+     *
+     * @param  array  $cookies
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @return $this
+     */
+    public function withoutCookies(array $cookies, $path = null, $domain = null)
+    {
+        foreach ($cookies as $cookie) {
+            $this->withoutCookie($cookie, $path, $domain);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the callback of the response.
      *
      * @return string|null

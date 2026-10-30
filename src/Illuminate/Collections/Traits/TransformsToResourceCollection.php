@@ -43,12 +43,16 @@ trait TransformsToResourceCollection
 
         $model = $this->items[0] ?? null;
 
-        throw_unless(is_object($model), LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
+        if (! is_object($model)) {
+            throw new LogicException('Resource collection guesser expects the collection to contain objects.');
+        }
 
         /** @var class-string<Model> $className */
         $className = get_class($model);
 
-        throw_unless(method_exists($className, 'guessResourceName'), LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
+        if (! method_exists($className, 'guessResourceName')) {
+            throw new LogicException(sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
+        }
 
         $useResourceCollection = $this->resolveResourceCollectionFromAttribute($className);
 

@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use WeakReference;
 
 class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 {
@@ -59,22 +62,40 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $this->assertNotNull($comments[1]->commentable);
     }
 
+    #[DataProvider('softDeleteConstraints')]
+    public function testRelationIsReleasedWithoutGarbageCollectionAfterSoftDeleteConstraint(string $method)
+    {
+        $comment = Comment::first();
+
+        gc_disable();
+
+        try {
+            $relation = $comment->commentable()->{$method}();
+
+            $reference = WeakReference::create($relation);
+            unset($relation);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
+    }
+
+    public static function softDeleteConstraints(): array
+    {
+        return [
+            'withTrashed' => ['withTrashed'],
+            'withoutTrashed' => ['withoutTrashed'],
+            'onlyTrashed' => ['onlyTrashed'],
+        ];
+    }
+
     public function testLazyLoading()
     {
         $comment = Comment::latest('id')->first();
         $post = $comment->commentable()->withoutGlobalScopes()->first();
 
         $this->assertNotNull($post);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

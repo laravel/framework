@@ -45,8 +45,8 @@ class LoadConfigurationTest extends TestCase
 
     public function testLoadsConfigurationInIsolation()
     {
-        $app = new Application(__DIR__.'/../fixtures');
-        $app->useConfigPath(__DIR__.'/../fixtures/config');
+        $app = new Application(__DIR__.'/../Fixtures');
+        $app->useConfigPath(__DIR__.'/../Fixtures/config');
 
         (new LoadConfiguration)->bootstrap($app);
 
@@ -57,7 +57,7 @@ class LoadConfigurationTest extends TestCase
     public function testConfigurationArrayKeysMatchLoadedFilenames()
     {
         $baseConfigPath = __DIR__.'/../../../config';
-        $customConfigPath = __DIR__.'/../fixtures/config';
+        $customConfigPath = __DIR__.'/../Fixtures/config';
 
         $app = new Application();
         $app->useConfigPath($customConfigPath);

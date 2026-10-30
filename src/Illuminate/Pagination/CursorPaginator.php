@@ -70,8 +70,10 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
         $this->items = $this->items->slice(0, $this->perPage);
 
         if (! is_null($this->cursor) && $this->cursor->pointsToPreviousItems()) {
-            $this->items = $this->items->reverse()->values();
+            $this->items = $this->items->reverse();
         }
+
+        $this->items = $this->items->values();
     }
 
     /**

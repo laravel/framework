@@ -212,10 +212,10 @@ class Middleware
      * Specify a middleware that should be replaced with another middleware.
      *
      * @param  string  $search
-     * @param  string  $replace
+     * @param  array|string  $replace
      * @return $this
      */
-    public function replace(string $search, string $replace)
+    public function replace(string $search, array|string $replace)
     {
         $this->replacements[$search] = $replace;
 
@@ -305,10 +305,10 @@ class Middleware
      *
      * @param  string  $group
      * @param  string  $search
-     * @param  string  $replace
+     * @param  array|string  $replace
      * @return $this
      */
-    public function replaceInGroup(string $group, string $search, string $replace)
+    public function replaceInGroup(string $group, string $search, array|string $replace)
     {
         $this->groupReplacements[$group][$search] = $replace;
 
@@ -462,9 +462,9 @@ class Middleware
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         ]));
 
-        $middleware = array_map(function ($middleware) {
+        $middleware = Arr::flatten(array_map(function ($middleware) {
             return $this->replacements[$middleware] ?? $middleware;
-        }, $middleware);
+        }, $middleware));
 
         return array_values(array_filter(
             array_diff(
@@ -502,11 +502,9 @@ class Middleware
         $middleware = array_merge($middleware, $this->groups);
 
         foreach ($middleware as $group => $groupedMiddleware) {
-            foreach ($groupedMiddleware as $index => $groupMiddleware) {
-                if (isset($this->groupReplacements[$group][$groupMiddleware])) {
-                    $middleware[$group][$index] = $this->groupReplacements[$group][$groupMiddleware];
-                }
-            }
+            $middleware[$group] = Arr::flatten(array_map(function ($groupMiddleware) use ($group) {
+                return $this->groupReplacements[$group][$groupMiddleware] ?? $groupMiddleware;
+            }, $groupedMiddleware));
         }
 
         foreach ($this->groupRemovals as $group => $removals) {

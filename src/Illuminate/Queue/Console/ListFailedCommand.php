@@ -16,6 +16,7 @@ class ListFailedCommand extends Command
      * @var string
      */
     protected $signature = 'queue:failed
+                            {--queue= : Only list the failed jobs for the specified queue}
                             {--json : Output the failed jobs as JSON}';
 
     /**
@@ -64,6 +65,7 @@ class ListFailedCommand extends Command
         $failed = $this->laravel['queue.failer']->all();
 
         return (new Collection($failed))
+            ->when($this->option('queue'), fn ($jobs, $queue) => $jobs->where('queue', $queue))
             ->map(fn ($failed) => $this->parseFailedJob((array) $failed))
             ->filter()
             ->all();

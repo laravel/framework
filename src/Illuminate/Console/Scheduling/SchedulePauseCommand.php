@@ -28,7 +28,7 @@ class SchedulePauseCommand extends Command
         if (! Schedule::$pausable) {
             $this->components->error('Schedule pausing is currently disabled.');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $cache->forever('illuminate:schedule:paused', true);
@@ -37,6 +37,6 @@ class SchedulePauseCommand extends Command
 
         $this->components->info('Scheduled task processing has been paused.');
 
-        return 0;
+        return self::SUCCESS;
     }
 }

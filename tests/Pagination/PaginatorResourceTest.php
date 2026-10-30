@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Pagination;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel;
+use LogicException;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorResourceTest extends TestCase
@@ -22,8 +24,7 @@ class PaginatorResourceTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel].');
+        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel].'));
 
         $paginator = new PaginatorResourceTestPaginator([
             new PaginatorResourceTestModel(),
@@ -32,6 +33,7 @@ class PaginatorResourceTest extends TestCase
         $paginator->toResourceCollection();
     }
 
+    #[RunInSeparateProcess]
     public function testItCanGuessResourceWhenNotProvided()
     {
         $paginator = new PaginatorResourceTestPaginator([

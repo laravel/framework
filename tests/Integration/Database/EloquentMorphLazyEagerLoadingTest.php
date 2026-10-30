@@ -3,8 +3,11 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphLazyEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
@@ -44,15 +47,24 @@ class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comment->relationLoaded('commentable'));
         $this->assertTrue($comment->commentable->relationLoaded('user'));
     }
-}
 
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
+    public function testLazyEagerLoadingWithMorphMap()
     {
-        return $this->morphTo();
+        Relation::morphMap(['post' => Post::class]);
+
+        try {
+            $comment = Comment::first();
+            $comment->loadMorph('commentable', ['post' => ['user']]);
+
+            $this->assertTrue($comment->commentable->relationLoaded('user'));
+
+            $comments = Comment::all();
+            $comments->loadMorph('commentable', ['post' => ['user']]);
+
+            $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 }
 
@@ -65,9 +77,4 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
 }

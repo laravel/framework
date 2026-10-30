@@ -40,6 +40,52 @@ class EventStreamResponseTest extends TestCase
         $this->assertStringContainsString('data: </stream>', $content);
     }
 
+    public function testEventStreamMessagesWithLineBreaksAreSentAsMultipleDataLines()
+    {
+        Route::get('/stream', function () {
+            return response()->eventStream(function () {
+                yield "Hello\nWorld";
+
+                yield new StreamedEvent(
+                    event: 'chunk',
+                    data: "line 1\r\nline 2",
+                );
+            });
+        });
+
+        $content = $this->get('/stream')->streamedContent();
+
+        $this->assertStringContainsString("event: update\ndata: Hello\ndata: World\n\n", $content);
+        $this->assertStringContainsString("event: chunk\ndata: line 1\ndata: line 2\n\n", $content);
+        $this->assertStringContainsString("event: update\ndata: </stream>\n\n", $content);
+    }
+
+    public function testEventStreamEndMessageWithLineBreaksIsSentAsMultipleDataLines()
+    {
+        Route::get('/stream', function () {
+            return response()->eventStream(function () {
+                yield 'hello';
+            }, endStreamWith: new StreamedEvent(event: 'end', data: "done\nbye"));
+        });
+
+        $content = $this->get('/stream')->streamedContent();
+
+        $this->assertStringEndsWith("event: end\ndata: done\ndata: bye\n\n", $content);
+    }
+
+    public function testEventStreamMessageCannotStartAnotherEvent()
+    {
+        Route::get('/stream', function () {
+            return response()->eventStream(function () {
+                yield "harmless\n\nevent: injected\ndata: evil";
+            }, endStreamWith: null);
+        });
+
+        $content = $this->get('/stream')->streamedContent();
+
+        $this->assertSame("event: update\ndata: harmless\ndata: \ndata: event: injected\ndata: data: evil\n\n", $content);
+    }
+
     public function testEventStreamExceptionDoesNotLeakToClient()
     {
         Route::get('/stream', function () {
@@ -53,8 +99,7 @@ class EventStreamResponseTest extends TestCase
             });
         });
 
-        Log::shouldReceive('error')
-            ->once()
+        Log::expects('error')
             ->with('Something went wrong during streaming', \Mockery::type('array'));
 
         $response = $this->get('/stream');
@@ -75,8 +120,7 @@ class EventStreamResponseTest extends TestCase
             });
         });
 
-        Log::shouldReceive('error')
-            ->once()
+        Log::expects('error')
             ->with('Test exception reporting', \Mockery::type('array'));
 
         $response = $this->get('/stream');

@@ -19,7 +19,7 @@ trait Batchable
     /**
      * The fake batch, if applicable.
      *
-     * @var \Illuminate\Support\Testing\Fakes\BatchFake
+     * @var \Illuminate\Support\Testing\Fakes\BatchFake|null
      */
     private $fakeBatch;
 

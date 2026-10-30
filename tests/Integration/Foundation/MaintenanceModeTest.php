@@ -3,6 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use DateTimeInterface;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Foundation\CacheBasedMaintenanceMode;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
@@ -12,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -22,6 +27,7 @@ class MaintenanceModeTest extends TestCase
     {
         $this->beforeApplicationDestroyed(function () {
             @unlink(storage_path('framework/down'));
+            @unlink(storage_path('framework/maintenance.php'));
         });
 
         parent::setUp();
@@ -43,6 +49,24 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
         $response->assertHeader('Retry-After', '60');
         $response->assertHeader('Refresh', '60');
+    }
+
+    public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
+    {
+        $cache = Mockery::mock(Factory::class, Repository::class);
+        $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
+        $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
+        $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
+
+        $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
+            $cache, 'maintenance', 'framework:down'
+        ));
+
+        Route::get('/foo', fn () => 'Hello World')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $this->get('/foo')
+            ->assertOk()
+            ->assertSeeText('Hello World');
     }
 
     public function testMaintenanceModeCanHaveCustomStatus()
@@ -78,6 +102,67 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
         $response->assertHeader('Retry-After', '60');
         $this->assertSame('Rendered Content', $response->original);
+    }
+
+    public function testMaintenanceModeDoesNotUseCustomTemplateForJsonRequests()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'template' => 'Rendered Content',
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->getJson('/foo');
+
+        $response->assertStatus(503);
+        $response->assertHeader('Retry-After', '60');
+        $response->assertJson(['message' => 'Service Unavailable']);
+    }
+
+    public function testMaintenanceModeDoesNotRedirectJsonRequests()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'redirect' => '/maintenance',
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->getJson('/foo');
+
+        $response->assertStatus(503);
+        $response->assertJson(['message' => 'Service Unavailable']);
+    }
+
+    public function testPrerenderedMaintenanceFileAllowsJsonRequestsToReachFramework()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'template' => 'Rendered Content',
+        ]));
+
+        file_put_contents(
+            storage_path('framework/maintenance.php'),
+            file_get_contents(__DIR__.'/../../../src/Illuminate/Foundation/Console/stubs/maintenance-mode.stub')
+        );
+
+        $server = $_SERVER;
+
+        try {
+            $_SERVER['REQUEST_URI'] = '/foo';
+            $_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+            ob_start();
+            include storage_path('framework/maintenance.php');
+            $output = ob_get_clean();
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame('', $output);
     }
 
     public function testMaintenanceModeCanRedirectWithBypassCookie()
@@ -172,6 +257,15 @@ class MaintenanceModeTest extends TestCase
         $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie->getValue(), 'test-key'));
     }
 
+    public function testBypassCookieWithMalformedMacIsInvalid()
+    {
+        foreach ([['mac' => []], ['mac' => ['nested']], ['expires_at' => 9999999999]] as $payload) {
+            $cookie = base64_encode(json_encode(array_merge(['expires_at' => 9999999999], $payload)));
+
+            $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie, 'test-key'));
+        }
+    }
+
     public function testDispatchEventWhenMaintenanceModeIsEnabled()
     {
         Event::fake();
@@ -206,8 +300,6 @@ class MaintenanceModeTest extends TestCase
 
         $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
-
-        Carbon::setTestNow();
     }
 
     public static function retryAfterDatetimeProvider(): array
@@ -217,6 +309,29 @@ class MaintenanceModeTest extends TestCase
             'natural language' => ['tomorrow 14:00'],
             'relative time' => ['+2 hours'],
         ];
+    }
+
+    public function testMaintenanceModeRetryDatetimeIsConvertedToGmt(): void
+    {
+        $timezone = date_default_timezone_get();
+
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31 15:30:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 14:30:00 GMT', $data['retry']);
+
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31T15:30:00+02:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 13:30:00 GMT', $data['retry']);
+        } finally {
+            date_default_timezone_set($timezone);
+        }
     }
 
     public function testMaintenanceModeRetryWithHttpDateHeader(): void

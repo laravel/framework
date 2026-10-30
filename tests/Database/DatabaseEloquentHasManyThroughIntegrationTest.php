@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
@@ -70,8 +71,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('countries');
-
-        parent::tearDown();
     }
 
     public function testItLoadsAHasManyThroughRelationWithCustomKeys()
@@ -171,8 +170,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFirstOrFailThrowsAnException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
@@ -182,8 +180,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFindOrFailThrowsAnException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
@@ -191,10 +188,27 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->findOrFail(1);
     }
 
+    public function testFindOrNewReturnsTheRelatedModel()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $post = $country->posts()->findOrNew(5);
+
+        $this->assertTrue($post->exists);
+        $this->assertSame(5, $post->id);
+        $this->assertSame('Example2 title1', $post->title);
+
+        $post = $country->posts()->findOrNew(1);
+
+        $this->assertFalse($post->exists);
+        $this->assertInstanceOf(HasManyThroughTestPost::class, $post);
+    }
+
     public function testFindOrFailWithManyThrowsAnException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
@@ -205,14 +219,44 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFindOrFailWithManyUsingCollectionThrowsAnException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
             ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
+    }
+
+    public function testFindOrFailAndFindOrWithEnumIds()
+    {
+        $country = HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us']);
+        $country->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 5, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 6, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
+
+        $ids = [Bar::FOO, 6, Bar::FOO, 5];
+
+        foreach ([$ids, new Collection($ids)] as $ids) {
+            $this->assertEqualsCanonicalizing([5, 6], $country->posts()->findOrFail($ids)->modelKeys());
+            $this->assertEqualsCanonicalizing([5, 6], $country->posts()->findOr($ids, fn () => $this->fail('Unexpected callback.'))->modelKeys());
+        }
+
+        $country->posts()->whereKey(5)->delete();
+
+        foreach ([[Bar::FOO, 6], new Collection([Bar::FOO, 6])] as $ids) {
+            $this->assertSame('missing', $country->posts()->findOr($ids, fn () => 'missing'));
+
+            try {
+                $country->posts()->findOrFail($ids);
+                $this->fail('Expected ModelNotFoundException was not thrown.');
+            } catch (ModelNotFoundException $exception) {
+                $this->assertSame(HasManyThroughTestPost::class, $exception->getModel());
+                $this->assertSame([5, 6], $exception->getIds());
+            }
+        }
     }
 
     public function testFindOrMethod()
@@ -345,6 +389,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'laravel_through_key',
             ], array_keys($post->getAttributes()));
         });
+    }
+
+    public function testChunkMapReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $posts = $country->posts()->chunkMap(fn ($post) => [$post->id, $post->title], 2);
+
+        $this->assertEquals([
+            [3, 'Example1 title1'],
+            [4, 'Example1 title2'],
+            [5, 'Example2 title1'],
+            [6, 'Example2 title2'],
+            [7, 'Example3 title1'],
+            [8, 'Example3 title2'],
+        ], $posts->all());
     }
 
     public function testChunkById()
@@ -494,6 +556,55 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertSame('us', $country->shortname);
         $this->assertSame('A title', $country->posts[0]->title);
         $this->assertCount(2, $country->posts);
+    }
+
+    public function testTouch()
+    {
+        $this->seedData();
+        $country = HasManyThroughTestCountry::first();
+
+        HasManyThroughTestPost::query()->update(['updated_at' => '2000-01-01 00:00:00']);
+        $this->assertSame('2000-01-01 00:00:00', HasManyThroughTestPost::first()->updated_at->format('Y-m-d H:i:s'));
+
+        $country->posts()->touch();
+
+        $this->assertNotSame('2000-01-01 00:00:00', HasManyThroughTestPost::first()->fresh()->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testTouchRespectsIntermediateSoftDeletes()
+    {
+        $this->seedData();
+        $user = HasManyThroughSoftDeletesTestUser::first();
+        $user->delete();
+
+        HasManyThroughTestPost::query()->update(['updated_at' => '2000-01-01 00:00:00']);
+
+        $country = HasManyThroughTestCountrySoftDeletesIntermediate::first();
+        $country->posts()->touch();
+
+        $this->assertSame('2000-01-01 00:00:00', HasManyThroughTestPost::first()->fresh()->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testTouchRespectsWithoutTouching()
+    {
+        $this->seedData();
+        $country = HasManyThroughTestCountry::first();
+
+        HasManyThroughTestPost::query()->update(['updated_at' => '2000-01-01 00:00:00']);
+
+        Eloquent::withoutTouching(function () use ($country) {
+            $country->posts()->touch();
+        });
+
+        $this->assertSame('2000-01-01 00:00:00', HasManyThroughTestPost::first()->fresh()->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testAllRelatedIds()
+    {
+        $this->seedData();
+        $country = HasManyThroughTestCountry::first();
+
+        $this->assertEquals([1, 2], $country->posts()->allRelatedIds()->all());
     }
 
     /**
@@ -744,5 +855,16 @@ class HasManyThroughSoftDeletesTestCountry extends Eloquent
     public function users()
     {
         return $this->hasMany(HasManyThroughSoftDeletesTestUser::class, 'country_id');
+    }
+}
+
+class HasManyThroughTestCountrySoftDeletesIntermediate extends Eloquent
+{
+    protected $table = 'countries';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasManyThrough(HasManyThroughSoftDeletesTestPost::class, HasManyThroughSoftDeletesTestUser::class, 'country_id', 'user_id');
     }
 }

@@ -3,11 +3,9 @@
 namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Console\Application;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Routing\Router;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class RouteListCommandTest extends TestCase
@@ -16,15 +14,13 @@ class RouteListCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->app = new Application(
             $laravel = new \Illuminate\Foundation\Application(__DIR__),
-            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            new \Illuminate\Events\Dispatcher($laravel),
             'testing',
         );
 
-        $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
+        $router = new Router(new \Illuminate\Events\Dispatcher($laravel));
 
         $kernel = new class($laravel, $router) extends Kernel
         {
@@ -237,6 +233,34 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
     }
 
+    public function testJsonOutputIsEmptyArrayWhenNoRoutesMatch()
+    {
+        $this->app->call('route:list', ['--json' => true, '--path' => 'missing']);
+
+        $this->assertSame('[]', trim($this->app->output()));
+    }
+
+    public function testJsonOutputIsEmptyArrayWhenApplicationHasNoRoutes()
+    {
+        $laravel = new \Illuminate\Foundation\Application(__DIR__);
+        $router = new Router(new \Illuminate\Events\Dispatcher($laravel));
+
+        $laravel->instance(Kernel::class, new Kernel($laravel, $router));
+
+        $command = new RouteListCommand($router);
+        $command->setLaravel($laravel);
+
+        $app = new Application(
+            $laravel,
+            new \Illuminate\Events\Dispatcher($laravel),
+            'testing',
+        );
+        $app->addCommands([$command]);
+        $app->call('route:list', ['--json' => true]);
+
+        $this->assertSame('[]', trim($app->output()));
+    }
+
     public function testClosureRouteShowsPathInCli()
     {
         RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
@@ -252,7 +276,7 @@ class RouteListCommandTest extends TestCase
     public function testControllerRoutePathIsNull()
     {
         $laravel = new \Illuminate\Foundation\Application(__DIR__);
-        $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
+        $router = new Router(new \Illuminate\Events\Dispatcher($laravel));
 
         $kernel = new class($laravel, $router) extends Kernel
         {
@@ -268,7 +292,7 @@ class RouteListCommandTest extends TestCase
 
         $app = new Application(
             $laravel,
-            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            new \Illuminate\Events\Dispatcher($laravel),
             'testing',
         );
         $app->addCommands([$command]);

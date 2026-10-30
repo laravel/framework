@@ -80,6 +80,24 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
+     * Test that the wildcard trusts proxies in an IPv6 forwarded chain, so the
+     * left-most client IP is returned rather than an intermediate IPv6 proxy.
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_with_wildcard_and_ipv6_chain()
+    {
+        $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
+        $request = $this->createProxiedRequest([
+            'REMOTE_ADDR' => '2001:db8::1',
+            'HTTP_X_FORWARDED_FOR' => '173.174.200.38, 2001:db8::2, 2001:db8::3',
+        ]);
+
+        $trustedProxy->handle($request, function ($request) {
+            $this->assertSame('173.174.200.38', $request->getClientIp(),
+                'Assert IPv6 proxies in the forwarded chain are trusted with wildcard proxy setting');
+        });
+    }
+
+    /**
      * Test the next most typical usage of TrustedProxies:
      * Trusted X-Forwarded-For header, REMOTE_ADDR for TrustedProxies.
      */
@@ -163,9 +181,9 @@ class TrustProxiesTest extends TestCase
 
         $forwardedFor = [
             '192.0.2.2',
-            '192.0.2.199, 192.0.2.2',
-            '192.0.2.199,192.0.2.2',
-            '99.99.99.99,192.0.2.199,192.0.2.2',
+            '192.0.2.2, 192.0.2.199',
+            '192.0.2.2,192.0.2.199',
+            '192.0.2.2,99.99.99.99,192.0.2.199',
         ];
 
         foreach ($forwardedFor as $forwardedForHeader) {
@@ -173,6 +191,28 @@ class TrustProxiesTest extends TestCase
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
                 $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
+            });
+        }
+    }
+
+    /**
+     * Test Forwarded header with multiple IP addresses, with * wildcard trusting of all proxies.
+     */
+    public function test_get_client_ip_with_multiple_ip_addresses_all_proxies_are_trusted_using_forwarded_header()
+    {
+        $trustedProxy = $this->createTrustedProxy(Request::HEADER_FORWARDED, '*');
+
+        $forwarded = [
+            'for=192.0.2.2',
+            'for=192.0.2.2,for=192.0.2.199',
+            'for=192.0.2.2,for=99.99.99.99,for=192.0.2.199',
+        ];
+
+        foreach ($forwarded as $forwardedHeader) {
+            $request = $this->createProxiedRequest(['HTTP_FORWARDED' => $forwardedHeader, 'HTTP_X_FORWARDED_FOR' => '']);
+
+            $trustedProxy->handle($request, function ($request) use ($forwardedHeader) {
+                $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedHeader);
             });
         }
     }

@@ -134,6 +134,47 @@ class CacheTaggedCacheTest extends TestCase
         ], $values);
     }
 
+    public function testManyWithEnumKeys()
+    {
+        $store = $this->getTestCacheStoreWithTagValues();
+
+        $values = $store->tags(['fruit'])->many([TestTaggedCacheKey::A, TestTaggedCacheKey::E, TestTaggedCacheKey::B]);
+        $this->assertSame([
+            'a' => 'apple',
+            'e' => null,
+            'b' => 'banana',
+        ], $values);
+    }
+
+    public function testManyWithEnumKeysAndDefaultValues()
+    {
+        $store = $this->getTestCacheStoreWithTagValues();
+
+        $values = $store->tags(['fruit'])->many([
+            'e' => 547,
+            'x' => 'hello world!',
+            TestTaggedCacheKey::A,
+            TestTaggedCacheKey::D,
+        ]);
+        $this->assertSame([
+            'e' => 547,
+            'x' => 'hello world!',
+            'a' => 'apple',
+            'd' => null,
+        ], $values);
+    }
+
+    public function testGetWithArrayOfEnumKeys()
+    {
+        $store = $this->getTestCacheStoreWithTagValues();
+
+        $values = $store->tags(['fruit'])->get([TestTaggedCacheKey::A, TestTaggedCacheKey::E]);
+        $this->assertSame([
+            'a' => 'apple',
+            'e' => null,
+        ], $values);
+    }
+
     public function testGetMultiple()
     {
         $store = $this->getTestCacheStoreWithTagValues();
@@ -222,4 +263,12 @@ class CacheTaggedCacheTest extends TestCase
 
         return $store;
     }
+}
+
+enum TestTaggedCacheKey: string
+{
+    case A = 'a';
+    case B = 'b';
+    case D = 'd';
+    case E = 'e';
 }

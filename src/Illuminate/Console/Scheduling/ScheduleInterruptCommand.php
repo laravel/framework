@@ -11,11 +11,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class ScheduleInterruptCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'schedule:interrupt';
+    protected $signature = 'schedule:interrupt';
 
     /**
      * The console command description.
@@ -46,12 +46,20 @@ class ScheduleInterruptCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
-        $this->cache->put('illuminate:schedule:interrupt', true, Date::now()->endOfMinute());
+        if (! Schedule::$interruptible) {
+            $this->components->error('Schedule interrupting is currently disabled.');
+
+            return self::FAILURE;
+        }
+
+        $this->cache->forever('illuminate:schedule:interrupt', Date::now()->getTimestampMs());
 
         $this->components->info('Broadcasting schedule interrupt signal.');
+
+        return self::SUCCESS;
     }
 }

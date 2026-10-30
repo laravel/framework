@@ -9,11 +9,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class ScheduleClearCacheCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'schedule:clear-cache';
+    protected $signature = 'schedule:clear-cache';
 
     /**
      * The console command description.

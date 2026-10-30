@@ -121,7 +121,7 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if ($values instanceof Collection) {
+            if ($values instanceof Enumerable) {
                 $results[] = $values->all();
             } elseif (is_array($values)) {
                 $results[] = $values;
@@ -258,7 +258,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|float  $key
+     * @param  string|int|float|null  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -308,6 +308,16 @@ class Arr
             return value($default);
         }
 
+        if ($array instanceof Traversable) {
+            foreach ($array as $key => $value) {
+                if ($callback($value, $key)) {
+                    return $value;
+                }
+            }
+
+            return value($default);
+        }
+
         $array = static::from($array);
 
         $key = array_find_key($array, $callback);
@@ -329,6 +339,12 @@ class Arr
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
+        if ($array === null) {
+            return value($default);
+        }
+
+        $array = static::from($array);
+
         if (is_null($callback)) {
             return empty($array) ? value($default) : array_last($array);
         }
@@ -364,7 +380,7 @@ class Arr
         $result = [];
 
         foreach ($array as $item) {
-            $item = $item instanceof Collection ? $item->all() : $item;
+            $item = $item instanceof Enumerable ? $item->all() : $item;
 
             if (! is_array($item)) {
                 $result[] = $item;
@@ -418,6 +434,9 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            // clean up before each pass
+            $array = &$original;
+
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
                 unset($array[$key]);
@@ -426,9 +445,6 @@ class Arr
             }
 
             $parts = explode('.', $key);
-
-            // clean up before each pass
-            $array = &$original;
 
             while (count($parts) > 1) {
                 $part = array_shift($parts);
@@ -556,20 +572,14 @@ class Arr
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (! static::has($array, $key)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($keys, fn ($key) => static::has($array, $key));
     }
 
     /**
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -588,13 +598,7 @@ class Arr
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (static::has($array, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => static::has($array, $key));
     }
 
     /**
@@ -606,7 +610,17 @@ class Arr
      */
     public static function every($array, callable $callback)
     {
-        return array_all($array, $callback);
+        if (is_array($array)) {
+            return array_all($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -618,7 +632,17 @@ class Arr
      */
     public static function some($array, callable $callback)
     {
-        return array_any($array, $callback);
+        if (is_array($array)) {
+            return array_any($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -707,9 +731,11 @@ class Arr
     /**
      * Prepend the key names of an associative array.
      *
-     * @param  array  $array
+     * @template TValue
+     *
+     * @param  array<TValue>  $array
      * @param  string  $prependWith
-     * @return array
+     * @return array<string, TValue>
      */
     public static function prependKeysWith($array, $prependWith)
     {

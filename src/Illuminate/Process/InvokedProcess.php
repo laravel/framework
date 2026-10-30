@@ -136,7 +136,7 @@ class InvokedProcess implements InvokedProcessContract
         try {
             $this->process->checkTimeout();
         } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+            throw ProcessTimedOutException::make($e, new ProcessResult($this->process));
         }
     }
 
@@ -155,7 +155,7 @@ class InvokedProcess implements InvokedProcessContract
 
             return new ProcessResult($this->process);
         } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+            throw ProcessTimedOutException::make($e, new ProcessResult($this->process));
         }
     }
 
@@ -174,7 +174,7 @@ class InvokedProcess implements InvokedProcessContract
 
             return new ProcessResult($this->process);
         } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+            throw ProcessTimedOutException::make($e, new ProcessResult($this->process));
         }
     }
 }

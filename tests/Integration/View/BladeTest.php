@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
-use Mockery;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -18,8 +18,6 @@ use function Orchestra\Testbench\phpunit_version_compare;
 
 class BladeTest extends TestCase
 {
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         artisan($this, 'view:clear');
@@ -209,6 +207,23 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
+    public function test_dynamic_component_slot_attributes_are_not_compiled_as_blade()
+    {
+        $payload = '{{ 7191 * 2 }}';
+
+        $static = Blade::render('<x-input-with-slot>
+    <x-slot:input :data-x="$payload">Test</x-slot:input>
+</x-input-with-slot>', ['payload' => $payload]);
+
+        $dynamic = Blade::render('<x-dynamic-component component="input-with-slot">
+    <x-slot:input :data-x="$payload">Test</x-slot:input>
+</x-dynamic-component>', ['payload' => $payload]);
+
+        $this->assertStringContainsString('data-x="{{ 7191 * 2 }}"', $static);
+        $this->assertStringNotContainsString('14382', $dynamic);
+        $this->assertSame(trim($static), trim($dynamic));
+    }
+
     public function test_no_name_passed_to_slot_uses_default_name()
     {
         $content = Blade::render('<x-link href="#"><x-slot>default slot</x-slot></x-link>');
@@ -248,22 +263,29 @@ class BladeTest extends TestCase
 
     public function test_view_cache_command_deduplicates_paths_before_compiling()
     {
-        View::addNamespace('templates', join_paths(__DIR__, 'templates'));
-        View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
+        View::addNamespace('templates', join_paths(__DIR__, 'Fixtures', 'templates'));
+        View::addNamespace('components', join_paths(__DIR__, 'Fixtures', 'templates', 'components'));
 
-        $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
-        $compiler->shouldReceive('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'))->once();
-
-        $this->instance('blade.compiler', $compiler);
+        Blade::partialMock()->expects('compile')->with(realpath(__DIR__.'/Fixtures/templates/components/panel.blade.php'));
 
         $this->artisan('view:cache');
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function test_view_cache_command_compiles_namespaced_views_at_the_path_they_render_from()
+    {
+        View::addNamespace('components', join_paths(__DIR__, 'Fixtures', 'templates', 'components', '..', 'components'));
+
+        $this->artisan('view:cache');
+
+        $this->assertFileExists(Blade::getCompiledPath(View::getFinder()->find('components::panel')));
     }
 
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)
     {
-        $app['config']->set('view.paths', [__DIR__.'/templates']);
+        $app['config']->set('view.paths', [__DIR__.'/Fixtures/templates']);
     }
 }
 

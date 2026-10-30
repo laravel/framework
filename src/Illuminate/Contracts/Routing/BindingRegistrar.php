@@ -17,7 +17,7 @@ interface BindingRegistrar
      * Get the binding callback for a given binding.
      *
      * @param  string  $key
-     * @return \Closure
+     * @return \Closure|null
      */
     public function getBindingCallback($key);
 }

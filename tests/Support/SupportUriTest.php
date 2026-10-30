@@ -3,11 +3,15 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Support\Concerns\TestsInteractsWithDataContract;
 use PHPUnit\Framework\TestCase;
 
 class SupportUriTest extends TestCase
 {
+    use TestsInteractsWithDataContract;
+
     public function test_can_build_special_urls()
     {
         Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
@@ -129,6 +133,17 @@ class SupportUriTest extends TestCase
         $this->assertEquals($expected, $uri->toString());
     }
 
+    public function test_to_stringable()
+    {
+        $uri = Uri::of('https://laravel.com/docs/installation?version=1#hello');
+
+        $stringable = $uri->toStringable();
+
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertSame('https://laravel.com/docs/installation?version=1#hello', (string) $stringable);
+        $this->assertSame($uri->value(), (string) $stringable);
+    }
+
     public function test_complicated_query_string_manipulation()
     {
         $uri = Uri::of('https://laravel.com');
@@ -169,6 +184,32 @@ class SupportUriTest extends TestCase
 
         $this->assertSame('foo.bar=baz&foo[bar]=zab', $uri->withQuery(['foo.bar' => 'zab'])->query()->decode());
         $this->assertSame('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
+    }
+
+    public function test_query_strings_with_asterisks_are_treated_as_literal_keys()
+    {
+        $uri = Uri::of('https://laravel.com/?role=user&tenant=10');
+
+        $this->assertEquals(['role' => 'user', 'tenant' => '10', '*' => 'admin'], $uri->withQuery(['*' => 'admin'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/');
+
+        $this->assertEquals(['*' => 'admin'], $uri->withQuery(['*' => 'admin'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/?filter[name]=taylor&filter[role]=user');
+
+        $this->assertEquals(['filter' => ['name' => 'taylor', 'role' => 'user', '*' => 'masked']], $uri->withQuery(['filter.*' => 'masked'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/?role=user');
+
+        $this->assertEquals(['*' => 'admin'], $uri->withQuery(['*' => 'admin'], merge: false)->query()->all());
+    }
+
+    public function test_with_query_if_missing_treats_asterisks_as_literal_keys()
+    {
+        $uri = Uri::of('https://laravel.com/?role=user&tenant=10');
+
+        $this->assertEquals(['role' => 'user', 'tenant' => '10', '*' => 'admin'], $uri->withQueryIfMissing(['*' => 'admin'])->query()->all());
     }
 
     public function test_decoding_the_entire_uri()
@@ -268,15 +309,15 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
     }
 
     public function test_macroable()
@@ -288,6 +329,150 @@ class SupportUriTest extends TestCase
         $uri = new Uri('https://laravel.com/');
 
         $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
+
+    public function test_exists_method()
+    {
+        $this->assertDataExistsContract();
+        $this->assertDataExistsNestedContract();
+    }
+
+    public function test_has_method()
+    {
+        $this->assertDataHasContract();
+        $this->assertDataHasNestedContract();
+    }
+
+    public function test_has_any_method()
+    {
+        $this->assertDataHasAnyContract();
+        $this->assertDataHasAnyNestedContract();
+    }
+
+    public function test_when_has_method()
+    {
+        $this->assertDataWhenHasContract();
+        $this->assertDataWhenHasNestedContract();
+    }
+
+    public function test_filled_method()
+    {
+        $this->assertDataFilledContract();
+        $this->assertDataFilledNestedContract();
+    }
+
+    public function test_is_not_filled_method()
+    {
+        $this->assertDataIsNotFilledContract();
+        $this->assertDataIsNotFilledNestedContract();
+    }
+
+    public function test_any_filled_method()
+    {
+        $this->assertDataAnyFilledContract();
+        $this->assertDataAnyFilledNestedContract();
+    }
+
+    public function test_when_filled_method()
+    {
+        $this->assertDataWhenFilledContract();
+        $this->assertDataWhenFilledNestedContract();
+    }
+
+    public function test_when_enum_method()
+    {
+        $this->assertDataWhenEnumContract();
+    }
+
+    public function test_missing_method()
+    {
+        $this->assertDataMissingContract();
+        $this->assertDataMissingNestedContract();
+    }
+
+    public function test_when_missing_method()
+    {
+        $this->assertDataWhenMissingContract();
+        $this->assertDataWhenMissingNestedContract();
+    }
+
+    public function test_str_method()
+    {
+        $this->assertDataStrContract();
+    }
+
+    public function test_string_method()
+    {
+        $this->assertDataStringContract();
+    }
+
+    public function test_boolean_method()
+    {
+        $this->assertDataBooleanContract();
+    }
+
+    public function test_integer_method()
+    {
+        $this->assertDataIntegerContract();
+    }
+
+    public function test_float_method()
+    {
+        $this->assertDataFloatContract();
+    }
+
+    public function test_clamp_method()
+    {
+        $this->assertDataClampContract();
+    }
+
+    public function test_date_method()
+    {
+        $this->assertDataDateContract();
+    }
+
+    public function test_interval_method()
+    {
+        $this->assertDataIntervalContract();
+    }
+
+    public function test_enum_method()
+    {
+        $this->assertDataEnumContract();
+        $this->assertDataEnumNestedContract();
+    }
+
+    public function test_enums_method()
+    {
+        $this->assertDataEnumsContract();
+    }
+
+    public function test_array_method()
+    {
+        $this->assertDataArrayContract();
+    }
+
+    public function test_collect_method()
+    {
+        $this->assertDataCollectContract();
+        $this->assertDataCollectNestedContract();
+    }
+
+    public function test_only_method()
+    {
+        $this->assertDataOnlyContract();
+        $this->assertDataOnlyNestedContract();
+    }
+
+    public function test_except_method()
+    {
+        $this->assertDataExceptContract();
+        $this->assertDataExceptNestedContract();
+    }
+
+    protected static function arrayToDataFactory(array $data)
+    {
+        return Uri::of('https://laravel.com')->withQuery($data)->query();
     }
 }
 

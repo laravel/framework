@@ -24,40 +24,35 @@ class AttachmentTest extends TestCase
 
     public function testFromUrlThrowsForFtpScheme(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attachment URLs must use the http or https scheme.');
+        $this->expectExceptionObject(new InvalidArgumentException('Attachment URLs must use the http or https scheme.'));
 
         Attachment::fromUrl('ftp://example.com/file.pdf');
     }
 
     public function testFromUrlThrowsForFileScheme(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attachment URLs must use the http or https scheme.');
+        $this->expectExceptionObject(new InvalidArgumentException('Attachment URLs must use the http or https scheme.'));
 
         Attachment::fromUrl('file:///var/www/file.pdf');
     }
 
     public function testFromUrlThrowsForMailtoScheme(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attachment URLs must use the http or https scheme.');
+        $this->expectExceptionObject(new InvalidArgumentException('Attachment URLs must use the http or https scheme.'));
 
         Attachment::fromUrl('mailto:user@example.com');
     }
 
     public function testFromUrlThrowsForInvalidUrl(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attachment URLs must use the http or https scheme.');
+        $this->expectExceptionObject(new InvalidArgumentException('Attachment URLs must use the http or https scheme.'));
 
         Attachment::fromUrl('not-a-url');
     }
 
     public function testFromUrlThrowsForEmptyString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attachment URLs must use the http or https scheme.');
+        $this->expectExceptionObject(new InvalidArgumentException('Attachment URLs must use the http or https scheme.'));
 
         Attachment::fromUrl('');
     }

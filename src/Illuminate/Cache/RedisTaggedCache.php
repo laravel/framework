@@ -29,16 +29,18 @@ class RedisTaggedCache extends TaggedCache
 
         if ($ttl !== null) {
             $seconds = $this->getSeconds($ttl);
-
-            if ($seconds > 0) {
-                $this->tags->addEntry(
-                    $this->itemKey($key),
-                    $seconds
-                );
-            }
         }
 
-        return parent::add($key, $value, $ttl);
+        $result = parent::add($key, $value, $ttl);
+
+        if ($result && $seconds > 0 && method_exists($this->store, 'add')) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -59,14 +61,41 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = $this->getSeconds($ttl);
 
-        if ($seconds > 0) {
+        $result = parent::put($key, $value, $ttl);
+
+        if ($result && $seconds > 0) {
             $this->tags->addEntry(
                 $this->itemKey($key),
                 $seconds
             );
         }
 
-        return parent::put($key, $value, $ttl);
+        return $result;
+    }
+
+    /**
+     * Set the expiration of a cached item.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @return bool
+     */
+    public function touch($key, $ttl)
+    {
+        $key = enum_value($key);
+
+        $seconds = $this->getSeconds($ttl);
+
+        $result = parent::touch($key, $ttl);
+
+        if ($result && $seconds > 0) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -80,9 +109,13 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $result = parent::increment($key, $value);
 
-        return parent::increment($key, $value);
+        if ($result !== false) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        }
+
+        return $result;
     }
 
     /**
@@ -94,9 +127,15 @@ class RedisTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $key = enum_value($key);
 
-        return parent::decrement($key, $value);
+        $result = parent::decrement($key, $value);
+
+        if ($result !== false) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        }
+
+        return $result;
     }
 
     /**
@@ -110,9 +149,13 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $this->tags->addEntry($this->itemKey($key));
+        $result = parent::forever($key, $value);
 
-        return parent::forever($key, $value);
+        if ($result) {
+            $this->tags->addEntry($this->itemKey($key));
+        }
+
+        return $result;
     }
 
     /**
@@ -138,12 +181,6 @@ class RedisTaggedCache extends TaggedCache
 
         $cachePrefix = $redisPrefix.$this->store->getPrefix();
 
-        $cacheTags = [];
-
-        foreach ($this->tags->getNames() as $name) {
-            $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
-        }
-
         $script = <<<'LUA'
             local prefix = table.remove(ARGV, 1)
 
@@ -157,17 +194,21 @@ class RedisTaggedCache extends TaggedCache
             end
         LUA;
 
-        $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
-            ->chunk(1000);
+        $prefix = $this->store->getPrefix();
 
-        foreach ($entries as $keysToBeDeleted) {
-            $connection->eval(
-                $script,
-                count($keysToBeDeleted),
-                ...$keysToBeDeleted,
-                ...[str_replace('-', '%-', $cachePrefix), ...$cacheTags]
-            );
+        foreach ($this->tags->getNames() as $name) {
+            $entries = (new RedisTagSet($this->store, [$name]))->entries()
+                ->map(fn (string $key) => $prefix.$key)
+                ->chunk(1000);
+
+            foreach ($entries as $keysToBeDeleted) {
+                $connection->eval(
+                    $script,
+                    count($keysToBeDeleted),
+                    ...$keysToBeDeleted,
+                    ...[str_replace('-', '%-', $cachePrefix), $cachePrefix.$this->tags->tagId($name)]
+                );
+            }
         }
 
         $this->event(new CacheFlushed($this->getName()));
@@ -199,8 +240,10 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function flushValues()
     {
+        $prefix = $this->store->getPrefix();
+
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->map(fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
         $connection = $this->store->connection();

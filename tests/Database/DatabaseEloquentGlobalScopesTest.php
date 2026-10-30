@@ -13,8 +13,6 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         tap(new DB)->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -23,9 +21,8 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         Model::unsetConnectionResolver();
-
-        parent::tearDown();
     }
 
     public function testGlobalScopeIsApplied()

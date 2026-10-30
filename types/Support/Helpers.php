@@ -39,7 +39,7 @@ assertType('Illuminate\Support\Stringable', str('foo'));
 assertType('User', tap(new User(), function ($user) {
     assertType('User', $user);
 }));
-assertType('Illuminate\Support\HigherOrderTapProxy', tap(new User()));
+assertType('Illuminate\Support\HigherOrderTapProxy<User>', tap(new User()));
 
 function testThrowIf(float|int $foo, ?DateTime $bar = null): void
 {

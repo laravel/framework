@@ -20,13 +20,17 @@
         "illuminate/container": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/queue": "^13.0",
+        "illuminate/reflection": "^13.0",
         "illuminate/support": "^13.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "suggest": {
         "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0).",
+        "symfony/http-client": "Required to set the Mercure \"client_options\" configuration value (^7.4).",
+        "symfony/mercure": "Required to use the Mercure broadcast driver (^0.8).",
+        "web-token/jwt-library": "Required to sign Mercure JWTs and use end-to-end encrypted channels (^4.1)."
     },
     "minimum-stability": "dev",
     "autoload": {

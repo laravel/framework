@@ -10,8 +10,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class MarkdownParserTest extends TestCase
 {
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         Markdown::flushState();
@@ -74,6 +72,13 @@ class MarkdownParserTest extends TestCase
         yield [
             new EncodedHtmlString('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
             '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
+        ];
+
+        yield [new EncodedHtmlString('\[Laravel](https://laravel.com)'), '<p>\[Laravel](https://laravel.com)</p>'];
+
+        yield [
+            new EncodedHtmlString('!\[Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)'),
+            '<p>!\[Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>',
         ];
 
         yield [

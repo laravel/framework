@@ -250,7 +250,7 @@ class ComponentTagCompiler
 
             $parameters = [
                 'view' => $view,
-                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
+                'data' => '['.$this->attributesToString($data->all(), escapeBound: false).']',
             ];
 
             $class = AnonymousComponent::class;
@@ -258,7 +258,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
+        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, escapeBound: false).'])
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\\'.$class.'::ignoredParameterNames()); ?>
 <?php endif; ?>

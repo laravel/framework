@@ -37,7 +37,7 @@ class CommandFailed
     /**
      * The Redis connection name.
      *
-     * @var string
+     * @var string|null
      */
     public $connectionName;
 

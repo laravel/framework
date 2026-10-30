@@ -45,7 +45,7 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number);
+        return $formatter->format(static::withoutNegativeZero($number, $formatter->format(...)));
     }
 
     /**
@@ -74,7 +74,7 @@ class Number
      */
     public static function parseInt(string $string, ?string $locale = null): int|false
     {
-        return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
+        return self::parse($string, NumberFormatter::TYPE_INT64, $locale);
     }
 
     /**
@@ -170,7 +170,7 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number / 100);
+        return $formatter->format(static::withoutNegativeZero($number / 100, $formatter->format(...)));
     }
 
     /**
@@ -192,7 +192,12 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
+        $currency = ! empty($in) ? $in : static::$currency;
+
+        return $formatter->formatCurrency(
+            static::withoutNegativeZero($number, fn ($number) => $formatter->formatCurrency($number, $currency)),
+            $currency,
+        );
     }
 
     /**
@@ -205,6 +210,10 @@ class Number
      */
     public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
+        if (! is_finite($bytes)) {
+            return sprintf('%s B', static::format($bytes, $precision, $maxPrecision));
+        }
+
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
         $unitCount = count($units);
@@ -263,9 +272,15 @@ class Number
      * @param  int|null  $maxPrecision
      * @param  array<int, string>  $units
      * @return string|false
+     *
+     * @phpstan-return ($number is INF ? '∞' : ($number is NAN ? 'NaN' : ($number is 0 ? ($precision is non-positive-int ? '0' : non-empty-string|false) : non-empty-string|false)))
      */
     protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
+        if (! is_finite($number)) {
+            return static::format($number, $precision, $maxPrecision);
+        }
+
         if (empty($units)) {
             $units = [
                 3 => 'K',
@@ -280,14 +295,19 @@ class Number
             case (float) $number === 0.0:
                 return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
             case $number < 0:
-                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
+                $summary = static::summarize(abs($number), $precision, $maxPrecision, $units);
+
+                // Avoid a spurious "-0" when the magnitude rounds down to zero at the given precision...
+                return $summary === static::summarize(0, $precision, $maxPrecision, $units)
+                    ? $summary
+                    : sprintf('-%s', $summary);
             case $number >= 1e15:
                 return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
         }
 
         $numberExponent = floor(log10($number));
-        $displayExponent = $numberExponent - ($numberExponent % 3);
-        $number /= pow(10, $displayExponent);
+        $displayExponent = max(0, $numberExponent - ($numberExponent % 3));
+        $number /= 10 ** $displayExponent;
 
         $formatted = static::format($number, $precision, $maxPrecision);
 
@@ -340,6 +360,10 @@ class Number
             }
 
             $output[] = [$lower, $upper];
+        }
+
+        if ($output !== [] && $lower == $to && end($output)[1] < $to) {
+            $output[] = [$lower, $to];
         }
 
         return $output;
@@ -460,5 +484,21 @@ class Number
 
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
+    }
+
+    /**
+     * Replace a negative number that would be formatted as zero with zero, avoiding a "-0" result.
+     *
+     * @param  int|float  $number
+     * @param  callable(int|float): (string|false)  $format
+     * @return int|float
+     */
+    protected static function withoutNegativeZero(int|float $number, callable $format)
+    {
+        if ($number == 0) {
+            return 0;
+        }
+
+        return $number < 0 && $format(abs($number)) === $format(0) ? 0 : $number;
     }
 }

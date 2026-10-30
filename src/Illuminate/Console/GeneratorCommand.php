@@ -457,12 +457,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function isReservedName($name)
     {
-        return in_array(
-            strtolower($name),
-            (new Collection($this->reservedNames))
-                ->transform(fn ($name) => strtolower($name))
-                ->all()
-        );
+        $name = strtolower($name);
+
+        return (new Collection($this->reservedNames))
+            ->contains(fn ($reservedName) => strtolower($reservedName) === $name);
     }
 
     /**
