@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Sleep;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -21,6 +22,68 @@ class SleepTest extends TestCase
         $end = microtime(true);
 
         $this->assertEqualsWithDelta(1, $end - $start, 0.03);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItKeepsSleepingWhenInterruptedBySignal()
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => null);
+        pcntl_alarm(1);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(2)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+        }
+
+        $this->assertEqualsWithDelta(2, $elapsed, 0.1);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItKeepsSleepingWhenInterruptedBySignalDuringTheLastSecond()
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => null);
+        pcntl_alarm(1);
+        usleep(500_000);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(1)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+        }
+
+        $this->assertEqualsWithDelta(1, $elapsed, 0.1);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItStopsSleepingWhenInterruptedAfterResumingWasStopped()
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => Sleep::stopResumingAfterSignals());
+        pcntl_alarm(1);
+
+        try {
+            $start = microtime(true);
+            Sleep::for(2)->seconds();
+            $elapsed = microtime(true) - $start;
+        } finally {
+            pcntl_alarm(0);
+            pcntl_signal(SIGALRM, SIG_DFL);
+            pcntl_async_signals(false);
+            Sleep::stopResumingAfterSignals(false);
+        }
+
+        $this->assertEqualsWithDelta(1, $elapsed, 0.1);
     }
 
     public function testCallbacksMayBeExecutedUsingThen()

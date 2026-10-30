@@ -28,6 +28,7 @@ use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Sleep;
 use Throwable;
 
 class Worker
@@ -1016,6 +1017,8 @@ class Worker
         foreach ([SIGQUIT, SIGTERM, SIGINT] as $signal) {
             pcntl_signal($signal, function (int $signal) use ($connectionName, $queue, $options) {
                 $this->shouldQuit = true;
+
+                Sleep::stopResumingAfterSignals();
 
                 $this->events->dispatch(new WorkerInterrupted($signal, $connectionName, $queue, $options));
 

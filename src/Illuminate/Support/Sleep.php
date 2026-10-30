@@ -56,6 +56,13 @@ class Sleep
     protected static $fake = false;
 
     /**
+     * Indicates if a sleep interrupted by a signal should not resume.
+     *
+     * @var bool
+     */
+    protected static $stopResumingAfterSignals = false;
+
+    /**
      * The sequence of sleep durations encountered while faking.
      *
      * @var array<int, \Carbon\CarbonInterval>
@@ -342,7 +349,11 @@ class Sleep
 
         while ($while()) {
             if ($seconds > 0) {
+                $wakeAt = hrtime(true) + $seconds * 1_000_000_000;
+
                 sleep($seconds);
+
+                $this->resumeAfterSignal($wakeAt);
 
                 $remaining = $remaining->subSeconds($seconds);
             }
@@ -352,6 +363,22 @@ class Sleep
             if ($microseconds > 0) {
                 usleep($microseconds);
             }
+        }
+    }
+
+    /**
+     * Sleep until the given hrtime, resuming after each signal unless resuming was stopped.
+     *
+     * The clock is used instead of sleep()'s return value, which is always 192 on Windows
+     * and drops the fraction on Linux, so a signal during the last second returns 0.
+     *
+     * @param  int  $wakeAt
+     * @return void
+     */
+    protected function resumeAfterSignal($wakeAt)
+    {
+        while (! static::$stopResumingAfterSignals && ($nanoseconds = $wakeAt - hrtime(true)) > 0) {
+            usleep(intdiv($nanoseconds, 1000));
         }
     }
 
@@ -541,6 +568,19 @@ class Sleep
     public static function whenFakingSleep($callback)
     {
         static::$fakeSleepCallbacks[] = $callback;
+    }
+
+    /**
+     * Indicate that a sleep interrupted by a signal should not resume.
+     *
+     * @internal
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function stopResumingAfterSignals($value = true)
+    {
+        static::$stopResumingAfterSignals = $value;
     }
 
     /**
