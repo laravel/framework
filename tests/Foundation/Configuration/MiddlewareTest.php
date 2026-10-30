@@ -305,6 +305,31 @@ class MiddlewareTest extends TestCase
         $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
     }
 
+    public function testPreventRequestForgeryCallsCombine()
+    {
+        $configuration = new Middleware();
+        $middleware = new PreventRequestForgery(
+            new FoundationApplication,
+            new Encrypter(str_repeat('a', 16))
+        );
+
+        $configuration->preventRequestForgery(originOnly: true);
+        $configuration->preventRequestForgery(allowSameSite: true);
+        $configuration->preventRequestForgery(except: ['stripe/*']);
+        $configuration->validateCsrfTokens(except: ['/webhook']);
+
+        $this->assertSame(['stripe/*', '/webhook'], $middleware->getExcludedPaths());
+
+        $reflection = new ReflectionClass(PreventRequestForgery::class);
+        $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
+        $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
+
+        $configuration->preventRequestForgery(originOnly: false, allowSameSite: false);
+
+        $this->assertFalse($reflection->getStaticPropertyValue('originOnly'));
+        $this->assertFalse($reflection->getStaticPropertyValue('allowSameSite'));
+    }
+
     public function testRedirectUsersToDoesNotOverwriteRedirectGuestsTo()
     {
         $middleware = new Middleware;

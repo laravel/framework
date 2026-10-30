@@ -596,18 +596,23 @@ class Middleware
      * Configure the request forgery prevention middleware.
      *
      * @param  array  $except
-     * @param  bool  $originOnly
-     * @param  bool  $allowSameSite
+     * @param  bool|null  $originOnly
+     * @param  bool|null  $allowSameSite
      * @return $this
      */
-    public function preventRequestForgery(array $except = [], bool $originOnly = false, bool $allowSameSite = false)
+    public function preventRequestForgery(array $except = [], ?bool $originOnly = null, ?bool $allowSameSite = null)
     {
         if (! empty($except)) {
             PreventRequestForgery::except($except);
         }
 
-        PreventRequestForgery::useOriginOnly($originOnly);
-        PreventRequestForgery::allowSameSite($allowSameSite);
+        if (! is_null($originOnly)) {
+            PreventRequestForgery::useOriginOnly($originOnly);
+        }
+
+        if (! is_null($allowSameSite)) {
+            PreventRequestForgery::allowSameSite($allowSameSite);
+        }
 
         return $this;
     }
