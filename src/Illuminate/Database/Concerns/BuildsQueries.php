@@ -491,11 +491,13 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         if (! is_null($cursor)) {
-            $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+            $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i, $source = null) use (&$addCursorConditions, $cursor, $orders) {
+                $source ??= $this;
+
                 $unionBuilders = $builder->getUnionBuilders();
 
                 if (! is_null($previousColumn)) {
-                    $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+                    $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($source, $previousColumn);
 
                     $builder->where(
                         $originalColumn !== $previousColumn && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
@@ -512,10 +514,10 @@ trait BuildsQueries
                     });
                 }
 
-                $builder->where(function (self $secondBuilder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
+                $builder->where(function (self $secondBuilder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders, $source) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
-                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($source, $column);
 
                     $secondBuilder->where(
                         $originalColumn !== $column && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
@@ -524,14 +526,14 @@ trait BuildsQueries
                     );
 
                     if ($i < $orders->count() - 1) {
-                        $secondBuilder->orWhere(function (self $thirdBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
-                            $addCursorConditions($thirdBuilder, $column, $originalColumn, $i + 1);
+                        $secondBuilder->orWhere(function (self $thirdBuilder) use ($addCursorConditions, $column, $originalColumn, $i, $source) {
+                            $addCursorConditions($thirdBuilder, $column, $originalColumn, $i + 1, $source);
                         });
                     }
 
-                    $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
-                        $originalColumn = $this->getOriginalColumnNameForCursorPagination($unionBuilder, $column);
-                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn) {
+                    $unionBuilders->each(function ($union) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                        $originalColumn = $this->getOriginalColumnNameForCursorPagination($union, $column);
+                        $union->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $union) {
                             $unionBuilder->where(
                                 $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
@@ -539,8 +541,8 @@ trait BuildsQueries
                             );
 
                             if ($i < $orders->count() - 1) {
-                                $unionBuilder->orWhere(function (self $fourthBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
-                                    $addCursorConditions($fourthBuilder, $column, $originalColumn, $i + 1);
+                                $unionBuilder->orWhere(function (self $fourthBuilder) use ($addCursorConditions, $column, $originalColumn, $i, $union) {
+                                    $addCursorConditions($fourthBuilder, $column, $originalColumn, $i + 1, $union);
                                 });
                             }
                         });
