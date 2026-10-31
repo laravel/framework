@@ -49,6 +49,8 @@ class ComposerScripts
     {
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
+        static::setDeferredInstallerHookEnvironmentVariable();
+
         static::clearCompiled();
     }
 
@@ -111,6 +113,26 @@ class ComposerScripts
 
         if (is_file($packagesPath = $laravel->getCachedPackagesPath())) {
             @unlink($packagesPath);
+        }
+    }
+
+    /**
+     * Ensure deferred installer hooks are inherited by Composer child processes.
+     *
+     * @return void
+     */
+    protected static function setDeferredInstallerHookEnvironmentVariable()
+    {
+        $variable = 'LARAVEL_INSTALLER_DEFER_HOOKS';
+
+        if (getenv($variable) !== false) {
+            return;
+        }
+
+        if (array_key_exists($variable, $_ENV)) {
+            putenv($variable.'='.$_ENV[$variable]);
+        } elseif (array_key_exists($variable, $_SERVER)) {
+            putenv($variable.'='.$_SERVER[$variable]);
         }
     }
 }
