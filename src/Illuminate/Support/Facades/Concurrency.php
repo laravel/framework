@@ -6,9 +6,10 @@ use Illuminate\Concurrency\ConcurrencyManager;
 
 /**
  * @method static mixed driver(\UnitEnum|string|null $name = null)
- * @method static \Illuminate\Concurrency\ProcessDriver createProcessDriver()
- * @method static \Illuminate\Concurrency\ForkDriver createForkDriver()
- * @method static \Illuminate\Concurrency\SyncDriver createSyncDriver()
+ * @method static \Illuminate\Concurrency\ProcessDriver createProcessDriver(array $config = [])
+ * @method static \Illuminate\Concurrency\ForkDriver createForkDriver(array $config = [])
+ * @method static \Illuminate\Concurrency\SyncDriver createSyncDriver(array $config = [])
+ * @method static \Illuminate\Concurrency\QueueDriver createQueueDriver(array $config = [])
  * @method static string getDefaultInstance()
  * @method static void setDefaultInstance(string $name)
  * @method static array getInstanceConfig(string $name)
