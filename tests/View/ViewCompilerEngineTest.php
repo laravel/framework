@@ -99,9 +99,13 @@ class ViewCompilerEngineTest extends TestCase
             ->with($compiled, [])
             ->andReturn('compiled-content');
 
+        $files->expects('exists')
+            ->with($compiled)
+            ->andReturn(false);
+
         $engine->getCompiler()
             ->expects('getCompiledPath')
-            ->times(3)
+            ->times(4)
             ->with($path)
             ->andReturn($compiled);
 
@@ -140,9 +144,13 @@ class ViewCompilerEngineTest extends TestCase
             ->with($compiled, [])
             ->andReturn('compiled-content');
 
+        $files->expects('exists')
+            ->with($compiled)
+            ->andReturn(false);
+
         $engine->getCompiler()
             ->expects('getCompiledPath')
-            ->times(3)
+            ->times(4)
             ->with($path)
             ->andReturn($compiled);
 
@@ -183,9 +191,13 @@ class ViewCompilerEngineTest extends TestCase
                 "File does not exist at path {$path}."
             ));
 
+        $files->expects('exists')
+            ->with($compiled)
+            ->andReturn(false);
+
         $engine->getCompiler()
             ->expects('getCompiledPath')
-            ->times(3)
+            ->times(4)
             ->with($path)
             ->andReturn($compiled);
 
@@ -201,6 +213,49 @@ class ViewCompilerEngineTest extends TestCase
         $engine->get($path);
 
         $this->expectExceptionObject(new ViewException("File does not exist at path {$path}."));
+        $engine->get($path);
+    }
+
+    public function testViewsAreNotRecompiledWhenCompiledViewExists()
+    {
+        $compiled = __DIR__.'/Fixtures/basic.php';
+        $path = __DIR__.'/Fixtures/foo.php';
+
+        $files = Mockery::mock(Filesystem::class);
+        $engine = $this->getEngine($files);
+
+        $files->expects('getRequire')
+            ->with($compiled, [])
+            ->andReturn('compiled-content');
+
+        $files->expects('getRequire')
+            ->with($compiled, [])
+            ->andThrow(new ErrorException(
+                'file_get_contents(missing.txt): Failed to open stream: No such file or directory',
+            ));
+
+        $files->expects('exists')
+            ->with($compiled)
+            ->andReturn(true);
+
+        $engine->getCompiler()
+            ->expects('getCompiledPath')
+            ->times(3)
+            ->with($path)
+            ->andReturn($compiled);
+
+        $engine->getCompiler()
+            ->expects('isExpired')
+            ->andReturn(true);
+
+        $engine->getCompiler()
+            ->expects('compile')
+            ->once()
+            ->with($path);
+
+        $engine->get($path);
+
+        $this->expectException(ViewException::class);
         $engine->get($path);
     }
 

@@ -79,7 +79,8 @@ class CompilerEngine extends PhpEngine
                 throw $e;
             }
 
-            if (! isset($this->compiledOrNotExpired[$path])) {
+            if (! isset($this->compiledOrNotExpired[$path]) ||
+                $this->files->exists($this->compiler->getCompiledPath($path))) {
                 throw $e;
             }
 
