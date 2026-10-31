@@ -11,12 +11,15 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Generators\TestCase;
-use Mockery as m;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class RouteCacheCommandTest extends TestCase
 {
     use InteractsWithPublishedFiles;
+    use VerifiesDoubles;
 
     protected $files = [
         'bootstrap/cache/routes-v7.php',
@@ -57,9 +60,7 @@ class RouteCacheCommandTest extends TestCase
 
     public function testRoutesAreCachedAtomically(): void
     {
-        $files = m::mock(Filesystem::class)->makePartial();
-        $files->shouldReceive('replace')->once()->with($this->app->getCachedRoutesPath(), m::type('string'))->passthru();
-        $files->shouldNotReceive('put');
+        $files = Double::for(Filesystem::class)->passthru(new Filesystem);
 
         $this->app->instance(RouteCacheCommand::class, new class($files) extends RouteCacheCommand
         {
@@ -76,6 +77,9 @@ class RouteCacheCommandTest extends TestCase
             ->expectsOutputToContain('Routes cached successfully');
 
         $this->assertFileExists($this->app->getCachedRoutesPath());
+
+        $files->received('replace')->times(1)->with($this->app->getCachedRoutesPath(), Argument::type('string'));
+        $files->received('put')->never();
     }
 }
 

@@ -5,13 +5,16 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueListFailedCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testQueuedListenerShowsUnderlyingListenerClassNotWrapper()
     {
         // CallQueuedListener is the wrapper class Laravel uses to dispatch
@@ -161,8 +164,8 @@ class QueueListFailedCommandTest extends TestCase
         $container = new Application;
 
         // The command resolves the failer via the queue.failer container binding.
-        $failer = Mockery::mock(FailedJobProviderInterface::class);
-        $failer->expects('all')->andReturn($rows);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $failer->expects('all')->returns($rows);
         $container->instance('queue.failer', $failer);
 
         $command = new ListFailedCommand;

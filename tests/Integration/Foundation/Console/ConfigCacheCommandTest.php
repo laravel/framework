@@ -4,13 +4,16 @@ namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Tests\Integration\Generators\TestCase;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use LogicException;
-use Mockery as m;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class ConfigCacheCommandTest extends TestCase
 {
     use InteractsWithPublishedFiles;
+    use VerifiesDoubles;
 
     protected $files = [
         'bootstrap/cache/config.php',
@@ -60,15 +63,16 @@ class ConfigCacheCommandTest extends TestCase
 
     public function testConfigurationIsCachedAtomically()
     {
-        $files = m::mock(Filesystem::class)->makePartial();
-        $files->shouldReceive('replace')->once()->with($this->app->getCachedConfigPath(), m::type('string'))->passthru();
-        $files->shouldNotReceive('put');
+        $files = Double::for(Filesystem::class)->passthru(new Filesystem);
 
         $this->app->instance('files', $files);
 
         $this->artisan('config:cache')->assertSuccessful();
 
         $this->assertFileExists($this->app->getCachedConfigPath());
+
+        $files->received('replace')->times(1)->with($this->app->getCachedConfigPath(), Argument::type('string'));
+        $files->received('put')->never();
     }
 
     public function testConfigurationCacheFailsWithNonSerializableValue()

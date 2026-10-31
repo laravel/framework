@@ -24,13 +24,16 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationChannelManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -45,9 +48,9 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
 
@@ -100,9 +103,9 @@ class NotificationChannelManagerTest extends TestCase
             $sent[] = $event;
         });
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
 
@@ -120,8 +123,8 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $manager->shouldNotReceive('driver');
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
+        $manager->expects('driver')->never();
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestCancelledNotification);
 
@@ -138,9 +141,9 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
 
@@ -160,10 +163,10 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
         $driver->exception = new Exception();
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
 
@@ -181,7 +184,7 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventsDispatcher;
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new class($events)
         {
             public function __construct(private $events)
@@ -195,7 +198,7 @@ class NotificationChannelManagerTest extends TestCase
                 throw new Exception();
             }
         };
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $failed = 0;
         $events->listen(NotificationFailed::class, function () use (&$failed) {
             $failed++;
@@ -518,9 +521,9 @@ class NotificationChannelManagerTest extends TestCase
         $events = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $driver->response = $response = new stdClass;
 
         $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerWithAfterSendingMethodNotification);

@@ -7,12 +7,15 @@ use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseQueryExceptionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         DB::clearResolvedInstance('db');
@@ -182,14 +185,14 @@ class DatabaseQueryExceptionTest extends TestCase
 
     protected function getConnection()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
 
         $grammar = new Grammar($connection);
 
-        $connection->shouldReceive('getName')->andReturn('default');
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $connection->shouldReceive('escape')->with(1, false)->andReturn(1);
-        $connection->shouldReceive('escape')->with('br', false)->andReturn("'br'");
+        $connection->allows('getName')->returns('default');
+        $connection->allows('getQueryGrammar')->returns($grammar);
+        $connection->allows('escape')->with(1, false)->returns(1);
+        $connection->allows('escape')->with('br', false)->returns("'br'");
 
         return $connection;
     }

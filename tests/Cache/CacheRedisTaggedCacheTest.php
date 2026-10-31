@@ -5,29 +5,38 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\RedisTaggedCache;
 use Illuminate\Cache\RedisTagSet;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisTaggedCacheTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[DataProvider('successfulWrites')]
     public function testTagEntriesAreRegisteredAfterSuccessfulWrites(string $method, array $arguments, string $storeMethod, array $storeArguments, array $tagArguments, mixed $result)
     {
         [$cache, $store, $tags, $itemKey] = $this->getCache();
 
+        $calls = [];
+
         $store->expects($storeMethod)
             ->with($itemKey, ...$storeArguments)
-            ->once()
-            ->globally()->ordered()
-            ->andReturn($result);
+            ->resolves(function () use (&$calls, $result) {
+                $calls[] = 'store';
+
+                return $result;
+            });
 
         $tags->expects('addEntry')
             ->with($itemKey, ...$tagArguments)
-            ->once()
-            ->globally()->ordered();
+            ->resolves(function () use (&$calls) {
+                $calls[] = 'tags';
+            });
 
         $this->assertSame($result, $cache->{$method}('key', ...$arguments));
+        $this->assertSame(['store', 'tags'], $calls);
     }
 
     public static function successfulWrites(): array
@@ -47,10 +56,7 @@ class CacheRedisTaggedCacheTest extends TestCase
     {
         [$cache, $store, $tags, $itemKey] = $this->getCache();
 
-        $store->expects($storeMethod)
-            ->with($itemKey, ...$storeArguments)
-            ->once()
-            ->andReturn(false);
+        $store->expects($storeMethod)->with($itemKey, ...$storeArguments)->returns(false);
 
         $tags->expects('addEntry')->never();
 
@@ -71,10 +77,10 @@ class CacheRedisTaggedCacheTest extends TestCase
 
     private function getCache(): array
     {
-        $store = Mockery::mock(RedisStore::class);
-        $tags = Mockery::mock(RedisTagSet::class);
-        $tags->allows('getNamespace')->andReturn('namespace');
-        $tags->allows('getNames')->andReturn([]);
+        $store = Double::for(RedisStore::class);
+        $tags = Double::for(RedisTagSet::class);
+        $tags->allows('getNamespace')->returns('namespace');
+        $tags->allows('getNames')->returns([]);
 
         return [
             new RedisTaggedCache($store, $tags),
