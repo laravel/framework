@@ -106,6 +106,15 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthThrowAccessDeniedHttpExceptionWhenChannelNameIsNotString()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel(['private-test'])
+        );
+    }
+
     public function testValidAuthenticationResponseWithPrivateChannel()
     {
         $request = $this->getMockRequestWithUserForChannel('private-test');
