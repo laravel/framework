@@ -1060,6 +1060,12 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('ltý', Str::remove('ž', 'Žltý', false));
         $this->assertSame('žltý ', Str::remove('KÔŇ', 'žltý kôň', false));
+
+        $this->assertSame(['Fbar', 'Bar'], Str::remove('o', ['Foobar', 'Boar']));
+        $this->assertSame(['Fbar', 'Bar'], Str::remove('o', collect(['Foobar', 'Boar'])));
+        $this->assertSame(['Fbr', 'Br'], Str::remove(collect(['o', 'a']), collect(['Foobar', 'Boar'])));
+        $this->assertSame(['Fooar', 'oar'], Str::remove('b', collect(['Foobar', 'Boar']), false));
+        $this->assertSame(['ltý', 'ito'], Str::remove('ž', collect(['Žltý', 'žito']), false));
     }
 
     public function testReverse()
