@@ -1386,6 +1386,15 @@ class SupportStrTest extends TestCase
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
         $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a', 1, -2));
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
+
+        $this->assertSame(3, Str::substrCount('سلام سلام سلام', 'سلام'));
+        $this->assertSame(2, Str::substrCount('سلام سلام سلام', 'سلام', 5));
+        $this->assertSame(3, Str::substrCount('سلام سلام سلام', 'سلام', 0, 14));
+        $this->assertSame(1, Str::substrCount('سلام سلام سلام', 'سلام', 5, 4));
+        $this->assertSame(1, Str::substrCount('سلام سلام سلام', 'سلام', -4));
+        $this->assertSame(2, Str::substrCount('ab🙂cd🙂ef', '🙂', 0, 6));
+        $this->assertSame(1, Str::substrCount('ab🙂cd🙂ef', '🙂', 3));
+        $this->assertSame(2, Str::substrCount('ab🙂cd🙂ef', '🙂', 1, -1));
     }
 
     public function testPosition()
