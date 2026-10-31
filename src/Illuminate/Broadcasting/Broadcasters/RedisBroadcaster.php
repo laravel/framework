@@ -62,6 +62,10 @@ class RedisBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
+        if (! is_string($request->channel_name)) {
+            throw new AccessDeniedHttpException;
+        }
+
         $channelName = $this->normalizeChannelName(
             str_replace($this->prefix, '', $request->channel_name)
         );

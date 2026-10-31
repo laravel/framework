@@ -102,6 +102,15 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthThrowAccessDeniedHttpExceptionWhenChannelNameIsNotString()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel(['private-test'])
+        );
+    }
+
     public function testValidAuthenticationResponseCallPusherSocketAuthMethodWithPrivateChannel()
     {
         $request = $this->getMockRequestWithUserForChannel('private-test');

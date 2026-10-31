@@ -42,6 +42,10 @@ class AblyBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
+        if (! is_string($request->channel_name)) {
+            throw new AccessDeniedHttpException;
+        }
+
         $channelName = $this->normalizeChannelName($request->channel_name);
 
         if (empty($request->channel_name) ||
