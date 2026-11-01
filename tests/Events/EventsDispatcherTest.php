@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Error;
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\RunConditionally;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use PHPUnit\Framework\TestCase;
@@ -736,6 +737,90 @@ class EventsDispatcherTest extends TestCase
             Container::setInstance($originalContainer);
         }
     }
+
+    public function testConditionallyRunnableListenerRunsWhenShouldRunReturnsTrue()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(TestConditionalEvent::class, TestRunConditionallyListener::class);
+        $d->dispatch(new TestConditionalEvent(run: true));
+
+        $this->assertSame([TestConditionalEvent::class], $_SERVER['__event.test']);
+    }
+
+    public function testConditionallyRunnableListenerSupportsClassAndMethodNotation()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(TestConditionalEvent::class, [TestRunConditionallyListener::class, 'handle']);
+        $d->listen(TestConditionalEvent::class, TestRunConditionallyListener::class.'@handle');
+        $d->dispatch(new TestConditionalEvent(run: true));
+
+        $this->assertSame([TestConditionalEvent::class, TestConditionalEvent::class], $_SERVER['__event.test']);
+    }
+
+    public function testConditionallyRunnableListenerInstancesRunWhenShouldRunReturnsTrue()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+
+        $d->listen(
+            TestConditionalEvent::class,
+            [new TestRunConditionallyListener, 'handle'],
+        );
+
+        $d->listen(
+            TestConditionalEvent::class,
+            new TestRunConditionallyInvokableListener,
+        );
+
+        $response = $d->dispatch(new TestConditionalEvent(run: true));
+
+        $this->assertSame(
+            [TestConditionalEvent::class, TestConditionalEvent::class],
+            $_SERVER['__event.test']
+        );
+        $this->assertSame([null, null], $response);
+    }
+
+    public function testConditionallyRunnableListenerInstancesAreSkippedWithoutAffectingPropagation()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+
+        $d->listen(
+            TestConditionalEvent::class,
+            [new TestRunConditionallyListener, 'handle'],
+        );
+
+        $d->listen(
+            TestConditionalEvent::class,
+            new TestRunConditionallyInvokableListener,
+        );
+
+        $response = $d->dispatch(new TestConditionalEvent(run: false));
+
+        $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertSame([null, null], $response);
+    }
+
+    public function testConditionallyRunnableListenerIsSkippedWithoutAffectingPropagation()
+    {
+        unset($_SERVER['__event.test']);
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen(TestConditionalEvent::class, TestRunConditionallyListener::class);
+        $d->listen(TestConditionalEvent::class, function ($event) {
+            $_SERVER['__event.test'][] = 'other-listener';
+        });
+        $d->listen(TestConditionalEvent::class, function ($event) {
+            $_SERVER['__event.test'][] = 'third-listener';
+        });
+        $response = $d->dispatch(new TestConditionalEvent(run: false));
+
+        $this->assertSame(['other-listener', 'third-listener'], $_SERVER['__event.test']);
+        $this->assertEquals([null, null, null], $response);
+    }
 }
 
 class TestListenerLean
@@ -881,6 +966,52 @@ class DeferTestEvent
 
 class ImmediateTestEvent
 {
+}
+
+class TestConditionalEvent
+{
+    public function __construct(
+        public bool $run = true,
+    ) {
+    }
+}
+
+class TestRunConditionallyListener implements RunConditionally
+{
+    /**
+     * Handle the event.
+     */
+    public function shouldRun(TestConditionalEvent $event): bool
+    {
+        return $event->run;
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle(TestConditionalEvent $event)
+    {
+        $_SERVER['__event.test'][] = $event::class;
+    }
+}
+
+class TestRunConditionallyInvokableListener implements RunConditionally
+{
+    /**
+     * Determine if the listener should run.
+     */
+    public function shouldRun(TestConditionalEvent $event): bool
+    {
+        return $event->run;
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function __invoke(TestConditionalEvent $event)
+    {
+        $_SERVER['__event.test'][] = $event::class;
+    }
 }
 
 class DispatchableNamedArgumentsEvent

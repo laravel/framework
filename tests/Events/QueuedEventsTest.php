@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Events\RunConditionally;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -793,6 +794,66 @@ class QueuedEventsTest extends TestCase
 
         $d->dispatch('some.event', [['id' => 'event-123'], 'bar']);
     }
+
+    public function testQueuedListenerWithRunConditionallyIsStillQueuedEvenWhenShouldRunReturnsFalse()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        TestDispatcherRunConditionallyHandler::$shouldRun = false;
+
+        $d->listen('some.event', TestDispatcherRunConditionallyHandler::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class);
+    }
+
+    public function testQueuedListenerWithRunConditionallyIsInvokedOnWorkerWhenShouldRunReturnsTrue()
+    {
+        $container = new Container;
+        $container->instance(BusDispatcher::class, new BusDispatcher($container));
+
+        TestDispatcherRunConditionallyHandler::$shouldRun = true;
+        TestDispatcherRunConditionallyHandler::$ran = false;
+        TestDispatcherRunConditionallyHandler::$handledData = null;
+
+        $listener = new CallQueuedListener(TestDispatcherRunConditionallyHandler::class, 'handle', ['foo', 'bar']);
+
+        $job = new FakeJob;
+
+        $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
+        $handler->call($job, ['command' => serialize($listener)]);
+
+        $this->assertTrue(TestDispatcherRunConditionallyHandler::$ran);
+        $this->assertSame(['foo', 'bar'], TestDispatcherRunConditionallyHandler::$handledData);
+        $this->assertTrue($job->isDeleted());
+    }
+
+    public function testQueuedListenerWithRunConditionallyIsNotInvokedOnWorkerWhenShouldRunReturnsFalse()
+    {
+        $container = new Container;
+        $container->instance(BusDispatcher::class, new BusDispatcher($container));
+
+        TestDispatcherRunConditionallyHandler::$shouldRun = false;
+        TestDispatcherRunConditionallyHandler::$ran = false;
+        TestDispatcherRunConditionallyHandler::$failed = false;
+
+        $listener = new CallQueuedListener(TestDispatcherRunConditionallyHandler::class, 'handle', ['foo', 'bar']);
+
+        $job = new FakeJob;
+
+        $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
+        $handler->call($job, ['command' => serialize($listener)]);
+
+        $this->assertFalse(TestDispatcherRunConditionallyHandler::$ran);
+        $this->assertFalse(TestDispatcherRunConditionallyHandler::$failed);
+        $this->assertTrue($job->isDeleted());
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -1219,5 +1280,34 @@ class TestDispatcherDebouncedAndUniqueHandler implements ShouldQueue, ShouldBeUn
     public function handle()
     {
         //
+    }
+}
+
+class TestDispatcherRunConditionallyHandler implements ShouldQueue, RunConditionally
+{
+    use InteractsWithQueue;
+
+    public static $shouldRun = true;
+
+    public static $ran = false;
+
+    public static $failed = false;
+
+    public static ?array $handledData = null;
+
+    public function shouldRun($event): bool
+    {
+        return static::$shouldRun;
+    }
+
+    public function handle($a, $b)
+    {
+        static::$ran = true;
+        static::$handledData = [$a, $b];
+    }
+
+    public function failed($event, $exception)
+    {
+        static::$failed = true;
     }
 }

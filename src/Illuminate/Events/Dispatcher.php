@@ -12,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\RunConditionally;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -46,7 +47,10 @@ use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReadsClassAttributes, ReflectsClosures, ResolvesQueueRoutes;
+    use Macroable;
+    use ReadsClassAttributes;
+    use ReflectsClosures;
+    use ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -490,6 +494,12 @@ class Dispatcher implements DispatcherContract
             return $this->createClassListener($listener, $wildcard);
         }
 
+        $conditionalListener = is_array($listener) ? ($listener[0] ?? null) : $listener;
+
+        if (is_object($conditionalListener) && $this->listenerRunsConditionally($conditionalListener)) {
+            $listener = $this->createConditionallyRunnableCallable($conditionalListener, $listener);
+        }
+
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
@@ -541,10 +551,16 @@ class Dispatcher implements DispatcherContract
 
         $listener = $this->container->make($class);
 
+        $callable = [$listener, $method];
+
+        if ($this->listenerRunsConditionally($listener)) {
+            $callable = $this->createConditionallyRunnableCallable($listener, $callable);
+        }
+
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
                 && ! in_array($method, ['creating', 'updating', 'saving', 'deleting', 'restoring', 'forceDeleting'])
-            ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
-            : [$listener, $method];
+            ? $this->createCallbackForListenerRunningAfterCommits($callable)
+            : $callable;
     }
 
     /**
@@ -613,21 +629,49 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a callable for dispatching a listener after database transactions.
      *
-     * @param  mixed  $listener
-     * @param  string  $method
+     * @param  callable  $callable
      * @return \Closure
      */
-    protected function createCallbackForListenerRunningAfterCommits($listener, $method)
+    protected function createCallbackForListenerRunningAfterCommits($callable)
     {
-        return function () use ($method, $listener) {
+        return function () use ($callable) {
             $payload = func_get_args();
 
             $this->resolveTransactionManager()->addCallback(
-                function () use ($listener, $method, $payload) {
-                    $listener->$method(...$payload);
-                }
+                fn () => $callable(...$payload)
             );
         };
+    }
+
+    /**
+     * Create a callable that only invokes the given callable if the listener should run.
+     *
+     * @param  mixed  $listener
+     * @param  callable  $callable
+     * @return \Closure
+     */
+    protected function createConditionallyRunnableCallable($listener, $callable)
+    {
+        return function () use ($listener, $callable) {
+            $arguments = func_get_args();
+
+            if (! $listener->shouldRun(array_values($arguments)[0] ?? null)) {
+                return;
+            }
+
+            return $callable(...$arguments);
+        };
+    }
+
+    /**
+     * Determine if the listener runs conditionally.
+     *
+     * @param  mixed  $listener
+     * @return bool
+     */
+    protected function listenerRunsConditionally($listener): bool
+    {
+        return $listener instanceof RunConditionally && method_exists($listener, 'shouldRun');
     }
 
     /**

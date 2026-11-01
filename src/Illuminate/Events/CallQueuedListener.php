@@ -5,13 +5,15 @@ namespace Illuminate\Events;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Events\RunConditionally;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
 class CallQueuedListener implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable;
+    use InteractsWithQueue;
+    use Queueable;
 
     /**
      * The listener class name.
@@ -150,7 +152,22 @@ class CallQueuedListener implements ShouldQueue
             $this->job, $container->make($this->class)
         );
 
+        if ($this->handlerRunsConditionally($handler) && ! $handler->shouldRun(array_values($this->data)[0] ?? null)) {
+            return;
+        }
+
         $handler->{$this->method}(...array_values($this->data));
+    }
+
+    /**
+     * Determine if the handler runs conditionally.
+     *
+     * @param  mixed  $handler
+     * @return bool
+     */
+    protected function handlerRunsConditionally($handler): bool
+    {
+        return $handler instanceof RunConditionally && method_exists($handler, 'shouldRun');
     }
 
     /**
