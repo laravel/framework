@@ -15,7 +15,9 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
@@ -254,7 +256,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertFalse($user->isForceDeleting());
     }
 
-    public function testForceDeleteResetsForceDeletingWhenDeletingListenerThrows()
+    #[DataProvider('deletionExceptions')]
+    public function testForceDeleteResetsForceDeletingWhenDeletingListenerThrows(Throwable $exception)
     {
         $previousDispatcher = Eloquent::getEventDispatcher();
         $dispatcher = new Dispatcher;
@@ -264,7 +267,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         try {
             $this->createUsers();
             $user = SoftDeletesTestUser::find(2);
-            $exception = new Exception('Deletion prevented.');
             $forceDeleted = false;
 
             SoftDeletesTestUser::deleting(function ($model) use ($exception) {
@@ -280,7 +282,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             try {
                 $user->forceDelete();
                 $this->fail('The deleting listener exception was not propagated.');
-            } catch (Exception $caught) {
+            } catch (Throwable $caught) {
                 $this->assertSame($exception, $caught);
             }
 
@@ -303,6 +305,63 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
                 Eloquent::unsetEventDispatcher();
             }
         }
+    }
+
+    public static function deletionExceptions()
+    {
+        return [
+            'exception' => [new Exception('Deletion prevented.')],
+            'error' => [new \Error('Deletion prevented.')],
+        ];
+    }
+
+    #[DataProvider('forceDeleteOutcomes')]
+    public function testForceDeletePreservesReturnValueAndEventOrder($cancelledEvent, $exists, $expectedResult, $expectedEvents)
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+
+        Eloquent::setEventDispatcher(new Dispatcher);
+
+        try {
+            $this->createUsers();
+            $user = $exists ? SoftDeletesTestUser::find(2) : new SoftDeletesTestUser;
+            $events = [];
+
+            foreach (['forceDeleting', 'deleting', 'deleted', 'forceDeleted'] as $event) {
+                SoftDeletesTestUser::{$event}(function ($model) use ($event, $cancelledEvent, &$events) {
+                    $events[] = [$event, $model->isForceDeleting()];
+
+                    if ($event === $cancelledEvent) {
+                        return false;
+                    }
+                });
+            }
+
+            $this->assertSame($expectedResult, $user->forceDelete());
+            $this->assertSame($expectedEvents, $events);
+            $this->assertFalse($user->isForceDeleting());
+            $this->assertSame($expectedResult !== true, SoftDeletesTestUser::withTrashed()->find(2) !== null);
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
+    }
+
+    public static function forceDeleteOutcomes()
+    {
+        return [
+            'successful deletion' => [null, true, true, [
+                ['forceDeleting', false], ['deleting', true], ['deleted', true], ['forceDeleted', false],
+            ]],
+            'cancelled force deletion' => ['forceDeleting', true, false, [['forceDeleting', false]]],
+            'cancelled deletion' => ['deleting', true, false, [['forceDeleting', false], ['deleting', true]]],
+            'nonexistent model' => [null, false, null, [['forceDeleting', false]]],
+        ];
     }
 
     public function testForceDestroyFullyDeletesRecord()
