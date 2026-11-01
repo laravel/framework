@@ -251,6 +251,58 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         }
 
         $this->assertTrue($user->exists);
+        $this->assertFalse($user->isForceDeleting());
+    }
+
+    public function testForceDeleteResetsForceDeletingWhenDeletingListenerThrows()
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+        $dispatcher = new Dispatcher;
+
+        Eloquent::setEventDispatcher($dispatcher);
+
+        try {
+            $this->createUsers();
+            $user = SoftDeletesTestUser::find(2);
+            $exception = new Exception('Deletion prevented.');
+            $forceDeleted = false;
+
+            SoftDeletesTestUser::deleting(function ($model) use ($exception) {
+                $this->assertTrue($model->isForceDeleting());
+
+                throw $exception;
+            });
+
+            SoftDeletesTestUser::forceDeleted(function () use (&$forceDeleted) {
+                $forceDeleted = true;
+            });
+
+            try {
+                $user->forceDelete();
+                $this->fail('The deleting listener exception was not propagated.');
+            } catch (Exception $caught) {
+                $this->assertSame($exception, $caught);
+            }
+
+            $this->assertFalse($user->isForceDeleting());
+            $this->assertFalse($forceDeleted);
+            $this->assertTrue($user->exists);
+            $this->assertNull($user->fresh()->deleted_at);
+
+            $dispatcher->forget('eloquent.deleting: '.SoftDeletesTestUser::class);
+
+            $this->assertTrue($user->delete());
+            $this->assertNotNull($user->fresh()->deleted_at);
+            $this->assertFalse($forceDeleted);
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
     }
 
     public function testForceDestroyFullyDeletesRecord()
