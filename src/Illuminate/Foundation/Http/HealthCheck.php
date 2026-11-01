@@ -28,7 +28,7 @@ class HealthCheck
 
             report($e);
 
-            $exception = $e->getMessage();
+            $exception = $e;
         }
 
         $status = $exception ? 500 : 200;

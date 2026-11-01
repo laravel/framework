@@ -59,10 +59,32 @@ class RouteServiceProviderHealthTest extends TestCase
             ->assertExactJson(['status' => 'down']);
     }
 
+    public function test_it_returns_json_failure_status_when_diagnosis_throws_without_a_message()
+    {
+        Event::listen(DiagnosingHealth::class, function () {
+            throw new RuntimeException;
+        });
+
+        $this->getJson('/up')
+            ->assertStatus(500)
+            ->assertExactJson(['status' => 'down']);
+    }
+
     public function test_it_renders_html_failure_page_when_diagnosis_reports_a_problem()
     {
         Event::listen(DiagnosingHealth::class, function () {
             throw new RuntimeException('Database connection refused.');
+        });
+
+        $this->get('/up')
+            ->assertStatus(500)
+            ->assertSee('experiencing problems');
+    }
+
+    public function test_it_renders_html_failure_page_when_diagnosis_throws_without_a_message()
+    {
+        Event::listen(DiagnosingHealth::class, function () {
+            throw new RuntimeException;
         });
 
         $this->get('/up')
