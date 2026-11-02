@@ -1477,12 +1477,16 @@ class Str
      * @param  string|iterable<string>  $search
      * @param  string|iterable<string>  $subject
      * @param  bool  $caseSensitive
-     * @return string
+     * @return ($subject is string ? string : string[])
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
             $search = iterator_to_array($search);
+        }
+
+        if ($subject instanceof Traversable) {
+            $subject = iterator_to_array($subject);
         }
 
         return $caseSensitive
