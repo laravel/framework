@@ -201,6 +201,7 @@ class MySqlConnection extends Connection
     public function getLastCommitId()
     {
         $gtid = $this->usingWritePdo(fn () => $this->selectOne('select @@log_bin as log_bin, @@global.gtid_mode as mode, @@global.gtid_executed as executed'));
+
         if (! $gtid->log_bin || $gtid->mode !== 'ON') {
             throw new RuntimeException("The MySQL configuration 'log_bin = ON' and 'gtid_mode = ON' are required to retrieve the last commit ID.");
         }

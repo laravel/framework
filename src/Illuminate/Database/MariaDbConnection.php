@@ -52,6 +52,7 @@ class MariaDbConnection extends MySqlConnection
     public function getLastCommitId()
     {
         $gtid = $this->usingWritePdo(fn () => $this->selectOne('select @@log_bin as log_bin, @@gtid_binlog_pos as gtid_binlog_pos'));
+
         if (! $gtid->log_bin) {
             throw new RuntimeException("The MariaDB configuration 'log_bin = ON' is required to retrieve the last commit ID.");
         }
@@ -87,16 +88,19 @@ class MariaDbConnection extends MySqlConnection
     {
         // MASTER_GTID_WAIT only sees replicated GTIDs, so fall back to @@gtid_current_pos for the server's own writes...
         $check = $this->selectOne('select master_gtid_wait(?, 0) as master_gtid_wait, @@gtid_current_pos as gtid_current_pos', [$value]);
+
         if ((int) $check->master_gtid_wait === 0) {
             return true;
         }
 
         $expected = array_column($this->parseCommitIds([$value]), 'sequence', 'domain');
+
         foreach ($this->parseCommitIds([$check->gtid_current_pos]) as $gtid) {
             if (isset($expected[$gtid['domain']]) && $gtid['sequence']->isGreaterThanOrEqualTo($expected[$gtid['domain']])) {
                 unset($expected[$gtid['domain']]);
             }
         }
+
         if ($expected === [] || $wait <= 0) {
             return $expected === [];
         }
@@ -115,6 +119,7 @@ class MariaDbConnection extends MySqlConnection
     protected function parseCommitIds(array $values)
     {
         $gtids = $parsed = [];
+
         foreach (explode(',', implode(',', $values)) as $gtid) {
             $gtid = trim($gtid);
             if ($gtid === '') {
@@ -126,13 +131,16 @@ class MariaDbConnection extends MySqlConnection
             }
 
             $domain = $matches['domain'];
+
             // The sequence is an unsigned 64-bit integer and may exceed PHP's integer range...
             $sequence = BigInteger::of($matches['sequence']);
+
             if (! isset($parsed[$domain]) || $sequence->isGreaterThan($parsed[$domain]['sequence'])) {
                 $gtids[$domain] = $gtid;
                 $parsed[$domain] = compact('domain', 'sequence');
             }
         }
+
         ksort($gtids);
         ksort($parsed);
 
