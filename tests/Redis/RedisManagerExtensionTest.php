@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class RedisManagerExtensionTest extends TestCase
 {
@@ -80,6 +81,31 @@ class RedisManagerExtensionTest extends TestCase
         });
 
         $redis->resolve($name);
+    }
+
+    public function testConnectionsIsAnEmptyArrayBeforeAnyConnectionIsResolved()
+    {
+        $this->assertSame([], $this->redis->connections());
+    }
+
+    public function testConnectionsIsAnEmptyArrayWhenTheConnectionCannotBeResolved()
+    {
+        $this->redis->extend('my_custom_driver', function () {
+            return Mockery::mock(Connector::class)
+                ->expects('connect')
+                ->andThrow(new RuntimeException('Connection refused'))
+                ->getMock();
+        });
+
+        try {
+            $this->redis->connection();
+            $this->fail('Expected the connection to fail.');
+        } catch (RuntimeException) {
+            //
+        }
+
+        $this->assertSame([], $this->redis->connections());
+        $this->assertSame([], array_keys($this->redis->connections()));
     }
 
     public function testPurgeAcceptsUnitEnum()

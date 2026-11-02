@@ -56,7 +56,7 @@ class RedisManager implements Factory
      *
      * @var mixed
      */
-    protected $connections;
+    protected $connections = [];
 
     /**
      * Indicates whether event dispatcher is set on connections.
