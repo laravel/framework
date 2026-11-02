@@ -1657,26 +1657,6 @@ class PendingRequest
     }
 
     /**
-     * Determine if a reusable client is required.
-     *
-     * @return bool
-     */
-    protected function requestsReusableClient()
-    {
-        return ! is_null($this->client) || $this->async;
-    }
-
-    /**
-     * Retrieve a reusable Guzzle client.
-     *
-     * @return \GuzzleHttp\Client
-     */
-    protected function getReusableClient()
-    {
-        return $this->client ??= $this->createClient($this->buildHandlerStack());
-    }
-
-    /**
      * Create new Guzzle client.
      *
      * @param  \GuzzleHttp\HandlerStack  $handlerStack
