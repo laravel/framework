@@ -365,7 +365,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         if (! empty($immediate) || empty($afterCommit)) {
             $now = $this->availableAt();
 
-            $result = $this->database->table($this->table)->insert((new Collection($immediate))->map(
+            $result = (new Collection($immediate))->map(
                 function ($job) use ($queue, $data, $now) {
                     $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
 
@@ -375,7 +375,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                         isset($delay) ? $this->availableAt($delay) : $now,
                     );
                 }
-            )->all());
+            )->chunk(150)->every(fn ($records) => $this->database->table($this->table)->insert($records->all()));
         }
 
         if (! empty($afterCommit)) {
@@ -395,13 +395,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             $this->container->make('db.transactions')->addCallback(function () use ($queue, $jobs) {
                 $now = $this->availableAt();
 
-                $this->database->table($this->table)->insert((new Collection($jobs))->map(
+                (new Collection($jobs))->map(
                     fn ($job) => $this->buildDatabaseRecord(
                         $queue,
                         $job['payload'],
                         isset($job['delay']) ? $this->availableAt($job['delay']) : $now,
                     )
-                )->all());
+                )->chunk(150)->each(fn ($records) => $this->database->table($this->table)->insert($records->all()));
             });
         }
 
