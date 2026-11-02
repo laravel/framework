@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Cache\DatabaseStore;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 
@@ -122,6 +124,49 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $this->assertTrue($result);
         $this->assertSame('new-bar', $store->get('foo'));
+    }
+
+    #[RequiresDatabase(['mysql', 'mariadb'])]
+    public function testAddOperationTakesExclusiveLockOnExistingKeyOnMySql()
+    {
+        // An "insert ignore" only takes a shared lock on the duplicate row, which lets concurrent
+        // adds of a just expired key deadlock. The add should hold an exclusive lock instead.
+        // The row is inserted by a concurrent add after this add's "get" already missed it.
+        $store = new class(DB::connection(), $this->getCacheTableName(), config('cache.prefix')) extends DatabaseStore
+        {
+            public function get($key)
+            {
+                return null;
+            }
+        };
+
+        $this->insertToCacheTable('foo', 'bar', 60);
+
+        $default = config('database.default');
+        config(["database.connections.{$default}_second" => config("database.connections.{$default}")]);
+        $second = DB::connection("{$default}_second");
+        $second->statement('set session innodb_lock_wait_timeout = 1');
+
+        DB::beginTransaction();
+
+        try {
+            $this->assertFalse($store->add('foo', 'new-bar', 60));
+
+            try {
+                $second->table($this->getCacheTableName())
+                    ->where('key', $this->withCachePrefix('foo'))
+                    ->sharedLock()
+                    ->first();
+
+                $this->fail('The added key was not exclusively locked.');
+            } catch (QueryException $e) {
+                $this->assertStringContainsString('1205', $e->getMessage());
+            }
+        } finally {
+            DB::rollBack();
+        }
+
+        $this->assertSame('bar', $this->getStore()->get('foo'));
     }
 
     public function testGetOperationReturnNullIfExpired()

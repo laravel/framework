@@ -5,9 +5,12 @@ namespace Illuminate\Tests\Cache;
 use Closure;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -278,6 +281,32 @@ class CacheDatabaseStoreTest extends TestCase
         $table->expects('update')->with(['expiration' => $ttl])->andReturn(1);
 
         $this->assertTrue($store->touch('foo', $ttl));
+    }
+
+    public function testAddUsesNoOpUpsertWithDeadlockRetriesOnMySql()
+    {
+        Carbon::setTestNow(Carbon::createFromTimestamp(1000));
+
+        $store = new DatabaseStore(Mockery::mock(MySqlConnection::class), 'table', 'prefix');
+        $table = Mockery::mock(Builder::class);
+        $grammar = Mockery::mock(Grammar::class);
+
+        $store->getConnection()->expects('table')->times(3)->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $store->getConnection()->expects('transaction')->with(Mockery::type(Closure::class), 3)->andReturnUsing(fn ($closure) => $closure());
+        $table->expects('getGrammar')->andReturn($grammar);
+        $grammar->expects('wrap')->with('key')->andReturn('`key`');
+        $table->expects('upsert')->with(
+            ['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 1060],
+            'key',
+            Mockery::on(fn ($update) => array_keys($update) === ['key'] && (string) $update['key']->getValue($grammar) === '`key`'),
+        )->andReturn(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
+
+        Carbon::setTestNow();
     }
 
     protected function getStore()

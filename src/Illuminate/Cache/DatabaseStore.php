@@ -7,7 +7,9 @@ use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
@@ -220,6 +222,18 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
+
+        // On MySQL, an "insert ignore" takes a shared lock on a deleted but not yet purged row,
+        // so concurrent adds for a key that just expired may deadlock. A no-op upsert takes
+        // an exclusive lock instead, so the inserts queue up and the first one simply wins.
+        // The upsert is retried, since a rare gap lock deadlock is still possible on purge.
+        if ($this->getConnection() instanceof MySqlConnection) {
+            return $this->connection->transaction(fn () => $this->table()->upsert(
+                ['key' => $key, 'value' => $value, 'expiration' => $expiration],
+                'key',
+                ['key' => new Expression($this->table()->getGrammar()->wrap('key'))],
+            ) > 0, 3);
+        }
 
         if (! $this->getConnection() instanceof SqlServerConnection) {
             return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;
