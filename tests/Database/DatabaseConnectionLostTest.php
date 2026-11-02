@@ -28,6 +28,7 @@ class DatabaseConnectionLostTest extends TestCase
             ['SQLSTATE[HY000]: General error: 2006 MySQL server has gone away'],
             ['SQLSTATE[08S01]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: Error code 0x68'],
             ['SQLSTATE[08S02]: [Microsoft][ODBC Driver 13 for SQL Server]SMux Provider: Physical connection is not usable [xFFFFFFFF]'],
+            ['SQLSTATE[HY000]: General error: 1105 unknown: target: example.-.primary: vttablet: rpc error: code = Canceled desc = QueryList.TerminateAll(), elapsed time: 33.391648184s, killing connection ID 12345'],
         ];
     }
 
