@@ -170,6 +170,27 @@ class CallQueuedHandlerTest extends TestCase
 
         Event::assertNotDispatched(JobFailed::class);
     }
+
+    public function testBatchJobIsRecordedAsFailedWhenModelIsMissing()
+    {
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $exception = new ModelNotFoundException('Foo');
+
+        $batch = Mockery::mock(Batch::class);
+        $batch->shouldReceive('recordFailedJob')->once()->with('job-uuid', $exception);
+
+        $repository = Mockery::mock(BatchRepository::class);
+        $repository->shouldReceive('find')->once()->with('test-batch-id')->andReturn($batch);
+        $this->app->instance(BatchRepository::class, $repository);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $instance->failed([
+            'batchId' => 'test-batch-id',
+            'command' => serialize((new CallQueuedHandlerBatchableExceptionThrower)->withBatchId('test-batch-id')),
+        ], $exception, 'job-uuid');
+    }
 }
 
 class CallQueuedHandlerTestJob

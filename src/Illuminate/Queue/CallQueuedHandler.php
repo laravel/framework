@@ -413,7 +413,13 @@ class CallQueuedHandler
      */
     public function failed(array $data, $e, string $uuid, ?Job $job = null)
     {
-        $command = $this->getCommand($data);
+        try {
+            $command = $this->getCommand($data);
+        } catch (ModelNotFoundException $exception) {
+            $this->ensureFailedBatchJobIsRecordedForMissingModel($uuid, $data, $e);
+
+            throw $exception;
+        }
 
         if (! is_null($job)) {
             $command = $this->setJobInstanceIfNecessary($job, $command);
@@ -450,6 +456,31 @@ class CallQueuedHandler
         }
 
         if ($batch = $command->batch()) {
+            $batch->recordFailedJob($uuid, $e);
+        }
+    }
+
+    /**
+     * Record a potentially batched job as failed when its models are missing.
+     *
+     * @param  string  $uuid
+     * @param  array  $data
+     * @param  \Throwable|null  $e
+     * @return void
+     */
+    protected function ensureFailedBatchJobIsRecordedForMissingModel(string $uuid, array $data, $e)
+    {
+        if (! $this->container->bound(BatchRepository::class)) {
+            return;
+        }
+
+        $batchId = $data['batchId'] ?? null;
+
+        if ((! is_string($batchId) || $batchId === '') || $uuid === '') {
+            return;
+        }
+
+        if ($batch = $this->container->make(BatchRepository::class)->find($batchId)) {
             $batch->recordFailedJob($uuid, $e);
         }
     }
