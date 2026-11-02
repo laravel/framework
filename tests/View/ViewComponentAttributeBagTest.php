@@ -328,21 +328,26 @@ class ViewComponentAttributeBagTest extends TestCase
     public function testString()
     {
         $this->assertDataStringContract();
+        $this->assertDataStringStrictContract();
     }
 
     public function testBoolean()
     {
         $this->assertDataBooleanContract();
+        $this->assertDataBooleanStrictContract();
+        $this->assertDataBooleanStrictNativeValuesContract();
     }
 
     public function testInteger()
     {
         $this->assertDataIntegerContract();
+        $this->assertDataIntegerStrictContract();
     }
 
     public function testFloat()
     {
         $this->assertDataFloatContract();
+        $this->assertDataFloatStrictContract();
     }
 
     public function testExists()
