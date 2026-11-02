@@ -109,11 +109,7 @@ class PostgresConnection extends Connection
      */
     public function getLastCommitId()
     {
-        // Some examples recommend using pg_current_wal_insert_lsn(), but it can't be used reliably: When the last WAL
-        // record ends exactly at a page boundary, it points behind the header of the next page. This is a WAL position
-        // that a replica can't ever reach. The only way to have a replica acknowledging to have received this WAL is
-        // when more WAL records are written and that impossible position is superseded by new WAL blocks. So a simple
-        // read-after-write couldn't work until some other connection also commits a transaction.
+        // Avoid pg_current_wal_insert_lsn() since it may point to a position a replica can never reach...
         return $this->usingWritePdo(fn () => $this->scalar('select pg_current_wal_lsn()'));
     }
 
@@ -131,7 +127,7 @@ class PostgresConnection extends Connection
             throw new RuntimeException("The list of commit IDs can't be empty.");
         }
 
-        // LSNs are linear, so the newest one includes all older ones.
+        // LSNs are linear, so the newest one includes all older ones...
         return $this->scalar('select value::pg_lsn from json_array_elements_text(?) order by 1 desc limit 1', [json_encode($values)]);
     }
 
@@ -153,7 +149,7 @@ class PostgresConnection extends Connection
 
             $status = $this->scalar("wait for lsn {$this->escapeString($value)} with (timeout {$this->escapeString("{$wait}s")}, no_throw)");
 
-            // A primary can't wait for its own LSNs, the normal wait = 0 check must be used.
+            // A primary can't wait for its own LSNs, so fall back to the immediate check...
             if ($status !== 'not in recovery') {
                 return $status === 'success';
             }

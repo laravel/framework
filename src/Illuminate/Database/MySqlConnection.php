@@ -222,9 +222,7 @@ class MySqlConnection extends Connection
             throw new RuntimeException("The list of commit IDs can't be empty.");
         }
 
-        // For MySQL, commit IDs could be merged simply by joining them. But with the `gtid_subtract` function, many
-        // commit IDs can be normalized into one by merging ranges, removing duplicates, etc. So the produced string is
-        // not growing infinitely but kept as small as possible.
+        // Normalize the joined GTID sets with gtid_subtract to keep the result as small as possible...
         return $this->scalar("select gtid_subtract(?, '')", [implode(',', $values)]);
     }
 

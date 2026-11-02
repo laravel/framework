@@ -85,11 +85,7 @@ class MariaDbConnection extends MySqlConnection
      */
     public function hasCommitId(string $value, int $wait = 0)
     {
-        // MASTER_GTID_WAIT only checks the GTIDs this server received through replication (@@gtid_slave_pos), so it
-        // can't find GTIDs the server wrote itself: on a primary, or on a server mixing replicated and own writes (e.g.
-        // multi-source replication) a wait would wait for their replicas having the commit applied. That's not what we
-        // want here. So a check first with zero wait is used, and @@gtid_current_pos which combines replicated and own
-        // GTIDs as a fallback is loaded for a local check on primary servers.
+        // MASTER_GTID_WAIT only sees replicated GTIDs, so fall back to @@gtid_current_pos for the server's own writes...
         $check = $this->selectOne('select master_gtid_wait(?, 0) as master_gtid_wait, @@gtid_current_pos as gtid_current_pos', [$value]);
         if ((int) $check->master_gtid_wait === 0) {
             return true;
@@ -111,9 +107,6 @@ class MariaDbConnection extends MySqlConnection
     /**
      * Parse a set of commit IDs (GTIDs) into the newest GTID of every MariaDB replication domain.
      *
-     * Every GTID has the structure "{domain}-{server}-{sequence}" and every commit ID can be a comma-separated list
-     * of GTIDs. But MariaDB only compares the sequence within a domain, so older GTIDs of a domain are dropped.
-     *
      * @param  string[]  $values
      * @return array<string, array{domain: string, sequence: \Brick\Math\BigInteger}>
      *
@@ -133,7 +126,8 @@ class MariaDbConnection extends MySqlConnection
             }
 
             $domain = $matches['domain'];
-            $sequence = BigInteger::of($matches['sequence']); // The sequence is a 64-bit unsigned integer and can exceed PHP's signed integers.
+            // The sequence is an unsigned 64-bit integer and may exceed PHP's integer range...
+            $sequence = BigInteger::of($matches['sequence']);
             if (! isset($parsed[$domain]) || $sequence->isGreaterThan($parsed[$domain]['sequence'])) {
                 $gtids[$domain] = $gtid;
                 $parsed[$domain] = compact('domain', 'sequence');
