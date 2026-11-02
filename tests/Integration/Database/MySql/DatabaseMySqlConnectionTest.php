@@ -181,4 +181,23 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
             Schema::drop('auto_id_table');
         }
     }
+
+    public function testLastCommitReadAfterWrite()
+    {
+        if (! DB::scalar('select @@log_bin') || DB::scalar('select @@global.gtid_mode') !== 'ON') {
+            $this->markTestSkipped('Commit IDs require log_bin = ON and gtid_mode = ON.');
+        }
+
+        $first = DB::getLastCommitId();
+        DB::table(self::TABLE)->insert([self::JSON_COL => '{"commit":"read-after-write"}']);
+        $second = DB::getLastCommitId();
+        $merged = DB::mergeCommitIds([$second, $first]);
+
+        $this->assertNotSame($first, $second);
+        $this->assertSame($second, $merged);
+        $this->assertTrue(DB::hasCommitId($first));
+        $this->assertTrue(DB::hasCommitId($second));
+        $this->assertTrue(DB::hasCommitId($merged));
+        $this->assertFalse(DB::hasCommitId('ffffffff-ffff-ffff-ffff-ffffffffffff:9223372036854775806'));
+    }
 }
