@@ -12,6 +12,7 @@ use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Redis\RedisManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -65,6 +66,76 @@ class RedisQueueTest extends TestCase
     private function getQueueRedisKey($queue = null)
     {
         return (new \ReflectionMethod($this->queue, 'getQueueRedisKey'))->invoke($this->queue, $queue);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testQueueOperationsThrowWhenLuaScriptsAreDeniedByAcl($driver): void
+    {
+        $admin_connection = $this->redis['phpredis']->connection();
+
+        if ($admin_connection->isCluster()) {
+            $this->markTestSkipped('ACL user setup is not supported with the test Redis cluster.');
+        }
+
+        $user_name = Str::lower(Str::random(12));
+        $password = Str::random(40);
+        $prefix = 'acl_'.Str::lower(Str::random(12)).'_';
+
+        $admin_connection->executeRaw([
+            'ACL', 'SETUSER', $user_name, 'reset', 'on', ">{$password}", "~{$prefix}*", '&*', '-@all', '+eval', '+select',
+        ]);
+
+        $redis_config = [
+            'options' => ['prefix' => $prefix],
+            'default' => [
+                'host' => env('REDIS_HOST', '127.0.0.1'),
+                'port' => env('REDIS_PORT', 6379),
+                'database' => 5,
+                'timeout' => 0.5,
+                'username' => $user_name,
+                'password' => $password,
+            ],
+        ];
+        $redis = new RedisManager($this->app, $driver, $redis_config);
+        $queue = new RedisQueue($redis, 'default');
+        $queue->setContainer(new Container);
+
+        try {
+            foreach ([
+                ['rpush', fn () => $queue->push('ExampleJob')],
+                ['rpush', fn () => $queue->pushRaw('{"id":"acl-repro","attempts":0}')],
+                ['zadd', fn () => $queue->later(60, 'ExampleJob')],
+                ['zrangebyscore', fn () => $queue->pop()],
+            ] as [$command, $operation]) {
+                try {
+                    $operation();
+                    $this->fail('A Lua ACL failure should be thrown.');
+                } catch (\Throwable $exception) {
+                    $expected_exception = $driver === 'phpredis'
+                        ? \RedisException::class
+                        : \Predis\Response\ServerException::class;
+
+                    $this->assertInstanceOf($expected_exception, $exception);
+                    $this->assertStringContainsString($command, $exception->getMessage());
+                }
+            }
+        } finally {
+            try {
+                $redis->connection()->disconnect();
+            } finally {
+                try {
+                    $admin_connection->executeRaw([
+                        'DEL',
+                        $prefix.'queues:default',
+                        $prefix.'queues:default:notify',
+                        $prefix.'queues:default:delayed',
+                        $prefix.'queues:default:reserved',
+                    ]);
+                } finally {
+                    $admin_connection->executeRaw(['ACL', 'DELUSER', $user_name]);
+                }
+            }
+        }
     }
 
     /**

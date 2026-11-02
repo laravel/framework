@@ -121,7 +121,7 @@ abstract class Connection
         $start = microtime(true);
 
         try {
-            $result = $this->client->{$method}(...$parameters);
+            $result = $this->executeCommand($method, $parameters);
         } catch (Throwable $e) {
             $this->events?->dispatch(new CommandFailed(
                 $method, $this->parseParametersForEvent($parameters), $e, $this
@@ -137,6 +137,11 @@ abstract class Connection
         ));
 
         return $result;
+    }
+
+    protected function executeCommand($method, array $parameters)
+    {
+        return $this->client->{$method}(...$parameters);
     }
 
     /**

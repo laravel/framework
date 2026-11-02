@@ -649,6 +649,23 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
     }
 
+    protected function executeCommand($method, array $parameters)
+    {
+        if (in_array(strtolower($method), ['eval', 'evalsha'], true)) {
+            $this->client->clearLastError();
+            $result = parent::executeCommand($method, $parameters);
+            $error = $this->client->getLastError();
+
+            if ($result === false && $error !== null) {
+                throw new RedisException($error);
+            }
+
+            return $result;
+        }
+
+        return parent::executeCommand($method, $parameters);
+    }
+
     /**
      * Determine whether the command may be safely retried.
      *
