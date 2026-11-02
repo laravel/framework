@@ -20,6 +20,16 @@ class ObjectType extends Type
     }
 
     /**
+     * Get the object's properties.
+     *
+     * @return array<string, Type>
+     */
+    public function properties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
      * Disallow additional properties.
      */
     public function withoutAdditionalProperties(): static

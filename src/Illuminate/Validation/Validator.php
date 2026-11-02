@@ -1290,6 +1290,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Convert the validation rules to a JSON Schema object.
+     *
+     * @return \Illuminate\JsonSchema\Types\ObjectType
+     */
+    public function toJsonSchema()
+    {
+        return JsonSchemaBuilder::fromRules(
+            (new Collection($this->initialRules))
+                ->mapWithKeys(fn ($value, $key) => [static::decodeAttributeWithPlaceholder($key) => $value])
+                ->all()
+        );
+    }
+
+    /**
      * Set the validation rules.
      *
      * @param  array  $rules
