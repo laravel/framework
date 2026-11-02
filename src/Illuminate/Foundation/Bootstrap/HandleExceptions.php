@@ -227,6 +227,10 @@ class HandleExceptions
      */
     protected function renderHttpResponse(Throwable $e)
     {
+        if (headers_sent()) {
+            return;
+        }
+
         $this->getExceptionHandler()->render(static::$app['request'], $e)->send();
     }
 
