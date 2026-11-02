@@ -52,6 +52,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $encoding = null;
 
     /**
+     * The filename that should be validated instead of the uploaded file's own name.
+     *
+     * @var string|null
+     */
+    protected $filename = null;
+
+    /**
      * An array of custom rules that will be merged into the validation rules.
      *
      * @var array
@@ -156,6 +163,44 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $this->allowedExtensions = (array) $extensions;
 
         return $this;
+    }
+
+    /**
+     * Validate the given filename in addition to the uploaded file.
+     *
+     * Image files may not have a PHP extension anywhere in the filename.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function filename($name)
+    {
+        $this->filename = $name;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given filename contains a PHP extension.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function shouldBlockFilenameWithPhpExtension($name)
+    {
+        $name = trim($name);
+
+        if (! str_contains($name, '.')) {
+            return false;
+        }
+
+        if (in_array('php', $this->allowedExtensions ?? [])) {
+            return false;
+        }
+
+        return in_array(strtolower(trim(Str::afterLast($name, '.'))), [
+            'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar',
+        ]);
     }
 
     /**
@@ -276,6 +321,15 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     public function passes($attribute, $value)
     {
         $this->messages = [];
+
+        if (! is_null($this->filename)
+            && $this instanceof ImageFile
+            && $this->shouldBlockFilenameWithPhpExtension($this->filename)
+        ) {
+            return $this->fail($this->validator->getTranslator()->get('validation.filename', [
+                'attribute' => str_replace('_', ' ', $attribute),
+            ]));
+        }
 
         $validator = Validator::make(
             $this->data,

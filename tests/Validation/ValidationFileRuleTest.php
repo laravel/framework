@@ -196,6 +196,25 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testImageFilename()
+    {
+        $image = UploadedFile::fake()->image('foo.png');
+
+        $this->passes(File::image()->filename('foo.png'), $image);
+        $this->passes(File::image()->filename('foo'), $image);
+        $this->passes(File::image()->filename('foo.php.png'), $image);
+        $this->passes(File::default()->filename('foo.php'), $image);
+        $this->passes(File::image()->extensions(['png', 'php'])->filename('foo.php'), $image);
+
+        foreach (['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar'] as $extension) {
+            $this->fails(File::image()->filename("foo.{$extension}"), $image, ['validation.filename']);
+        }
+
+        foreach (['foo.PHP', ' foo.phtml ', 'foo.png.php', 'dir/foo.php'] as $name) {
+            $this->fails(File::image()->filename($name), $image, ['validation.filename']);
+        }
+    }
+
     public function testImageFailsOnSvgByDefault()
     {
         $maliciousSvgFileWithXSS = UploadedFile::fake()->createWithContent(
