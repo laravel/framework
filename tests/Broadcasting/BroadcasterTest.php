@@ -96,6 +96,23 @@ class BroadcasterTest extends TestCase
         Container::setInstance(new Container);
     }
 
+    public function testClassRouteBinding()
+    {
+        $container = new Container;
+        Container::setInstance($container);
+        $binder = Mockery::mock(BindingRegistrar::class);
+        $callback = RouteBinding::forCallback($container, BroadcasterTestRouteBinder::class);
+
+        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $container->instance(BindingRegistrar::class, $binder);
+        $callback = function ($user, $model) {
+            //
+        };
+        $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
+        $this->assertEquals(['bound.1'], $parameters);
+        Container::setInstance(new Container);
+    }
+
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
         $this->expectException(Exception::class);
@@ -419,6 +436,14 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
     public function first()
     {
         //
+    }
+}
+
+class BroadcasterTestRouteBinder
+{
+    public function bind($value, $route)
+    {
+        return "bound.{$value}";
     }
 }
 
