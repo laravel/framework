@@ -1,6 +1,50 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.39.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.40.0...13.x)
+
+## [v13.40.0](https://github.com/laravel/framework/compare/v13.39.0...v13.40.0) - 2026-11-03
+
+* [13.x] Fix Paginator::links() return type by [@dhrupo](https://github.com/dhrupo) in https://github.com/laravel/framework/pull/62226
+* [13.x] Fix updating JSON paths with arrays and collections on MySQL and MariaDB by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62225
+* [13.x] Use the write connection in BelongsToMany createOrFirst lookup by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62223
+* [13.x] Drop check constraints when dropping columns on SQL Server by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62222
+* [13.x] Centralize + improve tests for `InteractsWithData` by [@inxilpro](https://github.com/inxilpro) in https://github.com/laravel/framework/pull/62217
+* [13.x] Fix Redis tagged cache flush blocking Redis when flushing many tags by [@MohannadElemary](https://github.com/MohannadElemary) in https://github.com/laravel/framework/pull/62215
+* [13.x] Qualify dropped and renamed indexes with the table schema on PostgreSQL by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62213
+* [13.x] Reconnect after losing the connection during a transaction by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62211
+* [13.x] Add missing PostgreSQL full text languages by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62210
+* [13.x] Add Queue::whenJobRunsLongerThan by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62141
+* [13.x] Fix named arguments in Cookie::queue() by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62246
+* [13.x] Fix ImageFile::default() returning a plain File rule by [@Marzaan](https://github.com/Marzaan) in https://github.com/laravel/framework/pull/62244
+* [13.x] Fix pagination contracts render() return type by [@dhrupo](https://github.com/dhrupo) in https://github.com/laravel/framework/pull/62242
+* [13.x] Fix SQL Server ignoring orderBy on update and delete with limit by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62239
+* [13.x] Preserve error_get_last() for suppressed errors by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62228
+* Prepare reusable development environments for Amp orbs by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/62231
+* Allow `$middleware->replace()` to accept an array of replacements by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/62230
+* [13.x] Show released jobs as released in queue:work output by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62180
+* Add `$middleware->insertBefore()` and `$middleware->insertAfter()` helper methods by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/62261
+* [13.x] Reconnect the Cloud log socket after a failed write by [@jamesdangercarpenter](https://github.com/jamesdangercarpenter) in https://github.com/laravel/framework/pull/62258
+* [13.x] Dispatch `ScheduledTaskSkipped` when a task already ran on another server by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62256
+* [13.x] Fix forceIndex() generating invalid SQL on SQLite for PRIMARY and multiple indexes by [@tharlei](https://github.com/tharlei) in https://github.com/laravel/framework/pull/62255
+* [13.x] Add Schedule::whenTaskRunsLongerThan by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62233
+* [13.x] Roll back to savepoint on concurrency errors in nested transactions by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62248
+* [13.x] Fix `toResourceCollection()` on filtered collections by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62266
+* Fix lazily loaded images not being freed until garbage collection by [@tamc](https://github.com/tamc) in https://github.com/laravel/framework/pull/62265
+* Bump stefanzweifel/git-auto-commit-action from 7.2.0 to 7.2.1 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/62288
+* KeyGenerateCommand: improve help message about '--show' by [@valerio-bozzolan](https://github.com/valerio-bozzolan) in https://github.com/laravel/framework/pull/62286
+* [13.x] Record failed batch jobs when the model is missing by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62280
+* [13.x] Fix broadcasting to multiple encrypted Pusher channels by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62279
+* [13.x] Fix Str::remove() rejecting a Traversable subject by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/62278
+* [13.x] Fix Str::substrCount() treating offset and length as bytes by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/62277
+* [13.x] Fix `withExists()` and `loadExists()` on SQL Server by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62273
+* [13.x] Fix `cursorPaginate()` columns on union queries with multiple orders by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/62272
+* [13.x] Fix [@param](https://github.com/param) types wider than the native parameter type by [@dhrupo](https://github.com/dhrupo) in https://github.com/laravel/framework/pull/62271
+* [13.x] Detect QueryList.TerminateAll() as lost connection by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62270
+* [13.x] Add a `strict` flag to `InteractsWithData` by [@inxilpro](https://github.com/inxilpro) in https://github.com/laravel/framework/pull/62254
+* [13.x] database fundamentals to know if a read connection has catched up to a write connection by [@tpetry](https://github.com/tpetry) in https://github.com/laravel/framework/pull/62198
+* [13.x] Fix CommandSignatureTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62295
+* [13.x] Fix JSON:API resource collections wrapping plain objects by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/62299
+* [13.x] Fix: Authenticate the Concurrency Process Result Envelope to Prevent Task Output Injection by [@Arr0way](https://github.com/Arr0way) in https://github.com/laravel/framework/pull/62297
 
 ## [v13.39.0](https://github.com/laravel/framework/compare/v13.38.0...v13.39.0) - 2026-10-27
 
