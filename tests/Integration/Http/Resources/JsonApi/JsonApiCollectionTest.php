@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ObjectBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
@@ -224,5 +226,26 @@ class JsonApiCollectionTest extends TestCase
 
         // One query for the count, one for the posts, one for the authors and one for their profiles...
         $this->assertCount(4, DB::getQueryLog());
+    }
+
+    public function testItCanGenerateJsonApiResponseForObjectBackedResources()
+    {
+        Route::get('things', function () {
+            return ObjectBackedJsonApiResource::collection([(object) ['id' => 99, 'name' => 'test']]);
+        });
+
+        $this->getJson('/things')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    [
+                        'id' => '99',
+                        'type' => 'things',
+                        'attributes' => [
+                            'name' => 'test',
+                        ],
+                    ],
+                ],
+            ]);
     }
 }
