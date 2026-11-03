@@ -148,7 +148,19 @@ class PostgresConnector extends Connector implements ConnectorInterface
         $options = [];
 
         foreach ($config['server_options'] as $name => $value) {
+            if (is_null($value)) {
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $value = $value ? 'on' : 'off';
+            }
+
             $options[] = '-c '.$name.'='.str_replace(['\\', ' '], ['\\\\', '\\ '], (string) $value);
+        }
+
+        if ($options === []) {
+            return $dsn;
         }
 
         $options = str_replace(['\\', "'"], ['\\\\', "\\'"], implode(' ', $options));
