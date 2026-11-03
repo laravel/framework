@@ -96,10 +96,16 @@ PHP);
     {
         $factory = $this->app->make(ProcessFactory::class);
 
-        $factory->fake(fn () => $factory->result(json_encode([
-            'successful' => true,
-            'result' => serialize('result'),
-        ])));
+        $factory->fake(function ($process) use ($factory) {
+            $encoded = base64_encode(json_encode([
+                'successful' => true,
+                'result' => serialize('result'),
+            ]));
+
+            $signature = hash_hmac('sha256', $encoded, $process->environment['LARAVEL_CONCURRENCY_HMAC_KEY']);
+
+            return $factory->result("\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$signature}@@\n");
+        });
 
         $result = (new ProcessDriver($factory))->run([
             fn () => 'result',
