@@ -96,10 +96,15 @@ PHP);
     {
         $factory = $this->app->make(ProcessFactory::class);
 
-        $factory->fake(fn () => $factory->result(json_encode([
+        $encoded = base64_encode(json_encode([
             'successful' => true,
             'result' => serialize('result'),
-        ])));
+        ]));
+        $mac = hash_hmac('sha256', $encoded, (string) config('app.key'));
+
+        $factory->fake(fn () => $factory->result(
+            "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$mac}@@\n"
+        ));
 
         $result = (new ProcessDriver($factory))->run([
             fn () => 'result',

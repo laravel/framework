@@ -38,6 +38,7 @@ class ProcessDriver implements Driver
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command, $timeout) {
             foreach (Arr::wrap($tasks) as $key => $task) {
                 $process = $pool->as($key)->path(base_path())->env([
+                    'LARAVEL_CONCURRENCY_HMAC_KEY' => (string) app('config')->get('app.key'),
                     /** @phpstan-ignore staticMethod.notFound */
                     '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
@@ -58,11 +59,7 @@ class ProcessDriver implements Driver
 
             $output = $result->output();
 
-            if (($pos = strpos($output, "\x1f\x8b")) !== false) {
-                $output = substr($output, 0, $pos);
-            }
-
-            $result = json_decode($output, true);
+            $result = $this->parseEnvelope($output);
 
             if (! $result['successful']) {
                 throw new $result['exception'](
@@ -77,6 +74,41 @@ class ProcessDriver implements Driver
     }
 
     /**
+     * Extract the authenticated result envelope from the child process output.
+     *
+     * Task output may contain arbitrary bytes (including attacker-controlled
+     * text), so only a sentinel-framed, HMAC-signed envelope is trusted: the
+     * scan runs bottom-up and accepts the last line carrying a valid MAC —
+     * task output cannot produce one, and the child always writes the real
+     * envelope last.
+     */
+    protected function parseEnvelope(string $output, ?string $key = null): array
+    {
+        $key = $key ?? (string) app('config')->get('app.key');
+        $lines = preg_split('/\r?\n/', $output) ?: [];
+
+        for ($i = count($lines) - 1; $i >= 0; $i--) {
+            if (! preg_match('/@@LARAVEL-CONCURRENCY-V1@@([A-Za-z0-9+\/=]+)@@([0-9a-f]{64})@@/', $lines[$i], $match)) {
+                continue;
+            }
+
+            if (! hash_equals(hash_hmac('sha256', $match[1], $key), $match[2])) {
+                continue;
+            }
+
+            $payload = base64_decode($match[1], true);
+
+            $result = is_string($payload) ? json_decode($payload, true) : null;
+
+            if (is_array($result) && array_key_exists('successful', $result)) {
+                return $result;
+            }
+        }
+
+        throw new \RuntimeException('The concurrency child process did not return a valid result envelope.');
+    }
+
+    /**
      * Start the given tasks in the background after the current task has finished.
      */
     public function defer(Closure|array $tasks): DeferredCallback
@@ -86,6 +118,7 @@ class ProcessDriver implements Driver
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
                 $this->processFactory->path(base_path())->env([
+                    'LARAVEL_CONCURRENCY_HMAC_KEY' => (string) app('config')->get('app.key'),
                     /** @phpstan-ignore staticMethod.notFound */
                     '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(

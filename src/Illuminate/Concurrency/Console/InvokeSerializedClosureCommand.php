@@ -41,7 +41,7 @@ class InvokeSerializedClosureCommand extends Command
     public function handle()
     {
         try {
-            $this->output->write(json_encode([
+            $this->output->write($this->frameEnvelope(json_encode([
                 'successful' => true,
                 'result' => serialize($this->laravel->call(match (true) {
                     ! is_null($this->argument('code')) => unserialize($this->argument('code')),
@@ -50,7 +50,7 @@ class InvokeSerializedClosureCommand extends Command
                     ),
                     default => fn () => null,
                 })),
-            ]));
+            ])));
         } catch (Throwable $e) {
             report($e);
 
@@ -68,14 +68,29 @@ class InvokeSerializedClosureCommand extends Command
                 }
             }
 
-            $this->output->write(json_encode([
+            $this->output->write($this->frameEnvelope(json_encode([
                 'successful' => false,
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'parameters' => $parameters,
-            ]));
+            ])));
         }
+    }
+
+    /**
+     * Frame the result envelope with a sentinel line and an HMAC keyed by the
+     * concurrency MAC key (LARAVEL_CONCURRENCY_HMAC_KEY, passed by the parent
+     * with the spawn, falling back to the application key) so that task output
+     * cannot be mistaken for the result channel.
+     */
+    protected function frameEnvelope(string $payload): string
+    {
+        $encoded = base64_encode($payload);
+        $macKey = getenv('LARAVEL_CONCURRENCY_HMAC_KEY') ?: (string) $this->laravel->make('config')->get('app.key');
+        $mac = hash_hmac('sha256', $encoded, $macKey);
+
+        return "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$mac}@@\n";
     }
 }

@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Concurrency\Console;
 
 use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
+use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\TestCase;
+use ReflectionMethod;
 use RuntimeException;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -44,7 +46,9 @@ class InvokeSerializedClosureCommandTest extends TestCase
         ], $output);
 
         // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the authenticated result envelope, using the same parsing
+        // the ProcessDriver performs on the child's output.
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -67,7 +71,9 @@ class InvokeSerializedClosureCommandTest extends TestCase
         Artisan::call('invoke-serialized-closure', [], $output);
 
         // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the authenticated result envelope, using the same parsing
+        // the ProcessDriver performs on the child's output.
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -86,7 +92,9 @@ class InvokeSerializedClosureCommandTest extends TestCase
         Artisan::call('invoke-serialized-closure', [], $output);
 
         // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the authenticated result envelope, using the same parsing
+        // the ProcessDriver performs on the child's output.
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -108,7 +116,9 @@ class InvokeSerializedClosureCommandTest extends TestCase
         ], $output);
 
         // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the authenticated result envelope, using the same parsing
+        // the ProcessDriver performs on the child's output.
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the exception was caught
         $this->assertFalse($result['successful']);
@@ -131,11 +141,25 @@ class InvokeSerializedClosureCommandTest extends TestCase
         ], $output);
 
         // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the authenticated result envelope, using the same parsing
+        // the ProcessDriver performs on the child's output.
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the exception was caught and parameters were captured
         $this->assertFalse($result['successful']);
         $this->assertArrayHasKey('parameters', $result);
         $this->assertSame('Test param', $result['parameters']['customParam'] ?? null);
+    }
+
+    /**
+     * Extract the authenticated result envelope from the command output,
+     * using the same parsing the ProcessDriver performs.
+     */
+    private function envelopeFrom(string $output): array
+    {
+        $driver = $this->app->make(ProcessDriver::class);
+        $method = new ReflectionMethod($driver, 'parseEnvelope');
+
+        return $method->invoke($driver, $output);
     }
 }
