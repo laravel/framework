@@ -2,173 +2,161 @@
 
 namespace Illuminate\Tests\Integration\Concurrency;
 
-use Illuminate\Broadcasting\BroadcastEvent;
-use Illuminate\Broadcasting\PendingBroadcast;
-use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Process\Factory as ProcessFactory;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
-use ReflectionClass;
-use ReflectionProperty;
+use RuntimeException;
 
-/**
- * Security regression tests for the concurrency process driver's result channel.
- *
- * The child process communicates its result over stdout; a task that echoes
- * user-controlled text must never be able to forge that channel. These tests
- * feed forged envelopes through a faked child process (parse-level) and
- * through a real child process (end-to-end), and assert that the parent only
- * ever accepts an authenticated envelope.
- *
- * On vulnerable revisions (the gzip-magic truncation of #59224 without the
- * authenticated envelope) the first and fourth tests fail because the attacker's
- * object is instantiated in the parent process — the RCE primitive.
- */
-#[RequiresOperatingSystem('Linux|Darwin')]
 #[WithEnv('APP_KEY', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class ProcessDriverSecurityTest extends TestCase
 {
-    /**
-     * The command a real gadget chain would execute in the parent process.
-     */
-    public const ATTACK_COMMAND = 'echo poc3-rce-confirmed >> /tmp/poc3-rce-marker';
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        ConcurrencyAttackGadget::$instantiatedByParent = false;
-        ConcurrencyAttackGadget::$destructed = false;
+        ConcurrencyEnvelopeGadget::$woken = false;
     }
 
-    public function testForgedEnvelopeInTaskOutputIsNotParsed()
+    public function testForgedResultInTaskOutputIsIgnored()
     {
-        $forged = json_encode(['successful' => true, 'result' => $this->attackChain()])."\x1f\x8b";
-        $legitimate = $this->framedEnvelope('benign');
+        $forged = json_encode(['successful' => true, 'result' => serialize(new ConcurrencyEnvelopeGadget)])."\x1f\x8b";
 
         $factory = new ProcessFactory;
-        $factory->fake(fn () => $factory->result($forged.$legitimate));
+        $factory->fake(fn ($process) => $factory->result($forged.$this->signedEnvelope($process, 'benign')));
 
-        $results = (new ProcessDriver($factory))->run([fn () => 'benign']);
-
-        $this->assertSame(['benign'], $results);
-        $this->assertNotInstanceOf(ConcurrencyAttackGadget::class, $results[0]);
+        $this->assertSame(['benign'], (new ProcessDriver($factory))->run([fn () => 'benign']));
+        $this->assertFalse(ConcurrencyEnvelopeGadget::$woken);
     }
 
-    public function testForgedSentinelLineWithInvalidMacIsRejected()
+    public function testEnvelopeWithInvalidSignatureIsIgnored()
     {
-        $encoded = base64_encode(json_encode(['successful' => true, 'result' => serialize('attacker')]));
-        $invalidMacLine = '@@LARAVEL-CONCURRENCY-V1@@'.$encoded.'@@'.str_repeat('0', 64).'@@';
-        $legitimate = $this->framedEnvelope('benign');
-
         $factory = new ProcessFactory;
-        $factory->fake(fn () => $factory->result($invalidMacLine."\n".$legitimate));
+        $factory->fake(fn ($process) => $factory->result(
+            $this->envelope(serialize(new ConcurrencyEnvelopeGadget), str_repeat('0', 64)).$this->signedEnvelope($process, 'benign')
+        ));
 
-        $results = (new ProcessDriver($factory))->run([fn () => 'benign']);
-
-        $this->assertSame(['benign'], $results);
+        $this->assertSame(['benign'], (new ProcessDriver($factory))->run([fn () => 'benign']));
+        $this->assertFalse(ConcurrencyEnvelopeGadget::$woken);
     }
 
-    public function testGzipCompressedJunkAfterEnvelopeIsIgnored()
+    public function testEnvelopeSignedWithTheApplicationKeyIsRejected()
     {
-        $legitimate = $this->framedEnvelope('benign');
-
-        $factory = new ProcessFactory;
-        $factory->fake(fn () => $factory->result($legitimate."\n".gzencode('gzip-compressed-junk')));
-
-        $results = (new ProcessDriver($factory))->run([fn () => 'benign']);
-
-        $this->assertSame(['benign'], $results);
+        $this->assertForgedEnvelopeIsRejected((string) config('app.key'));
     }
 
-    public function testOutputWithoutEnvelopeFailsWithADocumentedException()
+    #[WithEnv('APP_KEY', '')]
+    public function testEnvelopeSignedWithAnEmptyKeyIsRejected()
+    {
+        $this->assertSame('', (string) config('app.key'));
+
+        $this->assertForgedEnvelopeIsRejected('');
+    }
+
+    public function testGzipCompressedOutputAfterEnvelopeIsIgnored()
+    {
+        $factory = new ProcessFactory;
+        $factory->fake(fn ($process) => $factory->result(
+            $this->signedEnvelope($process, 'benign').gzencode('gzip-compressed-output')
+        ));
+
+        $this->assertSame(['benign'], (new ProcessDriver($factory))->run([fn () => 'benign']));
+    }
+
+    public function testOutputWithoutEnvelopeThrowsException()
     {
         $factory = new ProcessFactory;
         $factory->fake(fn () => $factory->result('just some task output'));
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('valid result envelope');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('did not return a valid result envelope. Output: just some task output');
 
         (new ProcessDriver($factory))->run([fn () => 'irrelevant']);
     }
 
-    public function testGadgetIsNotInstantiatedWhenEnvelopeIsRejected()
+    public function testEachTaskReceivesADistinctRandomKey()
     {
-        $forged = json_encode(['successful' => true, 'result' => $this->attackChain()])."\x1f\x8b";
+        $keys = [];
 
         $factory = new ProcessFactory;
-        $factory->fake(fn () => $factory->result('this output contains no envelope at all'));
+        $factory->fake(function ($process) use ($factory, &$keys) {
+            $keys[] = $process->environment['LARAVEL_CONCURRENCY_HMAC_KEY'];
+
+            return $factory->result($this->signedEnvelope($process, 'result'));
+        });
+
+        (new ProcessDriver($factory))->run([fn () => 'result', fn () => 'result']);
+
+        $this->assertCount(2, $keys);
+        $this->assertCount(2, array_unique($keys));
+        $this->assertNotContains((string) config('app.key'), $keys);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $keys[0]);
+    }
+
+    public function testDeferredTasksDoNotReceiveAKey()
+    {
+        $factory = new ProcessFactory;
+        $factory->fake();
+
+        $deferred = (new ProcessDriver($factory))->defer(fn () => null);
+
+        $deferred();
+
+        $factory->assertRan(fn ($process) => ! array_key_exists('LARAVEL_CONCURRENCY_HMAC_KEY', $process->environment));
+    }
+
+    /**
+     * Assert that an envelope signed with the given key is not accepted.
+     */
+    protected function assertForgedEnvelopeIsRejected(string $key): void
+    {
+        $result = serialize(new ConcurrencyEnvelopeGadget);
+        $encoded = base64_encode(json_encode(['successful' => true, 'result' => $result]));
+
+        $factory = new ProcessFactory;
+        $factory->fake(fn () => $factory->result($this->envelope($result, hash_hmac('sha256', $encoded, $key))));
 
         try {
             (new ProcessDriver($factory))->run([fn () => 'irrelevant']);
-        } catch (\RuntimeException) {
-            // expected on the fixed driver
+
+            $this->fail('The forged envelope was accepted.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('did not return a valid result envelope', $e->getMessage());
         }
 
-        $this->assertFalse(ConcurrencyAttackGadget::$instantiatedByParent);
-        $this->assertFalse(ConcurrencyAttackGadget::$destructed);
+        $this->assertFalse(ConcurrencyEnvelopeGadget::$woken);
     }
 
     /**
-     * The envelope exactly as the patched child process emits it: base64 JSON
-     * framed by a sentinel line and authenticated with the application key.
+     * Build an envelope signed with the key the driver passed to the given process.
      */
-    private function framedEnvelope(mixed $result): string
+    protected function signedEnvelope($process, mixed $result): string
     {
         $encoded = base64_encode(json_encode(['successful' => true, 'result' => serialize($result)]));
-        $mac = hash_hmac('sha256', $encoded, (string) config('app.key'));
 
-        return "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$mac}@@\n";
+        return $this->envelope(
+            serialize($result),
+            hash_hmac('sha256', $encoded, $process->environment['LARAVEL_CONCURRENCY_HMAC_KEY']),
+        );
     }
 
     /**
-     * The attacker-controlled object chain, built exactly as a phpggc-style
-     * payload would be: PendingBroadcast::__destruct -> Bus\Dispatcher::dispatch
-     * -> dispatchToQueue -> ($queueResolver)($connection).
+     * Build an envelope for the given serialized result and signature.
      */
-    private function attackChain(): string
+    protected function envelope(string $result, string $signature): string
     {
-        $pb = (new ReflectionClass(PendingBroadcast::class))->newInstanceWithoutConstructor();
-        $dispatcher = (new ReflectionClass(BusDispatcher::class))->newInstanceWithoutConstructor();
-        $event = (new ReflectionClass(BroadcastEvent::class))->newInstanceWithoutConstructor();
+        $encoded = base64_encode(json_encode(['successful' => true, 'result' => $result]));
 
-        (new ReflectionProperty($pb, 'events'))->setValue($pb, $dispatcher);
-        (new ReflectionProperty($pb, 'event'))->setValue($pb, $event);
-        (new ReflectionProperty($dispatcher, 'queueResolver'))->setValue($dispatcher, 'system');
-        (new ReflectionProperty($event, 'connection'))->setValue($event, self::ATTACK_COMMAND);
-
-        $chain = serialize($pb);
-
-        // Neutralize the builder's own objects so they cannot fire the chain
-        // when this test process shuts down.
-        (new ReflectionProperty($pb, 'events'))->setValue($pb, new ConcurrencyNoopDispatcher);
-
-        return $chain;
+        return "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$signature}@@\n";
     }
 }
 
-class ConcurrencyAttackGadget
+class ConcurrencyEnvelopeGadget
 {
-    public static bool $instantiatedByParent = false;
-    public static bool $destructed = false;
+    public static bool $woken = false;
 
-    public function __construct()
+    public function __wakeup()
     {
-        static::$instantiatedByParent = true;
-    }
-
-    public function __destruct()
-    {
-        static::$destructed = true;
-    }
-}
-
-class ConcurrencyNoopDispatcher
-{
-    public function dispatch(mixed $event = null): void
-    {
-        //
+        static::$woken = true;
     }
 }

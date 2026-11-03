@@ -40,8 +40,10 @@ class InvokeSerializedClosureCommand extends Command
      */
     public function handle()
     {
+        $key = $this->pullEnvelopeKey();
+
         try {
-            $this->output->write($this->frameEnvelope(json_encode([
+            $this->output->write($this->frameEnvelope($key, json_encode([
                 'successful' => true,
                 'result' => serialize($this->laravel->call(match (true) {
                     ! is_null($this->argument('code')) => unserialize($this->argument('code')),
@@ -68,7 +70,7 @@ class InvokeSerializedClosureCommand extends Command
                 }
             }
 
-            $this->output->write($this->frameEnvelope(json_encode([
+            $this->output->write($this->frameEnvelope($key, json_encode([
                 'successful' => false,
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
@@ -80,17 +82,28 @@ class InvokeSerializedClosureCommand extends Command
     }
 
     /**
-     * Frame the result envelope with a sentinel line and an HMAC keyed by the
-     * concurrency MAC key (LARAVEL_CONCURRENCY_HMAC_KEY, passed by the parent
-     * with the spawn, falling back to the application key) so that task output
-     * cannot be mistaken for the result channel.
+     * Get the envelope key passed by the parent process and remove it from the environment.
      */
-    protected function frameEnvelope(string $payload): string
+    protected function pullEnvelopeKey(): string
+    {
+        $key = $_SERVER['LARAVEL_CONCURRENCY_HMAC_KEY'] ?? $_ENV['LARAVEL_CONCURRENCY_HMAC_KEY'] ?? getenv('LARAVEL_CONCURRENCY_HMAC_KEY');
+
+        unset($_SERVER['LARAVEL_CONCURRENCY_HMAC_KEY'], $_ENV['LARAVEL_CONCURRENCY_HMAC_KEY']);
+
+        putenv('LARAVEL_CONCURRENCY_HMAC_KEY');
+
+        return is_string($key) && $key !== '' ? $key : bin2hex(random_bytes(32));
+    }
+
+    /**
+     * Frame the given result payload with a marker and an HMAC signature.
+     */
+    protected function frameEnvelope(string $key, string $payload): string
     {
         $encoded = base64_encode($payload);
-        $macKey = getenv('LARAVEL_CONCURRENCY_HMAC_KEY') ?: (string) $this->laravel->make('config')->get('app.key');
-        $mac = hash_hmac('sha256', $encoded, $macKey);
 
-        return "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$mac}@@\n";
+        $signature = hash_hmac('sha256', $encoded, $key);
+
+        return "\n@@LARAVEL-CONCURRENCY-V1@@{$encoded}@@{$signature}@@\n";
     }
 }
