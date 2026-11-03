@@ -116,7 +116,14 @@ class RedisQueueTest extends TestCase
                         : \Predis\Response\ServerException::class;
 
                     $this->assertInstanceOf($expected_exception, $exception);
-                    $this->assertStringContainsString($command, $exception->getMessage());
+
+                    $message = $exception->getMessage();
+
+                    $this->assertTrue(
+                        str_contains($message, "no permissions to run the '{$command}' command")
+                            || str_contains($message, "can't run this command or subcommand"),
+                        "Expected a Redis ACL denial for [{$command}], but received [{$message}].",
+                    );
                 }
             }
         } finally {
