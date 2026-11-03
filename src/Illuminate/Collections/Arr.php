@@ -179,7 +179,7 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return array
      */
     public static function dot($array, $prepend = '', $depth = INF)
@@ -372,7 +372,7 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return array
      */
     public static function flatten($array, $depth = INF)

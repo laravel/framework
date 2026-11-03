@@ -491,7 +491,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get a flattened list of the items in the collection.
      *
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return static<int, mixed>
      */
     public function flatten($depth = INF)
@@ -1711,7 +1711,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return static
      */
     public function dot($depth = INF)

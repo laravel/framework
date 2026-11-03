@@ -458,7 +458,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get a flattened array of the items in the collection.
      *
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return static<int, mixed>
      */
     public function flatten($depth = INF)
@@ -1841,7 +1841,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return static
      */
     public function dot($depth = INF)
