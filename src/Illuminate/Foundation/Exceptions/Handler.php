@@ -19,6 +19,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\OriginMismatchException;
@@ -55,7 +56,7 @@ use WeakMap;
 
 class Handler implements ExceptionHandlerContract
 {
-    use ReflectsClosures;
+    use ReflectsClosures, ResolvesDumpSource;
 
     /**
      * The container implementation.
@@ -1022,7 +1023,13 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderExceptionWithSymfony(Throwable $e, $debug)
     {
-        $renderer = new HtmlErrorRenderer($debug);
+        $editorHref = $this->resolveSourceHref('%f', '%l');
+
+        if ($editorHref && $basePath = config('app.editor.base_path')) {
+            $editorHref .= '&'.base_path().'>'.$basePath;
+        }
+
+        $renderer = new HtmlErrorRenderer($debug, null, $editorHref);
 
         return $renderer->render($e)->getAsString();
     }

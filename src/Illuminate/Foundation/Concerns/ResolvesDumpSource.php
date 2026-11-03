@@ -172,7 +172,7 @@ trait ResolvesDumpSource
 
         $basePath = $editor['base_path'] ?? false;
 
-        if ($basePath !== false) {
+        if ($basePath !== false && isset($this->basePath)) {
             $file = Str::replaceStart($this->basePath, $basePath, $file);
         }
 

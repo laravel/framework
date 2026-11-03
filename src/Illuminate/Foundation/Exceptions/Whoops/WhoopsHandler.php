@@ -3,11 +3,14 @@
 namespace Illuminate\Foundation\Exceptions\Whoops;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Illuminate\Support\Arr;
 use Whoops\Handler\PrettyPageHandler;
 
 class WhoopsHandler
 {
+    use ResolvesDumpSource;
+
     /**
      * Create a new Whoops handler for debug mode.
      *
@@ -77,8 +80,19 @@ class WhoopsHandler
      */
     protected function registerEditor($handler)
     {
-        if (config('app.editor', false)) {
-            $handler->setEditor(config('app.editor'));
+        $editorHref = $this->resolveSourceHref('{file}', '{line}');
+
+        if ($editorHref) {
+            $options = [];
+
+            if ($basePath = config('app.editor.base_path')) {
+                $options['pathMappings'] = [base_path() => $basePath];
+            }
+
+            $handler->setEditor(fn ($file, $line = null) => [
+                'url' => str_replace(['{file}', '{line}'], [$file, $line ?? 1], $editorHref),
+                'ajax' => config('app.editor.ajax', false),
+            ], $options);
         }
 
         return $this;
