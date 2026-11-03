@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Closure;
+use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -190,6 +193,40 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                     return Arr::has($payload, ['model', 'connection', 'queue', 'socket']);
                 });
         });
+    }
+
+    public function testBroadcastingRespectsTheQueueConnectionAfterCommitOption()
+    {
+        $this->app['config']->set('queue.default', 'sync');
+        $this->app['config']->set('queue.connections.sync.after_commit', true);
+        $this->app['config']->set('broadcasting.default', 'recording');
+        $this->app['config']->set('broadcasting.connections.recording', ['driver' => 'recording']);
+
+        $broadcasts = [];
+
+        Broadcast::extend('recording', function () use (&$broadcasts) {
+            return new class($broadcasts) extends NullBroadcaster
+            {
+                public function __construct(protected array &$broadcasts)
+                {
+                }
+
+                public function broadcast(array $channels, $event, array $payload = [])
+                {
+                    $this->broadcasts[] = $event;
+                }
+            };
+        });
+
+        DB::transaction(function () use (&$broadcasts) {
+            $model = new TestEloquentBroadcastUser;
+            $model->name = 'Taylor';
+            $model->save();
+
+            $this->assertSame([], $broadcasts);
+        });
+
+        $this->assertSame(['TestEloquentBroadcastUserCreated'], $broadcasts);
     }
 
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)

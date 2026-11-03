@@ -188,10 +188,10 @@ trait BroadcastsEvents
     /**
      * Determine if the model event broadcast queued job should be dispatched after all transactions are committed.
      *
-     * @return bool
+     * @return bool|null
      */
     public function broadcastAfterCommit()
     {
-        return false;
+        return null;
     }
 }
