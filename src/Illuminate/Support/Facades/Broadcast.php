@@ -17,7 +17,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static mixed connection(\UnitEnum|string|null $name = null)
  * @method static mixed driver(\UnitEnum|string|null $name = null)
  * @method static \Pusher\Pusher pusher(array $config)
- * @method static \Ably\AblyRest ably(array $config)
+ * @method static \Ably\PubSub\PubSubHttpClient|mixed ably(array $config)
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static void purge(\UnitEnum|string|null $name = null)
