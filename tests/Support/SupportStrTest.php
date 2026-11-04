@@ -1631,6 +1631,30 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤Mu<br />lti<br />Byt<br />e☆❤<br />☆❤☆<br />❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />', true));
     }
 
+    #[DataProvider('wordWrapWithExistingBreaksProvider')]
+    public function testWordWrapPreservesExistingBreaks($string, $characters, $break, $cutLongWords, $expected)
+    {
+        $this->assertSame($expected, Str::wordWrap($string, $characters, $break, $cutLongWords));
+    }
+
+    public static function wordWrapWithExistingBreaksProvider()
+    {
+        return [
+            'newlines' => ["éé\néé", 2, "\n", true, "éé\néé"],
+            'wrap each line' => ["éééé\néééé", 2, "\n", true, "éé\néé\néé\néé"],
+            'word boundaries' => ["éé éé\néé éé", 2, "\n", false, "éé\néé\néé\néé"],
+            'empty lines' => ["\néé\n\néé\n", 2, "\n", true, "\néé\n\néé\n"],
+            'custom break' => ['éé<br>éé', 2, '<br>', true, 'éé<br>éé'],
+            'multibyte break' => ['éé☆éééé', 2, '☆', true, 'éé☆éé☆éé'],
+            'placeholder in break' => ["ééA\x1ABéééé", 2, "A\x1AB", true, "ééA\x1ABééA\x1ABéé"],
+            'null byte break' => ["éé\0éééé", 2, "\0", true, "éé\0éé\0éé"],
+            'existing marker bytes' => ["é\2\3é<br>éééé", 4, '<br>', true, "é\2\3é<br>éééé"],
+            'marker prefix before break' => ["é\2<br>éééé", 2, '<br>', true, "é\2<br>éé<br>éé"],
+            'regex characters in break' => ['éé/.*éééé', 2, '/.*', true, 'éé/.*éé/.*éé'],
+            'carriage return and newline' => ["éé\r\néééé", 2, "\r\n", true, "éé\r\néé\r\néé"],
+        ];
+    }
+
     public static function validUuidList()
     {
         return [

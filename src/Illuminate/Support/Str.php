@@ -2080,6 +2080,20 @@ class Str
             return wordwrap($string, $characters, $break, $cutLongWords);
         }
 
+        if (($position = strpos($string, $break)) !== false) {
+            $result = '';
+            $offset = 0;
+            $breakLength = strlen($break);
+
+            // Wrap each existing line separately so its separator is never encoded or split.
+            do {
+                $result .= static::wordWrap(substr($string, $offset, $position - $offset), $characters, $break, $cutLongWords).$break;
+                $offset = $position + $breakLength;
+            } while (($position = strpos($string, $break, $offset)) !== false);
+
+            return $result.static::wordWrap(substr($string, $offset), $characters, $break, $cutLongWords);
+        }
+
         $replaced = [];
 
         $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', function ($match) use (&$replaced) {
