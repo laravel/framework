@@ -28,6 +28,7 @@ class FailoverConnector implements ConnectorInterface
             $this->manager,
             $this->events,
             $config['connections'],
+            $config['after_commit'] ?? null,
         );
     }
 }

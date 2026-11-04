@@ -25,8 +25,10 @@ class FailoverQueue extends Queue implements QueueContract
     public function __construct(
         public QueueManager $manager,
         public EventDispatcher $events,
-        public array $connections
+        public array $connections,
+        $dispatchAfterCommit = null
     ) {
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
@@ -263,12 +265,40 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Attempt the given method on all connections.
      *
+     * @param  string  $method
+     * @param  array  $arguments
      * @param  mixed  $job
      * @return mixed
      *
      * @throws \Throwable
      */
     protected function attemptOnAllConnections(string $method, array $arguments, $job = null)
+    {
+        if ($job !== null &&
+            isset($this->container) &&
+            $this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
+
+            return $this->container->make('db.transactions')->addCallback(
+                fn () => $this->attemptOnAllConnectionsNow($method, $arguments, $job),
+            );
+        }
+
+        return $this->attemptOnAllConnectionsNow($method, $arguments, $job);
+    }
+
+    /**
+     * Attempt the given method on all connections immediately.
+     *
+     * @param  string  $method
+     * @param  array  $arguments
+     * @param  mixed  $job
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function attemptOnAllConnectionsNow(string $method, array $arguments, $job = null)
     {
         [$lastException, $failedQueues] = [null, []];
 
