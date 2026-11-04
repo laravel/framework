@@ -70,7 +70,7 @@
     },
     "require-dev": {
         "ext-gmp": "*",
-        "ably/ably-php": "^1.0",
+        "ably/pubsub-server": "^1.0|^2.0",
         "aws/aws-sdk-php": "^3.322.9",
         "fakerphp/faker": "^1.24",
         "intervention/image": "^4.2",
