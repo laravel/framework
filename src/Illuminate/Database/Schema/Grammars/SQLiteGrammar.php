@@ -381,7 +381,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return null
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
