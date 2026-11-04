@@ -1061,9 +1061,9 @@ class Arr
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $values
-     * @return array
+     * @return \ArrayAccess|array
      */
-    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): ArrayAccess|array
     {
         $target = static::array($array, $key, []);
 
