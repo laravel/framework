@@ -235,6 +235,25 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertSame('B (post)', current($result->items())->alias, 'Expect the paginated query would return `B (post)`');
     }
 
+    public function testPaginationWithMultipleAliasesAndMultipleOrders()
+    {
+        TestUser::fillAndInsert([['name' => 'A'], ['name' => 'C']]);
+        TestPost::fillAndInsert([['title' => 'A', 'user_id' => 2], ['title' => 'B', 'user_id' => 1]]);
+
+        $table1 = TestPost::select(['title as label', 'user_id as rank']);
+        $table2 = TestUser::select(['name as label', 'id as rank']);
+
+        $result = $table1->toBase()
+            ->union($table2->toBase())
+            ->orderBy('label')
+            ->orderBy('rank')
+            ->cursorPaginate(1, ['*'], 'cursor', new Cursor(['label' => 'A', 'rank' => 1]));
+
+        $this->assertCount(1, $result->items());
+        $this->assertSame('A', current($result->items())->label);
+        $this->assertEquals(2, current($result->items())->rank);
+    }
+
     public function testPaginationWithAliasedOrderBy()
     {
         TestUser::fillAndInsert([[], [], [], [], [], []]);

@@ -83,21 +83,26 @@ class SupportInteractsWithDataTest extends TestCase
     public function testStringMethod()
     {
         $this->assertDataStringContract();
+        $this->assertDataStringStrictContract();
     }
 
     public function testBooleanMethod()
     {
         $this->assertDataBooleanContract();
+        $this->assertDataBooleanStrictContract();
+        $this->assertDataBooleanStrictNativeValuesContract();
     }
 
     public function testIntegerMethod()
     {
         $this->assertDataIntegerContract();
+        $this->assertDataIntegerStrictContract();
     }
 
     public function testFloatMethod()
     {
         $this->assertDataFloatContract();
+        $this->assertDataFloatStrictContract();
     }
 
     public function testClampMethod()

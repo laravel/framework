@@ -1168,7 +1168,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Execute the given callback if the string contains all array values.
      *
-     * @param  iterable<string>  $needles
+     * @param  array<string>  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static

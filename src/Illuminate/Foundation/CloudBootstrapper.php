@@ -17,6 +17,7 @@ use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\JsonFormatter;
 use Illuminate\Foundation\Cloud\QueueConnector;
+use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Log\Context\Events\ContextDehydrating;
 use Illuminate\Queue\Connectors\SqsConnector;
@@ -28,7 +29,6 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Laravel\Octane\Events\RequestReceived;
-use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
 

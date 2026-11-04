@@ -77,7 +77,7 @@ class Image implements Responsable, Stringable
      */
     protected function resolveOnce(Closure $loader): Closure
     {
-        return function () use ($loader) {
+        return static function () use ($loader) {
             static $contents;
 
             return $contents ??= $loader();

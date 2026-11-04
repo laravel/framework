@@ -436,4 +436,54 @@ class MiddlewareTest extends TestCase
 
         $this->assertSame('AfterMiddleware', $web[array_search(StartSession::class, $web) + 1]);
     }
+
+    public function testInsertBefore()
+    {
+        $middleware = new Middleware;
+
+        $middleware->use(['FirstMiddleware', 'SecondMiddleware']);
+        $middleware->insertBefore('SecondMiddleware', ['BeforeMiddleware', 'AnotherBeforeMiddleware']);
+
+        $this->assertSame([
+            'FirstMiddleware',
+            'BeforeMiddleware',
+            'AnotherBeforeMiddleware',
+            'SecondMiddleware',
+        ], $middleware->getGlobalMiddleware());
+    }
+
+    public function testInsertAfter()
+    {
+        $middleware = new Middleware;
+
+        $middleware->use(['FirstMiddleware', 'SecondMiddleware']);
+        $middleware->insertAfter('FirstMiddleware', 'AfterMiddleware');
+
+        $this->assertSame(['FirstMiddleware', 'AfterMiddleware', 'SecondMiddleware'], $middleware->getGlobalMiddleware());
+    }
+
+    public function testInsertBeforeInGroup()
+    {
+        $middleware = new Middleware;
+
+        $middleware->group('custom', ['FirstMiddleware', 'SecondMiddleware']);
+        $middleware->insertBeforeInGroup('custom', 'SecondMiddleware', ['BeforeMiddleware', 'AnotherBeforeMiddleware']);
+
+        $this->assertSame([
+            'FirstMiddleware',
+            'BeforeMiddleware',
+            'AnotherBeforeMiddleware',
+            'SecondMiddleware',
+        ], $middleware->getMiddlewareGroups()['custom']);
+    }
+
+    public function testInsertAfterInGroup()
+    {
+        $middleware = new Middleware;
+
+        $middleware->group('custom', ['FirstMiddleware', 'SecondMiddleware']);
+        $middleware->insertAfterInGroup('custom', 'FirstMiddleware', 'AfterMiddleware');
+
+        $this->assertSame(['FirstMiddleware', 'AfterMiddleware', 'SecondMiddleware'], $middleware->getMiddlewareGroups()['custom']);
+    }
 }

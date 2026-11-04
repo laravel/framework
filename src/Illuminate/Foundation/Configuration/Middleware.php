@@ -223,6 +223,36 @@ class Middleware
     }
 
     /**
+     * Insert middleware before the given middleware in the global middleware stack.
+     *
+     * @param  string  $search
+     * @param  array|string  $middleware
+     * @return $this
+     */
+    public function insertBefore(string $search, array|string $middleware)
+    {
+        return $this->replace($search, array_merge(
+            Arr::wrap($middleware),
+            Arr::wrap($this->replacements[$search] ?? $search)
+        ));
+    }
+
+    /**
+     * Insert middleware after the given middleware in the global middleware stack.
+     *
+     * @param  string  $search
+     * @param  array|string  $middleware
+     * @return $this
+     */
+    public function insertAfter(string $search, array|string $middleware)
+    {
+        return $this->replace($search, array_merge(
+            Arr::wrap($this->replacements[$search] ?? $search),
+            Arr::wrap($middleware)
+        ));
+    }
+
+    /**
      * Define the global middleware for the application.
      *
      * @param  array  $middleware
@@ -313,6 +343,38 @@ class Middleware
         $this->groupReplacements[$group][$search] = $replace;
 
         return $this;
+    }
+
+    /**
+     * Insert middleware before the given middleware in the specified group.
+     *
+     * @param  string  $group
+     * @param  string  $search
+     * @param  array|string  $middleware
+     * @return $this
+     */
+    public function insertBeforeInGroup(string $group, string $search, array|string $middleware)
+    {
+        return $this->replaceInGroup($group, $search, array_merge(
+            Arr::wrap($middleware),
+            Arr::wrap($this->groupReplacements[$group][$search] ?? $search)
+        ));
+    }
+
+    /**
+     * Insert middleware after the given middleware in the specified group.
+     *
+     * @param  string  $group
+     * @param  string  $search
+     * @param  array|string  $middleware
+     * @return $this
+     */
+    public function insertAfterInGroup(string $group, string $search, array|string $middleware)
+    {
+        return $this->replaceInGroup($group, $search, array_merge(
+            Arr::wrap($this->groupReplacements[$group][$search] ?? $search),
+            Arr::wrap($middleware)
+        ));
     }
 
     /**

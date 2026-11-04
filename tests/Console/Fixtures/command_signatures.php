@@ -2411,7 +2411,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => false,
                 'default' => false,
-                'description' => 'Display the key instead of modifying files',
+                'description' => 'Display a new key instead of modifying files',
             ],
             [
                 'name' => 'force',

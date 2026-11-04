@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Console\Events\ScheduledTaskFailed;
+use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Illuminate\Tests\Queue\Fixtures\JobToTestWithSchedule;
 use JMac\Testing\Double;
@@ -16,6 +20,7 @@ use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(Schedule::class)]
 final class ScheduleTest extends TestCase
@@ -148,5 +153,49 @@ final class ScheduleTest extends TestCase
         } finally {
             Schedule::alwaysOnOneServer(false);
         }
+    }
+
+    public function testWhenTaskRunsLongerThan(): void
+    {
+        $this->container->instance(DispatcherContract::class, $events = new Dispatcher($this->container));
+
+        $schedule = new Schedule();
+        $task = $schedule->command('inspire');
+
+        $called = false;
+
+        $schedule->whenTaskRunsLongerThan(5, function () use (&$called) {
+            $called = true;
+        });
+
+        $events->dispatch(new ScheduledTaskFinished($task, 1.0));
+
+        $this->assertFalse($called);
+
+        $events->dispatch(new ScheduledTaskFinished($task, 10.0));
+
+        $this->assertTrue($called);
+    }
+
+    public function testWhenTaskRunsLongerThanHandlesFailedTasks(): void
+    {
+        $this->container->instance(DispatcherContract::class, $events = new Dispatcher($this->container));
+
+        $schedule = new Schedule();
+        $task = $schedule->command('inspire');
+
+        $called = false;
+
+        $schedule->whenTaskRunsLongerThan(5, function () use (&$called) {
+            $called = true;
+        });
+
+        $events->dispatch(new ScheduledTaskFailed($task, new RuntimeException));
+
+        $this->assertFalse($called);
+
+        $events->dispatch(new ScheduledTaskFailed($task, new RuntimeException, 10.0));
+
+        $this->assertTrue($called);
     }
 }
