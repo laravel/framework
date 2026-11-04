@@ -16,6 +16,11 @@ if (! class_exists(Pusher::class)) {
             //
         }
 
+        public function trigger($channels, string $event, $data, array $params = [], bool $already_encoded = false)
+        {
+            //
+        }
+
         public function getSettings()
         {
             //

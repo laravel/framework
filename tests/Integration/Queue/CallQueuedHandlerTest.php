@@ -180,11 +180,11 @@ class CallQueuedHandlerTest extends TestCase
 
         $exception = new ModelNotFoundException('Foo');
 
-        $batch = Mockery::mock(Batch::class);
-        $batch->shouldReceive('recordFailedJob')->once()->with('job-uuid', $exception);
+        $batch = Double::for(Batch::class);
+        $batch->expects('recordFailedJob')->with('job-uuid', $exception);
 
-        $repository = Mockery::mock(BatchRepository::class);
-        $repository->shouldReceive('find')->once()->with('test-batch-id')->andReturn($batch);
+        $repository = Double::for(BatchRepository::class);
+        $repository->expects('find')->with('test-batch-id')->returns($batch);
         $this->app->instance(BatchRepository::class, $repository);
 
         $this->expectException(ModelNotFoundException::class);
