@@ -107,6 +107,17 @@ class SupportArrTest extends TestCase
         Arr::push($array, 'foo.bar', 'baz');
     }
 
+    public function testPushWorksWithArrayObject()
+    {
+        $array = new ArrayObject(['tags' => ['php']]);
+
+        $this->assertSame($array, Arr::push($array, 'tags', 'laravel', 'symfony'));
+        $this->assertSame(['php', 'laravel', 'symfony'], $array['tags']);
+
+        $this->assertSame($array, Arr::push($array, 'missing', 'first'));
+        $this->assertSame(['first'], $array['missing']);
+    }
+
     public function testCollapse()
     {
         // Normal case: a two-dimensional array with different elements
