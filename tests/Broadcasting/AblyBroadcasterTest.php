@@ -20,6 +20,10 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
+        if (! class_exists(AblyRest::class)) {
+            $this->markTestSkipped(sprintf('%s class is not available.', AblyRest::class));
+        }
+
         $this->ably = Mockery::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = Mockery::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
