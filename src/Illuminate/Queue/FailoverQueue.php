@@ -25,10 +25,8 @@ class FailoverQueue extends Queue implements QueueContract
     public function __construct(
         public QueueManager $manager,
         public EventDispatcher $events,
-        public array $connections,
-        $dispatchAfterCommit = null
+        public array $connections
     ) {
-        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
@@ -265,8 +263,6 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Attempt the given method on all connections.
      *
-     * @param  string  $method
-     * @param  array  $arguments
      * @param  mixed  $job
      * @return mixed
      *
@@ -274,25 +270,52 @@ class FailoverQueue extends Queue implements QueueContract
      */
     protected function attemptOnAllConnections(string $method, array $arguments, $job = null)
     {
+        // An inner connection would defer an after-commit push outside of the failover loop,
+        // so we will defer the entire attempt until the open transactions have committed,
+        // when the inner connections will push the job immediately within the loop...
         if ($job !== null &&
-            isset($this->container) &&
-            $this->shouldDispatchAfterCommit($job) &&
-            $this->container->bound('db.transactions')) {
-            $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
-
-            return $this->container->make('db.transactions')->addCallback(
-                fn () => $this->attemptOnAllConnectionsNow($method, $arguments, $job),
-            );
+            $this->hasCallbackApplicableTransactions() &&
+            $this->shouldDispatchAfterCommit($job)) {
+            return $this->attemptOnAllConnectionsAfterCommit($method, $arguments, $job);
         }
 
         return $this->attemptOnAllConnectionsNow($method, $arguments, $job);
     }
 
     /**
+     * Attempt the given method on all connections once the open transactions have committed.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function attemptOnAllConnectionsAfterCommit(string $method, array $arguments, $job)
+    {
+        $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
+
+        return $this->container->make('db.transactions')->addCallback(function () use ($method, $arguments, $job) {
+            // A transaction may still be open on another database connection, in which case
+            // an inner connection would defer the push again, so we will wait for it too...
+            return $this->hasCallbackApplicableTransactions()
+                ? $this->attemptOnAllConnectionsAfterCommit($method, $arguments, $job)
+                : $this->attemptOnAllConnectionsNow($method, $arguments, $job);
+        });
+    }
+
+    /**
+     * Determine if there are open transactions that after-commit callbacks would wait for.
+     *
+     * @return bool
+     */
+    protected function hasCallbackApplicableTransactions()
+    {
+        return isset($this->container) &&
+            $this->container->bound('db.transactions') &&
+            $this->container->make('db.transactions')->callbackApplicableTransactions()->isNotEmpty();
+    }
+
+    /**
      * Attempt the given method on all connections immediately.
      *
-     * @param  string  $method
-     * @param  array  $arguments
      * @param  mixed  $job
      * @return mixed
      *
@@ -321,5 +344,26 @@ class FailoverQueue extends Queue implements QueueContract
         }
 
         throw $lastException ?? new RuntimeException('All failover queue connections failed.');
+    }
+
+    /**
+     * Determine if the job should be dispatched after all database transactions have committed.
+     *
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatchAfterCommit($job)
+    {
+        // The primary connection decides, since that is where the job is normally pushed. If
+        // it cannot be resolved, the failover loop will report the error when it is tried...
+        try {
+            $primary = $this->manager->connection($this->connections[0]);
+        } catch (Throwable) {
+            return parent::shouldDispatchAfterCommit($job);
+        }
+
+        return $primary instanceof Queue
+            ? $primary->shouldDispatchAfterCommit($job)
+            : parent::shouldDispatchAfterCommit($job);
     }
 }
