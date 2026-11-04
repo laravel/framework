@@ -51,14 +51,14 @@ class PusherBroadcasterTest extends TestCase
 
     public function testAuthRejectsArrayChannelName()
     {
-    $this->expectException(AccessDeniedHttpException::class);
+        $this->expectException(AccessDeniedHttpException::class);
 
-    $request = $this->getMockRequestWithUserForChannel(
-        ['private-test']
-    );
+        $request = $this->getMockRequestWithUserForChannel(
+            ['private-test']
+        );
 
-    $this->broadcaster->auth($request);
-}
+        $this->broadcaster->auth($request);
+    }
 
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
