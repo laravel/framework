@@ -313,6 +313,50 @@ class SupportMessageBagTest extends TestCase
         $this->assertSame('baz', $container->first('foo.*'));
     }
 
+    public function testFirstSkipsEmptyMessageListsForWildcardKey()
+    {
+        $messages = [
+            'users.0.email' => [],
+            'users.1.email' => [],
+            'users.2.email' => [3 => 'Email is required.', 5 => 'Email is invalid.'],
+        ];
+        $container = new MessageBag($messages);
+
+        $this->assertSame('Email is required.', $container->first('users.*.email'));
+        $this->assertSame('users.2.email: Email is required.', $container->first('users.*.email', ':key: :message'));
+        $this->assertTrue($container->has('users.*.email'));
+        $this->assertSame($messages, $container->get('users.*.email'));
+    }
+
+    public function testFirstReturnsEmptyStringForEmptyWildcardMatches()
+    {
+        $container = new MessageBag([
+            'users.0.email' => [],
+            'users.1.email' => [],
+            'name' => ['Name is required.'],
+        ]);
+
+        $this->assertSame('', $container->first('users.*.email'));
+        $this->assertFalse($container->has('users.*.email'));
+        $this->assertFalse($container->hasAny('users.*.email'));
+        $this->assertTrue($container->missing('users.*.email'));
+    }
+
+    public function testFirstPreservesZeroMessageAfterEmptyWildcardMatch()
+    {
+        $container = new MessageBag(['users.0.email' => [], 'users.1.email' => ['0']]);
+
+        $this->assertSame('0', $container->first('users.*.email'));
+        $this->assertTrue($container->has('users.*.email'));
+    }
+
+    public function testFirstPreservesEmptyStringMessageForWildcardKey()
+    {
+        $container = new MessageBag(['users.0.email' => [], 'users.1.email' => [''], 'users.2.email' => ['Later error.']]);
+
+        $this->assertSame('', $container->first('users.*.email'));
+    }
+
     public function testIsEmptyTrue()
     {
         $container = new MessageBag;

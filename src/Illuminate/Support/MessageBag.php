@@ -171,7 +171,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     {
         $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-        $firstMessage = Arr::first($messages, null, '');
+        $firstMessage = Arr::first($messages, fn ($message) => $message !== [], '');
 
         return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
     }
