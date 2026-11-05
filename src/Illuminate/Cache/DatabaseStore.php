@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\DetectsConcurrencyErrors;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
@@ -19,7 +20,7 @@ use RuntimeException;
 
 class DatabaseStore implements CanFlushLocks, LockProvider, Store
 {
-    use InteractsWithTime;
+    use DetectsConcurrencyErrors, InteractsWithTime;
 
     /**
      * The database connection instance.
@@ -222,12 +223,32 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $expiration = $this->getTime() + $seconds;
 
         if (! $this->getConnection() instanceof SqlServerConnection) {
-            return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;
+            try {
+                return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;
+            } catch (QueryException $e) {
+                if ($this->causedByConcurrencyError($e)) {
+                    if ($this->connection->transactionLevel() > 0) {
+                        throw $e;
+                    }
+
+                    return false;
+                }
+
+                throw $e;
+            }
         }
 
         try {
             return $this->table()->insert(['key' => $key, 'value' => $value, 'expiration' => $expiration]);
-        } catch (QueryException) {
+        } catch (QueryException $e) {
+            if ($this->causedByConcurrencyError($e)) {
+                if ($this->connection->transactionLevel() > 0) {
+                    throw $e;
+                }
+
+                return false;
+            }
+
             // ...
         }
 
@@ -426,16 +447,22 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
     {
-        $this->table()
-            ->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => $prefixed ? [
-                $key,
-                $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.Str::chopStart($key, $this->prefix),
-            ] : [
-                "{$this->prefix}{$key}",
-                $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key,
-            ])->all())
-            ->where('expiration', '<=', $this->getTime())
-            ->delete();
+        try {
+            $this->table()
+                ->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => $prefixed ? [
+                    $key,
+                    $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.Str::chopStart($key, $this->prefix),
+                ] : [
+                    "{$this->prefix}{$key}",
+                    $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key,
+                ])->all())
+                ->where('expiration', '<=', $this->getTime())
+                ->delete();
+        } catch (QueryException $e) {
+            if (! $this->causedByConcurrencyError($e) || $this->connection->transactionLevel() > 0) {
+                throw $e;
+            }
+        }
 
         return true;
     }

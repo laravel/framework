@@ -7,8 +7,10 @@ use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Mockery;
+use PDOException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -278,6 +280,174 @@ class CacheDatabaseStoreTest extends TestCase
         $table->expects('update')->with(['expiration' => $ttl])->andReturn(1);
 
         $this->assertTrue($store->touch('foo', $ttl));
+    }
+
+    public function testAddSuccessfullyInsertsItem()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->twice()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $table->expects('insertOrIgnore')->with(Mockery::on(function ($values) {
+            return is_array($values)
+                && ($values['key'] ?? null) === 'prefixfoo'
+                && ($values['value'] ?? null) === serialize('bar')
+                && isset($values['expiration']);
+        }))->andReturn(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
+    }
+
+    public function testAddReturnsFalseWhenItemAlreadyExistsInCache()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->once()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => serialize('existing'), 'expiration' => 9999999999]]));
+
+        $this->assertFalse($store->add('foo', 'bar', 60));
+    }
+
+    public function testAddReturnsFalseWhenInsertOrIgnoreFailsDueToExistingRow()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->twice()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $table->expects('insertOrIgnore')->with(Mockery::on(function ($values) {
+            return is_array($values)
+                && ($values['key'] ?? null) === 'prefixfoo'
+                && ($values['value'] ?? null) === serialize('bar')
+                && isset($values['expiration']);
+        }))->andReturn(0);
+
+        $this->assertFalse($store->add('foo', 'bar', 60));
+    }
+
+    public function testAddReturnsFalseOnConcurrencyDeadlockOutsideTransaction()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->twice()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $deadlockException = new QueryException(
+            'mysql',
+            'insert ignore into cache (key, value, expiration) values (?, ?, ?)',
+            ['prefixfoo', serialize('bar'), 100],
+            new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction', 40001)
+        );
+
+        $table->expects('insertOrIgnore')->andThrow($deadlockException);
+        $store->getConnection()->expects('transactionLevel')->andReturn(0);
+
+        $this->assertFalse($store->add('foo', 'bar', 60));
+    }
+
+    public function testAddThrowsConcurrencyDeadlockWhenInsideTransaction()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->twice()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $deadlockException = new QueryException(
+            'mysql',
+            'insert ignore into cache (key, value, expiration) values (?, ?, ?)',
+            ['prefixfoo', serialize('bar'), 100],
+            new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction', 40001)
+        );
+
+        $table->expects('insertOrIgnore')->andThrow($deadlockException);
+        $store->getConnection()->expects('transactionLevel')->andReturn(1);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('1213 Deadlock found');
+
+        $store->add('foo', 'bar', 60);
+    }
+
+    public function testAddReThrowsNonConcurrencyException()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->twice()->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+
+        $syntaxException = new QueryException(
+            'mysql',
+            'insert ignore into cache ...',
+            [],
+            new PDOException('SQLSTATE[42S02]: Base table or view not found: 1146 Table cache does not exist', 1146)
+        );
+
+        $table->expects('insertOrIgnore')->andThrow($syntaxException);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Base table or view not found');
+
+        $store->add('foo', 'bar', 60);
+    }
+
+    public function testForgetManyIfExpiredSuppressesConcurrencyDeadlockOutsideTransaction()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
+        $table->expects('where')->with('expiration', '<=', Mockery::any())->andReturn($table);
+
+        $deadlockException = new QueryException(
+            'mysql',
+            'delete from cache where key in (?) and expiration <= ?',
+            ['prefixfoo', 100],
+            new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction', 40001)
+        );
+
+        $table->expects('delete')->andThrow($deadlockException);
+        $store->getConnection()->expects('transactionLevel')->andReturn(0);
+
+        $this->assertTrue($store->forgetIfExpired('foo'));
+    }
+
+    public function testForgetManyIfExpiredReThrowsConcurrencyDeadlockInsideTransaction()
+    {
+        $store = $this->getStore();
+        $table = Mockery::mock(Builder::class);
+
+        $store->getConnection()->expects('table')->with('table')->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
+        $table->expects('where')->with('expiration', '<=', Mockery::any())->andReturn($table);
+
+        $deadlockException = new QueryException(
+            'mysql',
+            'delete from cache where key in (?) and expiration <= ?',
+            ['prefixfoo', 100],
+            new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction', 40001)
+        );
+
+        $table->expects('delete')->andThrow($deadlockException);
+        $store->getConnection()->expects('transactionLevel')->andReturn(1);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('1213 Deadlock found');
+
+        $store->forgetIfExpired('foo');
     }
 
     protected function getStore()
