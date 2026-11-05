@@ -23,6 +23,10 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
+        if (! class_exists(AblyRest::class)) {
+            $this->markTestSkipped(sprintf('%s class is not available.', AblyRest::class));
+        }
+
         $this->ably = Double::for(new AblyRest('abcd:efgh'));
 
         $this->broadcaster = Double::for(AblyBroadcaster::class)->passthru(new AblyBroadcaster($this->ably));

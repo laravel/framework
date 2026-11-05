@@ -1061,9 +1061,11 @@ class Arr
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $values
-     * @return array
+     * @return \ArrayAccess|array
+     *
+     * @phpstan-return ($array is array ? array : \ArrayAccess|array)
      */
-    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): ArrayAccess|array
     {
         $target = static::array($array, $key, []);
 

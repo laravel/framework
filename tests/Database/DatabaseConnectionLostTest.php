@@ -7,6 +7,7 @@ use Illuminate\Database\LostConnectionDetector;
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class DatabaseConnectionLostTest extends TestCase
 {
@@ -37,5 +38,22 @@ class DatabaseConnectionLostTest extends TestCase
         $detector = new LostConnectionDetector;
 
         $this->assertFalse($detector->causedByLostConnection(new Exception('Unexpected EOF while parsing application data')));
+    }
+
+    public function test_lost_connection_detector_can_detect_using_callback()
+    {
+        $detector = new LostConnectionDetector;
+
+        $this->assertFalse($detector->causedByLostConnection(new PDOException('Proxy hiccup')));
+
+        LostConnectionDetector::detectUsing(fn (Throwable $e) => str_contains($e->getMessage(), 'Proxy hiccup'));
+
+        $this->assertTrue($detector->causedByLostConnection(new PDOException('SQLSTATE[HY000]: Proxy hiccup')));
+        $this->assertTrue($detector->causedByLostConnection(new PDOException('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away')));
+        $this->assertFalse($detector->causedByLostConnection(new PDOException('Syntax error')));
+
+        LostConnectionDetector::detectUsing(null);
+
+        $this->assertFalse($detector->causedByLostConnection(new PDOException('Proxy hiccup')));
     }
 }

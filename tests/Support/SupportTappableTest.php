@@ -33,15 +33,13 @@ class SupportTappableTest extends TestCase
     {
         $this->expectException('Error');
 
-        $name = TappableClass::make()->tap(new class
+        TappableClass::make()->tap(new class
         {
             public function setName($tappable)
             {
                 $tappable->setName('MyName');
             }
         })->getName();
-
-        $this->assertSame('MyName', $name);
     }
 
     public function testTappableClassWithoutCallback()

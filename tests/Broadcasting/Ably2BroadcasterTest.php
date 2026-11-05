@@ -1,0 +1,152 @@
+<?php
+
+namespace Illuminate\Tests\Broadcasting;
+
+use Ably\PubSub\PubSubHttpClient;
+use Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster;
+use Illuminate\Http\Request;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
+class Ably2BroadcasterTest extends TestCase
+{
+    use VerifiesDoubles;
+
+    /**
+     * @var \Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster
+     */
+    public $broadcaster;
+
+    public $ably;
+
+    protected function setUp(): void
+    {
+        if (! class_exists(PubSubHttpClient::class)) {
+            $this->markTestSkipped(sprintf('%s class is not available.', PubSubHttpClient::class));
+        }
+
+        $this->ably = Double::for(new PubSubHttpClient('abcd:efgh'));
+
+        $this->broadcaster = Double::for(Ably2Broadcaster::class)->passthru(new Ably2Broadcaster($this->ably));
+    }
+
+    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
+    {
+        $this->broadcaster->channel('test', function () {
+            return true;
+        });
+
+        $this->broadcaster->expects('validAuthenticationResponse');
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('private-test')
+        );
+    }
+
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return false;
+        });
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('private-test')
+        );
+    }
+
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return true;
+        });
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithoutUserForChannel('private-test')
+        );
+    }
+
+    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
+    {
+        $returnData = [1, 2, 3, 4];
+        $this->broadcaster->channel('test', function () use ($returnData) {
+            return $returnData;
+        });
+
+        $this->broadcaster->expects('validAuthenticationResponse');
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('presence-test')
+        );
+    }
+
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            //
+        });
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('presence-test')
+        );
+    }
+
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return [1, 2, 3, 4];
+        });
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithoutUserForChannel('presence-test')
+        );
+    }
+
+    /**
+     * @param  string  $channel
+     * @return \Illuminate\Http\Request
+     */
+    protected function getMockRequestWithUserForChannel($channel)
+    {
+        $request = new Request(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+
+        $user = new class
+        {
+            public function getAuthIdentifierForBroadcasting()
+            {
+                return 42;
+            }
+
+            public function getAuthIdentifier()
+            {
+                return 42;
+            }
+        };
+
+        $request->setUserResolver(fn () => $user);
+
+        return $request;
+    }
+
+    /**
+     * @param  string  $channel
+     * @return \Illuminate\Http\Request
+     */
+    protected function getMockRequestWithoutUserForChannel($channel)
+    {
+        $request = new Request(['channel_name' => $channel]);
+
+        $request->setUserResolver(fn () => null);
+
+        return $request;
+    }
+}
