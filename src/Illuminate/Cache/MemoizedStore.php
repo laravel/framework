@@ -309,6 +309,16 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Get the underlying cache store implementation.
+     *
+     * @return \Illuminate\Contracts\Cache\Store
+     */
+    public function getStore()
+    {
+        return $this->repository->getStore();
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string

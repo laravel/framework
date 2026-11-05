@@ -686,7 +686,13 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        $deferName = 'illuminate:cache:flexible:'.spl_object_id($this->store).':'.$this->store->getPrefix().$this->itemKey($key);
+        $store = $this->store;
+
+        while ($store instanceof MemoizedStore) {
+            $store = $store->getStore();
+        }
+
+        $deferName = 'illuminate:cache:flexible:'.spl_object_id($store).':'.$store->getPrefix().$this->itemKey($key);
 
         defer($refresh, $deferName, $alwaysDefer);
 

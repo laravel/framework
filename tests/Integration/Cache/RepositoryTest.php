@@ -38,6 +38,35 @@ class RepositoryTest extends TestCase
         $this->assertSame('second-refreshed', $second->get('profile'));
     }
 
+    public function testFlexibleDeduplicatesDirectAndMemoizedRefreshes(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $direct = Cache::store('array');
+        $memo = Cache::memo('array');
+        $refreshes = 0;
+
+        $direct->flexible('profile', [10, 20], fn () => 'initial');
+
+        $this->travel(11)->seconds();
+
+        $direct->flexible('profile', [10, 20], function () use (&$refreshes) {
+            $refreshes++;
+
+            return 'direct-refreshed';
+        });
+        $memo->flexible('profile', [10, 20], function () use (&$refreshes) {
+            $refreshes++;
+
+            return 'memo-refreshed';
+        });
+
+        defer()->invoke();
+
+        $this->assertSame(1, $refreshes);
+        $this->assertSame('memo-refreshed', $direct->get('profile'));
+    }
+
     public function testStaleWhileRevalidate(): void
     {
         Carbon::setTestNow('2000-01-01 00:00:00');
