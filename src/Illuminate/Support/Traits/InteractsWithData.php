@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
 use Illuminate\Support\Stringable;
+use Ramsey\Uuid\Uuid;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -406,6 +407,23 @@ trait InteractsWithData
         $unit = $unit instanceof Unit ? $unit : Unit::fromName($unit);
 
         return CarbonInterval::fromString(number_format((float) $value, 10, '.', '').' '.$unit->name);
+    }
+
+    /**
+     * Retrieve data from the instance as a UUID instance.
+     *
+     * @param  string  $key
+     * @return \Ramsey\Uuid\UuidInterface|null
+     *
+     * @throws \Ramsey\Uuid\Exception\InvalidUuidStringException
+     */
+    public function uuid($key)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        return Uuid::fromString($this->data($key));
     }
 
     /**
