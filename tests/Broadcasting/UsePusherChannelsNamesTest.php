@@ -41,6 +41,41 @@ class UsePusherChannelsNamesTest extends TestCase
                 'Test.{id}'
             )
         );
+
+        $this->assertFalse(
+            $broadcaster->testChannelNameMatchesPattern(
+                ['TestChannel'],
+                'Test.{id}'
+            )
+        );
+
+        $this->assertFalse(
+            $broadcaster->testChannelNameMatchesPattern(
+                null,
+                'Test.{id}'
+            )
+        );
+    }
+
+    public function testChannelNameNormalizationWithNonString()
+    {
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
+
+        $this->assertSame(['private-123'], $broadcaster->normalizeChannelName(['private-123']));
+        $object = (object) ['name' => 'private-123'];
+        $this->assertSame($object, $broadcaster->normalizeChannelName($object));
+        $this->assertNull($broadcaster->normalizeChannelName(null));
+        $this->assertSame(123, $broadcaster->normalizeChannelName(123));
+    }
+
+    public function testIsGuardedChannelWithNonString()
+    {
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
+
+        $this->assertFalse($broadcaster->isGuardedChannel(['private-test']));
+        $this->assertFalse($broadcaster->isGuardedChannel((object) ['name' => 'private-test']));
+        $this->assertFalse($broadcaster->isGuardedChannel(null));
+        $this->assertFalse($broadcaster->isGuardedChannel(123));
     }
 
     #[DataProvider('channelsProvider')]

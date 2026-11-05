@@ -55,6 +55,88 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthRejectsArrayChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => ['private-test'], 'socket_id' => 'abcd.1234']);
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testAuthRejectsObjectChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => (object) ['name' => 'private-test'], 'socket_id' => 'abcd.1234']);
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testAuthRejectsArraySocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return true;
+        });
+
+        $request = Request::create('/', 'POST', ['channel_name' => 'private-test', 'socket_id' => ['abcd.1234']]);
+        $user = Mockery::mock('User');
+        $request->setUserResolver(fn () => $user);
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testAuthRejectsObjectSocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return true;
+        });
+
+        $request = Request::create('/', 'POST', ['channel_name' => 'private-test', 'socket_id' => (object) ['id' => 'abcd.1234']]);
+        $user = Mockery::mock('User');
+        $request->setUserResolver(fn () => $user);
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testValidAuthenticationResponseRejectsNonStringChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => ['private-test'], 'socket_id' => 'abcd.1234']);
+
+        $this->broadcaster->validAuthenticationResponse($request, true);
+    }
+
+    public function testValidAuthenticationResponseRejectsNonStringSocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => 'private-test', 'socket_id' => ['abcd.1234']]);
+
+        $this->broadcaster->validAuthenticationResponse($request, true);
+    }
+
+    public function testIsGuardedChannelWithNonString()
+    {
+        $this->assertFalse($this->broadcaster->isGuardedChannel(['private-test']));
+        $this->assertFalse($this->broadcaster->isGuardedChannel((object) ['name' => 'private-test']));
+        $this->assertFalse($this->broadcaster->isGuardedChannel(null));
+        $this->assertFalse($this->broadcaster->isGuardedChannel(123));
+    }
+
+    public function testNormalizeChannelNameWithNonString()
+    {
+        $this->assertSame(['private-test'], $this->broadcaster->normalizeChannelName(['private-test']));
+        $object = (object) ['name' => 'private-test'];
+        $this->assertSame($object, $this->broadcaster->normalizeChannelName($object));
+        $this->assertNull($this->broadcaster->normalizeChannelName(null));
+    }
+
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
         $this->expectException(AccessDeniedHttpException::class);

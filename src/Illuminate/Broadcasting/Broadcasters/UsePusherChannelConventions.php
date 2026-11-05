@@ -14,6 +14,10 @@ trait UsePusherChannelConventions
      */
     public function isGuardedChannel($channel)
     {
+        if (! is_string($channel)) {
+            return false;
+        }
+
         return Str::startsWith($channel, ['private-', 'presence-']);
     }
 
@@ -25,6 +29,10 @@ trait UsePusherChannelConventions
      */
     public function normalizeChannelName($channel)
     {
+        if (! is_string($channel)) {
+            return $channel;
+        }
+
         foreach (['private-encrypted-', 'private-', 'presence-'] as $prefix) {
             if (Str::startsWith($channel, $prefix)) {
                 return Str::replaceFirst($prefix, '', $channel);

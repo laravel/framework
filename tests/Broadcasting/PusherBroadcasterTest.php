@@ -60,6 +60,47 @@ class PusherBroadcasterTest extends TestCase
         $this->broadcaster->auth($request);
     }
 
+    public function testAuthRejectsObjectChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = $this->getMockRequestWithUserForChannel(
+            (object) ['name' => 'private-test']
+        );
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testAuthRejectsArraySocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', [
+            'channel_name' => 'private-test',
+            'socket_id' => ['abcd.1234'],
+        ]);
+
+        $user = Mockery::mock('User');
+        $request->setUserResolver(fn () => $user);
+
+        $this->broadcaster->auth($request);
+    }
+
+    public function testAuthRejectsObjectSocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', [
+            'channel_name' => 'private-test',
+            'socket_id' => (object) ['id' => 'abcd.1234'],
+        ]);
+
+        $user = Mockery::mock('User');
+        $request->setUserResolver(fn () => $user);
+
+        $this->broadcaster->auth($request);
+    }
+
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
         $this->expectException(AccessDeniedHttpException::class);
@@ -185,6 +226,37 @@ class PusherBroadcasterTest extends TestCase
             'auth' => '278d425bdf160c739803:4708d583dada6a56435fb8bc611c77c359a31eebde13337c16ab43aa6de336ba',
             'user_data' => json_encode(['id' => '12345']),
         ], $response);
+    }
+
+    public function testUserAuthenticationRejectsNonStringSocketId()
+    {
+        $this->broadcaster = new PusherBroadcaster($this->pusher);
+
+        $this->broadcaster->resolveAuthenticatedUserUsing(function () {
+            return ['id' => '12345'];
+        });
+
+        $this->assertNull(
+            $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => ['1234.1234']]))
+        );
+    }
+
+    public function testValidAuthenticationResponseRejectsNonStringSocketId()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => 'private-test', 'socket_id' => ['abcd.1234']]);
+
+        $this->broadcaster->validAuthenticationResponse($request, true);
+    }
+
+    public function testValidAuthenticationResponseRejectsNonStringChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = Request::create('/', 'POST', ['channel_name' => ['private-test'], 'socket_id' => 'abcd.1234']);
+
+        $this->broadcaster->validAuthenticationResponse($request, true);
     }
 
     /**

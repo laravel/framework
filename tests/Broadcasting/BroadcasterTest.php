@@ -340,7 +340,25 @@ class BroadcasterTest extends TestCase
             ['23:test', '{id}:test:abcd', false],
             ['customer.order.1', 'order.{id}', false],
             ['customerorder.1', 'order.{id}', false],
+            [['something'], 'something', false],
+            [null, 'something', false],
+            [(object) ['name' => 'something'], 'something', false],
+            [123, 'something', false],
         ];
+    }
+
+    public function testExtractChannelKeysWithNonStringChannel()
+    {
+        $this->assertSame([], $this->broadcaster->extractChannelKeys('{id}', ['something']));
+        $this->assertSame([], $this->broadcaster->extractChannelKeys('{id}', null));
+        $this->assertSame([], $this->broadcaster->extractChannelKeys('{id}', (object) ['name' => 'something']));
+    }
+
+    public function testRetrieveChannelOptionsWithNonStringChannel()
+    {
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions(['something']));
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions(null));
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions((object) ['name' => 'something']));
     }
 }
 
@@ -359,6 +377,11 @@ class FakeBroadcaster extends Broadcaster
     public function broadcast(array $channels, $event, array $payload = [])
     {
         //
+    }
+
+    public function extractChannelKeys($pattern, $channel)
+    {
+        return parent::extractChannelKeys($pattern, $channel);
     }
 
     public function extractAuthParameters($pattern, $channel, $callback)

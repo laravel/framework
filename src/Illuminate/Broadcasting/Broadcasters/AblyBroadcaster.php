@@ -46,6 +46,10 @@ class AblyBroadcaster extends Broadcaster
     {
         $channelName = $this->normalizeChannelName($request->channel_name);
 
+        if (! is_string($channelName)) {
+            throw new AccessDeniedHttpException;
+        }
+
         if (empty($request->channel_name) ||
             ($this->isGuardedChannel($request->channel_name) &&
             ! $this->retrieveUser($request, $channelName))) {
@@ -66,6 +70,10 @@ class AblyBroadcaster extends Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
+        if (! is_string($request->channel_name) || ! is_string($request->socket_id)) {
+            throw new AccessDeniedHttpException;
+        }
+
         if (str_starts_with($request->channel_name, 'private')) {
             $signature = $this->generateAblySignature(
                 $request->channel_name, $request->socket_id
@@ -163,7 +171,7 @@ class AblyBroadcaster extends Broadcaster
      */
     public function isGuardedChannel($channel)
     {
-        return Str::startsWith($channel, ['private-', 'presence-']);
+        return is_string($channel) && Str::startsWith($channel, ['private-', 'presence-']);
     }
 
     /**
@@ -174,6 +182,10 @@ class AblyBroadcaster extends Broadcaster
      */
     public function normalizeChannelName($channel)
     {
+        if (! is_string($channel)) {
+            return $channel;
+        }
+
         if ($this->isGuardedChannel($channel)) {
             return str_starts_with($channel, 'private-')
                 ? Str::replaceFirst('private-', '', $channel)

@@ -53,6 +53,10 @@ class PusherBroadcaster extends Broadcaster
             return;
         }
 
+        if (! is_string($request->socket_id)) {
+            return;
+        }
+
         if (method_exists($this->pusher, 'authenticateUser')) {
             return $this->pusher->authenticateUser($request->socket_id, $user);
         }
@@ -107,6 +111,10 @@ class PusherBroadcaster extends Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
+        if (! is_string($request->channel_name) || ! is_string($request->socket_id)) {
+            throw new AccessDeniedHttpException;
+        }
+
         if (str_starts_with($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
                 $request,
