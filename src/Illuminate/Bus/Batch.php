@@ -264,6 +264,8 @@ class Batch implements Arrayable, JsonSerializable
             $this->invokeCallbacks('then');
         }
 
+        $this->markAsFinishedIfOnlyFailuresRemain($counts);
+
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $this->invokeCallbacks('finally');
         }
@@ -377,6 +379,8 @@ class Batch implements Arrayable, JsonSerializable
             $this->invokeCallbacks('catch', $e);
         }
 
+        $this->markAsFinishedIfOnlyFailuresRemain($counts);
+
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $this->invokeCallbacks('finally');
         }
@@ -390,6 +394,16 @@ class Batch implements Arrayable, JsonSerializable
     public function incrementFailedJobs(string $jobId)
     {
         return $this->repository->incrementFailedJobs($this->id, $jobId);
+    }
+
+    /**
+     * Mark a batch that allows failures as finished once every remaining job has failed.
+     */
+    protected function markAsFinishedIfOnlyFailuresRemain(UpdatedBatchJobCounts $counts): void
+    {
+        if ($this->allowsFailures() && $counts->pendingJobs > 0 && $counts->allJobsHaveRanExactlyOnce()) {
+            $this->repository->markAsFinished($this->id);
+        }
     }
 
     /**
