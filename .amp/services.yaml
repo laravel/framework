@@ -1,0 +1,7 @@
+services:
+  redis:
+    command: redis-server --bind 127.0.0.1 --port "$PORT" --save '' --appendonly no
+    port: 6379
+  memcached:
+    command: memcached -l 127.0.0.1 -p "$PORT" -U 0
+    port: 11211

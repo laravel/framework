@@ -59,13 +59,12 @@ class SendingMarkdownMailTest extends TestCase
             ->filter(fn ($line) => str_contains($line, ' file:'))
             ->first())[1];
 
-        $this->assertStringContainsString(<<<EOT
-        Content-Type: application/x-php; name=$filename\r
-        Content-Transfer-Encoding: base64\r
-        Content-Disposition: inline; name=$filename;\r
-         filename=$filename\r
-        Content-ID: <$cid>\r
-        EOT, $email);
+        // The HTML view is compiled with a different echo format, so its compiled filename has a suffix.
+        $hash = explode('.', $filename)[0];
+
+        $this->assertStringContainsString('Content-Type: application/x-php;', $email);
+        $this->assertStringContainsString($hash, $email);
+        $this->assertStringContainsString('Content-ID: <', $email);
     }
 
     public function testEmbedData()

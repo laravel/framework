@@ -7,6 +7,7 @@
 /.phpunit.cache
 /phpunit.xml
 /.vscode
+/.amp/portals/*
 /vendor
 composer.phar
 composer.lock

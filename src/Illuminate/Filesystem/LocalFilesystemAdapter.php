@@ -27,7 +27,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
     /**
      * The Closure that should be used to resolve the URL generator.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $urlGeneratorResolver;
 

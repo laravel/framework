@@ -3,23 +3,29 @@
 namespace Illuminate\Console\Scheduling;
 
 use BadMethodCallException;
+use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Console\Application;
+use Illuminate\Console\Events\ScheduledTaskFailed;
+use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -28,7 +34,7 @@ use function Illuminate\Support\enum_value;
  */
 class Schedule
 {
-    use Macroable {
+    use InteractsWithTime, Macroable {
         __call as macroCall;
     }
 
@@ -70,7 +76,7 @@ class Schedule
     /**
      * The timezone the date should be evaluated on.
      *
-     * @var \DateTimeZone|string
+     * @var \DateTimeZone|string|null
      */
     protected $timezone;
 
@@ -292,9 +298,15 @@ class Schedule
             return;
         }
 
-        $this->getDispatcher()->dispatch(
-            $job->onConnection($connection)->onQueue($queue)
-        );
+        try {
+            $this->getDispatcher()->dispatch(
+                $job->onConnection($connection)->onQueue($queue)
+            );
+        } catch (Throwable $e) {
+            (new UniqueLock(Container::getInstance()->make(Cache::class)))->release($job);
+
+            throw $e;
+        }
     }
 
     /**
@@ -560,6 +572,33 @@ class Schedule
     public static function alwaysOnOneServer($value = true)
     {
         static::$alwaysOnOneServer = $value;
+    }
+
+    /**
+     * Register a callback to be invoked when a scheduled task runs for longer than a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  (callable(\Illuminate\Console\Scheduling\Event, float): mixed)  $handler
+     * @return void
+     */
+    public function whenTaskRunsLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold)
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalSeconds
+            : $threshold;
+
+        Container::getInstance()->make(EventDispatcher::class)->listen(
+            [ScheduledTaskFinished::class, ScheduledTaskFailed::class],
+            function ($event) use ($threshold, $handler) {
+                if (! is_null($event->runtime) && $event->runtime > $threshold) {
+                    $handler($event->task, $event->runtime);
+                }
+            }
+        );
     }
 
     /**

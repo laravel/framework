@@ -77,7 +77,7 @@ class Image implements Responsable, Stringable
      */
     protected function resolveOnce(Closure $loader): Closure
     {
-        return function () use ($loader) {
+        return static function () use ($loader) {
             static $contents;
 
             return $contents ??= $loader();
@@ -314,6 +314,14 @@ class Image implements Responsable, Stringable
     }
 
     /**
+     * Convert the image to JPEG XL format.
+     */
+    public function toJxl(): static
+    {
+        return $this->toFormat('jxl');
+    }
+
+    /**
      * Convert the image to BMP format.
      */
     public function toBmp(): static
@@ -328,7 +336,7 @@ class Image implements Responsable, Stringable
      */
     public function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'bmp'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'jxl', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
@@ -458,6 +466,7 @@ class Image implements Responsable, Stringable
             'image/webp' => 'webp',
             'image/avif', 'image/x-avif' => 'avif',
             'image/heic', 'image/x-heic', 'image/heif' => 'heic',
+            'image/jxl', 'image/x-jxl' => 'jxl',
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',
@@ -485,8 +494,8 @@ class Image implements Responsable, Stringable
         return once(function () {
             $contents = $this->toBytes();
 
-            // getimagesize() misreports HEIC's coded / padded frame size, so read HEIC via the driver...
-            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic'], true)) {
+            // getimagesize() misreports HEIC's coded / padded frame size and can't read JXL, so read them via the driver...
+            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic', 'image/jxl', 'image/x-jxl'], true)) {
                 try {
                     return $this->resolveDriver()->dimensions($contents);
                 } catch (Throwable) {

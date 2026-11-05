@@ -216,7 +216,10 @@ class FilesystemManager implements FactoryContract
             $config['root'] = '';
         }
 
-        $adapter = new FtpAdapter(FtpConnectionOptions::fromArray($config));
+        $adapter = new FtpAdapter(
+            FtpConnectionOptions::fromArray($config),
+            detectMimeTypeUsingPath: $config['detect_mime_type_using_path'] ?? false,
+        );
 
         return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
@@ -237,7 +240,12 @@ class FilesystemManager implements FactoryContract
             $config['permissions'] ?? []
         );
 
-        $adapter = new SftpAdapter($provider, $root, $visibility);
+        $adapter = new SftpAdapter(
+            $provider,
+            $root,
+            $visibility,
+            detectMimeTypeUsingPath: $config['detect_mime_type_using_path'] ?? false,
+        );
 
         return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }

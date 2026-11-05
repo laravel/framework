@@ -102,7 +102,7 @@ class Route
     /**
      * The array of the matched parameters' original values.
      *
-     * @var array
+     * @var array|null
      */
     protected $originalParameters;
 
@@ -165,7 +165,7 @@ class Route
     /**
      * The validators used by the routes.
      *
-     * @var array
+     * @var array|null
      */
     public static $validators;
 

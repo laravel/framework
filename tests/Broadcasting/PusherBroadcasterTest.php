@@ -49,6 +49,17 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthRejectsArrayChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = $this->getMockRequestWithUserForChannel(
+            ['private-test']
+        );
+
+        $this->broadcaster->auth($request);
+    }
+
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
         $this->expectException(AccessDeniedHttpException::class);
@@ -99,6 +110,17 @@ class PusherBroadcasterTest extends TestCase
 
         $this->broadcaster->auth(
             $this->getMockRequestWithoutUserForChannel('presence-test')
+        );
+    }
+
+    public function testBroadcastTriggersEncryptedChannelsSeparately()
+    {
+        $this->pusher->expects('trigger')->with(['private-a', 'b'], 'event', ['foo' => 'bar'], []);
+        $this->pusher->expects('trigger')->with(['private-encrypted-c'], 'event', ['foo' => 'bar'], []);
+        $this->pusher->expects('trigger')->with(['private-encrypted-d'], 'event', ['foo' => 'bar'], []);
+
+        $this->broadcaster->broadcast(
+            ['private-a', 'private-encrypted-c', 'b', 'private-encrypted-d'], 'event', ['foo' => 'bar']
         );
     }
 

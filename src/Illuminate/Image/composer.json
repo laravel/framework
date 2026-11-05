@@ -25,7 +25,7 @@
     },
     "suggest": {
         "ext-fileinfo": "Required to use the Image class.",
-        "intervention/image": "Required to use the GD and Imagick image drivers (^4.0)."
+        "intervention/image": "Required to use the GD and Imagick image drivers (^4.2)."
     },
     "minimum-stability": "dev",
     "autoload": {

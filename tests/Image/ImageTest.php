@@ -158,6 +158,13 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toHeic());
     }
 
+    public function test_to_jxl_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toJxl());
+    }
+
     public function test_to_bmp_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -276,6 +283,29 @@ class ImageTest extends TestCase
         $image = new Image($contents);
 
         $this->assertSame('avif', $image->extension());
+    }
+
+    #[RequiresPhpExtension('imagick')]
+    public function test_extension_returns_jxl_for_jxl(): void
+    {
+        if (\Imagick::queryFormats('JXL') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with jxl support.');
+        }
+
+        $imagick = new \Imagick;
+        $imagick->newImage(10, 10, 'red');
+        $imagick->setImageFormat('jxl');
+        $contents = $imagick->getImageBlob();
+
+        $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+
+        if (! in_array($mimeType, ['image/jxl', 'image/x-jxl'], true)) {
+            $this->markTestSkipped('The installed fileinfo database does not recognize JXL.');
+        }
+
+        $image = new Image($contents);
+
+        $this->assertSame('jxl', $image->extension());
     }
 
     public function test_dimensions_returns_width_and_height()
@@ -500,6 +530,13 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('heic', $this->getOptions($image->toHeic())->format);
+    }
+
+    public function test_to_jxl_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('jxl', $this->getOptions($image->toJxl())->format);
     }
 
     public function test_to_bmp_sets_format()
@@ -1040,6 +1077,13 @@ class ImageTest extends TestCase
         $result = $this->makeImage()->optimize('heic');
 
         $this->assertSame('heic', $this->getOptions($result)->format);
+    }
+
+    public function test_optimize_allows_jxl()
+    {
+        $result = $this->makeImage()->optimize('jxl');
+
+        $this->assertSame('jxl', $this->getOptions($result)->format);
     }
 
     public function test_optimize_normalizes_heif_to_heic()

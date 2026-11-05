@@ -191,6 +191,22 @@ class HandleExceptionsTest extends TestCase
         );
     }
 
+    public function testSuppressedErrorsAreAvailableViaErrorGetLast()
+    {
+        set_error_handler([$this->handleExceptions(), 'handleError']);
+
+        try {
+            error_clear_last();
+
+            $result = @file_get_contents(__DIR__.'/missing-file.txt');
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertFalse($result);
+        $this->assertStringContainsString('Failed to open stream: No such file or directory', error_get_last()['message'] ?? '');
+    }
+
     public function testEnsuresDeprecationsDriver()
     {
         $this->app->instance(LogManager::class, new LogManager($this->app));

@@ -4,7 +4,10 @@ namespace Illuminate\Foundation\Testing\Traits;
 
 use Illuminate\Foundation\Testing\Attributes\Seed;
 use Illuminate\Foundation\Testing\Attributes\Seeder;
+use Illuminate\Foundation\Testing\Attributes\WithoutMigrationEvents;
 use ReflectionClass;
+use ReflectionMethod;
+use Throwable;
 
 trait CanConfigureMigrationCommands
 {
@@ -62,6 +65,32 @@ trait CanConfigureMigrationCommands
         } while ($class = $class->getParentClass());
 
         return property_exists($this, 'seed') ? $this->seed : false;
+    }
+
+    /**
+     * Determine if database events should be dispatched while migrating the database.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchMigrationEvents()
+    {
+        try {
+            if ((new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutMigrationEvents::class) !== []) {
+                return false;
+            }
+        } catch (Throwable) {
+            //
+        }
+
+        $class = new ReflectionClass($this);
+
+        do {
+            if ($class->getAttributes(WithoutMigrationEvents::class) !== []) {
+                return false;
+            }
+        } while ($class = $class->getParentClass());
+
+        return true;
     }
 
     /**

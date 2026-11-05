@@ -81,7 +81,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $source->getConnection()
             ->expects('select')
-            ->with('select * from "related_table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->with('select * from "related_table" where ("attr" = ?) limit 1', ['foo'], false, [])
             ->andReturn([[
                 'id' => 456,
                 'attr' => 'foo',
@@ -174,7 +174,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $source->getConnection()
             ->expects('select')
-            ->with('select * from "related_table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->with('select * from "related_table" where ("attr" = ?) limit 1', ['foo'], false, [])
             ->andReturn([[
                 'id' => 456,
                 'attr' => 'foo',

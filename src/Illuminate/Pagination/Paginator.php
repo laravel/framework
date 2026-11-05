@@ -58,12 +58,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Get the current page for the request.
      *
-     * @param  int  $currentPage
+     * @param  int|null  $currentPage
      * @return int
      */
     protected function setCurrentPage($currentPage)
     {
-        $currentPage = $currentPage ?: static::resolveCurrentPage();
+        $currentPage = $currentPage ?: static::resolveCurrentPage($this->pageName);
 
         return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
     }
@@ -100,7 +100,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function links($view = null, $data = [])
     {

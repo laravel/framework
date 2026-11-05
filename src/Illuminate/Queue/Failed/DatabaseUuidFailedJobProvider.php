@@ -70,7 +70,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
      * Get the IDs of all of the failed jobs.
      *
      * @param  string|null  $queue
-     * @return array
+     * @return list<string|int>
      */
     public function ids($queue = null)
     {
@@ -84,7 +84,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     /**
      * Get a list of all of the failed jobs.
      *
-     * @return array
+     * @return list<object>
      */
     public function all()
     {

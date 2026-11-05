@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Mockery;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -182,6 +183,38 @@ class DatabaseTransactionsTest extends TestCase
             });
         } catch (Throwable) {
         }
+    }
+
+    public function testFailedCommitRollsBackTheTransactionsManager()
+    {
+        $manager = new DatabaseTransactionsManager;
+        $this->connection()->setTransactionManager($manager);
+
+        $afterCommitRan = false;
+        $rolledBack = false;
+
+        try {
+            $this->connection()->transaction(function () use (&$afterCommitRan, &$rolledBack) {
+                $this->connection()->afterCommit(function () use (&$afterCommitRan) {
+                    $afterCommitRan = true;
+                });
+
+                $this->connection()->afterRollBack(function () use (&$rolledBack) {
+                    $rolledBack = true;
+                });
+
+                // End the transaction behind the connection's back so COMMIT fails.
+                $this->connection()->getPdo()->exec('ROLLBACK');
+            });
+
+            $this->fail('The failed commit should have thrown.');
+        } catch (PDOException) {
+        }
+
+        $this->assertSame(0, $this->connection()->transactionLevel());
+        $this->assertCount(0, $manager->getPendingTransactions());
+        $this->assertFalse($afterCommitRan);
+        $this->assertTrue($rolledBack);
     }
 
     public function testTransactionIsRolledBackUsingSeparateMethods()

@@ -11,7 +11,7 @@ class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      * @param  string  $queue
      * @param  string  $payload
      * @param  \Throwable  $exception
-     * @return int|null
+     * @return string|int|null
      */
     public function log($connection, $queue, $payload, $exception)
     {
@@ -22,7 +22,7 @@ class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      * Get the IDs of all of the failed jobs.
      *
      * @param  string|null  $queue
-     * @return array
+     * @return list<string|int>
      */
     public function ids($queue = null)
     {
@@ -32,7 +32,7 @@ class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * Get a list of all of the failed jobs.
      *
-     * @return array
+     * @return list<object>
      */
     public function all()
     {

@@ -23,6 +23,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -243,6 +244,50 @@ class NotificationSenderTest extends TestCase
             $this->fail('Expected exception was not thrown.');
         } catch (TransportException) {
             $this->assertInstanceOf(TransportException::class, $failed->data['exception']);
+        }
+    }
+
+    public function test_notification_failed_is_dispatched_after_a_channel_dispatched_it_without_throwing()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $bus = new BusFake(new BusDispatcher(new Container));
+        $events = new EventDispatcher;
+
+        $failed = [];
+        $events->listen(NotificationFailed::class, function ($event) use (&$failed) {
+            $failed[] = $event->channel;
+        });
+
+        $pushChannel = new class($events)
+        {
+            public function __construct(protected $events)
+            {
+            }
+
+            public function send($notifiable, $notification)
+            {
+                $this->events->dispatch(new NotificationFailed($notifiable, $notification, 'push'));
+            }
+        };
+
+        $smsChannel = new ChannelSpy;
+        $smsChannel->exception = new RuntimeException('SMS gateway down');
+
+        $manager->expects('driver')->with('push')->andReturn($pushChannel);
+        $manager->expects('driver')->with('sms')->andReturn($smsChannel);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->sendNow($notifiable, new DummyNotificationWithViaConnections, ['push']);
+
+        try {
+            $sender->sendNow($notifiable, new DummyNotificationWithViaConnections, ['sms']);
+            $this->fail('Expected exception was not thrown.');
+        } catch (RuntimeException) {
+            $this->assertSame(['push', 'sms'], $failed);
         }
     }
 

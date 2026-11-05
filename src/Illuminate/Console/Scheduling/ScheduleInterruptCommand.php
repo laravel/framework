@@ -46,12 +46,20 @@ class ScheduleInterruptCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
+        if (! Schedule::$interruptible) {
+            $this->components->error('Schedule interrupting is currently disabled.');
+
+            return self::FAILURE;
+        }
+
         $this->cache->forever('illuminate:schedule:interrupt', Date::now()->getTimestampMs());
 
         $this->components->info('Broadcasting schedule interrupt signal.');
+
+        return self::SUCCESS;
     }
 }

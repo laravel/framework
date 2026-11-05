@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Database\Connectors\ConnectorInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\JsonFormatter;
+use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
@@ -29,6 +31,17 @@ class CloudBootstrapperTest extends TestCase
         $this->assertSame('write.example.com', $this->app['config']->get('database.connections.mysql.host'));
 
         unset($_SERVER['DB_READ_HOST']);
+    }
+
+    public function test_it_stores_the_exceptions_config_after_configuration_is_loaded()
+    {
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
+
+        CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
+
+        $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
+
+        unset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS']);
     }
 
     public function test_it_does_not_configure_a_read_replica_connection_without_a_read_host()
@@ -532,6 +545,20 @@ class CloudBootstrapperTest extends TestCase
         CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
+
+    public function test_it_configures_the_cloud_logging_formatter()
+    {
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+    }
+
+    public function test_it_configures_the_cloud_logging_handler()
+    {
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(SocketHandler::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.handler'));
     }
 
     public function test_it_aliases_cloud_logging_channel()

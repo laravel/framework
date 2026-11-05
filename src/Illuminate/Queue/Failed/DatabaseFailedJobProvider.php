@@ -50,7 +50,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      * @param  string  $queue
      * @param  string  $payload
      * @param  \Throwable  $exception
-     * @return int|null
+     * @return string|int|null
      */
     public function log($connection, $queue, $payload, $exception)
     {
@@ -67,7 +67,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      * Get the IDs of all of the failed jobs.
      *
      * @param  string|null  $queue
-     * @return array
+     * @return list<string|int>
      */
     public function ids($queue = null)
     {
@@ -75,13 +75,14 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
             ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
             ->orderBy('id', 'desc')
             ->pluck('id')
+            ->map(fn ($id) => is_int($id) ? $id : (string) $id)
             ->all();
     }
 
     /**
      * Get a list of all of the failed jobs.
      *
-     * @return array
+     * @return list<object>
      */
     public function all()
     {

@@ -414,6 +414,15 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue($column['nullable']);
     }
 
+    public function testGetColumnIsCaseInsensitive()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->string('bar');
+        });
+
+        $this->assertSame('bar', Schema::getColumn('foo', 'BAR')['name']);
+    }
+
     public function testGetColumnWithUnknownColumn()
     {
         Schema::create('foo', function (Blueprint $table) {

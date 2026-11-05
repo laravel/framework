@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
@@ -11,6 +12,7 @@ use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use PDO;
+use RuntimeException;
 
 class MySqlConnection extends Connection
 {
@@ -55,6 +57,54 @@ class MySqlConnection extends Connection
             $this->lastInsertId = $this->getPdo()->lastInsertId($sequence);
 
             return $result;
+        });
+    }
+
+    /**
+     * Execute the given callback using OLAP workload.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function olap(Closure $callback)
+    {
+        if (! $this->isVitess()) {
+            return $callback($this);
+        }
+
+        $this->setWorkload('olap');
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->setWorkload('oltp');
+        }
+    }
+
+    /**
+     * Set the Vitess workload for the connection.
+     *
+     * @param  'olap'|'oltp'  $workload
+     * @return void
+     */
+    protected function setWorkload($workload)
+    {
+        $this->run("set workload = '{$workload}'", [], function ($query) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            $this->getPdo()->exec($query);
+
+            if ($this->readPdo instanceof Closure) {
+                $this->readPdo = call_user_func($this->readPdo);
+            }
+
+            $this->readPdo?->exec($query);
+
+            return true;
         });
     }
 
@@ -120,6 +170,16 @@ class MySqlConnection extends Connection
     }
 
     /**
+     * Determine if the connected database is a Vitess database.
+     *
+     * @return bool
+     */
+    public function isVitess()
+    {
+        return Str::contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), ['Vitess', 'PlanetScale'], ignoreCase: true);
+    }
+
+    /**
      * Get the server version for the connection.
      *
      * @return string
@@ -129,6 +189,58 @@ class MySqlConnection extends Connection
         return str_contains($version = parent::getServerVersion(), 'MariaDB')
             ? Str::between($version, '5.5.5-', '-MariaDB')
             : $version;
+    }
+
+    /**
+     * Get the ID of the last committed transaction.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getLastCommitId()
+    {
+        $gtid = $this->usingWritePdo(fn () => $this->selectOne('select @@log_bin as log_bin, @@global.gtid_mode as mode, @@global.gtid_executed as executed'));
+
+        if (! $gtid->log_bin || $gtid->mode !== 'ON') {
+            throw new RuntimeException("The MySQL configuration 'log_bin = ON' and 'gtid_mode = ON' are required to retrieve the last commit ID.");
+        }
+
+        return $gtid->executed;
+    }
+
+    /**
+     * Calculate the commit ID for a set of commit IDs that includes all of them.
+     *
+     * @param  string[]  $values
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function mergeCommitIds(array $values)
+    {
+        if ($values === []) {
+            throw new RuntimeException("The list of commit IDs can't be empty.");
+        }
+
+        // Normalize the joined GTID sets with gtid_subtract to keep the result as small as possible...
+        return $this->scalar("select gtid_subtract(?, '')", [implode(',', $values)]);
+    }
+
+    /**
+     * Determine if the given commit ID has been applied.
+     *
+     * @param  string  $value
+     * @param  int  $wait
+     * @return bool
+     */
+    public function hasCommitId(string $value, int $wait = 0)
+    {
+        if ($wait <= 0) {
+            return (bool) $this->scalar('select gtid_subset(?, @@global.gtid_executed)', [$value]);
+        }
+
+        return (int) $this->scalar('select wait_for_executed_gtid_set(?, ?)', [$value, $wait]) === 0;
     }
 
     /**

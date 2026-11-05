@@ -2,9 +2,12 @@
 
 namespace Illuminate\Queue;
 
+use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 use UnitEnum;
@@ -16,7 +19,7 @@ use function Illuminate\Support\enum_value;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
-    use ResolvesQueueRoutes;
+    use InteractsWithTime, ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -124,6 +127,30 @@ class QueueManager implements FactoryContract, MonitorContract
     public function stopping($callback)
     {
         $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+    }
+
+    /**
+     * Register a callback to be invoked when a job runs for longer than a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  callable  $handler
+     * @return void
+     */
+    public function whenJobRunsLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $this->app['events']->listen(Events\JobAttempted::class, function ($event) use ($threshold, $handler) {
+            if (! is_null($event->duration) && $event->duration > $threshold) {
+                $handler($event->job, $event->duration);
+            }
+        });
     }
 
     /**

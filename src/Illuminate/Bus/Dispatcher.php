@@ -12,16 +12,16 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
 {
-    use ReadsQueueAttributes, ResolvesQueueRoutes;
+    use ReadsClassAttributes, ResolvesQueueRoutes;
 
     /**
      * The container implementation.
@@ -308,13 +308,15 @@ class Dispatcher implements QueueingDispatcher
     public function dispatchAfterResponse($command, $handler = null)
     {
         if (! $this->allowsDispatchingAfterResponses) {
-            $this->dispatchSync($command);
+            rescue(fn () => $this->dispatchSync($command), report: true);
 
             return;
         }
 
         $this->container->terminating(function () use ($command, $handler) {
-            $this->dispatchSync($command, $handler);
+            rescue(function () use ($command, $handler) {
+                $this->dispatchSync($command, $handler);
+            }, report: true);
         });
     }
 

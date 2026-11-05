@@ -2411,7 +2411,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => false,
                 'default' => false,
-                'description' => 'Display the key instead of modifying files',
+                'description' => 'Display a new key instead of modifying files',
             ],
             [
                 'name' => 'force',
@@ -3545,15 +3545,26 @@ return [
             [
                 'name' => 'id',
                 'mode' => 'required',
-                'isArray' => false,
-                'default' => null,
-                'description' => 'The ID of the failed job',
+                'isArray' => true,
+                'default' => [],
+                'description' => 'The IDs of the failed jobs',
             ],
         ],
     ],
     \Illuminate\Queue\Console\ListFailedCommand::class => [
         'name' => 'queue:failed',
         'options' => [
+            [
+                'name' => 'queue',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'Only list the failed jobs for the specified queue',
+            ],
             [
                 'name' => 'json',
                 'shortcut' => null,

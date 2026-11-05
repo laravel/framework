@@ -2,13 +2,16 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Cache\ArrayLock;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\StorageStore;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\Event;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheEventMutexTest extends TestCase
@@ -120,6 +123,45 @@ class CacheEventMutexTest extends TestCase
         $this->cacheFactory->repository = new Repository(new ArrayStore);
 
         $this->cacheMutex->create($this->event);
+
+        $this->assertTrue($this->cacheMutex->exists($this->event));
+    }
+
+    public function testCheckingForOverlapDoesNotAcquireLockWithLockProvider()
+    {
+        $store = new class extends ArrayStore
+        {
+            public $acquisitions = 0;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                return new class($this, $name, $seconds, $owner) extends ArrayLock
+                {
+                    public function acquire()
+                    {
+                        $this->store->acquisitions++;
+
+                        return parent::acquire();
+                    }
+                };
+            }
+        };
+
+        $this->cacheFactory->repository = new Repository($store);
+
+        $this->assertFalse($this->cacheMutex->exists($this->event));
+        $this->assertSame(0, $store->acquisitions);
+    }
+
+    public function testOverlapsForRunningTaskWithLockThatCannotReportWhetherItIsLocked()
+    {
+        $lock = Mockery::mock(Lock::class);
+        $lock->expects('get')->andReturnFalse();
+
+        $store = Mockery::mock(ArrayStore::class);
+        $store->expects('lock')->with($this->event->mutexName(), $this->event->expiresAt * 60)->andReturn($lock);
+
+        $this->cacheFactory->repository = new Repository($store);
 
         $this->assertTrue($this->cacheMutex->exists($this->event));
     }

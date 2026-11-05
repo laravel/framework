@@ -31,7 +31,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * The mailer currently being used to send a message.
      *
-     * @var string
+     * @var string|null
      */
     protected $currentMailer;
 
@@ -498,6 +498,18 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Send a new message with only an HTML part.
+     *
+     * @param  string  $html
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public function html($html, $callback)
+    {
+        //
+    }
+
+    /**
      * Send a new message with only a raw text part.
      *
      * @param  string  $text
@@ -505,6 +517,19 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * @return void
      */
     public function raw($text, $callback)
+    {
+        //
+    }
+
+    /**
+     * Send a new message with only a plain part.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public function plain($view, array $data, $callback)
     {
         //
     }

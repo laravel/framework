@@ -145,6 +145,43 @@ class ImagickDriverTest extends TestCase
         $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
     }
 
+    public function test_processes_optimize_to_jxl()
+    {
+        $this->ensureImageFormatCanBeEncoded('jxl');
+
+        $driver = new ImagickDriver;
+
+        $result = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'jxl'));
+
+        $header = substr($result, 0, 16);
+
+        $this->assertTrue(
+            str_starts_with($result, "\xff\x0a") || str_contains($header, 'JXL '),
+            'Expected a JPEG XL codestream or container signature.'
+        );
+    }
+
+    public function test_processes_jxl_input()
+    {
+        $this->ensureImageFormatCanBeEncoded('jxl');
+
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'jxl'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25)));
+
+        $header = substr($result, 0, 16);
+
+        $this->assertTrue(
+            str_starts_with($result, "\xff\x0a") || str_contains($header, 'JXL '),
+            'Expected a JPEG XL codestream or container signature.'
+        );
+
+        $result = $driver->process($result, $this->pipeline(format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
     public function test_dimensions_returns_the_decoded_size()
     {
         $driver = new ImagickDriver;

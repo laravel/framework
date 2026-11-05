@@ -181,6 +181,10 @@ class QueueTest extends TestCase
         try {
             CloudBootstrapper::registerEvents($this->app);
             CloudBootstrapper::bootManagedQueues($this->app);
+
+            Worker::$timedOutExitCode = null;
+            Worker::killUsing(null);
+
             $this->assertNull(Worker::$timedOutExitCode);
 
             $this->app['queue']->connection('cloud');
@@ -195,6 +199,9 @@ class QueueTest extends TestCase
             $this->assertTrue(pcntl_wifexited($status));
             $this->assertSame(124, pcntl_wexitstatus($status));
         } finally {
+            Worker::$timedOutExitCode = null;
+            Worker::killUsing(null);
+
             $_SERVER['argv'] = $argv;
         }
     }
@@ -647,7 +654,7 @@ class QueueTest extends TestCase
         [$queue, $agent] = $this->fakeQueue();
         $reporter = new ExceptionReporter(
             $eventsFake,
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             ['stop' => true],
         );
@@ -670,6 +677,7 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode([]);
+        CloudBootstrapper::configureExceptions($this->app);
         CloudBootstrapper::registerExceptionReporting($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 

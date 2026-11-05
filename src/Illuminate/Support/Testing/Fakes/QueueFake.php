@@ -673,7 +673,8 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
-            if ($job instanceof ShouldBeUnique) {
+            if ($job instanceof ShouldBeUnique ||
+                ($job instanceof CallQueuedListener && $job->shouldBeUnique())) {
                 $this->uniqueJobs[] = $job;
             }
         } else {

@@ -141,9 +141,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function resolveNotificationSender()
     {
-        return $this->notificationSender ??= new NotificationSender(
-            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale
+        $this->notificationSender ??= new NotificationSender(
+            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class)
         );
+
+        return tap($this->notificationSender->locale($this->locale), function () {
+            $this->locale = null;
+        });
     }
 
     /**

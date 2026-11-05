@@ -17,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
@@ -242,6 +243,27 @@ class QueuedEventsTest extends TestCase
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
             return $job->maxExceptions === 1 && $job->retryUntil !== null;
         });
+    }
+
+    public function testQueuePropagatesCountCrashesAsExceptions()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherCountCrashesAsExceptionsAttribute::class.'@handle');
+        $d->listen('some.event', TestDispatcherCountCrashesAsExceptionsProperty::class.'@handle');
+        $d->listen('other.event', TestDispatcherOptions::class.'@handle');
+        $d->dispatch('some.event', ['foo']);
+        $d->dispatch('other.event', ['foo']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, fn ($job) => $job->class === TestDispatcherCountCrashesAsExceptionsAttribute::class && $job->countCrashesAsExceptions === true);
+        $fakeQueue->assertPushed(CallQueuedListener::class, fn ($job) => $job->class === TestDispatcherCountCrashesAsExceptionsProperty::class && $job->countCrashesAsExceptions === true);
+        $fakeQueue->assertPushed(CallQueuedListener::class, fn ($job) => $job->class === TestDispatcherOptions::class && $job->countCrashesAsExceptions === false);
     }
 
     public function testQueuePropagateTries()
@@ -837,6 +859,25 @@ class TestDispatcherGetDelay implements ShouldQueue
     public function withDelay()
     {
         return 20;
+    }
+}
+
+#[CountCrashesAsExceptions]
+class TestDispatcherCountCrashesAsExceptionsAttribute implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherCountCrashesAsExceptionsProperty implements ShouldQueue
+{
+    public $countCrashesAsExceptions = true;
+
+    public function handle()
+    {
+        //
     }
 }
 

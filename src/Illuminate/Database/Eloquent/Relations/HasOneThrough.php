@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -73,9 +74,35 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
 
         if ($this->isOneOfMany()) {
             $this->mergeOneOfManyJoinsTo($query);
+
+            if ($parentQuery->getQuery()->from !== $query->getQuery()->from &&
+                $parentQuery->getQuery()->from === $this->throughParent->getTable()) {
+                $this->qualifyOneOfManyJoinWithThroughParentAlias($query);
+            }
         }
 
         return $query;
+    }
+
+    /**
+     * Point the one-of-many join at the aliased intermediate table of a self-referencing existence query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
+     * @return void
+     */
+    protected function qualifyOneOfManyJoinWithThroughParentAlias(Builder $query)
+    {
+        $joins = $query->getQuery()->joins;
+
+        $alias = Str::afterLast($joins[0]->table, ' as ');
+
+        $join = last($joins);
+
+        foreach ($join->wheres as $key => $where) {
+            if (($where['second'] ?? null) === $this->getQualifiedFirstKeyName()) {
+                $join->wheres[$key]['second'] = $alias.'.'.$this->firstKey;
+            }
+        }
     }
 
     /** @inheritDoc */

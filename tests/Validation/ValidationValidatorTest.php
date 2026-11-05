@@ -4566,6 +4566,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ["caf\xE9", 'bar']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ["caf\xE9", "caf\xE9"]], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDistinctForTopLevelArrays()
@@ -6961,6 +6967,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['from' => '2020-05-08', 'to' => '2020-08-06'], ['from' => 'date_format:Y-m-d', 'to' => 'date_format:Y-d-m|after:from']);
         $this->assertTrue($v->passes());
+    }
+
+    public function testBeforeAndAfterDoNotThrowOnNonDateValues()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date', 'ends' => 'date|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date_format:Y-m-d', 'ends' => 'date_format:Y-m-d|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => new DateTimeImmutable('2000-01-01')], ['x' => 'date_format:Y-m-d|before:2012-01-01']);
+        $this->assertTrue($v->fails());
     }
 
     public function testWeakBeforeAndAfter()

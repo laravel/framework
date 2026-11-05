@@ -28,7 +28,7 @@ class BladeAnonymousComponentTest extends TestCase
         Blade::anonymousComponentPath(__DIR__.'/Fixtures/anonymous-components-1', 'layouts');
         Blade::anonymousComponentPath(__DIR__.'/Fixtures/anonymous-components-2');
 
-        $view = View::make('layouts::app')->render();
+        View::make('layouts::app')->render();
     }
 
     public function test_anonymous_components_with_custom_paths_cant_be_rendered_as_normal_views_even_with_no_prefix()
@@ -38,7 +38,7 @@ class BladeAnonymousComponentTest extends TestCase
         Blade::anonymousComponentPath(__DIR__.'/Fixtures/anonymous-components-1', 'layouts');
         Blade::anonymousComponentPath(__DIR__.'/Fixtures/anonymous-components-2');
 
-        $view = View::make('panel')->render();
+        View::make('panel')->render();
     }
 
     protected function defineEnvironment($app)

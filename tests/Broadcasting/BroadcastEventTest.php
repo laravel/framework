@@ -5,14 +5,44 @@ namespace Illuminate\Tests\Broadcasting;
 use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
+use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Queue\Attributes\UniqueFor;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class BroadcastEventTest extends TestCase
 {
+    public function testUniqueBroadcastEventReadsUniqueForAttribute()
+    {
+        $job = new UniqueBroadcastEvent(new TestBroadcastEventWithUniqueForAttribute);
+
+        $this->assertSame(60, $job->uniqueFor);
+    }
+
+    public function testUniqueBroadcastEventReadsInheritedUniqueForAttribute()
+    {
+        $job = new UniqueBroadcastEvent(new TestBroadcastEventWithInheritedUniqueFor);
+
+        $this->assertSame(60, $job->uniqueFor);
+    }
+
+    public function testUniqueBroadcastEventUniqueForMethodOverridesAttribute()
+    {
+        $job = new UniqueBroadcastEvent(new TestBroadcastEventWithUniqueForMethod);
+
+        $this->assertSame(120, $job->uniqueFor);
+    }
+
+    public function testUniqueBroadcastEventChildPropertyOverridesInheritedAttribute()
+    {
+        $job = new UniqueBroadcastEvent(new TestBroadcastEventWithUniqueForProperty);
+
+        $this->assertSame(180, $job->uniqueFor);
+    }
+
     public function testBasicEventBroadcastParameterFormatting()
     {
         $broadcaster = Mockery::mock(Broadcaster::class);
@@ -170,6 +200,28 @@ class BroadcastEventTest extends TestCase
 
         $this->assertSame($exception, $event->failedWith);
     }
+}
+
+#[UniqueFor(60)]
+class TestBroadcastEventWithUniqueForAttribute extends TestBroadcastEvent
+{
+}
+
+class TestBroadcastEventWithInheritedUniqueFor extends TestBroadcastEventWithUniqueForAttribute
+{
+}
+
+class TestBroadcastEventWithUniqueForMethod extends TestBroadcastEventWithUniqueForAttribute
+{
+    public function uniqueFor(): int
+    {
+        return 120;
+    }
+}
+
+class TestBroadcastEventWithUniqueForProperty extends TestBroadcastEventWithUniqueForAttribute
+{
+    public $uniqueFor = 180;
 }
 
 class TestBroadcastEvent

@@ -65,6 +65,34 @@ class DatabaseLockTest extends DatabaseTestCase
         $otherLock->release();
     }
 
+    public function testLockCannotBeAcquiredWhileHeldInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+
+        DB::transaction(function () {
+            $this->assertFalse(Cache::driver('database')->lock('foo')->get());
+
+            $this->assertSame(1, DB::table('cache_locks')->count());
+        });
+
+        $lock->release();
+    }
+
+    public function testExpiredLockCanBeAcquiredInsideTransaction()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertTrue($lock->get());
+        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDay()->getTimestamp()]);
+
+        DB::transaction(function () {
+            $otherLock = Cache::driver('database')->lock('foo');
+            $this->assertTrue($otherLock->get());
+
+            $otherLock->release();
+        });
+    }
+
     public function testIsLocked()
     {
         $lock = Cache::driver('database')->lock('foo');
@@ -152,7 +180,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $insertBuilder = Mockery::mock(Builder::class);
         $deleteBuilder = Mockery::mock(Builder::class);
 
-        $insertBuilder->expects('insert')->andReturn(true);
+        $insertBuilder->expects('insertOrIgnore')->andReturn(1);
 
         $deleteBuilder->expects('where')->with('expiration', '<=', Mockery::any())->andReturnSelf();
         $deleteBuilder->expects('delete')->andThrow(
@@ -185,7 +213,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $insertBuilder = Mockery::mock(Builder::class);
         $updateBuilder = Mockery::mock(Builder::class);
 
-        $insertBuilder->expects('insert')->andThrow(
+        $insertBuilder->expects('insertOrIgnore')->andThrow(
             new QueryException(
                 'mysql',
                 'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',

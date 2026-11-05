@@ -10,6 +10,7 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
@@ -834,6 +835,36 @@ class RedisQueueTest extends TestCase
 
         $this->assertSame(1050, $this->queue->size('bulk-many'));
         $this->assertSame(1050, $this->redis[$driver]->connection()->llen("$redisKey:notify"));
+    }
+
+    #[DataProvider('bulkPushNotificationCountProvider')]
+    public function testBulkPushScriptCreatesOneNotificationPerJob(int $count)
+    {
+        $connection = $this->redis['phpredis']->connection();
+        $key = "queues:{bulk-script-{$count}}";
+        $payloads = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $payloads[] = "job-{$i}";
+        }
+
+        $connection->eval(LuaScripts::bulkPush(), 2, $key, "{$key}:notify", ...$payloads);
+
+        $this->assertSame($payloads, $connection->lrange($key, 0, -1));
+        $this->assertSame(array_fill(0, $count, '1'), $connection->lrange("{$key}:notify", 0, -1));
+    }
+
+    public static function bulkPushNotificationCountProvider(): array
+    {
+        return [
+            'empty' => [0],
+            'single' => [1],
+            'before chunk boundary' => [99],
+            'at chunk boundary' => [100],
+            'after chunk boundary' => [101],
+            'multiple chunks' => [250],
+            'full bulk' => [1000],
+        ];
     }
 
     #[DataProvider('redisDriverProvider')]

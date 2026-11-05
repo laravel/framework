@@ -286,6 +286,7 @@ class ConsoleApplicationTest extends TestCase
             $app->instance('events', $events);
 
             $kernel = new TestKernel($app, $events);
+            $kernel->loadFrom(default_skeleton_path('app', 'Console', 'Commands'));
 
             $commands = $kernel->getRegisteredCommands();
 

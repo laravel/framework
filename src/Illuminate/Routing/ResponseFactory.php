@@ -164,7 +164,7 @@ class ResponseFactory implements FactoryContract
                     }
 
                     echo "event: $event\n";
-                    echo 'data: '.$message;
+                    echo 'data: '.preg_replace('/\r\n|\r|\n/', "\ndata: ", (string) $message);
                     echo "\n\n";
 
                     if (ob_get_level() > 0) {
@@ -183,7 +183,7 @@ class ResponseFactory implements FactoryContract
                     }
 
                     echo "event: $endEvent\n";
-                    echo 'data: '.$endStreamWith;
+                    echo 'data: '.preg_replace('/\r\n|\r|\n/', "\ndata: ", (string) $endStreamWith);
                     echo "\n\n";
 
                     if (ob_get_level() > 0) {

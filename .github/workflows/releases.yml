@@ -62,7 +62,7 @@ jobs:
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
       - name: Commit version change
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7
         with:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
@@ -80,7 +80,7 @@ jobs:
 
       - name: Generate release notes
         id: generated-notes
-        uses: RedCrafter07/release-notes-action@31674bfa3a219e7c661fc0c5b7b3851c741b9965 # main
+        uses: RedCrafter07/release-notes-action@304edb57ff4d0cb822b39a00556c015790dee977 # main
         with:
           tag-name: v${{ steps.version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}

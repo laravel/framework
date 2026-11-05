@@ -46,6 +46,11 @@ class ExceptionReporter
     protected bool $reportingViewException = false;
 
     /**
+     * The Blade mapper resolved for the currently reporting exception.
+     */
+    protected ?BladeMapper $bladeMapper = null;
+
+    /**
      * The captured identifiers, keyed by exception.
      *
      * @var \WeakMap<\Throwable, string>
@@ -125,6 +130,11 @@ class ExceptionReporter
     ];
 
     /**
+     * The memory reserved for reporting fatal errors.
+     */
+    protected ?string $reservedMemory;
+
+    /**
      * Create a new Exception Reporter instance.
      *
      * @param  array{
@@ -137,11 +147,13 @@ class ExceptionReporter
      */
     public function __construct(
         protected Events $events,
-        protected Closure|BladeMapper $bladeMapper,
+        protected Closure $bladeMapperResolver,
         protected string $basePath,
         protected array $config,
     ) {
         $this->exceptionIds = new WeakMap;
+
+        $this->reservedMemory = str_repeat('x', 32768);
     }
 
     /**
@@ -149,10 +161,16 @@ class ExceptionReporter
      */
     public function __invoke(Throwable $e): ?bool
     {
+        if ($e instanceof FatalError) {
+            $this->reservedMemory = null;
+        }
+
         $previousReportingViewException = $this->reportingViewException;
+        $previousBladeMapper = $this->bladeMapper;
 
         try {
             $this->reportingViewException = $this->isViewException($e);
+            $this->bladeMapper = null;
 
             $e = $this->unwrapViewException($e);
 
@@ -167,6 +185,7 @@ class ExceptionReporter
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
+            $this->bladeMapper = $previousBladeMapper;
 
             if ($this->scheduledTaskAwaitingFailureReport) {
                 $this->flushScheduledTaskContext();
@@ -308,7 +327,7 @@ class ExceptionReporter
     /**
      * Retrieve the request headers.
      *
-     * @return array<string, list<string|null>>
+     * @return array<string, list<string|null>>|null
      */
     protected function requestHeaders(): ?array
     {
@@ -1289,9 +1308,7 @@ class ExceptionReporter
      */
     protected function bladeMapper(): BladeMapper
     {
-        return $this->bladeMapper instanceof Closure
-            ? $this->bladeMapper = ($this->bladeMapper)()
-            : $this->bladeMapper;
+        return $this->bladeMapper ??= ($this->bladeMapperResolver)();
     }
 
     /**

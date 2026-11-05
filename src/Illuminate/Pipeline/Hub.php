@@ -79,7 +79,7 @@ class Hub implements HubContract
     /**
      * Get the container instance used by the hub.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return \Illuminate\Contracts\Container\Container|null
      */
     public function getContainer()
     {

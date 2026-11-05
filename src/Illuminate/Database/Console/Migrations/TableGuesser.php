@@ -18,7 +18,7 @@ class TableGuesser
      * Attempt to guess the table name and "creation" status of the given migration.
      *
      * @param  string  $migration
-     * @return array{string, bool}
+     * @return array{string, bool}|null
      */
     public static function guess($migration)
     {

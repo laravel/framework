@@ -43,4 +43,15 @@ class ScheduleInterruptCommandTest extends TestCase
 
         $this->assertFalse($this->app->make(Schedule::class)->hasBeenInterruptedSince(Carbon::now()->subMinute()));
     }
+
+    public function testFailsWhenInterruptingIsDisabled()
+    {
+        Schedule::$interruptible = false;
+
+        $this->artisan('schedule:interrupt')
+            ->expectsOutputToContain('Schedule interrupting is currently disabled.')
+            ->assertFailed();
+
+        $this->assertNull($this->app['cache']->get('illuminate:schedule:interrupt'));
+    }
 }

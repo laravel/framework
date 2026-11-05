@@ -16,6 +16,7 @@ assertType('ArrayIterator<int, Post>', $paginator->getIterator());
 
 assertType('string|null', $paginator->fragment());
 assertType('Illuminate\Pagination\Paginator<int, Post>', $paginator->fragment('foo'));
+assertType('Illuminate\Contracts\Support\Htmlable', $paginator->links());
 
 $paginator->each(function ($post) {
     assertType('Post', $post);
@@ -68,3 +69,9 @@ $throughPaginator->through(function ($post, $key): array {
 });
 
 assertType('Illuminate\Pagination\CursorPaginator<int, array{id: int, post: Post}>', $throughPaginator);
+
+/** @var \Illuminate\Contracts\Pagination\Paginator<int, Post> $paginatorContract */
+assertType('Illuminate\Contracts\Support\Htmlable', $paginatorContract->render());
+
+/** @var \Illuminate\Contracts\Pagination\CursorPaginator<int, Post> $cursorPaginatorContract */
+assertType('Illuminate\Contracts\Support\Htmlable', $cursorPaginatorContract->render());

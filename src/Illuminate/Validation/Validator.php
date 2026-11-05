@@ -43,7 +43,7 @@ class Validator implements ValidatorContract
     /**
      * The Presence Verifier implementation.
      *
-     * @var \Illuminate\Validation\PresenceVerifierInterface
+     * @var \Illuminate\Validation\PresenceVerifierInterface|null
      */
     protected $presenceVerifier;
 

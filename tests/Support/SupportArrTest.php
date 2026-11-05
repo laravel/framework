@@ -29,6 +29,8 @@ include_once 'Fixtures/Enums.php';
 
 class SupportArrTest extends TestCase
 {
+    use Concerns\CountsEnumerations;
+
     public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
@@ -103,6 +105,17 @@ class SupportArrTest extends TestCase
 
         $array = ['foo' => ['bar' => false]];
         Arr::push($array, 'foo.bar', 'baz');
+    }
+
+    public function testPushWorksWithArrayObject()
+    {
+        $array = new ArrayObject(['tags' => ['php']]);
+
+        $this->assertSame($array, Arr::push($array, 'tags', 'laravel', 'symfony'));
+        $this->assertSame(['php', 'laravel', 'symfony'], $array['tags']);
+
+        $this->assertSame($array, Arr::push($array, 'missing', 'first'));
+        $this->assertSame(['first'], $array['missing']);
     }
 
     public function testCollapse()
@@ -461,6 +474,23 @@ class SupportArrTest extends TestCase
         $result = Arr::first($arrayObject, fn ($value) => $value === 0);
 
         $this->assertSame(0, $result);
+    }
+
+    public function testFirstIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            Arr::first($collection, fn ($value) => $value === 2);
+        });
+    }
+
+    public function testFirstWorksWithYieldFrom()
+    {
+        $products = (function () {
+            yield from ['Laptop', 'Monitor'];
+            yield from ['Keyboard', 'Mouse'];
+        })();
+
+        $this->assertSame('Laptop', Arr::first($products, fn ($product) => $product === 'Laptop'));
     }
 
     public function testJoin()

@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Concurrency\Console;
 
 use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
+use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\TestCase;
+use ReflectionMethod;
 use RuntimeException;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -22,11 +24,22 @@ class CustomParameterException extends RuntimeException
 
 class InvokeSerializedClosureCommandTest extends TestCase
 {
+    private const KEY = 'test-envelope-key';
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->app[Kernel::class]->registerCommand(new InvokeSerializedClosureCommand);
+
+        $_SERVER['LARAVEL_CONCURRENCY_HMAC_KEY'] = self::KEY;
+    }
+
+    protected function tearDown(): void
+    {
+        unset($_SERVER['LARAVEL_CONCURRENCY_HMAC_KEY']);
+
+        parent::tearDown();
     }
 
     public function testItCanInvokeSerializedClosureFromArgument()
@@ -43,8 +56,8 @@ class InvokeSerializedClosureCommandTest extends TestCase
             'code' => $serialized,
         ], $output);
 
-        // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the signed result envelope...
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -66,8 +79,8 @@ class InvokeSerializedClosureCommandTest extends TestCase
         // Call the command without arguments
         Artisan::call('invoke-serialized-closure', [], $output);
 
-        // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the signed result envelope...
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -85,8 +98,8 @@ class InvokeSerializedClosureCommandTest extends TestCase
         // Call the command without arguments
         Artisan::call('invoke-serialized-closure', [], $output);
 
-        // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the signed result envelope...
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the result
         $this->assertTrue($result['successful']);
@@ -107,8 +120,8 @@ class InvokeSerializedClosureCommandTest extends TestCase
             'code' => $serialized,
         ], $output);
 
-        // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the signed result envelope...
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the exception was caught
         $this->assertFalse($result['successful']);
@@ -130,12 +143,44 @@ class InvokeSerializedClosureCommandTest extends TestCase
             'code' => $serialized,
         ], $output);
 
-        // Get the output and decode it
-        $result = json_decode($output->fetch(), true);
+        // Extract the signed result envelope...
+        $result = $this->envelopeFrom($output->fetch());
 
         // Verify the exception was caught and parameters were captured
         $this->assertFalse($result['successful']);
         $this->assertArrayHasKey('parameters', $result);
         $this->assertSame('Test param', $result['parameters']['customParam'] ?? null);
+    }
+
+    public function testEnvelopeKeyIsRemovedFromTheEnvironmentBeforeTheTaskRuns()
+    {
+        putenv('LARAVEL_CONCURRENCY_HMAC_KEY='.self::KEY);
+
+        $closure = fn () => [
+            $_SERVER['LARAVEL_CONCURRENCY_HMAC_KEY'] ?? null,
+            $_ENV['LARAVEL_CONCURRENCY_HMAC_KEY'] ?? null,
+            getenv('LARAVEL_CONCURRENCY_HMAC_KEY'),
+        ];
+
+        $output = new BufferedOutput;
+
+        Artisan::call('invoke-serialized-closure', [
+            'code' => serialize(new SerializableClosure($closure)),
+        ], $output);
+
+        $result = $this->envelopeFrom($output->fetch());
+
+        $this->assertSame([null, null, false], unserialize($result['result']));
+    }
+
+    /**
+     * Extract the signed result envelope from the command output using the process driver's parser.
+     */
+    private function envelopeFrom(string $output): array
+    {
+        $driver = $this->app->make(ProcessDriver::class);
+        $method = new ReflectionMethod($driver, 'parseEnvelope');
+
+        return $method->invoke($driver, $output, self::KEY);
     }
 }

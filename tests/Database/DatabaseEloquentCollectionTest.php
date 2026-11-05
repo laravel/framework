@@ -253,6 +253,20 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->findOrFail(new BaseCollection([1, 3]));
     }
 
+    public function testFindOrFailFindsModelByModelInstance()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
+
+        $c = new Collection([$model1]);
+
+        $this->assertSame($model1, $c->findOrFail($model1));
+
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 2'));
+
+        $c->findOrFail($model2);
+    }
+
     public function testFindOrFailThrowsExceptionWithMessageWhenOtherModelsArePresent()
     {
         $model = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);

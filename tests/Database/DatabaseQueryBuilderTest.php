@@ -1929,6 +1929,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'greek']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'greek\', "body")) @@ plainto_tsquery(\'greek\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
@@ -3097,6 +3102,35 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $count = $builder->getCountForPagination();
         $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithGroupedUnionLimitAndOffset()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('posts')->select('category')->groupBy('category')->unionAll($this->getBuilder()->from('videos')->select('category'))->limit(15)->offset(1);
+
+        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithGroupedUnionOrders()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('posts')->select('category')->groupBy('category')->unionAll($this->getBuilder()->from('videos')->select('category'))->orderBy('category')->orderByRaw('field(category, ?)', ['news']);
+
+        $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from ((select "category" from "posts" group by "category") union all (select "category" from "videos")) as "aggregate_table"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+        $this->assertSame(['news'], $builder->getRawBindings()['unionOrder']);
     }
 
     public function testWhereShortcut()
@@ -4832,6 +4866,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->limit(5)->offset(5)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? from (select top (5) * from [users] where [id] > ? order by [foo] desc) as [users]', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '>', 1)->orderBy('foo', 'desc')->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertMethod()
@@ -5162,6 +5201,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->expects('delete')->with('delete top (1) from [users] where [email] = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('delete')->with('delete [users] from (select top (1) * from [users] where [email] = ? order by [id] asc) as [users]', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
     }
@@ -5481,6 +5525,25 @@ class DatabaseQueryBuilderTest extends TestCase
             'meta->tags' => ['white', 'large'],
             'group_id' => new Raw('45'),
             'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testMariaDbUpdateWrappingJsonArray()
+    {
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MariaDbGrammar($connection);
+        $processor = new Processor;
+
+        $connection->expects($this->once())
+            ->method('update')
+            ->with(
+                'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_query(?, \'$\')) where `active` = ?',
+                [json_encode(['white', 'large']), 1]
+            );
+
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('active', 1)->update([
+            'meta->tags' => ['white', 'large'],
         ]);
     }
 
@@ -7129,7 +7192,7 @@ SQL;
 
         $builder->expects('get')->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertSame(
-                '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
+                '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("created_at" < ? or ("created_at" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("created_at" < ? or ("created_at" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
                 $builder->toSql());
             $this->assertEquals(['first', 1, 1, $ts, $ts, 'news'], $builder->bindings['where']);
             $this->assertEquals(['second', 1, 1, $ts, $ts, 'news', 'third', 1, 1, $ts, $ts, 'news'], $builder->bindings['union']);
@@ -7915,6 +7978,29 @@ SQL;
         $builder = $this->getSQLiteBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
         $this->assertSame('select "foo" from "users" indexed by test_index', $builder->toSql());
+    }
+
+    public function testForceIndexSqliteIgnoresPrimaryKey()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->forceIndex('PRIMARY');
+        $this->assertSame('select "foo" from "users"', $builder->toSql());
+    }
+
+    public function testForceIndexSqliteIgnoresMultipleIndexes()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->forceIndex('test_index, other_index');
+        $this->assertSame('select "foo" from "users"', $builder->toSql());
+    }
+
+    public function testForceIndexSqliteRejectsInvalidIndexNames()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Index name contains invalid characters.');
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->forceIndex('test_index, other index')->toSql();
     }
 
     public function testIgnoreIndexSqlite()

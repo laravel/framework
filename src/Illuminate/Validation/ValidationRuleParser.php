@@ -5,11 +5,13 @@ namespace Illuminate\Validation;
 use Closure;
 use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ParameterizedRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Numeric;
@@ -95,7 +97,7 @@ class ValidationRuleParser
         }
 
         if (is_object($rule)) {
-            if ($rule instanceof Date || $rule instanceof Numeric || $rule instanceof StringRule) {
+            if ($rule instanceof ArrayRule || $rule instanceof Date || $rule instanceof Numeric || $rule instanceof StringRule) {
                 return explode('|', (string) $rule);
             }
 
@@ -105,7 +107,7 @@ class ValidationRuleParser
         $rules = [];
 
         foreach ($rule as $value) {
-            if ($value instanceof Date || $value instanceof Numeric || $value instanceof StringRule) {
+            if ($value instanceof ArrayRule || $value instanceof Date || $value instanceof Numeric || $value instanceof StringRule) {
                 $rules = array_merge($rules, explode('|', (string) $value));
             } else {
                 $rules[] = $this->prepareRule($value, $attribute);
@@ -134,6 +136,7 @@ class ValidationRuleParser
 
         if (! is_object($rule) ||
             $rule instanceof RuleContract ||
+            $rule instanceof ParameterizedRule ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -254,6 +257,10 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
+        if ($rule instanceof ParameterizedRule) {
+            $rule = $rule->toArray();
+        }
+
         if ($rule instanceof RuleContract || $rule instanceof CompilableRules) {
             return [$rule, []];
         }

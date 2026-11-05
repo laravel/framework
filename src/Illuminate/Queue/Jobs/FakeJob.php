@@ -24,7 +24,7 @@ class FakeJob extends Job implements JobContract
     /**
      * The exception the job failed with.
      *
-     * @var \Throwable
+     * @var \Throwable|null
      */
     public $failedWith;
 

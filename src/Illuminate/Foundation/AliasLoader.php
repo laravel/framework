@@ -28,7 +28,7 @@ class AliasLoader
     /**
      * The singleton instance of the loader.
      *
-     * @var \Illuminate\Foundation\AliasLoader
+     * @var \Illuminate\Foundation\AliasLoader|null
      */
     protected static $instance;
 

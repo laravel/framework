@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
@@ -58,7 +59,11 @@ class AsEncryptedCollection implements Castable
             public function set($model, $key, $value, $attributes)
             {
                 if (! is_null($value)) {
-                    return [$key => Crypt::encryptString(Json::encode($value))];
+                    if (($json = Json::encode($value)) === false) {
+                        throw JsonEncodingException::forAttribute($model, $key, json_last_error_msg());
+                    }
+
+                    return [$key => Crypt::encryptString($json)];
                 }
 
                 return null;

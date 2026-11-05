@@ -362,6 +362,10 @@ class Number
             $output[] = [$lower, $upper];
         }
 
+        if ($output !== [] && $lower == $to && end($output)[1] < $to) {
+            $output[] = [$lower, $to];
+        }
+
         return $output;
     }
 

@@ -225,6 +225,20 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('drop index "foo"', $statements[0]);
     }
 
+    public function testDropIndexOnSchemaQualifiedTable()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'tenant.users');
+        $blueprint->dropIndex(['email']);
+        $blueprint->dropIndex('foo');
+        $blueprint->dropIndex('other.bar');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(3, $statements);
+        $this->assertSame('drop index "tenant"."tenant_users_email_index"', $statements[0]);
+        $this->assertSame('drop index "tenant"."foo"', $statements[1]);
+        $this->assertSame('drop index "other"."bar"', $statements[2]);
+    }
+
     public function testDropSpatialIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'geo');
@@ -304,6 +318,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter index "foo" rename to "bar"', $statements[0]);
+    }
+
+    public function testRenameIndexOnSchemaQualifiedTable()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'tenant.users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter index "tenant"."foo" rename to "bar"', $statements[0]);
     }
 
     public function testAddingPrimaryKey()
@@ -1417,7 +1441,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(PostgresBuilder::class);
+        return mock(PostgresBuilder::class)->makePartial();
     }
 
     /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */

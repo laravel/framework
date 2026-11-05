@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -284,6 +285,20 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
     }
 
+    public function testReleasedJobIsWrittenAsReleased()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        Queue::push(new ReleasingJob);
+
+        $this->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('RELEASED')
+            ->doesntExpectOutputToContain('DONE')
+            ->assertExitCode(0);
+    }
+
     public function testStopReasonIsWritten()
     {
         Queue::push(new FirstJob);
@@ -302,13 +317,36 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
 
+        $connection = config('queue.default');
+
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1,
+            '--queue' => 'high,default',
             '--json' => true,
-        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high,default","status":"stopped","reason":"memory","exit_code":12')
             ->assertExitCode(12);
+    }
+
+    public function testPausedQueueStatusIsWrittenAsJson()
+    {
+        $connection = config('queue.default');
+
+        Queue::pause($connection, 'high');
+
+        Queue::push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+            '--queue' => 'high,default',
+            '--json' => true,
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high","status":"paused"')
+            ->assertExitCode(0);
+
+        $this->assertTrue(FirstJob::$ran);
     }
 }
 
@@ -361,6 +399,16 @@ class WritingJob implements ShouldQueue
             'email' => 'bigt@laravel.com',
             'password' => 'secret',
         ]);
+    }
+}
+
+class ReleasingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        $this->release(30);
     }
 }
 

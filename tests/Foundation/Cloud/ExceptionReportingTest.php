@@ -12,6 +12,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\CloudBootstrapper as Cloud;
@@ -119,6 +120,7 @@ class ExceptionReportingTest extends TestCase
 
         // This config existing will activate exception reporting
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode([]);
+        Cloud::configureExceptions($this->app);
         Cloud::registerExceptionReporting($this->app);
 
         report(new RuntimeException('Whoops!'));
@@ -190,6 +192,61 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJsonContains([
             'message' => 'Whoops!',
         ]);
+    }
+
+    public function testItDoesNotReportTwiceWhenTheResolvedExceptionHandlerIsWrapped(): void
+    {
+        $streams = $this->fakeEventsStreams();
+
+        unset($this->app[ExceptionHandler::class]);
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
+
+        $this->setupExceptionReporting(['stop' => false]);
+
+        // Mirror a service provider, such as Collision's, that resolves the
+        // handler and then rebinds it as a wrapper forwarding to the original.
+        $inner = $this->app->make(ExceptionHandler::class);
+
+        $this->app->forgetInstance(ExceptionHandler::class);
+        $this->app->singleton(ExceptionHandler::class, fn () => new class($inner) implements ExceptionHandler
+        {
+            public function __construct(protected $inner)
+            {
+            }
+
+            public function reportable($callback)
+            {
+                return $this->inner->reportable($callback);
+            }
+
+            public function report(Throwable $e)
+            {
+                $this->inner->report($e);
+            }
+
+            public function shouldReport(Throwable $e)
+            {
+                return $this->inner->shouldReport($e);
+            }
+
+            public function render($request, Throwable $e)
+            {
+                return $this->inner->render($request, $e);
+            }
+
+            public function renderForConsole($output, Throwable $e)
+            {
+                $this->inner->renderForConsole($output, $e);
+            }
+        });
+
+        $this->app->make(ExceptionHandler::class);
+
+        report(new RuntimeException('Whoops!'));
+
+        $writes = $streams->flatMap(fn ($stream) => array_filter(explode("\n", $stream->stream)));
+
+        $this->assertCount(1, $writes);
     }
 
     public function testItIgnoresExceptionHandlersThatCannotRegisterReportables(): void
@@ -937,6 +994,30 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
     }
 
+    public function testItResolvesTheBladeMapperForEachViewExceptionReported(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        $resolved = 0;
+
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            function () use (&$resolved) {
+                $resolved++;
+
+                return $this->app[BladeMapper::class];
+            },
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The first!')));
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The second!')));
+
+        $this->assertSame(2, $resolved);
+        $this->assertCount(1, $streams);
+    }
+
     public function testItNormalizesViewExceptions(): void
     {
         $this->setupExceptionReporting();
@@ -950,7 +1031,7 @@ class ExceptionReportingTest extends TestCase
             report($e);
         }
 
-        $compiledComponent = $this->reportedCompiledViewPath(__DIR__.'/components/profile.blade.php');
+        $compiledComponent = $this->reportedCompiledViewPath(realpath(__DIR__.'/components').'/profile.blade.php');
         $compiledView = $this->reportedCompiledViewPath(__DIR__.'/foo.blade.php');
 
         $this->assertCount(1, $streams);
@@ -986,6 +1067,37 @@ class ExceptionReportingTest extends TestCase
             unset($reportedInView['trace'][0], $thrownInView['trace'][0], $thrownInView['trace'][9], $reportedInView['trace'][9]);
 
             $this->assertSame($reportedInView['trace'], $thrownInView['trace']);
+
+            return true;
+        });
+    }
+
+    public function testItNormalizesViewExceptionsFromEachViewTheProcessRenders(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        foreach (['reentrancy.blade.php', 'components/profile.blade.php'] as $view) {
+            try {
+                view()->file(__DIR__.'/'.$view)->render();
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWritten(function (string $stream) {
+            [
+                $thrownInFirstView,
+                $reportedInSecondView,
+                $thrownInSecondView,
+            ] = array_map(
+                fn ($payload) => json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR),
+                explode("\n", trim($stream)),
+            );
+
+            $this->assertSame('tests/Foundation/Cloud/reentrancy.blade.php', $thrownInFirstView['trace'][0]['file']);
+            $this->assertSame('tests/Foundation/Cloud/components/profile.blade.php', $thrownInSecondView['trace'][0]['file']);
 
             return true;
         });
@@ -3585,6 +3697,37 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItReservesMemoryForReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+
+        $this->assertSame(32768, strlen($this->reservedMemory($this->exceptionReporter())));
+    }
+
+    public function testItKeepsTheReservedMemoryWhenReportingOtherExceptions(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = null;
+        $reporter(new RuntimeException('Whoops!'));
+
+        $this->assertSame(32768, strlen($this->reservedMemory($reporter)));
+    }
+
+    public function testItReleasesTheReservedMemoryWhenReportingFatalErrors(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        $reporter = $this->exceptionReporter();
+
+        HandleExceptions::$reservedMemory = str_repeat('x', 32768);
+        $reporter(new FatalError('Out of memory', 0, ['file' => __FILE__, 'line' => __LINE__], 0));
+
+        $this->assertNull($this->reservedMemory($reporter));
+    }
+
     public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
     {
         $this->setupExceptionReporting();
@@ -3619,7 +3762,7 @@ class ExceptionReportingTest extends TestCase
         // runs on, so that a file is the same file everywhere.
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             'D:\\a\\framework\\framework\\',
             ['stop' => true],
         );
@@ -3817,7 +3960,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => $stopConfig,
@@ -3844,7 +3987,7 @@ class ExceptionReportingTest extends TestCase
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => false,
@@ -4021,7 +4164,7 @@ class ExceptionReportingTest extends TestCase
     {
         return new ExceptionReporter(
             $this->app[Events::class],
-            $this->app[BladeMapper::class],
+            fn () => $this->app[BladeMapper::class],
             $this->app->basePath().DIRECTORY_SEPARATOR,
             [
                 'stop' => true,
@@ -4101,6 +4244,7 @@ class ExceptionReportingTest extends TestCase
     {
         $_SERVER['LARAVEL_CLOUD'] = '1';
         $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode($config);
+        Cloud::configureExceptions($this->app);
         Cloud::registerEvents($this->app);
         Cloud::registerExceptionReporting($this->app);
     }
@@ -4139,6 +4283,11 @@ class ExceptionReportingTest extends TestCase
     protected function reportedCommandLine(string $command): ?string
     {
         return interface_exists(RawInputInterface::class) ? $command : null;
+    }
+
+    protected function reservedMemory(ExceptionReporter $reporter): ?string
+    {
+        return (fn () => $this->reservedMemory)->call($reporter);
     }
 
     protected function setRunningInConsole(bool $runningInConsole): void

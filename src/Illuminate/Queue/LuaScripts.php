@@ -57,8 +57,13 @@ for i = 1, #ARGV, 100 do
 end
 
 -- Push a notification for every job that was pushed...
-for i = 1, #ARGV do
-    redis.call('rpush', KEYS[2], 1)
+local notifications = {}
+for i = 1, math.min(#ARGV, 100) do
+    notifications[i] = 1
+end
+
+for i = 1, #ARGV, 100 do
+    redis.call('rpush', KEYS[2], unpack(notifications, 1, math.min(100, #ARGV - i + 1)))
 end
 LUA;
     }

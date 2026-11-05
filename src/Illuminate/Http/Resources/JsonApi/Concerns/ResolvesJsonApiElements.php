@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 
 use Generator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -155,7 +156,7 @@ trait ResolvesJsonApiElements
 
         $sparseFieldset = $usesSparseFieldset ? $request->sparseFields($resourceType) : [];
 
-        $data = (new Collection($data))
+        $data = (new Collection($this->filter($data)))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->when($usesSparseFieldset, fn ($attributes) => $attributes->only($sparseFieldset))
             ->transform(fn ($value) => value($value, $request))
@@ -246,6 +247,10 @@ trait ResolvesJsonApiElements
                 return;
             }
 
+            if (! empty($requestedRelationships)) {
+                $this->loadMissingRequestedRelationships($request, $relatedModels, $resourceClass, $requestedRelationships);
+            }
+
             $relationship = $resource->{$relationName}();
 
             $isUnique = ! $relationship instanceof BelongsToMany;
@@ -308,6 +313,71 @@ trait ResolvesJsonApiElements
                 ];
             }
         )];
+    }
+
+    /**
+     * Load the requested relationships that are missing on the given models at once.
+     *
+     * @internal
+     */
+    public function loadMissingRequestedRelationshipsOn(JsonApiRequest $request, Collection $models): void
+    {
+        $requestedRelationships = (new Collection($this->requestedResourceRelationships($request)))
+            ->flatMap(fn ($relationship) => [
+                $relationship,
+                ...array_map(fn ($nested) => $relationship.'.'.$nested, $this->requestedResourceRelationships($request, $relationship)),
+            ])
+            ->all();
+
+        if (! empty($requestedRelationships)) {
+            $this->loadMissingRequestedRelationships($request, $models, static::class, $requestedRelationships);
+        }
+    }
+
+    /**
+     * Load the requested relationships that are missing on the given related models.
+     */
+    protected function loadMissingRequestedRelationships(
+        JsonApiRequest $request,
+        Collection $relatedModels,
+        ?string $resourceClass,
+        array $requestedRelationships
+    ): void {
+        $relatedModels->groupBy(fn ($relatedModel) => $relatedModel::class)->each(function ($relatedModels) use ($request, $resourceClass, $requestedRelationships) {
+            $relatedResource = rescue(fn () => $relatedModels->first()->toResource($resourceClass), report: false);
+
+            if (! $relatedResource instanceof JsonApiResource) {
+                return;
+            }
+
+            $relatedModels = new EloquentCollection($relatedModels->all());
+
+            $resourceRelationships = (new Collection($relatedResource->toRelationships($request)))
+                ->map(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+                ->keyBy(fn ($relationResolver) => $relationResolver->relationName)
+                ->only(array_map(fn ($relationship) => explode('.', $relationship, 2)[0], $requestedRelationships));
+
+            $relatedModels->loadMissing($resourceRelationships->keys()->all());
+
+            foreach ($resourceRelationships as $relationName => $relationResolver) {
+                $nestedRelationships = (new Collection($requestedRelationships))
+                    ->filter(fn ($relationship) => str_starts_with($relationship, $relationName.'.'))
+                    ->map(fn ($relationship) => substr($relationship, strlen($relationName) + 1))
+                    ->values()
+                    ->all();
+
+                if (empty($nestedRelationships)) {
+                    continue;
+                }
+
+                $this->loadMissingRequestedRelationships(
+                    $request,
+                    $relatedModels->toBase()->map->getRelation($relationName)->flatten(1)->filter(),
+                    $relationResolver->resourceClass(),
+                    $nestedRelationships,
+                );
+            }
+        });
     }
 
     /**

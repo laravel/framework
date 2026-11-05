@@ -462,13 +462,17 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|null  $column
      * @return $this
      */
     public function latest($column = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
+                $column = $this->qualifyColumn($column);
+            }
         }
 
         $this->query->latest($column);
@@ -479,13 +483,17 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|null  $column
      * @return $this
      */
     public function oldest($column = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+
+            if (! empty($this->query->joins) && empty($this->query->unions) && is_string($this->query->from)) {
+                $column = $this->qualifyColumn($column);
+            }
         }
 
         $this->query->oldest($column);
@@ -1092,10 +1100,12 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
-            $model = $this->newModelInstance()->newFromBuilder($record);
+        $instance = $this->newModelInstance();
 
-            return $this->applyAfterQueryCallbacks($this->newModelInstance()->newCollection([$model]))->first();
+        return $this->applyScopes()->query->cursor()->map(function ($record) use ($instance) {
+            $model = $instance->newFromBuilder($record);
+
+            return $this->applyAfterQueryCallbacks($instance->newCollection([$model]))->first();
         })->reject(fn ($model) => is_null($model));
     }
 

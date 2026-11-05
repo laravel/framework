@@ -1455,6 +1455,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(['abigailotwell@gmail.com'], $results->first()->friends->pluck('email')->unique()->toArray());
     }
 
+    public function testWithWhereHasWithSpecificColumnsAndCallback()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::withWhereHas('friends:id,email', function ($query) {
+            $query->where('email', 'abigailotwell@gmail.com');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertCount(1, $results->first()->friends);
+        $this->assertSame(['id', 'email'], array_keys($results->first()->friends->first()->getAttributes()));
+        $this->assertSame('abigailotwell@gmail.com', $results->first()->friends->first()->email);
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -1779,6 +1796,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('abigailotwell@gmail.com', $results->first()->email);
         $this->assertEquals($user->id, $results->first()->pivot->user_id);
         $this->assertEquals($friend->id, $results->first()->pivot->friend_id);
+    }
+
+    public function testCursorDoesNotCreateExtraModelInstancesForEachRecord()
+    {
+        EloquentTestUser::insert([
+            ['email' => 'taylorotwell@gmail.com'],
+            ['email' => 'abigailotwell@gmail.com'],
+            ['email' => 'foo@gmail.com'],
+        ]);
+
+        $query = EloquentTestUserWithInstanceCount::query();
+
+        EloquentTestUserWithInstanceCount::$instances = 0;
+
+        $models = $query->cursor()->all();
+
+        $this->assertCount(3, $models);
+        $this->assertSame(4, EloquentTestUserWithInstanceCount::$instances);
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverCursorRequest()
@@ -3037,6 +3072,18 @@ class EloquentTestUser extends Eloquent
     public function eloquentTestAchievements()
     {
         return $this->belongsToMany(EloquentTestAchievement::class);
+    }
+}
+
+class EloquentTestUserWithInstanceCount extends EloquentTestUser
+{
+    public static $instances = 0;
+
+    public function __construct(array $attributes = [])
+    {
+        static::$instances++;
+
+        parent::__construct($attributes);
     }
 }
 

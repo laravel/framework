@@ -258,7 +258,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|float  $key
+     * @param  string|int|float|null  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -303,6 +303,16 @@ class Arr
 
             foreach ($array as $item) {
                 return $item;
+            }
+
+            return value($default);
+        }
+
+        if ($array instanceof Traversable) {
+            foreach ($array as $key => $value) {
+                if ($callback($value, $key)) {
+                    return $value;
+                }
             }
 
             return value($default);
@@ -569,7 +579,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -1051,9 +1061,11 @@ class Arr
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $values
-     * @return array
+     * @return \ArrayAccess|array
+     *
+     * @phpstan-return ($array is array ? array : \ArrayAccess|array)
      */
-    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): ArrayAccess|array
     {
         $target = static::array($array, $key, []);
 

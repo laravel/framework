@@ -19,6 +19,7 @@ use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use WeakReference;
 
 class ImageManagerTest extends TestCase
 {
@@ -272,6 +273,26 @@ class ImageManagerTest extends TestCase
         $this->assertSame('first', $first->toBytes());
         $this->assertSame('second', $second->toBytes());
         $this->assertSame('first', $first->toBytes());
+    }
+
+    public function test_lazy_images_are_freed_without_waiting_for_the_garbage_collector()
+    {
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+
+        gc_disable();
+
+        try {
+            $image = $manager->fromBase64(base64_encode('contents'));
+            $this->assertSame('contents', $image->toBytes());
+
+            $reference = WeakReference::create($image);
+            unset($image);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
     }
 
     public function test_from_url_is_only_fetched_once()

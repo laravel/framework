@@ -100,7 +100,6 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
         $factory->getFinder()->expects('find')->with('view')->andThrow(InvalidArgumentException::class);
         $factory->getFinder()->expects('find')->with('bar')->andThrow(InvalidArgumentException::class);
-        $engine = Mockery::mock(Engine::class);
         $factory->getFinder()->expects('addExtension')->with('php');
         $factory->addExtension('php', 'php');
         $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);

@@ -198,17 +198,7 @@ trait InteractsWithExceptionHandling
         );
 
         if (isset($expectedMessage)) {
-            if (! isset($actualMessage)) {
-                Assert::fail(
-                    sprintf(
-                        'Failed asserting that exception of type "%s" with message "%s" was thrown.',
-                        $expectedClass,
-                        $expectedMessage
-                    )
-                );
-            } else {
-                Assert::assertStringContainsString($expectedMessage, $actualMessage);
-            }
+            Assert::assertStringContainsString($expectedMessage, $actualMessage);
         }
 
         return $this;

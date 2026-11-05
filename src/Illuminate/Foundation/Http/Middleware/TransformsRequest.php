@@ -3,10 +3,25 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TransformsRequest
 {
+    /**
+     * The maximum cumulative size of the keys processed per request, in bytes.
+     *
+     * @var int
+     */
+    protected $maxKeyBytes = 20 * 1024 * 1024;
+
+    /**
+     * The cumulative size of the keys processed for the current request.
+     *
+     * @var int
+     */
+    protected $keyBytes = 0;
+
     /**
      * Handle an incoming request.
      *
@@ -16,6 +31,8 @@ class TransformsRequest
      */
     public function handle($request, Closure $next)
     {
+        $this->keyBytes = 0;
+
         $this->clean($request);
 
         return $next($request);
@@ -58,8 +75,21 @@ class TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
+        $prefixLength = strlen($keyPrefix);
+
         foreach ($data as $key => $value) {
-            $data[$key] = $this->cleanValue($keyPrefix.$key, $value);
+            $this->keyBytes += $prefixLength + strlen((string) $key);
+
+            if ($this->keyBytes > $this->maxKeyBytes) {
+                throw new PostTooLargeException('The cumulative size of the input keys is too large.');
+            }
+
+            $cleaned = $this->cleanValue($keyPrefix.$key, $value);
+
+            // Avoid copying arrays when none of their values have changed...
+            if ($cleaned !== $value) {
+                $data[$key] = $cleaned;
+            }
         }
 
         return $data;

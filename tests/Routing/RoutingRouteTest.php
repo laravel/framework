@@ -228,6 +228,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareWithParametersCanBeSkipped()
+    {
+        $router = $this->getRouter();
+        $router->aliasMiddleware('two', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/bar', ['middleware' => RoutingTestMiddlewareGroupTwo::class.':taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware(RoutingTestMiddlewareGroupTwo::class);
+
+        $router->get('foo/baz', ['middleware' => 'two:taylor', function () {
+            return 'hello';
+        }])->withoutMiddleware('two');
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
     public function testMiddlewareCanBeSkippedFromResources()
     {
         $router = $this->getRouter();
@@ -815,6 +832,27 @@ class RoutingRouteTest extends TestCase
             return $age;
         });
         $this->assertSame('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testCurrentRouteIsResetWhenTheNextRequestDoesNotMatch()
+    {
+        $router = $this->getRouter();
+        $router->get('invoices/{invoice}', fn ($invoice) => $invoice)->name('invoices.show');
+
+        $this->assertSame('123', $router->dispatch(Request::create('invoices/123', 'GET'))->getContent());
+        $this->assertSame('invoices.show', $router->currentRouteName());
+
+        try {
+            $router->dispatch(Request::create('missing', 'GET'));
+
+            $this->fail('A NotFoundHttpException should have been thrown.');
+        } catch (NotFoundHttpException) {
+            //
+        }
+
+        $this->assertNull($router->current());
+        $this->assertNull($router->currentRouteName());
+        $this->assertFalse($router->is('invoices.show'));
     }
 
     public function testRoutesDontMatchNonMatchingDomain()
@@ -2108,6 +2146,21 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('foo/bar', 'GET'));
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNotInstanceOf(JsonResponse::class, $response);
+    }
+
+    public function testRedirectResponseCanBeReturnedAsResponsable(): void
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function (): Responsable {
+            return new RedirectResponse('/destination', 303, ['X-Test' => 'value']);
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(303, $response->getStatusCode());
+        $this->assertSame('/destination', $response->headers->get('Location'));
+        $this->assertSame('value', $response->headers->get('X-Test'));
     }
 
     public function testJsonResponseIsReturned()
