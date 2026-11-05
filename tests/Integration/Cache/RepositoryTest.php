@@ -16,6 +16,28 @@ class RepositoryTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
+    public function testFlexibleRefreshesTheSameKeyOnIndependentStores(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        config(['cache.stores.second_array' => ['driver' => 'array']]);
+
+        $first = Cache::store('array');
+        $second = Cache::store('second_array');
+
+        $first->flexible('profile', [10, 20], fn () => 'first');
+        $second->flexible('profile', [10, 20], fn () => 'second');
+
+        $this->travel(11)->seconds();
+
+        $first->flexible('profile', [10, 20], fn () => 'first-refreshed');
+        $second->flexible('profile', [10, 20], fn () => 'second-refreshed');
+
+        defer()->invoke();
+
+        $this->assertSame('first-refreshed', $first->get('profile'));
+        $this->assertSame('second-refreshed', $second->get('profile'));
+    }
+
     public function testStaleWhileRevalidate(): void
     {
         Carbon::setTestNow('2000-01-01 00:00:00');
