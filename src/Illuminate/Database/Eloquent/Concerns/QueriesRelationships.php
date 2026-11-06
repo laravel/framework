@@ -833,7 +833,12 @@ trait QueriesRelationships
         $this->has(
             $relationshipName,
             boolean: $boolean,
-            callback: fn (Builder $query) => $query->whereKey($relatedCollection->pluck($related->getKeyName())),
+            callback: fn (Builder $query) => $relationship->getRelatedKeyName() === $related->getKeyName()
+                ? $query->whereKey($relatedCollection->pluck($related->getKeyName()))
+                : $query->whereIn(
+                    $query->qualifyColumn($relationship->getRelatedKeyName()),
+                    $relatedCollection->pluck($relationship->getRelatedKeyName())->toArray(),
+                ),
         );
 
         return $this;

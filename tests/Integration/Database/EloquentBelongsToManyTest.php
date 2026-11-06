@@ -1765,6 +1765,22 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertTrue($tag->is($tags[0]));
         $this->assertInstanceOf(Pivot::class, $tags[0]->pivot);
     }
+
+    public function testWhereAttachedToUsesCustomRelatedKey()
+    {
+        $user1 = User::create(['name' => Str::random()]);
+        $user2 = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+
+        $user1->posts()->attach($post1);
+        $user2->posts()->attach($post2);
+
+        $users = User::whereAttachedTo(Post::select('uuid')->find($post1->id))->get();
+
+        $this->assertCount(1, $users);
+        $this->assertTrue($users->first()->is($user1));
+    }
 }
 
 class User extends Model
