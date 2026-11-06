@@ -688,7 +688,7 @@ class Repository implements ArrayAccess, CacheContract
 
         $store = $this->store;
 
-        while ($store instanceof MemoizedStore) {
+        if ($store instanceof MemoizedStore) {
             $store = $store->getStore();
         }
 
