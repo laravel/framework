@@ -88,6 +88,10 @@ return [
     | generating more password reset tokens. This prevents the user from
     | quickly generating a very large amount of password reset tokens.
     |
+    | When hiding user existence, unknown and throttled addresses receive
+    | the same "link sent" status as a known one, so the reset form can
+    | not be used to find out which addresses have an account.
+    |
     */
 
     'passwords' => [
@@ -96,6 +100,7 @@ return [
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
+            'hide_user_existence' => false,
         ],
     ],
 

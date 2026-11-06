@@ -50,6 +50,13 @@ class PasswordBroker implements PasswordBrokerContract
     protected $timeboxDuration;
 
     /**
+     * Indicates if unknown users and throttled requests should be reported as sent.
+     *
+     * @var bool
+     */
+    protected $hideUserExistence;
+
+    /**
      * Create a new password broker instance.
      *
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
@@ -57,6 +64,7 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  int  $timeboxDuration
+     * @param  bool  $hideUserExistence
      */
     public function __construct(
         #[\SensitiveParameter] TokenRepositoryInterface $tokens,
@@ -64,12 +72,14 @@ class PasswordBroker implements PasswordBrokerContract
         ?Dispatcher $dispatcher = null,
         ?Timebox $timebox = null,
         int $timeboxDuration = 200000,
+        bool $hideUserExistence = false,
     ) {
         $this->users = $users;
         $this->tokens = $tokens;
         $this->events = $dispatcher;
         $this->timebox = $timebox ?: new Timebox;
         $this->timeboxDuration = $timeboxDuration;
+        $this->hideUserExistence = $hideUserExistence;
     }
 
     /**
@@ -88,11 +98,11 @@ class PasswordBroker implements PasswordBrokerContract
             $user = $this->getUser($credentials);
 
             if (is_null($user)) {
-                return static::INVALID_USER;
+                return $this->hideUserExistence ? static::RESET_LINK_SENT : static::INVALID_USER;
             }
 
             if ($this->tokens->recentlyCreatedToken($user)) {
-                return static::RESET_THROTTLED;
+                return $this->hideUserExistence ? static::RESET_LINK_SENT : static::RESET_THROTTLED;
             }
 
             $token = $this->tokens->create($user);

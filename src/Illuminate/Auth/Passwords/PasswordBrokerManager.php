@@ -73,6 +73,7 @@ class PasswordBrokerManager implements FactoryContract
             $this->app['auth']->createUserProvider($config['provider'] ?? null),
             $this->app['events'] ?? null,
             timeboxDuration: $this->app['config']->get('auth.timebox_duration', 200000),
+            hideUserExistence: $config['hide_user_existence'] ?? false,
         );
     }
 
