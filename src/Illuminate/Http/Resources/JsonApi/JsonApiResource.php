@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 
+/**
+ * @method static \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection collection(mixed $resource)
+ */
 class JsonApiResource extends JsonResource
 {
     use Concerns\ResolvesJsonApiElements,
@@ -76,7 +79,7 @@ class JsonApiResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Support\Arrayable|\JsonSerializable|array
+     * @return \Illuminate\Contracts\Support\Arrayable|\JsonSerializable|array<string, mixed>
      */
     #[\Override]
     public function toAttributes(Request $request)
@@ -92,7 +95,7 @@ class JsonApiResource extends JsonResource
      * Get the resource's relationships.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Support\Arrayable|array
+     * @return \Illuminate\Contracts\Support\Arrayable|array<string, mixed>
      */
     public function toRelationships(Request $request)
     {
@@ -106,7 +109,7 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's links.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toLinks(Request $request)
     {
@@ -116,7 +119,7 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's meta information.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toMeta(Request $request)
     {
