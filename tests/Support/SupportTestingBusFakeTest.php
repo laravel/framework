@@ -918,7 +918,27 @@ class SupportTestingBusFakeTest extends TestCase
         ])->dispatch();
 
         $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
-            return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
+            return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello-serialized-unserialized';
+        });
+    }
+
+    public function testSerializeAndRestoreLeavesClosuresInBatchUntouched()
+    {
+        $this->fake->serializeAndRestore();
+
+        $closure = function () {
+            //
+        };
+
+        $this->fake->batch([
+            $closure,
+            [new BusFakeJobWithSerialization('hello'), $closure],
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batch) use ($closure) {
+            return $batch->jobs[0] === $closure
+                && $batch->jobs[1][0]->value === 'hello-serialized-unserialized'
+                && $batch->jobs[1][1] === $closure;
         });
     }
 
