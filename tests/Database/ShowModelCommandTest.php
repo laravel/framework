@@ -42,7 +42,7 @@ class ShowModelCommandTest extends TestCase
 
         $this->assertSame(Command::FAILURE, $status);
         $this->assertSame('', $output->fetch());
-        $this->assertSame("Target class [App\Models\Missing] does not exist.\n", $output->fetchErrors());
+        $this->assertSame('Target class [App\Models\Missing] does not exist.'.PHP_EOL, $output->fetchErrors());
     }
 
     public function testJsonErrorIsPlainTextOnStderr()

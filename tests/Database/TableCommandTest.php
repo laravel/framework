@@ -50,7 +50,7 @@ class TableCommandTest extends TestCase
 
         $this->assertSame(Command::FAILURE, $status);
         $this->assertSame('', $output->fetch());
-        $this->assertSame("Table [missing] doesn't exist.\n", $output->fetchErrors());
+        $this->assertSame("Table [missing] doesn't exist.".PHP_EOL, $output->fetchErrors());
     }
 
     public function testMissingTableIsReportedOnStdoutWithoutJsonOption()
