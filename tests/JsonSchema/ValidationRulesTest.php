@@ -79,6 +79,18 @@ class ValidationRulesTest extends TestCase
             'optional nullable null' => [fn ($s) => ['note' => $s->string()->nullable()], ['note' => null], true],
             'optional empty array' => [fn ($s) => ['tags' => $s->array()->items($s->string())], ['tags' => []], true],
             'object valid' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])->required()], ['address' => ['city' => 'Lisbon']], true],
+            'required empty array' => [fn ($s) => ['tags' => $s->array()->items($s->string())->required()], ['tags' => []], false],
+            'required empty object' => [fn ($s) => ['meta' => $s->object()->required()], ['meta' => []], false],
+            'empty object given a key' => [fn ($s) => ['meta' => $s->object()->required()], ['meta' => ['admin' => true]], false],
+            'optional object missing with a required key' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])], [], true],
+            'optional object given with a missing key' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])], ['address' => []], false],
+            'nullable object null with a required key' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])->nullable()->required()], ['address' => null], true],
+            'required nested key given null' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])->required()], ['address' => ['city' => null]], false],
+            'required nested key given an empty string' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->required()])->required()], ['address' => ['city' => '']], false],
+            'required nested key given an empty array' => [fn ($s) => ['order' => $s->object(['tags' => $s->array()->items($s->string())->required()])->required()], ['order' => ['tags' => []]], false],
+            'nullable nested key given null' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->nullable()->required()])->required()], ['address' => ['city' => null]], true],
+            'nullable nested key missing' => [fn ($s) => ['address' => $s->object(['city' => $s->string()->nullable()->required()])->required()], ['address' => ['zip' => '1000']], false],
+            'optional array of objects missing a required key' => [fn ($s) => ['people' => $s->array()->items($s->object(['age' => $s->integer()->required()]))], ['people' => [['age' => 1], []]], false],
         ];
     }
 
@@ -103,6 +115,14 @@ class ValidationRulesTest extends TestCase
         $this->assertTrue($this->passes($schema, ['id' => 'abc']));
         $this->assertTrue($this->passes($schema, ['id' => 7]));
         $this->assertFalse($this->passes($schema, ['id' => ['a']]));
+    }
+
+    public function test_property_names_with_a_dot_are_not_treated_as_nested_paths()
+    {
+        $schema = ['type' => 'object', 'properties' => ['v1.0' => ['type' => 'integer']], 'required' => ['v1.0']];
+
+        $this->assertTrue($this->passes($schema, ['v1.0' => 1]));
+        $this->assertFalse($this->passes($schema, ['v1.0' => 'x']));
     }
 
     public function test_numeric_property_names_keep_their_own_rules()

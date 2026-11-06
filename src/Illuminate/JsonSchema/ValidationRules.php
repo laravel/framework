@@ -35,11 +35,13 @@ class ValidationRules
 
         foreach ($schema['properties'] ?? [] as $name => $property) {
             $name = (string) $name;
+            $key = str_replace('.', '\\.', $name);
 
             $rules += static::rules(
                 $property,
-                $prefix === null ? $name : "{$prefix}.{$name}",
+                $prefix === null ? $key : "{$prefix}.{$key}",
                 in_array($name, $required, true),
+                $prefix !== null,
             );
         }
 
@@ -52,16 +54,17 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<string, array<int, mixed>>
      */
-    protected static function rules(array $schema, string $attribute, bool $required): array
+    protected static function rules(array $schema, string $attribute, bool $required, bool $nested = false): array
     {
         $isNull = fn (array $branch) => ($branch['type'] ?? null) === 'null';
 
         $nullable = in_array('null', (array) ($schema['type'] ?? []), true)
             || array_filter($schema['anyOf'] ?? [], $isNull) !== [];
 
+        // A nested required key is enforced by its parent's "required_array_keys", so an absent parent passes...
         $presence = match (true) {
-            $required && $nullable => ['present', 'nullable', new RejectEmptyString],
-            $required => ['required'],
+            $required && ! $nested => $nullable ? ['present', 'nullable', new RejectEmptyString] : ['required'],
+            $required && ! $nullable => ['sometimes', 'filled'],
             $nullable => ['sometimes', 'nullable', new RejectEmptyString],
             default => ['sometimes', new RejectEmptyString],
         };
@@ -105,17 +108,46 @@ class ValidationRules
     {
         $rules = match ($type) {
             'string' => ['string', ...static::bounds($schema, 'minLength', 'maxLength'), ...static::stringRules($schema)],
-            'integer' => ['integer', ...static::bounds($schema, 'minimum', 'maximum'), ...static::multipleOf($schema)],
-            'number' => ['numeric', ...static::bounds($schema, 'minimum', 'maximum'), ...static::multipleOf($schema)],
+            'integer' => ['integer', ...static::numberRules($schema)],
+            'number' => ['numeric', ...static::numberRules($schema)],
             'boolean' => ['boolean'],
             'array' => ['list', ...static::bounds($schema, 'minItems', 'maxItems')],
-            'object' => ($schema['additionalProperties'] ?? null) === false && isset($schema['properties'])
-                ? ['array:'.implode(',', array_keys($schema['properties']))]
-                : ['array'],
+            'object' => static::objectRules($schema),
             default => [],
         };
 
         return isset($schema['enum']) ? [...$rules, Rule::in($schema['enum'])] : $rules;
+    }
+
+    /**
+     * Get the rules an object value must pass.
+     *
+     * @param  array<string, mixed>  $schema
+     * @return array<int, string>
+     */
+    protected static function objectRules(array $schema): array
+    {
+        $keys = array_map('strval', array_keys($schema['properties'] ?? []));
+
+        $rules = match (true) {
+            ($schema['additionalProperties'] ?? null) !== false => ['array'],
+            $keys === [] => ['array', 'max:0'],
+            default => ['array:'.static::csv($keys)],
+        };
+
+        $required = array_map('strval', $schema['required'] ?? []);
+
+        return $required === [] ? $rules : [...$rules, 'required_array_keys:'.static::csv($required)];
+    }
+
+    /**
+     * Join the given values into a quoted rule parameter list.
+     *
+     * @param  array<int, string>  $values
+     */
+    protected static function csv(array $values): string
+    {
+        return implode(',', array_map(fn (string $value) => '"'.str_replace('"', '""', $value).'"', $values));
     }
 
     /**
@@ -133,14 +165,17 @@ class ValidationRules
     }
 
     /**
-     * Get the "multiple_of" rule for the given schema.
+     * Get the bound and "multiple_of" rules for a numeric schema.
      *
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function multipleOf(array $schema): array
+    protected static function numberRules(array $schema): array
     {
-        return isset($schema['multipleOf']) ? ["multiple_of:{$schema['multipleOf']}"] : [];
+        return [
+            ...static::bounds($schema, 'minimum', 'maximum'),
+            ...isset($schema['multipleOf']) ? ["multiple_of:{$schema['multipleOf']}"] : [],
+        ];
     }
 
     /**
@@ -179,9 +214,11 @@ class ValidationRules
      */
     protected static function anyOf(array $branches): Closure
     {
+        $branches = array_map(fn (array $branch) => static::rules($branch, 'value', true), $branches);
+
         return function (string $attribute, mixed $value, Closure $fail) use ($branches) {
-            foreach ($branches as $branch) {
-                if (Validator::make(['value' => $value], static::rules($branch, 'value', true))->passes()) {
+            foreach ($branches as $rules) {
+                if (Validator::make(['value' => $value], $rules)->passes()) {
                     return;
                 }
             }
