@@ -55,6 +55,15 @@ class Ably2BroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthRejectsArrayChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->auth(
+            Request::create('/', 'POST', ['channel_name' => ['private-test']])
+        );
+    }
+
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
         $this->expectException(AccessDeniedHttpException::class);
@@ -115,7 +124,7 @@ class Ably2BroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = Mockery::mock(Request::class);
-        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+        $request->expects('all')->times(5)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
             ->with('callback', false)
@@ -141,7 +150,7 @@ class Ably2BroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = Mockery::mock(Request::class);
-        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel]);
+        $request->expects('all')->times(5)->andReturn(['channel_name' => $channel]);
 
         $request->expects('user')
             ->andReturn(null);

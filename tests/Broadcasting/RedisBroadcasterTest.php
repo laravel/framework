@@ -53,6 +53,17 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
+    public function testAuthRejectsArrayChannelName()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $request = $this->getMockRequestWithUserForChannel(
+            ['private-test']
+        );
+
+        $this->broadcaster->auth($request);
+    }
+
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
         $this->expectException(AccessDeniedHttpException::class);
