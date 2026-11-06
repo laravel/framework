@@ -5,20 +5,23 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class QueueRedisJobTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $handler = Mockery::mock(stdClass::class);
-        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
-        $handler->expects('fire')->with($job, ['data']);
+        $handler = new RedisJobTestHandler;
+        $job->getContainer()->instance('foo', $handler);
 
         $job->fire();
+
+        $this->assertSame([[$job, ['data']]], $handler->fired);
     }
 
     public function testDeleteRemovesTheJobFromRedis()
@@ -42,12 +45,22 @@ class QueueRedisJobTest extends TestCase
     protected function getJob()
     {
         return new RedisJob(
-            Mockery::mock(Container::class),
-            Mockery::mock(RedisQueue::class),
+            new Container,
+            Double::for(RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
             'connection-name',
             'default'
         );
+    }
+}
+
+class RedisJobTestHandler
+{
+    public array $fired = [];
+
+    public function fire($job, array $data)
+    {
+        $this->fired[] = [$job, $data];
     }
 }

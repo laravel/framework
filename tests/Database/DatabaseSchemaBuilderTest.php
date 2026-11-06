@@ -6,18 +6,21 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new class($connection) extends Grammar {
         };
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with($grammar->compileCreateDatabase('foo'))->andReturnTrue();
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with($grammar->compileCreateDatabase('foo'))->returns(true);
         $builder = new Builder($connection);
 
         $this->assertTrue($builder->createDatabase('foo'));
@@ -25,11 +28,11 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new class($connection) extends Grammar {
         };
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with($grammar->compileDropDatabaseIfExists('foo'))->andReturnTrue();
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with($grammar->compileDropDatabaseIfExists('foo'))->returns(true);
         $builder = new Builder($connection);
 
         $this->assertTrue($builder->dropDatabaseIfExists('foo'));
@@ -37,28 +40,28 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testHasTableCorrectlyCallsGrammar()
     {
-        $connection = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(Grammar::class);
-        $processor = Mockery::mock(Processor::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
+        $connection = Double::for(Connection::class);
+        $grammar = Double::for(Grammar::class);
+        $processor = Double::for(Processor::class);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
         $builder = new Builder($connection);
         $grammar->expects('compileTableExists');
-        $grammar->expects('compileTables')->andReturn('sql');
-        $processor->expects('processTables')->andReturn([['name' => 'prefix_table']]);
-        $connection->expects('getTablePrefix')->andReturn('prefix_');
-        $connection->expects('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'prefix_table']]);
+        $grammar->expects('compileTables')->returns('sql');
+        $processor->expects('processTables')->returns([['name' => 'prefix_table']]);
+        $connection->expects('getTablePrefix')->returns('prefix_');
+        $connection->expects('selectFromWriteConnection')->with('sql')->returns([['name' => 'prefix_table']]);
 
         $this->assertTrue($builder->hasTable('table'));
     }
 
     public function testTableHasColumns()
     {
-        $connection = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(Grammar::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $builder = Mockery::mock(Builder::class.'[getColumnListing]', [$connection]);
-        $builder->expects('getColumnListing')->with('users')->times(2)->andReturn(['id', 'firstname']);
+        $connection = Double::for(Connection::class);
+        $grammar = Double::for(Grammar::class);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $builder = Double::for(Builder::class)->passthru(new Builder($connection));
+        $builder->expects('getColumnListing')->with('users')->times(2)->returns(['id', 'firstname']);
 
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
@@ -66,7 +69,7 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testGetColumnTypeAddsPrefix()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new class($connection) extends Grammar
         {
             public function compileColumns($schema, $table)
@@ -75,11 +78,11 @@ class DatabaseSchemaBuilderTest extends TestCase
             }
         };
         $processor = new Processor;
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
         $builder = new Builder($connection);
-        $connection->expects('getTablePrefix')->andReturn('prefix_');
-        $connection->expects('selectFromWriteConnection')->with('columns for prefix_users')->andReturn([['name' => 'id', 'type_name' => 'integer']]);
+        $connection->expects('getTablePrefix')->returns('prefix_');
+        $connection->expects('selectFromWriteConnection')->with('columns for prefix_users')->returns([['name' => 'id', 'type_name' => 'integer']]);
 
         $this->assertSame('integer', $builder->getColumnType('users', 'id'));
     }

@@ -10,7 +10,8 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
@@ -20,6 +21,8 @@ use RuntimeException;
 
 class HandleExceptionsTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $app;
     protected $config;
 
@@ -175,11 +178,11 @@ class HandleExceptionsTest extends TestCase
 
     public function testErrors()
     {
-        $logger = Mockery::mock(LogManager::class);
+        $logger = Double::for(LogManager::class);
         $this->app->instance(LogManager::class, $logger);
 
-        $logger->shouldNotReceive('channel');
-        $logger->shouldNotReceive('warning');
+        $logger->expects('channel')->never();
+        $logger->expects('warning')->never();
 
         $this->expectExceptionObject(new ErrorException('Something went wrong'));
 

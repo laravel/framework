@@ -6,11 +6,14 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function getRealConnection(): Connection
     {
         $capsule = new Manager;
@@ -51,9 +54,9 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->times(150)->andReturn('testing');
-        $connection->expects('prepareBindings')->times(100)->andReturnUsing(fn ($b) => $b);
+        $connection = Double::for(Connection::class);
+        $connection->expects('getName')->times(150)->returns('testing');
+        $connection->expects('prepareBindings')->times(100)->resolves(fn ($b) => $b);
 
         for ($i = 0; $i < 150; $i++) {
             $listener->onQueryExecuted(

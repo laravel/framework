@@ -30,6 +30,17 @@ class ListenerTest extends TestCase
         $this->assertTrue(ListenerTestListener::$ran);
     }
 
+    public function testClassListenerRunsNormallyIfNoTransactions()
+    {
+        $this->app->singleton('db.transactions', fn () => new DatabaseTransactionsManager);
+
+        Event::listen(ListenerTestEvent::class, ListenerTestListener::class);
+
+        Event::dispatch(new ListenerTestEvent);
+
+        $this->assertTrue(ListenerTestListener::$ran);
+    }
+
     public function testClassListenerDoesntRunInsideTransaction()
     {
         $manager = new DatabaseTransactionsManager;

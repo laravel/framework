@@ -5,11 +5,14 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Env;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         // Testbench disables putenv and may not re-enable it.
@@ -24,18 +27,14 @@ class LoadEnvironmentVariablesTest extends TestCase
 
     protected function getAppMock($file)
     {
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class, override: true);
 
-        $app->expects('configurationIsCached')
-            ->with()->andReturn(false);
-        $app->expects('runningInConsole')
-            ->with()->andReturn(false);
-        $app->expects('environmentPath')
-            ->with()->andReturn(__DIR__.'/../Fixtures');
-        $app->expects('environmentFile')
-            ->with()->andReturn($file);
+        $app->expects('configurationIsCached')->with()->returns(false);
+        $app->expects('runningInConsole')->with()->returns(false);
+        $app->expects('environmentPath')->with()->returns(__DIR__.'/../Fixtures');
+        $app->expects('environmentFile')->with()->returns($file);
 
-        return $app;
+        return $app->instance();
     }
 
     public function testCanLoad()

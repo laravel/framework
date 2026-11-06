@@ -34,13 +34,16 @@ use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class QueueWorkerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public $events;
     public $exceptionHandler;
     public $maintenanceFlags;
@@ -806,8 +809,8 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler = Double::for(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -829,8 +832,8 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler = Double::for(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -861,8 +864,8 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler = Double::for(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -886,8 +889,8 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler = Double::for(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;

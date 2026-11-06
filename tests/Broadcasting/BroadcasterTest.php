@@ -9,13 +9,16 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteBinding;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Tests\Broadcasting\FakeBroadcaster
      */
@@ -60,8 +63,8 @@ class BroadcasterTest extends TestCase
         // Test Explicit Binding...
         $container = new Container;
         Container::setInstance($container);
-        $binder = Mockery::mock(BindingRegistrar::class);
-        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn(function () {
+        $binder = Double::for(BindingRegistrar::class);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->returns(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
@@ -83,10 +86,10 @@ class BroadcasterTest extends TestCase
     {
         $container = new Container;
         Container::setInstance($container);
-        $binder = Mockery::mock(BindingRegistrar::class);
+        $binder = Double::for(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
 
-        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->returns($callback);
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
             //
@@ -189,16 +192,25 @@ class BroadcasterTest extends TestCase
         );
     }
 
+    protected function requestResolvingUsers(array $users, array &$guards = []): Request
+    {
+        $request = new Request;
+        $request->setUserResolver(function ($guard = null) use ($users, &$guards) {
+            $guards[] = $guard;
+
+            return $users[$guard ?? ''] ?? null;
+        });
+
+        return $request;
+    }
+
     public function testRetrieveUserWithoutGuard()
     {
         $this->broadcaster->channel('somechannel', function () {
             //
         });
 
-        $request = Mockery::mock(Request::class);
-        $request->expects('user')
-            ->withNoArgs()
-            ->andReturn(new DummyUser);
+        $request = $this->requestResolvingUsers(['' => new DummyUser]);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -212,10 +224,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = Mockery::mock(Request::class);
-        $request->expects('user')
-            ->with('myguard')
-            ->andReturn(new DummyUser);
+        $request = $this->requestResolvingUsers(['myguard' => new DummyUser]);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -232,15 +241,8 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = Mockery::mock(Request::class);
-        $request->expects('user')
-            ->with('myguard1')
-            ->andReturn(null);
-        $request->expects('user')
-            ->times(2)
-            ->with('myguard2')
-            ->andReturn(new DummyUser)
-            ->ordered('user');
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard1' => null, 'myguard2' => new DummyUser], $guards);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -251,6 +253,8 @@ class BroadcasterTest extends TestCase
             DummyUser::class,
             $this->broadcaster->retrieveUser($request, 'someotherchannel')
         );
+
+        $this->assertSame(['myguard1', 'myguard2', 'myguard2'], $guards);
     }
 
     public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
@@ -259,14 +263,12 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = Mockery::mock(Request::class);
-        $request->expects('user')
-            ->with('myguard')
-            ->andReturn(null);
-        $request->shouldNotReceive('user')
-            ->withNoArgs();
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard' => null], $guards);
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
+
+        $this->assertSame(['myguard'], $guards);
     }
 
     public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
@@ -275,17 +277,12 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = Mockery::mock(Request::class);
-        $request->expects('user')
-            ->with('myguard1')
-            ->andReturn(null);
-        $request->expects('user')
-            ->with('myguard2')
-            ->andReturn(null);
-        $request->shouldNotReceive('user')
-            ->withNoArgs();
+        $guards = [];
+        $request = $this->requestResolvingUsers(['myguard1' => null, 'myguard2' => null], $guards);
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
+
+        $this->assertSame(['myguard1', 'myguard2'], $guards);
     }
 
     public function testUserAuthenticationWithValidUser()
