@@ -580,6 +580,118 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertSame('primary', $model->getConnectionName());
     }
+
+    public function test_model_attribute_reflection_metadata_is_cached_per_class(): void
+    {
+        $this->assertArrayNotHasKey(ModelWithTableAttribute::class, ModelAttributeReflectionCacheInspector::getCache());
+
+        new ModelWithTableAttribute;
+
+        $this->assertSame([
+            'declaresTable' => false,
+            'hasTableAttribute' => true,
+            'declaresConnection' => false,
+            'hasConnectionAttribute' => false,
+        ], ModelAttributeReflectionCacheInspector::getCache()[ModelWithTableAttribute::class]);
+    }
+
+    public function test_model_attribute_reflection_metadata_reflects_declared_properties(): void
+    {
+        new ModelWithTableAttributeAndProperty;
+        new ChildModelWithConnectionProperty;
+
+        $cache = ModelAttributeReflectionCacheInspector::getCache();
+
+        $this->assertSame([
+            'declaresTable' => true,
+            'hasTableAttribute' => true,
+            'declaresConnection' => false,
+            'hasConnectionAttribute' => false,
+        ], $cache[ModelWithTableAttributeAndProperty::class]);
+
+        $this->assertSame([
+            'declaresTable' => false,
+            'hasTableAttribute' => false,
+            'declaresConnection' => true,
+            'hasConnectionAttribute' => false,
+        ], $cache[ChildModelWithConnectionProperty::class]);
+    }
+
+    public function test_model_attribute_reflection_metadata_is_separate_for_parent_and_child(): void
+    {
+        new ChildModelWithConnectionAttribute;
+
+        $cache = ModelAttributeReflectionCacheInspector::getCache();
+
+        $this->assertArrayHasKey(ChildModelWithConnectionAttribute::class, $cache);
+        $this->assertArrayNotHasKey(ParentModelWithConnectionProperty::class, $cache);
+        $this->assertTrue($cache[ChildModelWithConnectionAttribute::class]['hasConnectionAttribute']);
+        $this->assertFalse($cache[ChildModelWithConnectionAttribute::class]['declaresConnection']);
+
+        new ParentModelWithConnectionProperty;
+
+        $cache = ModelAttributeReflectionCacheInspector::getCache();
+
+        $this->assertFalse($cache[ParentModelWithConnectionProperty::class]['hasConnectionAttribute']);
+        $this->assertTrue($cache[ParentModelWithConnectionProperty::class]['declaresConnection']);
+    }
+
+    public function test_cached_model_attribute_reflection_metadata_is_used_for_subsequent_instances(): void
+    {
+        ModelAttributeReflectionCacheInspector::setCache(ModelWithTableAttributeAndProperty::class, [
+            'declaresTable' => false,
+            'hasTableAttribute' => true,
+            'declaresConnection' => false,
+            'hasConnectionAttribute' => false,
+        ]);
+
+        try {
+            $model = new ModelWithTableAttributeAndProperty;
+
+            $this->assertSame('attribute_table', $model->getTable());
+        } finally {
+            Model::clearBootedModels();
+        }
+    }
+
+    public function test_repeated_instantiation_resolves_same_table_and_connection(): void
+    {
+        $first = new ChildModelWithTableAttribute;
+        $second = new ChildModelWithTableAttribute;
+
+        $this->assertSame('child_attr', $first->getTable());
+        $this->assertSame('child_attr', $second->getTable());
+
+        $first = new ChildModelWithConnectionProperty;
+        $second = new ChildModelWithConnectionProperty;
+
+        $this->assertSame('default', $first->getConnectionName());
+        $this->assertSame('default', $second->getConnectionName());
+    }
+
+    public function test_clear_booted_models_clears_model_attribute_reflection_cache(): void
+    {
+        new ModelWithConnectionAttribute;
+
+        $this->assertArrayHasKey(ModelWithConnectionAttribute::class, ModelAttributeReflectionCacheInspector::getCache());
+
+        Model::clearBootedModels();
+
+        $this->assertSame([], ModelAttributeReflectionCacheInspector::getCache());
+    }
+}
+
+class ModelAttributeReflectionCacheInspector extends Model
+{
+    public static function getCache(): array
+    {
+        return static::$modelAttributeReflection;
+    }
+
+    public static function setCache(string $class, array $metadata): void
+    {
+        static::$modelAttributeReflection[$class] = $metadata;
+    }
 }
 
 enum ConnectionUnitEnum

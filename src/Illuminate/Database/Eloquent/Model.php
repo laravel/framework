@@ -304,6 +304,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $classAttributes = [];
 
     /**
+     * Cache of reflection metadata used when initializing model attributes.
+     *
+     * @var array<class-string<self>, array{declaresTable: bool, hasTableAttribute: bool, declaresConnection: bool, hasConnectionAttribute: bool}>
+     */
+    protected static array $modelAttributeReflection = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -446,20 +453,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $table = static::resolveClassAttribute(Table::class);
 
-        $reflection = new ReflectionClass(static::class);
+        $metadata = static::$modelAttributeReflection[static::class] ??= (function () {
+            $reflection = new ReflectionClass(static::class);
 
-        $declaresTable = $reflection->hasProperty('table')
-            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
+            return [
+                'declaresTable' => $reflection->hasProperty('table')
+                    && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class,
+                'hasTableAttribute' => $reflection->getAttributes(Table::class) !== [],
+                'declaresConnection' => $reflection->getProperty('connection')->getDeclaringClass()->getName() === static::class,
+                'hasConnectionAttribute' => $reflection->getAttributes(Connection::class) !== [],
+            ];
+        })();
 
-        if (! $declaresTable && $reflection->getAttributes(Table::class) !== []) {
+        if (! $metadata['declaresTable'] && $metadata['hasTableAttribute']) {
             $this->table = $table->name ?? null;
         } else {
             $this->table ??= $table->name ?? null;
         }
 
-        $declaresConnection = $reflection->getProperty('connection')->getDeclaringClass()->getName() === static::class;
-
-        if (! $declaresConnection && $reflection->getAttributes(Connection::class) !== []) {
+        if (! $metadata['declaresConnection'] && $metadata['hasConnectionAttribute']) {
             $this->connection = static::resolveClassAttribute(Connection::class, 'name');
         } else {
             $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
@@ -519,6 +531,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         static::$booted = [];
         static::$bootedCallbacks = [];
         static::$classAttributes = [];
+        static::$modelAttributeReflection = [];
         static::$globalScopes = [];
     }
 
