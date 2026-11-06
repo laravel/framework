@@ -71,7 +71,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             ->with(
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ?) limit 1',
                 [123, 'foo'],
-                true,
+                false,
                 [],
             )
             ->andReturn([[
@@ -204,7 +204,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             ->with(
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ? and "child"."val" = ?) limit 1',
                 [123, 'foo', 'bar'],
-                true,
+                false,
                 [],
             )
             ->andReturn([[
@@ -348,7 +348,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             ->with(
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ? and "child"."val" = ?) limit 1',
                 [123, 'foo', 'bar'],
-                true,
+                false,
                 [],
             )
             ->andReturn([[
