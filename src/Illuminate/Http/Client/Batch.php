@@ -4,11 +4,11 @@ namespace Illuminate\Http\Client;
 
 use Carbon\CarbonImmutable;
 use Closure;
-use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Defer\DeferredCallback;
+use Throwable;
 
 use function Illuminate\Support\defer;
 
@@ -76,7 +76,7 @@ class Batch
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Throwable): void)|null
      */
     protected $catchCallback = null;
 
@@ -90,7 +90,7 @@ class Batch
     /**
      * The callback to run after all the requests from the batch finish.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response|\Throwable>): void)|null
      */
     protected $finallyCallback = null;
 
@@ -198,7 +198,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Throwable): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -224,7 +224,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch finish.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response|\Throwable>): void)  $callback
      * @return Batch
      */
     public function finally(Closure $callback): self
@@ -260,7 +260,7 @@ class Batch
     /**
      * Send all of the requests in the batch.
      *
-     * @return array<int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException>
+     * @return array<int|string, \Illuminate\Http\Client\Response|\Throwable>
      */
     public function send(): array
     {
@@ -287,12 +287,7 @@ class Batch
                         return $result;
                     }
 
-                    if (
-                        ($result instanceof Response && $result->failed()) ||
-                        $result instanceof RequestException ||
-                        $result instanceof GuzzleRequestException ||
-                        $result instanceof ConnectionException
-                    ) {
+                    if (($result instanceof Response && $result->failed()) || $result instanceof Throwable) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
@@ -302,14 +297,12 @@ class Batch
 
                     return $result;
                 },
-                'rejected' => function ($reason, $key) {
+                'rejected' => function ($reason, $key) use (&$results) {
+                    $results[$key] = $reason;
+
                     $this->decrementPendingRequests();
 
-                    if (
-                        $reason instanceof RequestException ||
-                        $reason instanceof GuzzleRequestException ||
-                        $reason instanceof ConnectionException
-                    ) {
+                    if ($reason instanceof Throwable) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {

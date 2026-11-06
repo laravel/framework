@@ -4894,6 +4894,92 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['third'], $catchCallbacks['third']);
     }
 
+    #[TestWith([RuntimeException::class])]
+    #[TestWith([\Error::class])]
+    public function testBatchCatchHookIsCalledForThrowables(string $exceptionClass): void
+    {
+        $this->factory->fake();
+
+        $exception = new $exceptionClass('Response callback failed.');
+        $catchCallbacks = [];
+        $progressCallbacks = [];
+        $finallyResults = [];
+        $thenCalled = false;
+
+        $batch = $this->factory->batch(function (Batch $batch) use ($exception) {
+            return [
+                $batch->as('first')->get('https://laravel.com/first'),
+                $batch->as('second')->afterResponse(fn () => throw $exception)->get('https://laravel.com/second'),
+                $batch->as('third')->get('https://laravel.com/third'),
+            ];
+        })->progress(function (Batch $batch, int|string $key, Response $response) use (&$progressCallbacks) {
+            $progressCallbacks[$key] = $response;
+        })->catch(function (Batch $batch, int|string $key, Response|Throwable $response) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $response;
+        })->then(function () use (&$thenCalled) {
+            $thenCalled = true;
+        })->finally(function (Batch $batch, array $results) use (&$finallyResults) {
+            $finallyResults = $results;
+        });
+
+        $responses = $batch->send();
+
+        $this->assertSame(['first', 'second', 'third'], array_keys($responses));
+        $this->assertSame($exception, $responses['second']);
+        $this->assertSame(['second' => $exception], $catchCallbacks);
+        $this->assertSame(['first', 'third'], array_keys($progressCallbacks));
+        $this->assertSame($responses, $finallyResults);
+        $this->assertSame(0, $batch->pendingRequests);
+        $this->assertSame(3, $batch->processedRequests());
+        $this->assertSame(1, $batch->failedRequests);
+        $this->assertTrue($batch->hasFailures());
+        $this->assertTrue($batch->finished());
+        $this->assertFalse($thenCalled);
+    }
+
+    public function testBatchCatchHookIsCalledForStrayRequests(): void
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake([
+            'https://laravel.com/first' => $this->factory::response('First'),
+            'https://laravel.com/third' => $this->factory::response('Third'),
+        ]);
+
+        $catchCallbacks = [];
+        $finallyResults = [];
+        $thenCalled = false;
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://laravel.com/first'),
+                $batch->as('second')->get('https://laravel.com/second'),
+                $batch->as('third')->get('https://laravel.com/third'),
+            ];
+        })->catch(function (Batch $batch, int|string $key, Response|Throwable $response) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $response;
+        })->then(function () use (&$thenCalled) {
+            $thenCalled = true;
+        })->finally(function (Batch $batch, array $results) use (&$finallyResults) {
+            $finallyResults = $results;
+        });
+
+        $responses = $batch->send();
+
+        $this->assertSame(['first', 'second', 'third'], array_keys($responses));
+        $this->assertSame('First', $responses['first']->body());
+        $this->assertSame('Third', $responses['third']->body());
+        $this->assertInstanceOf(StrayRequestException::class, $responses['second']);
+        $this->assertSame('Attempted request to [https://laravel.com/second] without a matching fake.', $responses['second']->getMessage());
+        $this->assertSame(['second' => $responses['second']], $catchCallbacks);
+        $this->assertSame($responses, $finallyResults);
+        $this->assertSame(0, $batch->pendingRequests);
+        $this->assertSame(3, $batch->processedRequests());
+        $this->assertSame(1, $batch->failedRequests);
+        $this->assertTrue($batch->hasFailures());
+        $this->assertTrue($batch->finished());
+        $this->assertFalse($thenCalled);
+    }
+
     public function testBatchThenHookIsCalled(): void
     {
         $this->factory->fake([
