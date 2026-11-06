@@ -375,6 +375,11 @@ class SupportFluentTest extends TestCase
         $this->assertDataUuidContract();
     }
 
+    public function testUlidMethod()
+    {
+        $this->assertDataUlidContract();
+    }
+
     public function testOnlyMethod()
     {
         $this->assertDataOnlyContract();

@@ -125,6 +125,11 @@ class SupportInteractsWithDataTest extends TestCase
         $this->assertDataUuidContract();
     }
 
+    public function testUlidMethod()
+    {
+        $this->assertDataUlidContract();
+    }
+
     public function testEnumMethod()
     {
         $this->assertDataEnumContract();
