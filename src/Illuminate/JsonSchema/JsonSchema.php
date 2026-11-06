@@ -30,6 +30,17 @@ class JsonSchema
     }
 
     /**
+     * Get the Laravel validation rules for the properties of the given object schema.
+     *
+     * @param  \Illuminate\JsonSchema\Types\Type|array<string, mixed>  $schema
+     * @return array<string, array<int, mixed>>
+     */
+    public static function rules(Type|array $schema): array
+    {
+        return ValidationRules::for($schema);
+    }
+
+    /**
      * Dynamically pass static methods to the schema instance.
      */
     public static function __callStatic(string $name, mixed $arguments): Type
