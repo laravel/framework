@@ -82,6 +82,13 @@ class WorkCommand extends Command
     protected $latestStartedAt;
 
     /**
+     * Holds the memory usage at the start of the last processed job, if any.
+     *
+     * @var int|null
+     */
+    protected $latestStartedMemory;
+
+    /**
      * Indicates if the worker's event listeners have been registered.
      *
      * @var bool
@@ -333,6 +340,7 @@ class WorkCommand extends Command
 
         if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
+            $this->latestStartedMemory = memory_get_usage();
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
                 $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
@@ -344,7 +352,13 @@ class WorkCommand extends Command
         }
 
         $runTime = $this->runTimeForHumans($this->latestStartedAt);
-        $memory = $isVerbose ? round(memory_get_usage(true) / 1024 / 1024, 1).'MB' : '';
+        $memory = '';
+
+        if ($isVerbose) {
+            $memoryDelta = round((memory_get_usage() - $this->latestStartedMemory) / 1024 / 1024, 1);
+
+            $memory = round(memory_get_usage(true) / 1024 / 1024, 1).'MB '.($memoryDelta < 0 ? '-' : '+').abs($memoryDelta).'MB';
+        }
 
         [$result, $color] = match (true) {
             $status === 'success' && $job->isReleased() => ['RELEASED', 'yellow'],

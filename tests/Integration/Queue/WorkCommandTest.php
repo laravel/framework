@@ -32,6 +32,8 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
+            MemoryGrowingJob::$buffer = null;
+            MemoryReleasingJob::$buffer = null;
             Worker::$flushStickyConnections = false;
         });
 
@@ -299,6 +301,101 @@ class WorkCommandTest extends QueueTestCase
             ->assertExitCode(0);
     }
 
+    public function testVerboseOutputIncludesMemoryUsageAndPerJobDelta()
+    {
+        Queue::push(new FirstJob);
+
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+            '-v' => true,
+        ]);
+
+        $this->assertMatchesRegularExpression(
+            '/FirstJob.*\s\d+(\.\d+)?MB [+-]\d+(\.\d+)?MB DONE/',
+            Artisan::output()
+        );
+    }
+
+    public function testNonVerboseOutputDoesNotIncludeMemoryUsage()
+    {
+        Queue::push(new FirstJob);
+
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('DONE', $output);
+        $this->assertStringNotContainsString('MB', $output);
+    }
+
+    public function testVerboseOutputReportsPositiveMemoryGrowthOfJob()
+    {
+        Queue::push(new MemoryGrowingJob);
+
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+            '-v' => true,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertMatchesRegularExpression('/MemoryGrowingJob.*\s\d+(\.\d+)?MB \+(\d+(\.\d+)?)MB DONE/', $output);
+
+        preg_match('/MemoryGrowingJob.*\s\d+(?:\.\d+)?MB \+(\d+(?:\.\d+)?)MB DONE/', $output, $matches);
+
+        $this->assertGreaterThanOrEqual(4.5, (float) $matches[1]);
+        $this->assertLessThan(10, (float) $matches[1]);
+    }
+
+    public function testVerboseOutputReportsNegativeMemoryGrowthOfJob()
+    {
+        MemoryReleasingJob::$buffer = str_repeat('x', 5 * 1024 * 1024);
+
+        Queue::push(new MemoryReleasingJob);
+
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+            '-v' => true,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertNull(MemoryReleasingJob::$buffer);
+        $this->assertMatchesRegularExpression('/MemoryReleasingJob.*\s\d+(\.\d+)?MB -(\d+(\.\d+)?)MB DONE/', $output);
+
+        preg_match('/MemoryReleasingJob.*\s\d+(?:\.\d+)?MB -(\d+(?:\.\d+)?)MB DONE/', $output, $matches);
+
+        $this->assertGreaterThanOrEqual(4.5, (float) $matches[1]);
+        $this->assertLessThan(10, (float) $matches[1]);
+    }
+
+    public function testVerboseOutputMeasuresMemoryDeltaPerJob()
+    {
+        Queue::push(new MemoryGrowingJob);
+        Queue::push(new FirstJob);
+
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+            '-v' => true,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertTrue(FirstJob::$ran);
+
+        preg_match('/FirstJob.*\s\d+(?:\.\d+)?MB ([+-]\d+(?:\.\d+)?)MB DONE/', $output, $matches);
+
+        $this->assertNotEmpty($matches);
+        $this->assertLessThan(1, abs((float) $matches[1]));
+    }
+
     public function testStopReasonIsWritten()
     {
         Queue::push(new FirstJob);
@@ -385,6 +482,30 @@ class ThirdJob implements ShouldQueue
         sleep(1);
 
         static::$ran = true;
+    }
+}
+
+class MemoryGrowingJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $buffer = null;
+
+    public function handle()
+    {
+        static::$buffer = str_repeat('x', 5 * 1024 * 1024);
+    }
+}
+
+class MemoryReleasingJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $buffer = null;
+
+    public function handle()
+    {
+        static::$buffer = null;
     }
 }
 
