@@ -522,7 +522,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $case->tearDown();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nMost repeated queries:\n  4x select count(*) as aggregate from \"foo\"\nFailed asserting that 4 is identical to 3.", $e->getMessage());
+            $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nMost repeated queries:\n  4x select count(*) as \"aggregate\" from \"foo\"\nFailed asserting that 4 is identical to 3.", $e->getMessage());
         }
 
         $case = new class('foo') extends TestingTestCase
@@ -605,7 +605,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $case->tearDown();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertSame("Expected 1 database queries on the [testing] connection. 3 occurred.\nMost repeated queries:\n  2x select count(*) as aggregate from \"foo\"\nFailed asserting that 3 is identical to 1.", $e->getMessage());
+            $this->assertSame("Expected 1 database queries on the [testing] connection. 3 occurred.\nMost repeated queries:\n  2x select count(*) as \"aggregate\" from \"foo\"\nFailed asserting that 3 is identical to 1.", $e->getMessage());
             $this->assertStringNotContainsString('"bar"', $e->getMessage());
         }
     }
@@ -669,9 +669,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $this->assertSame(
                 "Expected 0 database queries on the [testing] connection. 15 occurred.\n".
                 "Most repeated queries:\n".
-                "  5x select count(*) as aggregate from \"bar\"\n".
-                "  4x select count(*) as aggregate from \"qux\"\n".
-                "  3x select count(*) as aggregate from \"baz\"\n".
+                "  5x select count(*) as \"aggregate\" from \"bar\"\n".
+                "  4x select count(*) as \"aggregate\" from \"qux\"\n".
+                "  3x select count(*) as \"aggregate\" from \"baz\"\n".
                 'Failed asserting that 15 is identical to 0.',
                 $e->getMessage()
             );
