@@ -50,7 +50,7 @@ class PasswordBroker implements PasswordBrokerContract
     protected $timeboxDuration;
 
     /**
-     * Indicates if unknown users and throttled requests should be reported as sent.
+     * Indicates if the reset link request status should hide whether the user exists.
      *
      * @var bool
      */
@@ -98,17 +98,17 @@ class PasswordBroker implements PasswordBrokerContract
             $user = $this->getUser($credentials);
 
             if (is_null($user)) {
-                return $this->hideUserExistence ? static::RESET_LINK_SENT : static::INVALID_USER;
+                return $this->hideUserExistence ? static::RESET_LINK_REQUESTED : static::INVALID_USER;
             }
 
             if ($this->tokens->recentlyCreatedToken($user)) {
-                return $this->hideUserExistence ? static::RESET_LINK_SENT : static::RESET_THROTTLED;
+                return $this->hideUserExistence ? static::RESET_LINK_REQUESTED : static::RESET_THROTTLED;
             }
 
             $token = $this->tokens->create($user);
 
             if ($callback) {
-                return $callback($user, $token) ?? static::RESET_LINK_SENT;
+                return $callback($user, $token) ?? $this->linkSentStatus();
             }
 
             // Once we have the reset token, we are ready to send the message out to this
@@ -118,8 +118,18 @@ class PasswordBroker implements PasswordBrokerContract
 
             $this->events?->dispatch(new PasswordResetLinkSent($user));
 
-            return static::RESET_LINK_SENT;
+            return $this->linkSentStatus();
         }, $this->timeboxDuration);
+    }
+
+    /**
+     * Get the status for a reset link that has been sent.
+     *
+     * @return string
+     */
+    protected function linkSentStatus()
+    {
+        return $this->hideUserExistence ? static::RESET_LINK_REQUESTED : static::RESET_LINK_SENT;
     }
 
     /**

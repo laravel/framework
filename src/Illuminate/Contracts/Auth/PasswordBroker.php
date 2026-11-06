@@ -14,6 +14,13 @@ interface PasswordBroker
     const RESET_LINK_SENT = 'passwords.sent';
 
     /**
+     * Constant representing a reset link request that does not reveal if the user exists.
+     *
+     * @var string
+     */
+    const RESET_LINK_REQUESTED = 'passwords.requested';
+
+    /**
      * Constant representing a successfully reset password.
      *
      * @var string

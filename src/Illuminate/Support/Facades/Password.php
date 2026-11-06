@@ -30,6 +30,13 @@ class Password extends Facade
     const ResetLinkSent = PasswordBroker::RESET_LINK_SENT;
 
     /**
+     * Constant representing a password reset link request that does not reveal if the user exists.
+     *
+     * @var string
+     */
+    const ResetLinkRequested = PasswordBroker::RESET_LINK_REQUESTED;
+
+    /**
      * Constant representing a successfully reset password.
      *
      * @var string
@@ -58,6 +65,7 @@ class Password extends Facade
     const ResetThrottled = PasswordBroker::RESET_THROTTLED;
 
     const RESET_LINK_SENT = PasswordBroker::RESET_LINK_SENT;
+    const RESET_LINK_REQUESTED = PasswordBroker::RESET_LINK_REQUESTED;
     const PASSWORD_RESET = PasswordBroker::PASSWORD_RESET;
     const INVALID_USER = PasswordBroker::INVALID_USER;
     const INVALID_TOKEN = PasswordBroker::INVALID_TOKEN;

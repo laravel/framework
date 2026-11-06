@@ -40,7 +40,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->expects('retrieveByCredentials')->with(['credentials'])->andReturnNull();
         $mocks['tokens']->shouldNotReceive('create');
 
-        $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['credentials']));
+        $this->assertSame(PasswordBrokerContract::RESET_LINK_REQUESTED, $broker->sendResetLink(['credentials']));
     }
 
     public function testThrottledRequestIsReportedAsSentWhenUserExistenceIsHidden()
@@ -53,7 +53,20 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldNotReceive('create');
         $user->shouldNotReceive('sendPasswordResetNotification');
 
-        $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
+        $this->assertSame(PasswordBrokerContract::RESET_LINK_REQUESTED, $broker->sendResetLink(['foo']));
+    }
+
+    public function testSentLinkIsReportedAsRequestedWhenUserExistenceIsHidden()
+    {
+        $mocks = $this->getMocks();
+        $broker = new PasswordBroker($mocks['tokens'], $mocks['users'], hideUserExistence: true);
+        $user = Mockery::mock(CanResetPassword::class);
+        $mocks['users']->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
+        $mocks['tokens']->expects('recentlyCreatedToken')->with($user)->andReturn(false);
+        $mocks['tokens']->expects('create')->with($user)->andReturn('token');
+        $user->expects('sendPasswordResetNotification')->with('token');
+
+        $this->assertSame(PasswordBrokerContract::RESET_LINK_REQUESTED, $broker->sendResetLink(['foo']));
     }
 
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
