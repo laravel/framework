@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 
+/**
+ * @method static \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection collection(mixed $resource)
+ */
 class JsonApiResource extends JsonResource
 {
     use Concerns\ResolvesJsonApiElements,
