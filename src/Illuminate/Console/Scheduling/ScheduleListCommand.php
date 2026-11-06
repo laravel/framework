@@ -80,6 +80,8 @@ class ScheduleListCommand extends Command
     protected function displayJson(Collection $events, DateTimeZone $timezone)
     {
         $this->output->writeln($events->flatMap(function ($event) use ($timezone) {
+            $timezone = is_null($this->option('timezone')) ? $this->getTimezoneForEvent($event) : $timezone;
+
             $nextDueDate = $this->getNextDueDateForEvent($event, $timezone);
 
             $command = $event->command ?? '';
@@ -301,6 +303,21 @@ class ScheduleListCommand extends Command
         return $now
             ->endOfSecond()
             ->ceilSeconds($event->repeatSeconds);
+    }
+
+    /**
+     * Get the timezone the event's cron expression is evaluated in.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return \DateTimeZone
+     */
+    private function getTimezoneForEvent($event)
+    {
+        if ($event->timezone instanceof DateTimeZone) {
+            return $event->timezone;
+        }
+
+        return new DateTimeZone($event->timezone ?? date_default_timezone_get());
     }
 
     /**
