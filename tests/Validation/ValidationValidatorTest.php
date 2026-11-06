@@ -17,6 +17,7 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Stringable;
@@ -1401,6 +1402,39 @@ class ValidationValidatorTest extends TestCase
         $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateCurrentPasswordDoesNotThrowOnNonStringValue()
+    {
+        $hasher = new BcryptHasher(['rounds' => 4]);
+
+        $user = Mockery::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->andReturn($hasher->make('12345678'));
+
+        $guard = Mockery::mock(Guard::class);
+        $guard->shouldReceive('guest')->andReturn(false);
+        $guard->shouldReceive('user')->andReturn($user);
+        $auth = Mockery::mock(AuthFactory::class);
+        $auth->shouldReceive('guard')->andReturn($guard);
+
+        $container = Mockery::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        // Fails when the value is an array.
+        $v = new Validator($trans, ['password' => ['12345678']], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Succeeds when the value is a number matching the password.
+        $v = new Validator($trans, ['password' => 12345678], ['password' => 'current_password']);
         $v->setContainer($container);
 
         $this->assertTrue($v->passes());

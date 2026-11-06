@@ -605,6 +605,10 @@ trait ValidatesAttributes
      */
     protected function validateCurrentPassword($attribute, $value, $parameters)
     {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         $auth = $this->container->make('auth');
         $hasher = $this->container->make('hash');
 
