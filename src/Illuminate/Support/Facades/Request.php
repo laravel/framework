@@ -178,6 +178,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, \UnitEnum|string|null $tz = null)
  * @method static \Carbon\CarbonInterval|null interval(string $key, \Carbon\Unit|string|null $unit = null)
  * @method static \Ramsey\Uuid\UuidInterface|null uuid(string $key)
+ * @method static \Symfony\Component\Uid\Ulid|null ulid(string $key)
  * @method static \BackedEnum|\BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
  * @method static array array(array|string|null $key = null)
