@@ -478,6 +478,15 @@ class CacheFileStoreTest extends TestCase
         $store->flushLocks();
     }
 
+    public function testAddWithoutExpirationStoresItemForever()
+    {
+        $store = new FileStore(new Filesystem, self::$tempDir);
+
+        $this->assertTrue($store->add('foo', 'bar', 0));
+        $this->assertFalse($store->add('foo', 'baz', 0));
+        $this->assertSame('9999999999'.serialize('bar'), file_get_contents($store->path('foo')));
+    }
+
     public function testItHandlesForgettingNonFlexibleKeys()
     {
         $store = new FileStore(new Filesystem, self::$tempDir);

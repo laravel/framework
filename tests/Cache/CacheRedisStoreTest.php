@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\LuaScripts;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -61,6 +62,24 @@ class CacheRedisStoreTest extends TestCase
         $redis->getRedis()->expects('connection')->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->expects('setex')->with('prefix:foo', 60, serialize('foo'))->andReturn('OK');
         $result = $redis->put('foo', 'foo', 60);
+        $this->assertTrue($result);
+    }
+
+    public function testAddMethodProperlyCallsRedis()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->expects('connection')->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->expects('eval')->with(LuaScripts::add(), 1, 'prefix:foo', serialize('foo'), 60)->andReturn(1);
+        $result = $redis->add('foo', 'foo', 60);
+        $this->assertTrue($result);
+    }
+
+    public function testAddMethodWithoutExpirationProperlyCallsRedis()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->expects('connection')->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->expects('setnx')->with('prefix:foo', serialize('foo'))->andReturn(1);
+        $result = $redis->add('foo', 'foo', 0);
         $this->assertTrue($result);
     }
 

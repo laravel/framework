@@ -286,6 +286,14 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->add('foo', 'bar'));
     }
 
+    public function testAddWithNullTTLCallsStoreAddWithZeroSeconds()
+    {
+        $store = Mockery::mock(RedisStore::class);
+        $store->expects('add')->with('k', 'v', 0)->andReturn(true);
+        $repository = new Repository($store);
+        $this->assertTrue($repository->add('k', 'v'));
+    }
+
     public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
     {
         $repo = $this->getRepository();

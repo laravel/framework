@@ -189,6 +189,10 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     {
         $connection = $this->connection();
 
+        if ($seconds <= 0) {
+            return (bool) $connection->setnx($this->prefix.$key, $this->pack($value, $connection));
+        }
+
         return (bool) $connection->eval(
             LuaScripts::add(), 1, $this->prefix.$key, $this->pack($value, $connection), (int) max(1, $seconds)
         );

@@ -42,6 +42,20 @@ class RedisCacheIntegrationTest extends TestCase
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
+    public function testRedisCacheAddWithoutTtlStoresItemForever($driver)
+    {
+        $store = new RedisStore($this->redis[$driver]);
+        $repository = new Repository($store);
+        $this->assertTrue($repository->add('k', 'v'));
+        $this->assertFalse($repository->add('k', 'v'));
+        $this->assertSame('v', $repository->get('k'));
+        $this->assertSame(-1, $this->redis[$driver]->connection()->ttl('k'));
+    }
+
+    /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheRateLimiter($driver)
     {
         $store = new RedisStore($this->redis[$driver]);

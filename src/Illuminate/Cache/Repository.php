@@ -486,15 +486,16 @@ class Repository implements ArrayAccess, CacheContract
             if ($seconds <= 0) {
                 return false;
             }
+        }
 
-            // If the store has an "add" method we will call the method on the store so it
-            // has a chance to override this logic. Some drivers better support the way
-            // this operation should work with a total "atomic" implementation of it.
-            if (method_exists($this->store, 'add')) {
-                return $this->store->add(
-                    $this->itemKey($key), $value, $seconds
-                );
-            }
+        // If the store has an "add" method we will call the method on the store so it
+        // has a chance to override this logic. Some drivers better support the way
+        // this operation should work with a total "atomic" implementation of it. A
+        // value of zero seconds indicates the item should be stored indefinitely.
+        if (method_exists($this->store, 'add')) {
+            return $this->store->add(
+                $this->itemKey($key), $value, $seconds ?? 0
+            );
         }
 
         // If the value did not exist in the cache, we will put the value in the cache

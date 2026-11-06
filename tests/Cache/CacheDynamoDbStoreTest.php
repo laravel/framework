@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Cache\DynamoDbStore;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class CacheDynamoDbStoreTest extends TestCase
@@ -29,6 +30,32 @@ class CacheDynamoDbStoreTest extends TestCase
         );
     }
 
+    public function testAddMethodCorrectlyCallsDynamoDb(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->assertTrue((new DynamoDbStore($dynamo = new TestDynamo, 'table'))->add('key', 'value', 60));
+
+        $this->assertSame('key', $dynamo->args['Item']['key']['S']);
+        $this->assertSame('attribute_not_exists(#key) OR #expires_at < :now', $dynamo->args['ConditionExpression']);
+        $this->assertSame((string) $now->copy()->addSeconds(60)->getTimestamp(), $dynamo->args['Item']['expires_at']['N']);
+
+        Carbon::setTestNow();
+    }
+
+    public function testAddMethodWithoutExpirationStoresItemForever(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->assertTrue((new DynamoDbStore($dynamo = new TestDynamo, 'table'))->add('key', 'value', 0));
+
+        $this->assertGreaterThan(
+            $now->copy()->addYears(5)->getTimestamp(), (int) $dynamo->args['Item']['expires_at']['N']
+        );
+
+        Carbon::setTestNow();
+    }
+
     public function testManyMethodPreservesNumericKeys(): void
     {
         $dynamo = new TestDynamo;
@@ -51,6 +78,13 @@ class TestDynamo extends DynamoDbClient
 
     public function __construct()
     {
+    }
+
+    public function putItem(array $args): bool
+    {
+        $this->args = $args;
+
+        return true;
     }
 
     public function updateItem(array $args): bool

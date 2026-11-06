@@ -114,6 +114,32 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testAddInsertsValueWhenItemDoesNotExist()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = Mockery::mock(Builder::class);
+        $store->getConnection()->expects('table')->with('table')->twice()->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $table->expects('insertOrIgnore')->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturn(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
+    }
+
+    public function testAddWithoutExpirationStoresValueWithReallyLongTime()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = Mockery::mock(Builder::class);
+        $store->getConnection()->expects('table')->with('table')->twice()->andReturn($table);
+        $table->expects('whereIn')->with('key', ['prefixfoo'])->andReturn($table);
+        $table->expects('get')->andReturn(collect([]));
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $table->expects('insertOrIgnore')->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 315360001])->andReturn(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 0));
+    }
+
     public function testForeverCallsStoreItemWithReallyLongTime()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();

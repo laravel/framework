@@ -91,6 +91,25 @@ class CacheMemcachedStoreTest extends TestCase
         $store->decrement('foo', 5);
     }
 
+    public function testAddMethodProperlyCallsMemcache()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['add'])->getMock();
+        $memcache->expects($this->once())->method('add')->with('foo', 'bar', $now->addMinute()->getTimestamp())->willReturn(true);
+        $store = new MemcachedStore($memcache);
+        $result = $store->add('foo', 'bar', 60);
+        $this->assertTrue($result);
+    }
+
+    public function testAddMethodWithoutExpirationProperlyCallsMemcache()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['add'])->getMock();
+        $memcache->expects($this->once())->method('add')->with('foo', 'bar', 0)->willReturn(true);
+        $store = new MemcachedStore($memcache);
+        $result = $store->add('foo', 'bar', 0);
+        $this->assertTrue($result);
+    }
+
     public function testStoreItemForeverProperlyCallsMemcached()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();

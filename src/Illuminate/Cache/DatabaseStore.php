@@ -219,7 +219,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
 
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
-        $expiration = $this->getTime() + $seconds;
+        $expiration = $this->getTime() + ($seconds > 0 ? $seconds : 315360000);
 
         if (! $this->getConnection() instanceof SqlServerConnection) {
             return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;

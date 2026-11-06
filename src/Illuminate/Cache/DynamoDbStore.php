@@ -246,7 +246,9 @@ class DynamoDbStore implements LockProvider, Store
                         $this->type($value) => $this->serialize($value),
                     ],
                     $this->expirationAttribute => [
-                        'N' => (string) $this->toTimestamp($seconds),
+                        'N' => (string) $this->toTimestamp(
+                            $seconds > 0 ? $seconds : Carbon::now()->addYears(5)->getTimestamp()
+                        ),
                     ],
                 ],
                 'ConditionExpression' => 'attribute_not_exists(#key) OR #expires_at < :now',

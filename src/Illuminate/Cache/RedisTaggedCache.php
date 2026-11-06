@@ -33,7 +33,7 @@ class RedisTaggedCache extends TaggedCache
 
         $result = parent::add($key, $value, $ttl);
 
-        if ($result && $seconds > 0 && method_exists($this->store, 'add')) {
+        if ($result && method_exists($this->store, 'add')) {
             $this->tags->addEntry(
                 $this->itemKey($key),
                 $seconds
