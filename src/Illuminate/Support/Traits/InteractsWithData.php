@@ -11,6 +11,7 @@ use Illuminate\Support\Number;
 use Illuminate\Support\Stringable;
 use Ramsey\Uuid\Uuid;
 use stdClass;
+use Symfony\Component\Uid\Ulid;
 
 use function Illuminate\Support\enum_value;
 
@@ -424,6 +425,23 @@ trait InteractsWithData
         }
 
         return Uuid::fromString($this->data($key));
+    }
+
+    /**
+     * Retrieve data from the instance as a ULID instance.
+     *
+     * @param  string  $key
+     * @return \Symfony\Component\Uid\Ulid|null
+     *
+     * @throws \Symfony\Component\Uid\Exception\InvalidArgumentException
+     */
+    public function ulid($key)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        return Ulid::fromString($this->data($key));
     }
 
     /**

@@ -13,6 +13,7 @@ use Illuminate\Tests\Support\Fixtures\TestIntegerBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Uid\Ulid;
 
 include_once dirname(__DIR__).'/Fixtures/Enums.php';
 
@@ -872,6 +873,33 @@ trait TestsInteractsWithDataContract
             $data->uuid('invalid');
 
             $this->fail('An invalid UUID value should throw an exception.');
+        } catch (InvalidArgumentException) {
+            //
+        }
+    }
+
+    protected function assertDataUlidContract()
+    {
+        $data = static::arrayToDataFactory([
+            'as_empty' => '',
+            'as_ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV',
+            'as_lowercase' => '01arz3ndektsv4rrffq69g5fav',
+            'invalid' => 'invalid',
+        ]);
+
+        $this->assertNull($data->ulid('as_empty'));
+        $this->assertNull($data->ulid('doesnt_exist'));
+
+        $ulid = $data->ulid('as_ulid');
+        $this->assertInstanceOf(Ulid::class, $ulid);
+        $this->assertSame('01ARZ3NDEKTSV4RRFFQ69G5FAV', $ulid->toString());
+
+        $this->assertTrue($data->ulid('as_lowercase')->equals($ulid));
+
+        try {
+            $data->ulid('invalid');
+
+            $this->fail('An invalid ULID value should throw an exception.');
         } catch (InvalidArgumentException) {
             //
         }

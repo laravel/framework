@@ -176,6 +176,11 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertDataUuidContract();
     }
 
+    public function testUlid()
+    {
+        $this->assertDataUlidContract();
+    }
+
     public function testEnum()
     {
         $this->assertDataEnumContract();
