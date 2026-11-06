@@ -186,11 +186,46 @@ class FileStore implements CanFlushLocks, LockProvider, Store
      */
     public function increment($key, $value = 1)
     {
-        $raw = $this->getPayload($key);
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
 
-        return tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
-            $this->put($key, $newValue, $raw['time'] ?? 0);
-        });
+        $file = new LockableFile($path, 'c+');
+
+        try {
+            $file->getExclusiveLock($block = true);
+        } catch (LockTimeoutException $e) {
+            $file->close();
+
+            throw $e;
+        }
+
+        $contents = $file->read();
+
+        $expire = strlen($contents) >= 10 ? substr($contents, 0, 10) : null;
+
+        $data = null;
+
+        // If the item is missing, expired, or can not be unserialized we will treat it
+        // as a fresh counter that never expires. Otherwise, we will keep the current
+        // expiration so that incrementing an item does not extend its lifetime.
+        if (! is_null($expire) && $this->currentTime() < $expire) {
+            try {
+                $data = $this->unserialize(substr($contents, 10));
+            } catch (Exception) {
+                $expire = null;
+            }
+        } else {
+            $expire = null;
+        }
+
+        $newValue = ((int) $data) + $value;
+
+        $file->truncate()
+            ->write(str_pad((string) ($expire ?? $this->expiration(0)), 10, '0', STR_PAD_LEFT).serialize($newValue))
+            ->close();
+
+        $this->ensurePermissionsAreCorrect($path);
+
+        return $newValue;
     }
 
     /**

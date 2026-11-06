@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Exception;
 use Illuminate\Cache\FileStore;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
@@ -35,6 +34,8 @@ class CacheFileStoreTest extends TestCase
     protected function tearDown(): void
     {
         (new Filesystem)->deleteDirectory(self::$tempDir, $preserve = true);
+
+        Carbon::setTestNow();
     }
 
     public function testNullIsReturnedIfFileDoesntExist()
@@ -258,93 +259,94 @@ class CacheFileStoreTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $filePath = $this->getCachePath('foo');
-        $files = $this->mockFilesystem();
-        $initialValue = $now->subSeconds(10)->getTimestamp().serialize(77);
-        $valueAfterIncrement = '9999999999'.serialize(3);
-        $store = new FileStore($files, __DIR__);
+        $store = new FileStore(new Filesystem, self::$tempDir);
+        $store->put('foo', 77, 10);
 
-        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
+        Carbon::setTestNow($now->copy()->addSeconds(20));
 
-        $result = $store->increment('foo', 3);
+        $this->assertSame(3, $store->increment('foo', 3));
+        $this->assertSame('9999999999'.serialize(3), file_get_contents($store->path('foo')));
     }
 
     public function testIncrementCanAtomicallyJump()
     {
-        $filePath = $this->getCachePath('foo');
-        $files = $this->mockFilesystem();
-        $initialValue = '9999999999'.serialize(1);
-        $valueAfterIncrement = '9999999999'.serialize(4);
-        $store = new FileStore($files, __DIR__);
+        $store = new FileStore(new Filesystem, self::$tempDir);
+        $store->forever('foo', 1);
 
-        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
-
-        $result = $store->increment('foo', 3);
-        $this->assertEquals(4, $result);
+        $this->assertSame(4, $store->increment('foo', 3));
+        $this->assertSame('9999999999'.serialize(4), file_get_contents($store->path('foo')));
     }
 
     public function testDecrementCanAtomicallyJump()
     {
-        $filePath = $this->getCachePath('foo');
+        $store = new FileStore(new Filesystem, self::$tempDir);
+        $store->forever('foo', 2);
 
-        $files = $this->mockFilesystem();
-        $initialValue = '9999999999'.serialize(2);
-        $valueAfterIncrement = '9999999999'.serialize(0);
-        $store = new FileStore($files, __DIR__);
-
-        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
-
-        $result = $store->decrement('foo', 2);
-        $this->assertEquals(0, $result);
+        $this->assertSame(0, $store->decrement('foo', 2));
+        $this->assertSame('9999999999'.serialize(0), file_get_contents($store->path('foo')));
     }
 
     public function testIncrementNonNumericValues()
     {
-        $filePath = $this->getCachePath('foo');
+        $store = new FileStore($files = new Filesystem, self::$tempDir);
+        $files->ensureDirectoryExists(dirname($path = $store->path('foo')));
+        $files->put($path, '1999999909'.serialize('foo'));
 
-        $files = $this->mockFilesystem();
-        $initialValue = '1999999909'.serialize('foo');
-        $valueAfterIncrement = '1999999909'.serialize(1);
-        $store = new FileStore($files, __DIR__);
-        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
-        $result = $store->increment('foo');
-
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $store->increment('foo'));
+        $this->assertSame('1999999909'.serialize(1), $files->get($path));
     }
 
     public function testIncrementNonExistentKeys()
     {
-        $filePath = $this->getCachePath('foo');
+        $store = new FileStore(new Filesystem, self::$tempDir);
 
-        $files = $this->mockFilesystem();
-        $valueAfterIncrement = '9999999999'.serialize(1);
-        $store = new FileStore($files, __DIR__);
-        // simulates a missing item in file store by the exception
-        $files->expects($this->once())->method('get')->with($filePath, true)->willThrowException(new Exception);
-        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
-        $result = $store->increment('foo');
-        $this->assertIsInt($result);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $store->increment('foo'));
+        $this->assertSame('9999999999'.serialize(1), file_get_contents($store->path('foo')));
     }
 
     public function testIncrementDoesNotExtendCacheLife()
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $files = $this->mockFilesystem();
-        $expiration = $now->addSeconds(50)->getTimestamp();
-        $initialValue = $expiration.serialize(1);
-        $valueAfterIncrement = $expiration.serialize(2);
-        $store = new FileStore($files, __DIR__);
-        $files->expects($this->once())->method('get')->willReturn($initialValue);
-        $hash = sha1('foo');
-        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $valueAfterIncrement);
-        $store->increment('foo');
+        $store = new FileStore(new Filesystem, self::$tempDir);
+        $store->put('foo', 1, 50);
+
+        $this->assertSame(2, $store->increment('foo'));
+        $this->assertSame($now->copy()->addSeconds(50)->getTimestamp().serialize(2), file_get_contents($store->path('foo')));
+    }
+
+    public function testIncrementIsAtomicAcrossProcesses()
+    {
+        if (! function_exists('proc_open')) {
+            $this->markTestSkipped('The proc_open function is not available.');
+        }
+
+        $store = new FileStore($files = new Filesystem, self::$tempDir);
+        $store->forever('foo', 0);
+
+        $files->put($worker = self::$tempDir.'/increment-worker.php', sprintf(<<<'PHP'
+            <?php
+
+            require %s;
+
+            $store = new Illuminate\Cache\FileStore(new Illuminate\Filesystem\Filesystem, %s);
+
+            for ($i = 0; $i < 100; $i++) {
+                $store->increment('foo');
+            }
+            PHP, var_export(__DIR__.'/../../vendor/autoload.php', true), var_export(self::$tempDir, true)));
+
+        $processes = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $processes[] = proc_open([PHP_BINARY, $worker], [], $pipes);
+        }
+
+        foreach ($processes as $process) {
+            proc_close($process);
+        }
+
+        $this->assertSame(400, $store->get('foo'));
     }
 
     public function testRemoveDeletesFileDoesntExist()
