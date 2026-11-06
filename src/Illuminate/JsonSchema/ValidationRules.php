@@ -72,7 +72,7 @@ class ValidationRules
         if (isset($schema['anyOf'])) {
             $branches = array_values(array_filter($schema['anyOf'], fn (array $branch) => ! $isNull($branch)));
 
-            return [$attribute => [...$presence, static::anyOf($branches)]];
+            return [$attribute => [...$presence, static::anyOf($branches), ...static::enumRules($schema)]];
         }
 
         $types = array_values(array_diff((array) ($schema['type'] ?? []), ['null']));
@@ -111,12 +111,59 @@ class ValidationRules
             'integer' => ['integer', ...static::numberRules($schema)],
             'number' => ['numeric', ...static::numberRules($schema)],
             'boolean' => ['boolean'],
-            'array' => ['list', ...static::bounds($schema, 'minItems', 'maxItems')],
+            'array' => [
+                'list',
+                ...static::bounds($schema, 'minItems', 'maxItems'),
+                ...($schema['uniqueItems'] ?? false) ? [static::uniqueArrayItems()] : [],
+            ],
             'object' => static::objectRules($schema),
             default => [],
         };
 
-        return isset($schema['enum']) ? [...$rules, Rule::in($schema['enum'])] : $rules;
+        return [...$rules, ...static::enumRules($schema)];
+    }
+
+    /**
+     * Get the rule that restricts a value to the schema's enumerated values.
+     *
+     * @param  array<string, mixed>  $schema
+     * @return array<int, mixed>
+     */
+    protected static function enumRules(array $schema): array
+    {
+        if (! isset($schema['enum'])) {
+            return [];
+        }
+
+        $enum = $schema['enum'];
+
+        if (array_filter($enum, is_array(...)) === []) {
+            return [Rule::in($enum)];
+        }
+
+        return [function (string $attribute, mixed $value, Closure $fail) use ($enum) {
+            if (! in_array($value, $enum)) {
+                $fail('validation.in')->translate();
+            }
+        }];
+    }
+
+    /**
+     * Build a rule that refuses an array holding two equal array items, which "distinct" does not compare.
+     */
+    protected static function uniqueArrayItems(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) {
+            $items = array_values(array_filter((array) $value, is_array(...)));
+
+            foreach ($items as $index => $item) {
+                if (in_array($item, array_slice($items, $index + 1))) {
+                    $fail('validation.distinct')->translate();
+
+                    return;
+                }
+            }
+        };
     }
 
     /**
@@ -223,7 +270,7 @@ class ValidationRules
                 }
             }
 
-            $fail('The :attribute field is invalid.');
+            $fail('validation.any_of')->translate();
         };
     }
 }

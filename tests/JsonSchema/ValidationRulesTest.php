@@ -125,6 +125,40 @@ class ValidationRulesTest extends TestCase
         $this->assertFalse($this->passes($schema, ['v1.0' => 'x']));
     }
 
+    public function test_unique_items_refuses_equal_object_items()
+    {
+        $schema = $this->schema(fn ($s) => ['rows' => $s->array()->items($s->object(['a' => $s->integer()]))->unique()->required()]);
+
+        $this->assertFalse($this->passes($schema, ['rows' => [['a' => 1], ['a' => 1]]]));
+        $this->assertTrue($this->passes($schema, ['rows' => [['a' => 1], ['a' => 2]]]));
+    }
+
+    public function test_an_enum_of_objects_compares_values_structurally()
+    {
+        $schema = ['type' => 'object', 'properties' => ['point' => ['type' => 'object', 'enum' => [['x' => 1, 'y' => 2]]]], 'required' => ['point']];
+
+        $this->assertTrue($this->passes($schema, ['point' => ['y' => 2, 'x' => 1]]));
+        $this->assertFalse($this->passes($schema, ['point' => ['x' => 1, 'y' => 3]]));
+    }
+
+    public function test_an_any_of_value_must_also_pass_a_sibling_enum()
+    {
+        $schema = $this->schema(fn ($s) => ['v' => $s->anyOf([$s->string(), $s->integer()])->enum(['allowed', 7])->required()]);
+
+        $this->assertTrue($this->passes($schema, ['v' => 'allowed']));
+        $this->assertTrue($this->passes($schema, ['v' => 7]));
+        $this->assertFalse($this->passes($schema, ['v' => 'other']));
+    }
+
+    public function test_an_any_of_failure_uses_the_any_of_translation()
+    {
+        $schema = ['type' => 'object', 'properties' => ['v' => ['anyOf' => [['type' => 'string'], ['type' => 'integer']]]], 'required' => ['v']];
+
+        $validator = Validator::make(['v' => ['a']], JsonSchema::rules($schema));
+
+        $this->assertSame(['validation.any_of'], $validator->errors()->get('v'));
+    }
+
     public function test_numeric_property_names_keep_their_own_rules()
     {
         $schema = ['type' => 'object', 'properties' => ['1' => ['type' => 'string'], '2' => ['type' => 'integer']], 'required' => ['2']];
