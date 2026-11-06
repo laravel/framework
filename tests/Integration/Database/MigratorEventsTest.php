@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Events\MigrationEnded;
+use Illuminate\Database\Events\MigrationFailed;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationSkipped;
 use Illuminate\Database\Events\MigrationsStarted;
@@ -11,6 +12,7 @@ use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class MigratorEventsTest extends TestCase
 {
@@ -159,6 +161,33 @@ class MigratorEventsTest extends TestCase
 
         Event::assertDispatched(MigrationSkipped::class, function ($event) {
             return $event->migrationName === '2014_10_13_000000_skipped_migration';
+        });
+    }
+
+    public function testMigrationFailedEventIsFired()
+    {
+        Event::fake();
+
+        try {
+            $this->artisan('migrate', [
+                '--path' => realpath(__DIR__.'/Fixtures/FailingMigrations'),
+                '--realpath' => true,
+            ]);
+
+            $this->fail('The migration exception was not rethrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Jack ruined this migration', $e->getMessage());
+        }
+
+        Event::assertDispatched(MigrationStarted::class, 1);
+        Event::assertNotDispatched(MigrationEnded::class);
+        Event::assertNotDispatched(MigrationsEnded::class);
+
+        Event::assertDispatched(MigrationFailed::class, function ($event) use ($e) {
+            return $event->method === 'up'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_14_000000_failing_migration'
+                && $event->exception === $e;
         });
     }
 }
