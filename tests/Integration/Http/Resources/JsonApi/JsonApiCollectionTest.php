@@ -209,6 +209,30 @@ class JsonApiCollectionTest extends TestCase
             );
     }
 
+    public function testItIncludesIdenticalBelongsToManyResourcesOnce()
+    {
+        $users = User::factory()->times(2)->create();
+
+        $team = Team::factory()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $users->each(fn ($user) => $user->teams()->attach($team, ['role' => 'Member']));
+
+        $this->getJson('/users?'.http_build_query(['include' => 'teams', 'fields' => ['teams' => 'name']]))
+            ->assertJsonPath('data.0.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('data.1.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('included', [
+                [
+                    'id' => (string) $team->getKey(),
+                    'type' => 'teams',
+                    'attributes' => [
+                        'name' => 'Laravel Team',
+                    ],
+                ],
+            ]);
+    }
+
     public function testItEagerLoadsIncludesForAllResourcesAtOnce()
     {
         $users = User::factory()->times(3)->create();
