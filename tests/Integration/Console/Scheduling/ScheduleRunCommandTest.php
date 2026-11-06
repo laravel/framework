@@ -13,7 +13,9 @@ use Illuminate\Console\Scheduling\ScheduledTaskSkipReason;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -263,6 +265,35 @@ class ScheduleRunCommandTest extends TestCase
             return $event->task === $task &&
                    $event->reason === ScheduledTaskSkipReason::ConditionNotMet;
         });
+    }
+
+    public function test_repeating_task_skipped_event_is_dispatched_when_maintenance_mode_is_entered()
+    {
+        Event::fake([ScheduledTaskSkipped::class]);
+
+        Config::set('app.maintenance.driver', 'cache');
+        Config::set('app.maintenance.store', 'array');
+        Carbon::setTestNow(Carbon::now()->startOfMinute());
+        $startedAt = Carbon::now();
+
+        $task = $this->app->make(Schedule::class)->call(fn () => null)->everySecond();
+
+        Sleep::fake();
+        Sleep::whenFakingSleep(function ($duration) use ($startedAt) {
+            Carbon::setTestNow(Carbon::now()->add($duration));
+
+            if ($startedAt->diffInSeconds() >= 30 && ! $this->app->isDownForMaintenance()) {
+                $this->artisan('down');
+            }
+        });
+
+        $this->artisan('schedule:run');
+
+        Event::assertDispatched(ScheduledTaskSkipped::class, function ($event) use ($task) {
+            return $event->task === $task &&
+                   $event->reason === ScheduledTaskSkipReason::MaintenanceMode;
+        });
+        Event::assertDispatchedTimes(ScheduledTaskSkipped::class, 30);
     }
 
     /**

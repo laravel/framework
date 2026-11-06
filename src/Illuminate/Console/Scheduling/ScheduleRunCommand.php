@@ -263,6 +263,8 @@ class ScheduleRunCommand extends Command
                 $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
 
                 if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event, ScheduledTaskSkipReason::MaintenanceMode));
+
                     continue;
                 }
 

@@ -178,8 +178,13 @@ class Event
      */
     public function shouldRepeatNow()
     {
-        return $this->isRepeatable()
-            && $this->lastChecked?->diffInSeconds() >= $this->repeatSeconds;
+        if (! $this->isRepeatable() || $this->lastChecked?->diffInSeconds() < $this->repeatSeconds) {
+            return false;
+        }
+
+        $this->lastChecked = Date::now();
+
+        return true;
     }
 
     /**
