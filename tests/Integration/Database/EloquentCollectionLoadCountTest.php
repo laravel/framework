@@ -94,6 +94,36 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $this->assertSame('0', (string) $posts[1]->likes_count);
     }
 
+    public function testLoadCountWithVariadicRelations()
+    {
+        $posts = Post::all();
+
+        DB::enableQueryLog();
+
+        $posts->loadCount('comments', 'likes');
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertSame('2', (string) $posts[0]->comments_count);
+        $this->assertSame('1', (string) $posts[0]->likes_count);
+        $this->assertSame('0', (string) $posts[1]->comments_count);
+        $this->assertSame('0', (string) $posts[1]->likes_count);
+    }
+
+    public function testLoadExistsWithVariadicRelations()
+    {
+        $posts = Post::all();
+
+        DB::enableQueryLog();
+
+        $posts->loadExists('comments', 'likes');
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments_exists);
+        $this->assertTrue($posts[0]->likes_exists);
+        $this->assertFalse($posts[1]->comments_exists);
+        $this->assertFalse($posts[1]->likes_exists);
+    }
+
     public function testLoadCountDoesNotOverrideAttributesWithDefaultValue()
     {
         $post = Post::first();

@@ -1015,6 +1015,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadExists($relations)
     {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
         return $this->loadAggregate($relations, '*', 'exists');
     }
 

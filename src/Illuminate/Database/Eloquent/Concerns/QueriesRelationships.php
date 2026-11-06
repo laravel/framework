@@ -1032,12 +1032,12 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the existence of related models.
      *
-     * @param  string|array  $relation
+     * @param  mixed  $relations
      * @return $this
      */
-    public function withExists($relation)
+    public function withExists($relations)
     {
-        return $this->withAggregate($relation, '*', 'exists');
+        return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'exists');
     }
 
     /**

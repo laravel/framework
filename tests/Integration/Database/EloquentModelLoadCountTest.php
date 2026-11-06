@@ -66,6 +66,27 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $this->assertEquals(1, $model->related2_count);
     }
 
+    public function testLoadExistsVariadicRelations()
+    {
+        $model = BaseModel::first();
+
+        DB::enableQueryLog();
+
+        $model->loadExists('related1', 'related2');
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertTrue($model->related1_exists);
+        $this->assertTrue($model->related2_exists);
+    }
+
+    public function testWithExistsVariadicRelations()
+    {
+        $model = BaseModel::withExists('related1', 'related2')->first();
+
+        $this->assertTrue($model->related1_exists);
+        $this->assertTrue($model->related2_exists);
+    }
+
     public function testLoadCountDeletedRelations()
     {
         $model = BaseModel::first();
