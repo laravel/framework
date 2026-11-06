@@ -153,6 +153,10 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadCount($relations)
     {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
         return $this->loadAggregate($relations, '*', 'count');
     }
 
@@ -212,6 +216,10 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadExists($relations)
     {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
         return $this->loadAggregate($relations, '*', 'exists');
     }
 
