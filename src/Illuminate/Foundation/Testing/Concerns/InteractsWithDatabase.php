@@ -276,19 +276,32 @@ trait InteractsWithDatabase
         $connectionInstance = $this->getConnection($connection);
 
         $actual = 0;
+        $queries = [];
 
-        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
+        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, &$queries, $connectionInstance, $connection) {
             if (is_null($connection) || $connectionInstance === $event->connection) {
                 $actual++;
+
+                $queries[$event->sql] = ($queries[$event->sql] ?? 0) + 1;
             }
         });
 
-        $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
-            $this->assertSame(
-                $expected,
-                $actual,
-                "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
-            );
+        $this->beforeApplicationDestroyed(function () use (&$actual, &$queries, $expected, $connectionInstance) {
+            $message = "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred.";
+
+            $repeated = array_filter($queries, fn ($count) => $count > 1);
+
+            if (! empty($repeated)) {
+                arsort($repeated);
+
+                $message .= "\nMost repeated queries:";
+
+                foreach (array_slice($repeated, 0, 3, true) as $sql => $count) {
+                    $message .= "\n  {$count}x {$sql}";
+                }
+            }
+
+            $this->assertSame($expected, $actual, $message);
         });
 
         return $this;

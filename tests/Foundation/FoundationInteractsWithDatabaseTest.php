@@ -522,7 +522,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $case->tearDown();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nFailed asserting that 4 is identical to 3.", $e->getMessage());
+            $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nMost repeated queries:\n  4x select count(*) as aggregate from \"foo\"\nFailed asserting that 4 is identical to 3.", $e->getMessage());
         }
 
         $case = new class('foo') extends TestingTestCase
@@ -549,6 +549,193 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $case->setUp();
         $case->testExpectsDatabaseQueryCount();
         $case->tearDown();
+    }
+
+    public function testExpectsDatabaseQueryCountOmitsRepeatedQueriesSectionWhenAllQueriesAreUnique()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(1);
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('bar')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 1 database queries on the [testing] connection. 2 occurred.\nFailed asserting that 2 is identical to 1.", $e->getMessage());
+            $this->assertStringNotContainsString('Most repeated queries', $e->getMessage());
+        }
+    }
+
+    public function testExpectsDatabaseQueryCountListsOnlyRepeatedQueries()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(1);
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('bar')->count();
+                    $db->table('foo')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 1 database queries on the [testing] connection. 3 occurred.\nMost repeated queries:\n  2x select count(*) as aggregate from \"foo\"\nFailed asserting that 3 is identical to 1.", $e->getMessage());
+            $this->assertStringNotContainsString('"bar"', $e->getMessage());
+        }
+    }
+
+    public function testExpectsDatabaseQueryCountGroupsQueriesWithDifferentBindings()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(1);
+
+                DB::pretend(function ($db) {
+                    foreach ([1, 2, 3] as $id) {
+                        $db->table('users')->where('id', $id)->get();
+                    }
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 1 database queries on the [testing] connection. 3 occurred.\nMost repeated queries:\n  3x select * from \"users\" where \"id\" = ?\nFailed asserting that 3 is identical to 1.", $e->getMessage());
+        }
+    }
+
+    public function testExpectsDatabaseQueryCountShowsTopThreeRepeatedQueriesSortedByCount()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(0);
+
+                DB::pretend(function ($db) {
+                    foreach (['foo' => 2, 'bar' => 5, 'baz' => 3, 'qux' => 4, 'quux' => 1] as $table => $times) {
+                        for ($i = 0; $i < $times; $i++) {
+                            $db->table($table)->count();
+                        }
+                    }
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame(
+                "Expected 0 database queries on the [testing] connection. 15 occurred.\n".
+                "Most repeated queries:\n".
+                "  5x select count(*) as aggregate from \"bar\"\n".
+                "  4x select count(*) as aggregate from \"qux\"\n".
+                "  3x select count(*) as aggregate from \"baz\"\n".
+                'Failed asserting that 15 is identical to 0.',
+                $e->getMessage()
+            );
+            $this->assertStringNotContainsString('"foo"', $e->getMessage());
+            $this->assertStringNotContainsString('"quux"', $e->getMessage());
+        }
+    }
+
+    public function testExpectsDatabaseQueryCountOnlyReportsRepeatedQueriesFromTheExpectedConnection()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(0, 'mysql');
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                });
+
+                DB::connection('mysql')->pretend(function ($db) {
+                    $db->table('bar')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 0 database queries on the [mysql] connection. 1 occurred.\nFailed asserting that 1 is identical to 0.", $e->getMessage());
+        }
+    }
+
+    public function testExpectsDatabaseQueryCountPassesWithRepeatedQueriesWhenCountMatches()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(3);
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
+
+        $this->assertTrue(true);
     }
 
     protected function mockCountBuilder($existsResult, $deletedAtColumn = 'deleted_at', $countResult = null)
