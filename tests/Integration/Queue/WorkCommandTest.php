@@ -303,6 +303,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testVerboseOutputIncludesMemoryUsageAndPerJobDelta()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         Queue::push(new FirstJob);
 
         $this->withoutMockingConsoleOutput()->artisan('queue:work', [
@@ -334,6 +336,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testVerboseOutputReportsPositiveMemoryGrowthOfJob()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         Queue::push(new MemoryGrowingJob);
 
         $this->withoutMockingConsoleOutput()->artisan('queue:work', [
@@ -354,6 +358,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testVerboseOutputReportsNegativeMemoryGrowthOfJob()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         MemoryReleasingJob::$buffer = str_repeat('x', 5 * 1024 * 1024);
 
         Queue::push(new MemoryReleasingJob);
