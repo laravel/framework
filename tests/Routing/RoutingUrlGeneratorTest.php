@@ -10,6 +10,7 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -818,6 +819,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: ['tampered']));
 
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
+    }
+
+    public function testSignatureExpirationIsReadFromTheRawQueryString()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $request = Request::create('http://www.foo.com/foo', server: [
+            'QUERY_STRING' => sprintf('expires=%d', $now->addMinutes(10)->timestamp),
+        ]);
+
+        $url = new UrlGenerator(new RouteCollection, $request);
+
+        $this->assertNull($request->query('expires'));
+        $this->assertTrue($url->signatureHasNotExpired($request));
+
+        Carbon::setTestNow(null);
     }
 
     public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
