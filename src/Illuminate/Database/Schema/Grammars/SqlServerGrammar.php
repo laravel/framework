@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use RuntimeException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -944,6 +945,23 @@ class SqlServerGrammar extends Grammar
     protected function typeGeography(Fluent $column)
     {
         return 'geography';
+    }
+
+    /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeVector(Fluent $column)
+    {
+        if (! isset($column->dimensions) || $column->dimensions === '') {
+            throw new RuntimeException('SQL Server requires the dimensions of a vector column to be specified.');
+        }
+
+        return "vector({$column->dimensions})";
     }
 
     /**

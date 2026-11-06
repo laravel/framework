@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
@@ -914,6 +915,58 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "geo" add "coordinates" geography not null', $statements[0]);
+    }
+
+    public function testAddingVector()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->vector('embedding', 384);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "embeddings" add "embedding" vector(384) not null', $statements[0]);
+    }
+
+    public function testAddingNullableVector()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->vector('embedding', 1536)->nullable();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "embeddings" add "embedding" vector(1536) null', $statements[0]);
+    }
+
+    public function testCreateTableWithVector()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->create();
+        $blueprint->increments('id');
+        $blueprint->vector('embedding', 3);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "embeddings" ("id" int not null identity primary key, "embedding" vector(3) not null)', $statements[0]);
+    }
+
+    public function testAddingVectorWithoutDimensionsThrows()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('SQL Server requires the dimensions of a vector column to be specified.');
+
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->vector('embedding');
+        $blueprint->toSql();
+    }
+
+    public function testAddingVectorWithEmptyDimensionsThrows()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('SQL Server requires the dimensions of a vector column to be specified.');
+
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->vector('embedding')->dimensions('');
+        $blueprint->toSql();
     }
 
     public function testAddingGeneratedColumn()
