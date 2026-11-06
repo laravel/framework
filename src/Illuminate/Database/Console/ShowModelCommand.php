@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\suggest;
@@ -47,7 +48,11 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
                 $this->option('database')
             );
         } catch (BindingResolutionException $e) {
-            $this->components->error($e->getMessage());
+            if ($this->option('json') && ($output = $this->output->getOutput()) instanceof ConsoleOutputInterface) {
+                $output->getErrorOutput()->writeln($e->getMessage());
+            } else {
+                $this->components->error($e->getMessage());
+            }
 
             return self::FAILURE;
         }

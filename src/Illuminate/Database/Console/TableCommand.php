@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 use function Laravel\Prompts\search;
 
@@ -68,7 +69,11 @@ class TableCommand extends DatabaseInspectionCommand
         )->firstWhere('name', $tableName);
 
         if (! $table) {
-            $this->components->warn("Table [{$tableName}] doesn't exist.");
+            if ($this->option('json') && ($output = $this->output->getOutput()) instanceof ConsoleOutputInterface) {
+                $output->getErrorOutput()->writeln("Table [{$tableName}] doesn't exist.");
+            } else {
+                $this->components->warn("Table [{$tableName}] doesn't exist.");
+            }
 
             return self::FAILURE;
         }
