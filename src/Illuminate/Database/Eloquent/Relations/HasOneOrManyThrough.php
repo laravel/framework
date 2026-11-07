@@ -223,16 +223,16 @@ abstract class HasOneOrManyThrough extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
         if (! is_null($instance = $this->where($this->qualifyRelatedAttributes($attributes))->first())) {
             return $instance;
         }
 
-        return $this->related->newInstance(array_merge($attributes, $values));
+        return $this->related->newInstance(array_merge($attributes, value($values)));
     }
 
     /**
@@ -307,14 +307,14 @@ abstract class HasOneOrManyThrough extends Relation
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes, Closure|array $values = [])
     {
         return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
             if (! $instance->wasRecentlyCreated) {
-                $instance->fill($values)->save();
+                $instance->fill(value($values))->save();
             }
         });
     }
