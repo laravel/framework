@@ -335,7 +335,7 @@ class WorkCommandTest extends QueueTestCase
     {
         $connection = config('queue.default');
 
-        Queue::pause($connection, 'high');
+        Queue::pause('high', $connection);
 
         Queue::push(new FirstJob);
 
