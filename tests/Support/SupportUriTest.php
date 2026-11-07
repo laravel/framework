@@ -27,6 +27,7 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of($originalUri = 'https://laravel.com/docs/installation');
 
+        $this->assertSame('https://laravel.com', $uri->origin());
         $this->assertSame('https', $uri->scheme());
         $this->assertNull($uri->user());
         $this->assertNull($uri->password());
@@ -41,6 +42,7 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://taylor:password@laravel.com/docs/installation?version=1#hello');
 
+        $this->assertSame('https://laravel.com', $uri->origin());
         $this->assertSame('taylor', $uri->user());
         $this->assertSame('password', $uri->password());
         $this->assertSame('hello', $uri->fragment());
@@ -56,6 +58,19 @@ class SupportUriTest extends TestCase
 
         $this->assertFalse(Uri::of('https://laravel.com')->isEmpty());
         $this->assertTrue(Uri::of('https://laravel.com')->isNotEmpty());
+    }
+
+    public function test_origin()
+    {
+        $this->assertSame('https://github.com:80', Uri::of('https://github.com:80/a/b#x')->origin());
+        $this->assertSame('https://a.com', Uri::of('https://A.com:443/x')->origin());
+        $this->assertSame('http://a.com', Uri::of('http://a.com:80')->origin());
+        $this->assertSame('wss://a.com:8080', Uri::of('wss://a.com:8080/socket')->origin());
+
+        $this->assertNull(Uri::of('/rel')->origin());
+        $this->assertNull(Uri::of('mailto:x@y.z')->origin());
+        $this->assertNull(Uri::of('file:///etc/hosts')->origin());
+        $this->assertNull(Uri::of('')->origin());
     }
 
     public function test_without_fragment()
@@ -438,6 +453,16 @@ class SupportUriTest extends TestCase
     public function test_interval_method()
     {
         $this->assertDataIntervalContract();
+    }
+
+    public function test_uuid_method()
+    {
+        $this->assertDataUuidContract();
+    }
+
+    public function test_ulid_method()
+    {
+        $this->assertDataUlidContract();
     }
 
     public function test_enum_method()

@@ -7,19 +7,17 @@ use Ably\PubSub\Models\Message as AblyMessage;
 use Ably\PubSub\PubSubHttpClient;
 use Illuminate\Broadcasting\BroadcastException;
 
+/**
+ * @template TClient of \Ably\PubSub\PubSubHttpClient
+ *
+ * @extends \Illuminate\Broadcasting\Broadcasters\AblyBroadcaster<TClient>
+ */
 class Ably2Broadcaster extends AblyBroadcaster
 {
     /**
-     * The Ably Pub/Sub HTTP client instance.
-     *
-     * @var \Ably\PubSub\PubSubHttpClient
-     */
-    protected $ably;
-
-    /**
      * Create a new broadcaster instance.
      *
-     * @param  \Ably\PubSub\PubSubHttpClient  $ably
+     * @param  TClient  $ably
      */
     public function __construct(PubSubHttpClient $ably)
     {
@@ -36,6 +34,7 @@ class Ably2Broadcaster extends AblyBroadcaster
      *
      * @throws \Illuminate\Broadcasting\BroadcastException
      */
+    #[\Override]
     public function broadcast(array $channels, $event, array $payload = [])
     {
         try {
@@ -58,6 +57,7 @@ class Ably2Broadcaster extends AblyBroadcaster
      * @param  array  $payload
      * @return \Ably\PubSub\Models\Message
      */
+    #[\Override]
     protected function buildAblyMessage($event, array $payload = [])
     {
         return tap(new AblyMessage, function ($message) use ($event, $payload) {
@@ -65,26 +65,5 @@ class Ably2Broadcaster extends AblyBroadcaster
             $message->data = $payload;
             $message->connectionKey = data_get($payload, 'socket');
         });
-    }
-
-    /**
-     * Get the underlying Ably SDK instance.
-     *
-     * @return \Ably\PubSub\PubSubHttpClient
-     */
-    public function getAbly()
-    {
-        return $this->ably;
-    }
-
-    /**
-     * Set the underlying Ably SDK instance.
-     *
-     * @param  \Ably\PubSub\PubSubHttpClient  $ably
-     * @return void
-     */
-    public function setAbly($ably)
-    {
-        $this->ably = $ably;
     }
 }

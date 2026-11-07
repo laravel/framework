@@ -1105,6 +1105,8 @@ class Builder implements BuilderContract
         return $this->applyScopes()->query->cursor()->map(function ($record) use ($instance) {
             $model = $instance->newFromBuilder($record);
 
+            $model->preventsLazyLoading = Model::preventsLazyLoading();
+
             return $this->applyAfterQueryCallbacks($instance->newCollection([$model]))->first();
         })->reject(fn ($model) => is_null($model));
     }

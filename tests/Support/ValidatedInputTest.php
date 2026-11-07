@@ -169,6 +169,16 @@ class ValidatedInputTest extends TestCase
         $this->assertDataIntervalContract();
     }
 
+    public function test_uuid_method()
+    {
+        $this->assertDataUuidContract();
+    }
+
+    public function test_ulid_method()
+    {
+        $this->assertDataUlidContract();
+    }
+
     public function test_enum_method()
     {
         $this->assertDataEnumContract();
