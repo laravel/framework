@@ -125,6 +125,12 @@ class ValidationStringRuleTest extends TestCase
         $this->assertSame('string|doesnt_end_with:.exe,.bat', (string) $rule);
     }
 
+    public function testEncodingRule()
+    {
+        $rule = Rule::string()->encoding('UTF-8');
+        $this->assertSame('string|encoding:UTF-8', (string) $rule);
+    }
+
     public function testChainedRules()
     {
         $rule = Rule::string()
@@ -215,6 +221,24 @@ class ValidationStringRuleTest extends TestCase
         $validator = new Validator(
             $trans,
             ['field' => 'hello'],
+            ['field' => $rule]
+        );
+
+        $this->assertNotEmpty($validator->errors()->first('field'));
+
+        $rule = Rule::string()->encoding('UTF-8');
+
+        $validator = new Validator(
+            $trans,
+            ['field' => 'zażółć'],
+            ['field' => $rule]
+        );
+
+        $this->assertEmpty($validator->errors()->first('field'));
+
+        $validator = new Validator(
+            $trans,
+            ['field' => "\xB1\x31"],
             ['field' => $rule]
         );
 
