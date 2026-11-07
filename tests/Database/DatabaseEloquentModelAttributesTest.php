@@ -85,6 +85,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('custom_id', $model->getKeyName());
     }
 
+    public function test_primary_key_attribute_can_disable_primary_key(): void
+    {
+        $model = new ModelWithoutPrimaryKeyAttribute;
+
+        $this->assertNull($model->getKeyName());
+    }
+
+    public function test_disabled_primary_key_is_not_incrementing(): void
+    {
+        $model = new ModelWithoutPrimaryKeyAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
     public function test_primary_key_property_takes_precedence(): void
     {
         $model = new ModelWithPrimaryKeyAttributeAndProperty;
@@ -157,6 +171,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithBackedEnumConnectionAttribute;
 
         $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_child_connection_attribute_overrides_inherited_connection_property(): void
+    {
+        $model = new ChildModelWithConnectionAttribute;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_child_inherits_parent_connection_attribute(): void
+    {
+        $model = new ChildModelWithNoConnection;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_child_connection_property_overrides_parent_connection_attribute(): void
+    {
+        $model = new ChildModelWithConnectionProperty;
+
+        $this->assertSame('default', $model->getConnectionName());
     }
 
     public function test_timestamps_attribute(): void
@@ -602,6 +637,12 @@ class ModelWithPrimaryKeyAttribute extends Model
     //
 }
 
+#[Table(key: false)]
+class ModelWithoutPrimaryKeyAttribute extends Model
+{
+    //
+}
+
 #[Table(key: 'attribute_id')]
 class ModelWithPrimaryKeyAttributeAndProperty extends Model
 {
@@ -642,6 +683,33 @@ class ModelWithUnitEnumConnectionAttribute extends Model
 class ModelWithBackedEnumConnectionAttribute extends Model
 {
     //
+}
+
+class ParentModelWithConnectionProperty extends Model
+{
+    protected $connection = 'default';
+}
+
+#[Connection('secondary')]
+class ChildModelWithConnectionAttribute extends ParentModelWithConnectionProperty
+{
+    //
+}
+
+#[Connection('secondary')]
+class ParentModelWithConnectionAttribute extends Model
+{
+    //
+}
+
+class ChildModelWithNoConnection extends ParentModelWithConnectionAttribute
+{
+    //
+}
+
+class ChildModelWithConnectionProperty extends ParentModelWithConnectionAttribute
+{
+    protected $connection = 'default';
 }
 
 #[Table(timestamps: false)]

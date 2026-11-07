@@ -2,13 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Mockery;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class EloquentHasOneOrManyDeprecationTest extends TestCase
@@ -27,10 +30,6 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
         $model1->id = 1;
         $model2 = new HasOneOrManyDeprecationModelStub;
         $model2->id = null;
-
-        $relation->getRelated()->expects('newCollection')->andReturnUsing(function ($array) {
-            return new Collection($array);
-        });
 
         $models = $relation->match([$model1, $model2], new Collection([$result1, $result2]), 'foo');
 
@@ -58,30 +57,27 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
 
     protected function getHasManyRelation(): HasMany
     {
-        $queryBuilder = Mockery::mock(QueryBuilder::class);
-        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
-        $builder->expects('whereNotNull')->with('table.foreign_key');
-        $builder->expects('where')->with('table.foreign_key', '=', 1);
-        $related = Mockery::mock(Model::class);
-        $builder->expects('getModel')->andReturn($related);
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getAttribute')->with('id')->andReturn(1);
-
-        return new HasMany($builder, $parent, 'table.foreign_key', 'id');
+        return new HasMany($this->newBuilder(), $this->newParent(), 'table.foreign_key', 'id');
     }
 
     protected function getHasOneRelation(): HasOne
     {
-        $queryBuilder = Mockery::mock(QueryBuilder::class);
-        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
-        $builder->expects('whereNotNull')->with('table.foreign_key');
-        $builder->expects('where')->with('table.foreign_key', '=', 1);
-        $related = Mockery::mock(Model::class);
-        $builder->expects('getModel')->andReturn($related);
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getAttribute')->with('id')->andReturn(1);
+        return new HasOne($this->newBuilder(), $this->newParent(), 'table.foreign_key', 'id');
+    }
 
-        return new HasOne($builder, $parent, 'table.foreign_key', 'id');
+    protected function newBuilder(): Builder
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+
+        return (new Builder(new QueryBuilder($connection, new Grammar($connection), new Processor)))->setModel(new HasOneOrManyDeprecationModelStub);
+    }
+
+    protected function newParent(): Model
+    {
+        $parent = new HasOneOrManyDeprecationModelStub;
+        $parent->id = 1;
+
+        return $parent;
     }
 }
 

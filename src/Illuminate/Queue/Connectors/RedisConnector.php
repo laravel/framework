@@ -17,7 +17,7 @@ class RedisConnector implements ConnectorInterface
     /**
      * The connection name.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 

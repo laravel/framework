@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Sleep;
 
 class DurationLimiter
@@ -77,10 +78,10 @@ class DurationLimiter
      */
     public function block($timeout, $callback = null, $sleep = 750)
     {
-        $starting = time();
+        $starting = Carbon::now()->getTimestamp();
 
         while (! $this->acquire()) {
-            if (time() - $timeout >= $starting) {
+            if (Carbon::now()->getTimestamp() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 
@@ -187,7 +188,7 @@ LUA;
         return <<<'LUA'
 
 if redis.call('EXISTS', KEYS[1]) == 0 then
-    return {0, ARGV[2] + ARGV[3]}
+    return {ARGV[2] + ARGV[3], tonumber(ARGV[4])}
 end
 
 if ARGV[1] >= redis.call('HGET', KEYS[1], 'start') and ARGV[1] <= redis.call('HGET', KEYS[1], 'end') then
@@ -197,7 +198,7 @@ if ARGV[1] >= redis.call('HGET', KEYS[1], 'start') and ARGV[1] <= redis.call('HG
     }
 end
 
-return {0, ARGV[2] + ARGV[3]}
+return {ARGV[2] + ARGV[3], tonumber(ARGV[4])}
 LUA;
     }
 }

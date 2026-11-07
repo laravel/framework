@@ -9,6 +9,23 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TrimStringsTest extends TestCase
 {
+    public function testNonStringValuesDoNotCheckExclusions()
+    {
+        $middleware = new class extends TrimStrings
+        {
+            protected function shouldSkip($key, $except)
+            {
+                TestCase::fail('Non-string values should not check trimming exclusions.');
+            }
+        };
+
+        $data = ['values' => [[0], [false], [null], [1.5], []]];
+
+        $middleware->handle(new Request($data), function ($request) use ($data) {
+            $this->assertSame($data, $request->query->all());
+        });
+    }
+
     public function testTrimStringsIgnoringExceptAttribute()
     {
         $middleware = new TrimStringsWithExceptAttribute;

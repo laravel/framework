@@ -15,7 +15,6 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\DateFormat;
-use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
@@ -1136,6 +1135,8 @@ trait HasAttributes
 
         $this->attributes[$key] = $value;
 
+        unset($this->attributeCastCache[$key]);
+
         return $this;
     }
 
@@ -1246,17 +1247,23 @@ trait HasAttributes
     {
         [$key, $path] = explode('->', $key, 2);
 
-        $value = $this->asJson($this->getArrayAttributeWithValue(
-            $path, $key, $value
-        ), $this->getJsonCastFlags($key));
+        $this->mergeAttributeFromCachedCasts($key);
 
-        $this->attributes[$key] = $this->isEncryptedCastable($key)
-            ? $this->castAttributeAsEncryptedString($key, $value)
-            : $value;
+        $value = $this->castAttributeAsJson($key, $this->getArrayAttributeWithValue(
+            $path, $key, $value
+        ));
+
+        $this->attributes[$key] = match (true) {
+            $this->isEncryptedCastable($key) => $this->castAttributeAsEncryptedString($key, $value),
+            $this->isEncryptedClassCastable($key) => Crypt::encryptString($value),
+            default => $value,
+        };
 
         if ($this->isClassCastable($key)) {
             unset($this->classCastCache[$key]);
         }
+
+        unset($this->attributeCastCache[$key]);
 
         return $this;
     }
@@ -1369,11 +1376,11 @@ trait HasAttributes
             return [];
         }
 
-        return $this->fromJson(
-            $this->isEncryptedCastable($key)
-                ? $this->fromEncryptedString($this->attributes[$key])
-                : $this->attributes[$key]
-        );
+        return $this->fromJson(match (true) {
+            $this->isEncryptedCastable($key) => $this->fromEncryptedString($this->attributes[$key]),
+            $this->isEncryptedClassCastable($key) => Crypt::decryptString($this->attributes[$key]),
+            default => $this->attributes[$key],
+        });
     }
 
     /**
@@ -1797,6 +1804,18 @@ trait HasAttributes
     protected function isEncryptedCastable($key)
     {
         return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+    }
+
+    /**
+     * Determine whether a value is an encrypted class castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isEncryptedClassCastable($key)
+    {
+        return $this->isClassCastable($key) &&
+            Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class]);
     }
 
     /**
@@ -2400,6 +2419,9 @@ trait HasAttributes
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
         } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
             return false;
+        } elseif ($original !== null && $this->hasCast($key, ['encrypted:object', 'encrypted:collection'])) {
+            return $this->fromJson($this->fromEncryptedString($attribute)) ===
+                $this->fromJson($this->fromEncryptedString($original));
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);

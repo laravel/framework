@@ -6,11 +6,10 @@ use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Mockery;
 
 class WithoutOverlappingJobsTest extends QueueTestCase
 {
@@ -19,16 +18,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         OverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command = new OverlappingTestJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $lockKey = (new WithoutOverlapping)->getLockKey($command);
 
@@ -41,7 +37,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         FailedOverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
+        $job = new FakeJob;
 
         $this->expectException(Exception::class);
 
@@ -65,16 +61,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->getLockKey($command = new OverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('release');
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse(OverlappingTestJob::$handled);
     }
@@ -87,16 +80,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->getLockKey($command = new SkipOverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertFalse(SkipOverlappingTestJob::$handled);
     }
@@ -109,16 +99,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->shared()->getLockKey(new OverlappingTestJobWithSharedKeyTwo);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('release');
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize(new OverlappingTestJobWithSharedKeyOne),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse(OverlappingTestJob::$handled);
     }

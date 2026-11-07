@@ -81,7 +81,9 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->migrateDatabases();
+            $this->shouldDispatchMigrationEvents()
+                ? $this->migrateDatabases()
+                : $this->migrateDatabasesWithoutEvents();
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -117,6 +119,36 @@ trait RefreshDatabase
     protected function migrateDatabases()
     {
         $this->artisan('migrate:fresh', $this->migrateFreshUsing());
+    }
+
+    /**
+     * Migrate the database without dispatching database events.
+     *
+     * @return void
+     */
+    protected function migrateDatabasesWithoutEvents()
+    {
+        $database = $this->app->make('db');
+
+        $dispatchers = [];
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $connection = $database->connection($name);
+
+            $dispatchers[$name] = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+        }
+
+        try {
+            $this->migrateDatabases();
+        } finally {
+            foreach ($dispatchers as $name => $dispatcher) {
+                if ($dispatcher) {
+                    $database->connection($name)->setEventDispatcher($dispatcher);
+                }
+            }
+        }
     }
 
     /**
@@ -159,7 +191,7 @@ trait RefreshDatabase
                     RefreshDatabaseState::$migrated = false;
                 }
 
-                $connection->rollBack();
+                $connection->rollBack(0);
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
             }

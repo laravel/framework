@@ -82,7 +82,7 @@ class Authorize
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $model
-     * @return \Illuminate\Database\Eloquent\Model|string
+     * @return \Illuminate\Database\Eloquent\Model|string|null
      */
     protected function getModel($request, $model)
     {

@@ -124,7 +124,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * The registered custom implicit binding callback.
      *
-     * @var array
+     * @var callable|null
      */
     protected $implicitBindingCallback;
 
@@ -761,6 +761,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function dispatch(Request $request)
     {
         $this->currentRequest = $request;
+        $this->current = null;
 
         return $this->dispatchToRoute($request);
     }
@@ -873,15 +874,17 @@ class Router implements BindingRegistrar, RegistrarContract
                         return false;
                     }
 
-                    if (in_array($name, $excluded, true)) {
+                    $class = explode(':', $name, 2)[0];
+
+                    if (in_array($name, $excluded, true) || in_array($class, $excluded, true)) {
                         return true;
                     }
 
-                    if (! class_exists($name)) {
+                    if (! class_exists($class)) {
                         return false;
                     }
 
-                    $reflection = new ReflectionClass($name);
+                    $reflection = new ReflectionClass($class);
 
                     return (new Collection($excluded))->contains(
                         fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)

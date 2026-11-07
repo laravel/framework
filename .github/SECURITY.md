@@ -8,7 +8,7 @@ Please see [our support policy](https://laravel.com/docs/releases#support-policy
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Laravel, please send an email to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within Laravel, please send an email to the Laravel Security team at security@laravel.com. All security vulnerabilities will be promptly addressed.
 
 ### Public PGP Key
 

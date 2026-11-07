@@ -34,9 +34,9 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 ```
 
-> `composer require "illuminate/events"` required when you need to use observers with Eloquent.
+> `composer require "illuminate/events"` is required when you need to use observers with Eloquent.
 
-Once the Capsule instance has been registered. You may use it like so:
+Once the Capsule instance has been registered, you may use it like so:
 
 **Using The Query Builder**
 

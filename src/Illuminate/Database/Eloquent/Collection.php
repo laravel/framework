@@ -62,6 +62,12 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = $this->find($key);
 
+        if ($key instanceof Model) {
+            $key = $key->getKey();
+        }
+
+        $key = $key instanceof Arrayable ? $key->toArray() : $key;
+
         if (is_array($key) && count($result) === count(array_unique($key))) {
             return $result;
         } elseif (! is_array($key) && ! is_null($result)) {
@@ -221,7 +227,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        if ($this->isNotEmpty()) {
+        if ($this->isNotEmpty() && ! empty($relations)) {
             $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
             foreach ($query->getEagerLoads() as $key => $value) {
@@ -306,7 +312,9 @@ class Collection extends BaseCollection implements QueueableCollection
             $models = $models->collapse();
         }
 
-        $this->loadMissingRelation(new static($models), $path);
+        $models->groupBy(fn ($model) => $model::class)->each(
+            fn ($models) => $this->loadMissingRelation(new static($models), $path)
+        );
     }
 
     /**
@@ -321,7 +329,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->load(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }
@@ -338,7 +348,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->loadCount(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }

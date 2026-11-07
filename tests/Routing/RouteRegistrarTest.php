@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Routing;
 use BadMethodCallException;
 use FooController;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
@@ -16,7 +16,6 @@ use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use InvalidArgumentException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
@@ -34,7 +33,7 @@ class RouteRegistrarTest extends TestCase
         $container = new Container;
         $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
-        $this->router = new Router(Mockery::mock(Dispatcher::class), $container);
+        $this->router = new Router(new Dispatcher, $container);
     }
 
     public function testMiddlewareFluentRegistration()
@@ -232,6 +231,15 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($this->getRoute()->matches(Request::create('users', 'QUERY')));
         $this->assertSame(['QUERY'], $this->getRoute()->methods());
+        $this->seeMiddleware('query-middleware');
+    }
+
+    public function testCanRegisterQueryRouteWithControllerAction()
+    {
+        $this->router->middleware('query-middleware')
+            ->query('users', RouteRegistrarControllerStub::class.'@index');
+
+        $this->seeResponse('controller', Request::create('users', 'QUERY'));
         $this->seeMiddleware('query-middleware');
     }
 

@@ -56,11 +56,11 @@ class GenericUser implements UserContract
     /**
      * Get the password for the user.
      *
-     * @return string
+     * @return string|null
      */
     public function getAuthPassword()
     {
-        return $this->attributes[$this->getAuthPasswordName()];
+        return $this->attributes[$this->getAuthPasswordName()] ?? null;
     }
 
     /**
@@ -76,7 +76,7 @@ class GenericUser implements UserContract
     /**
      * Set the "remember me" token value.
      *
-     * @param  string  $value
+     * @param  string|null  $value
      * @return void
      */
     public function setRememberToken($value)

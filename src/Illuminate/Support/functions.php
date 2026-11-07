@@ -92,7 +92,7 @@ if (! function_exists('Illuminate\Support\seconds')) {
      */
     function seconds(int|float $seconds): CarbonInterval
     {
-        return CarbonInterval::seconds($seconds);
+        return CarbonInterval::make($seconds, 'seconds');
     }
 }
 
@@ -102,7 +102,7 @@ if (! function_exists('Illuminate\Support\minutes')) {
      */
     function minutes(int|float $minutes): CarbonInterval
     {
-        return CarbonInterval::minutes($minutes);
+        return CarbonInterval::make($minutes, 'minutes');
     }
 }
 
@@ -112,7 +112,7 @@ if (! function_exists('Illuminate\Support\hours')) {
      */
     function hours(int|float $hours): CarbonInterval
     {
-        return CarbonInterval::hours($hours);
+        return CarbonInterval::make($hours, 'hours');
     }
 }
 
@@ -122,7 +122,7 @@ if (! function_exists('Illuminate\Support\days')) {
      */
     function days(int|float $days): CarbonInterval
     {
-        return CarbonInterval::days($days);
+        return CarbonInterval::make($days, 'days');
     }
 }
 

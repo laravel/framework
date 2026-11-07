@@ -38,14 +38,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $readPdo;
 
@@ -59,7 +59,7 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection used for direct connections.
      *
-     * @var \PDO|(\Closure(): \PDO)
+     * @var \PDO|(\Closure(): \PDO)|null
      */
     protected $directPdo;
 
@@ -106,6 +106,13 @@ class Connection implements ConnectionInterface
     protected $reconnector;
 
     /**
+     * Indicates if the connection is reconnecting after a lost connection.
+     *
+     * @var bool
+     */
+    protected $reconnecting = false;
+
+    /**
      * The query grammar implementation.
      *
      * @var \Illuminate\Database\Query\Grammars\Grammar
@@ -115,7 +122,7 @@ class Connection implements ConnectionInterface
     /**
      * The schema grammar implementation.
      *
-     * @var \Illuminate\Database\Schema\Grammars\Grammar
+     * @var \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     protected $schemaGrammar;
 
@@ -1044,8 +1051,15 @@ class Connection implements ConnectionInterface
      */
     protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
     {
-        if ($this->causedByLostConnection($e->getPrevious())) {
-            $this->reconnect();
+        // Queries run while reconnecting (e.g. from ConnectionEstablished listeners) must not reconnect again...
+        if (! $this->reconnecting && $this->causedByLostConnection($e->getPrevious())) {
+            $this->reconnecting = true;
+
+            try {
+                $this->reconnect();
+            } finally {
+                $this->reconnecting = false;
+            }
 
             return $this->runQueryCallback($query, $bindings, $callback);
         }
@@ -1090,7 +1104,7 @@ class Connection implements ConnectionInterface
     {
         $this->transactionsManager?->rollback($this->getName(), 0);
 
-        $this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
+        @$this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
     }
 
     /**
@@ -1122,7 +1136,7 @@ class Connection implements ConnectionInterface
     /**
      * Register a database query listener with the connection.
      *
-     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted)  $callback
+     * @param  \Closure(\Illuminate\Database\Events\QueryExecuted): mixed  $callback
      * @return void
      */
     public function listen(Closure $callback)
@@ -1295,6 +1309,27 @@ class Connection implements ConnectionInterface
         $this->readOnWriteConnection = $value;
 
         return $this;
+    }
+
+    /**
+     * Execute the given callback using the write PDO connection for reads.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function usingWritePdo(Closure $callback): mixed
+    {
+        $readOnWriteConnection = $this->readOnWriteConnection;
+
+        $this->useWriteConnectionWhenReading();
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->useWriteConnectionWhenReading($readOnWriteConnection);
+        }
     }
 
     /**
@@ -1873,6 +1908,45 @@ class Connection implements ConnectionInterface
     public function getServerVersion(): string
     {
         return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+    }
+
+    /**
+     * Get the ID of the last committed transaction.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getLastCommitId()
+    {
+        throw new RuntimeException('The database connection does not support retrieving the last commit ID.');
+    }
+
+    /**
+     * Calculate the commit ID for a set of commit IDs that includes all of them.
+     *
+     * @param  string[]  $values
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function mergeCommitIds(array $values)
+    {
+        throw new RuntimeException('The database connection does not support managing commit IDs.');
+    }
+
+    /**
+     * Determine if the given commit ID has been applied.
+     *
+     * @param  string  $value
+     * @param  int  $wait
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function hasCommitId(string $value, int $wait = 0)
+    {
+        throw new RuntimeException('The database connection does not support checking a commit ID.');
     }
 
     /**

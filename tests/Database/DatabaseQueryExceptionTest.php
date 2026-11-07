@@ -3,15 +3,24 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseQueryExceptionTest extends TestCase
 {
+    use VerifiesDoubles;
+
+    protected function tearDown(): void
+    {
+        DB::clearResolvedInstance('db');
+    }
+
     public function testIfItEmbedsBindingsIntoSql()
     {
         $connection = $this->getConnection();
@@ -24,7 +33,7 @@ class DatabaseQueryExceptionTest extends TestCase
         $pdoException = new PDOException('Mock SQL error');
         $exception = new QueryException($connection->getName(), $sql, $bindings, $pdoException);
 
-        DB::shouldReceive('connection')->andReturn($connection);
+        DB::swap($this->getConnectionResolver($connection));
         $result = $exception->getRawSql();
 
         $this->assertSame($expectedSql, $result);
@@ -42,7 +51,7 @@ class DatabaseQueryExceptionTest extends TestCase
         $pdoException = new PDOException('Mock SQL error');
         $exception = new QueryException($connection->getName(), $sql, $bindings, $pdoException);
 
-        DB::shouldReceive('connection')->andReturn($connection);
+        DB::swap($this->getConnectionResolver($connection));
         $result = $exception->getRawSql();
 
         $this->assertSame($expectedSql, $result);
@@ -176,15 +185,23 @@ class DatabaseQueryExceptionTest extends TestCase
 
     protected function getConnection()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
 
         $grammar = new Grammar($connection);
 
-        $connection->shouldReceive('getName')->andReturn('default');
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $connection->shouldReceive('escape')->with(1, false)->andReturn(1);
-        $connection->shouldReceive('escape')->with('br', false)->andReturn("'br'");
+        $connection->allows('getName')->returns('default');
+        $connection->allows('getQueryGrammar')->returns($grammar);
+        $connection->allows('escape')->with(1, false)->returns(1);
+        $connection->allows('escape')->with('br', false)->returns("'br'");
 
         return $connection;
+    }
+
+    protected function getConnectionResolver($connection)
+    {
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+
+        return $resolver;
     }
 }

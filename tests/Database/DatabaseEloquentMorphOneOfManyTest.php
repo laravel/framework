@@ -40,6 +40,12 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
             $table->string('state');
             $table->string('type')->nullable();
         });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->nullableMorphs('commentable');
+            $table->integer('score')->default(0);
+        });
     }
 
     /**
@@ -51,6 +57,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $this->schema()->drop('products');
         $this->schema()->drop('states');
+        $this->schema()->drop('comments');
     }
 
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
@@ -196,6 +203,19 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $this->assertTrue($product->current_foo_state_exists);
     }
 
+    public function testExistenceQueriesOnSelfReferencingRelation()
+    {
+        $first = MorphOneOfManyTestComment::create();
+        $second = MorphOneOfManyTestComment::create();
+        $first->replies()->create(['score' => 5]);
+        $first->replies()->create(['score' => 3]);
+        $second->replies()->create(['score' => 1]);
+
+        $this->assertEquals([$first->id, $second->id], MorphOneOfManyTestComment::has('latestReply')->pluck('id')->all());
+        $this->assertEquals([$first->id], MorphOneOfManyTestComment::whereHas('topReply', fn ($query) => $query->where('score', 5))->pluck('id')->all());
+        $this->assertEquals([1, 1, 0, 0, 0], MorphOneOfManyTestComment::withCount('latestReply')->pluck('latest_reply_count')->all());
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -253,4 +273,26 @@ class MorphOneOfManyTestState extends Eloquent
     protected $guarded = [];
     public $timestamps = false;
     protected $fillable = ['state', 'type'];
+}
+
+class MorphOneOfManyTestComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function replies()
+    {
+        return $this->morphMany(self::class, 'commentable');
+    }
+
+    public function latestReply()
+    {
+        return $this->morphOne(self::class, 'commentable')->latestOfMany();
+    }
+
+    public function topReply()
+    {
+        return $this->morphOne(self::class, 'commentable')->ofMany('score', 'max');
+    }
 }

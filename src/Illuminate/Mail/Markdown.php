@@ -87,12 +87,14 @@ class Markdown
                 if (static::$withSecuredEncoding === true) {
                     EncodedHtmlString::encodeUsing(function ($value) {
                         $replacements = [
+                            '\\' => '\\\\',
                             '[' => '\[',
+                            ']' => '\]',
                             '<' => '&lt;',
                             '>' => '&gt;',
                         ];
 
-                        return str_replace(array_keys($replacements), array_values($replacements), $value);
+                        return strtr($value, $replacements);
                     });
                 }
 
@@ -116,8 +118,12 @@ class Markdown
                 : 'mail::themes.'.$this->theme;
         }
 
+        $contents = static::$withSecuredEncoding === true
+            ? strtr($contents, ['\\\\' => '\\', '\[' => '[', '\]' => ']'])
+            : str_replace('\[', '[', $contents);
+
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            str_replace('\[', '[', $contents), $this->view->make($theme, $data)->render()
+            $contents, $this->view->make($theme, $data)->render()
         ));
     }
 
@@ -157,11 +163,12 @@ class Markdown
         if (static::$withSecuredEncoding === true || $encoded === true) {
             EncodedHtmlString::encodeUsing(function ($value) {
                 $replacements = [
+                    '\\' => '\\\\',
                     '[' => '\[',
                     '<' => '\<',
                 ];
 
-                $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+                $html = strtr($value, $replacements);
 
                 return static::converter([
                     'html_input' => 'escape',

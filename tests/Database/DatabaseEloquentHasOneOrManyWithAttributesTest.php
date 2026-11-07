@@ -284,6 +284,50 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame($parentId, $relatedModel->parent_id);
         $this->assertTrue($relatedModel->is_admin);
     }
+
+    public function testHasManyForceCreateAddsAttributes(): void
+    {
+        $this->createTable();
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = 123;
+
+        $relatedModel = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes(['is_admin' => true])
+            ->forceCreate();
+
+        $this->assertSame(123, $relatedModel->parent_id);
+        $this->assertTrue($relatedModel->fresh()->is_admin);
+    }
+
+    public function testMorphManyForceCreateAddsAttributes(): void
+    {
+        $this->createTable();
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = 123;
+
+        $relatedModel = $parent
+            ->morphMany(RelatedWithAttributesModel::class, 'relatable')
+            ->withAttributes(['is_admin' => true])
+            ->forceCreate();
+
+        $this->assertSame(123, $relatedModel->relatable_id);
+        $this->assertSame($parent::class, $relatedModel->relatable_type);
+        $this->assertTrue($relatedModel->fresh()->is_admin);
+    }
+
+    protected function createTable(): void
+    {
+        DB::schema()->create((new RelatedWithAttributesModel)->getTable(), function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->nullableMorphs('relatable');
+            $table->boolean('is_admin')->default(false);
+            $table->timestamps();
+        });
+    }
 }
 
 class RelatedWithAttributesModel extends Model

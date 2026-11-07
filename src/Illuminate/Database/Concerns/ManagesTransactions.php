@@ -92,6 +92,12 @@ trait ManagesTransactions
         // let the developer handle it in another way. We will decrement too.
         if ($this->causedByConcurrencyError($e) &&
             $this->transactions > 1) {
+            try {
+                $this->performRollBack($this->transactions - 1);
+            } catch (Throwable) {
+                //
+            }
+
             $this->transactions--;
 
             $this->transactionsManager?->rollback(
@@ -233,6 +239,10 @@ trait ManagesTransactions
     {
         $this->transactions = max(0, $this->transactions - 1);
 
+        $this->transactionsManager?->rollback(
+            $this->getName(), $this->transactions
+        );
+
         if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             $pdo = $this->getPdo();
 
@@ -324,6 +334,8 @@ trait ManagesTransactions
     {
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
+
+            $this->pdo = null;
 
             $this->transactionsManager?->rollback(
                 $this->getName(), $this->transactions

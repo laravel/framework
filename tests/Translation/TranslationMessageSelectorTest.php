@@ -30,6 +30,23 @@ class TranslationMessageSelectorTest extends TestCase
         $this->assertSame('plural', $selector->choose('singular|plural', 0.5, 'en'));
     }
 
+    public function testChooseUsesAbsoluteValueForPluralRules()
+    {
+        $selector = new MessageSelector;
+
+        $this->assertSame('item', $selector->choose('item|items', -1, 'en'));
+        $this->assertSame('items', $selector->choose('item|items', -2, 'en'));
+
+        $this->assertSame('файл', $selector->choose('файл|файла|файлов', -1, 'ru'));
+        $this->assertSame('файла', $selector->choose('файл|файла|файлов', -2, 'ru'));
+        $this->assertSame('файлов', $selector->choose('файл|файла|файлов', -5, 'ru'));
+        $this->assertSame('файл', $selector->choose('файл|файла|файлов', -21, 'ru'));
+
+        $this->assertSame('minus one', $selector->choose('{-1} minus one|[*,*] other', -1, 'en'));
+        $this->assertSame('items', $selector->choose('item|items', '-3', 'en'));
+        $this->assertSame('items', $selector->choose('item|items', null, 'en'));
+    }
+
     public static function chooseTestData()
     {
         return [

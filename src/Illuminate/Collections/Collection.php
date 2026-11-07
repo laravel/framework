@@ -126,22 +126,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mode($key = null)
     {
-        if ($this->isEmpty()) {
+        $collection = (isset($key) ? $this->pluck($key) : $this)
+            ->reject(fn ($item) => is_null($item));
+
+        if ($collection->isEmpty()) {
             return;
         }
 
-        $collection = isset($key) ? $this->pluck($key) : $this;
-
         $counts = $this->newInstance();
 
-        $collection->each(fn ($value) => $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1);
+        $floats = [];
+
+        $collection->each(function ($value) use ($counts, &$floats) {
+            if (is_float($value)) {
+                $floats[$key = (string) $value] = $value;
+            } else {
+                $key = $value;
+            }
+
+            $counts[$key] = isset($counts[$key]) ? $counts[$key] + 1 : 1;
+        });
 
         $sorted = $counts->sort();
 
         $highestValue = $sorted->last();
 
         return $sorted->filter(fn ($value) => $value == $highestValue)
-            ->sort()->keys()->all();
+            ->sort()->keys()->map(fn ($key) => is_string($key) ? $floats[$key] ?? $key : $key)->all();
     }
 
     /**
@@ -168,7 +179,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $results = [];
 
         foreach ($this->items as $values) {
-            if ($values instanceof Collection) {
+            if ($values instanceof Enumerable) {
                 $values = $values->all();
             } elseif (! is_array($values)) {
                 continue;
@@ -1282,16 +1293,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             throw new InvalidArgumentException('Number of shifted items may not be less than zero.');
         }
 
-        if ($this->isEmpty()) {
-            return null;
-        }
-
         if ($count === 0) {
             return $this->newInstance();
         }
 
         if ($count === 1) {
             return array_shift($this->items);
+        }
+
+        if ($this->isEmpty()) {
+            return $this->newInstance();
         }
 
         $results = [];
@@ -1497,7 +1508,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue
@@ -1672,7 +1683,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                         }
                     } else {
                         $result = match ($options) {
-                            SORT_NUMERIC => (int) $values[0] <=> (int) $values[1],
+                            SORT_NUMERIC => (float) $values[0] <=> (float) $values[1],
                             SORT_STRING => strcmp($values[0], $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
                             SORT_LOCALE_STRING => strcoll($values[0], $values[1]),

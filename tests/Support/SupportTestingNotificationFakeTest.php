@@ -78,6 +78,14 @@ class SupportTestingNotificationFakeTest extends TestCase
         });
     }
 
+    public function testAssertSentToWithArrayOfProperties()
+    {
+        $this->fake->send($this->user, new NotificationWithPropertiesStub('pending'));
+
+        $this->fake->assertSentTo($this->user, NotificationWithPropertiesStub::class, ['status' => 'pending']);
+        $this->fake->assertNotSentTo($this->user, NotificationWithPropertiesStub::class, ['status' => 'complete']);
+    }
+
     public function testAssertNotSentTo()
     {
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
@@ -276,6 +284,13 @@ class NotificationWithFalsyShouldSendStub extends Notification
     public function shouldSend($notifiable, $channel)
     {
         return false;
+    }
+}
+
+class NotificationWithPropertiesStub extends NotificationStub
+{
+    public function __construct(public string $status)
+    {
     }
 }
 

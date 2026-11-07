@@ -27,7 +27,7 @@ use function Illuminate\Support\enum_value;
  */
 class QueueFake extends QueueManager implements Fake, Queue
 {
-    use ReadsQueueAttributes, ReflectsClosures;
+    use MatchesProperties, ReadsQueueAttributes, ReflectsClosures;
 
     /**
      * The original queue manager.
@@ -132,7 +132,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string|\Closure  $job
-     * @param  callable|int|null  $callback
+     * @param  callable|array<string, mixed>|int|null  $callback
      * @return void
      */
     public function assertPushed($job, $callback = null)
@@ -188,7 +188,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  \UnitEnum|string  $queue
      * @param  string|\Closure  $job
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertPushedOn($queue, $job, $callback = null)
@@ -198,6 +198,8 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         $queue = enum_value($queue);
+
+        $callback = $this->resolveTruthTest($callback);
 
         $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if (enum_value($pushedQueue) !== $queue) {
@@ -326,7 +328,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Determine if a job was pushed based on a truth-test callback.
      *
      * @param  string|\Closure  $job
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertNotPushed($job, $callback = null)
@@ -373,7 +375,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $job
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function pushed($job, $callback = null)
@@ -382,7 +384,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->jobs[$job]))->filter(
             fn ($data) => $callback($data['job'], $data['queue'], $data['data'])
@@ -681,7 +683,8 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
-            if ($job instanceof ShouldBeUnique) {
+            if ($job instanceof ShouldBeUnique ||
+                ($job instanceof CallQueuedListener && $job->shouldBeUnique())) {
                 $this->uniqueJobs[] = $job;
             }
         } else {
@@ -899,6 +902,10 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function releaseUniqueJobLocks()
     {
+        if (empty($this->uniqueJobs)) {
+            return;
+        }
+
         $lock = new UniqueLock($this->app->make(Cache::class));
 
         foreach ($this->uniqueJobs as $job) {

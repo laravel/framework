@@ -115,4 +115,36 @@ else
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testElsePushIfWithMoreThanOneCommaIsCompiled()
+    {
+        $string = '@pushIf(true, \'stack\')
+if
+@elsePushIf(in_array($x, [3, 4]), \'scripts\')
+elseif
+@endPushIf';
+        $expected = '<?php if(true): $__env->startPush( \'stack\'); ?>
+if
+<?php $__env->stopPush(); elseif(in_array($x, [3, 4])): $__env->startPush(\'scripts\'); ?>
+elseif
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testElsePushIfWithCommaInStringIsCompiled()
+    {
+        $string = '@pushIf(true, \'stack\')
+if
+@elsePushIf(Str::startsWith(\'abc,,,\', \'a,,,\'), \'body-end\')
+elseif
+@endPushIf';
+        $expected = '<?php if(true): $__env->startPush( \'stack\'); ?>
+if
+<?php $__env->stopPush(); elseif(Str::startsWith(\'abc,,,\', \'a,,,\')): $__env->startPush(\'body-end\'); ?>
+elseif
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }

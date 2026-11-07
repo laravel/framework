@@ -8,16 +8,18 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\RequestGuard;
-use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $auth;
 
     protected function setUp(): void
@@ -244,7 +246,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, new Request, Mockery::mock(EloquentUserProvider::class));
+        }, new Request, Double::for(EloquentUserProvider::class));
     }
 
     /**
@@ -257,9 +259,7 @@ class AuthenticateMiddlewareTest extends TestCase
      */
     protected function authenticate(...$guards)
     {
-        $request = Mockery::mock(Request::class);
-
-        $request->shouldReceive('expectsJson')->andReturn(false);
+        $request = Request::create('/');
 
         $nextParam = null;
 

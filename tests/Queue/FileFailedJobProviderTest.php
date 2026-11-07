@@ -119,6 +119,38 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertEmpty($failedJobs);
     }
 
+    public function testCanFlushFailedJobsForASingleQueue()
+    {
+        $this->logFailedJob('connection', 'emails');
+        $this->logFailedJob('connection', 'emails');
+        $this->logFailedJob('connection', 'default');
+
+        $this->provider->flush(queue: 'emails');
+
+        $failedJobs = $this->provider->all();
+
+        $this->assertCount(1, $failedJobs);
+        $this->assertSame('default', $failedJobs[0]->queue);
+    }
+
+    public function testCanFlushFailedJobsForASingleQueueByHours()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->logFailedJob('connection', 'emails');
+        $this->logFailedJob('connection', 'default');
+
+        Carbon::setTestNow($now->copy()->addHours(10));
+
+        $this->logFailedJob('connection', 'emails');
+
+        $this->provider->flush(5, 'emails');
+
+        $this->assertCount(2, $this->provider->all());
+        $this->assertSame(1, $this->provider->count(queue: 'emails'));
+        $this->assertSame(1, $this->provider->count(queue: 'default'));
+    }
+
     public function testCanPruneFailedJobs()
     {
         $this->logFailedJob();

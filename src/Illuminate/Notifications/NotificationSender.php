@@ -166,6 +166,8 @@ class NotificationSender
             return;
         }
 
+        $this->failedEventWasDispatched = false;
+
         try {
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
         } catch (Throwable $exception) {
@@ -313,5 +315,18 @@ class NotificationSender
         }
 
         return $notifiables;
+    }
+
+    /**
+     * Set the locale to be used when sending notifications.
+     *
+     * @param  string|null  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 }

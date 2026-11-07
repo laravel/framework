@@ -32,7 +32,7 @@ class Builder
     /**
      * The Blueprint resolver callback.
      *
-     * @var \Closure(\Illuminate\Database\Connection, string, \Closure|null): \Illuminate\Database\Schema\Blueprint
+     * @var (\Closure(\Illuminate\Database\Connection, string, \Closure|null): \Illuminate\Database\Schema\Blueprint)|null
      */
     protected $resolver;
 
@@ -382,6 +382,24 @@ class Builder
     public function getColumnListing($table)
     {
         return array_column($this->getColumns($table), 'name');
+    }
+
+    /**
+     * Get the column for a given table.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return array{name: string, type: string, type_name: string, collation: string|null, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}
+     */
+    public function getColumn($table, $column)
+    {
+        foreach ($this->getColumns($table) as $value) {
+            if (strtolower($value['name']) === strtolower($column)) {
+                return $value;
+            }
+        }
+
+        return [];
     }
 
     /**

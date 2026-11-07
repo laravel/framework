@@ -7,7 +7,7 @@ class ListenerOptions extends WorkerOptions
     /**
      * The environment the worker should run in.
      *
-     * @var string
+     * @var string|null
      */
     public $environment;
 

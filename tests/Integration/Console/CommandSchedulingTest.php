@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use ErrorException;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -54,13 +55,12 @@ class CommandSchedulingTest extends TestCase
     protected function tearDown(): void
     {
         $this->fs->delete($this->logfile);
-        $this->fs->delete(base_path('artisan'));
 
-        if (! is_null($this->originalArtisan)) {
-            $this->fs->put(base_path('artisan'), $this->originalArtisan);
+        try {
+            $this->restoreArtisanScript();
+        } finally {
+            parent::tearDown();
         }
-
-        parent::tearDown();
     }
 
     #[DataProvider('executionProvider')]
@@ -122,6 +122,38 @@ class CommandSchedulingTest extends TestCase
             $tries++;
             usleep($sleep);
         } while ($tries < $limit);
+    }
+
+    protected function restoreArtisanScript()
+    {
+        $path = base_path('artisan');
+
+        $tries = 0;
+        $sleep = 100000; // 100K microseconds = 0.1 second
+        $limit = 50; // 0.1s * 50 = 5 second wait limit
+
+        // On Windows, a background process may still have the script open, which
+        // blocks replacing or removing it until that process has fully exited.
+        do {
+            try {
+                if (is_null($this->originalArtisan)) {
+                    $this->fs->delete($path);
+                } else {
+                    $this->fs->put($path, $this->originalArtisan);
+                }
+            } catch (ErrorException) {
+                //
+            }
+
+            if (($this->fs->exists($path) ? $this->fs->get($path) : null) === $this->originalArtisan) {
+                return;
+            }
+
+            $tries++;
+            usleep($sleep);
+        } while ($tries < $limit);
+
+        $this->fail("Unable to restore the artisan script at [{$path}].");
     }
 
     protected function assertLogged(...$messages)

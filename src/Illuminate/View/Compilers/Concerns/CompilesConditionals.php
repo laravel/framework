@@ -412,7 +412,16 @@ trait CompilesConditionals
      */
     protected function compileElsePushIf($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression), 2);
+        $parts = explode(',', $this->stripParentheses($expression));
+
+        if (count($parts) > 2) {
+            $last = array_pop($parts);
+
+            $parts = [
+                implode(',', $parts),
+                trim($last),
+            ];
+        }
 
         return "<?php \$__env->stopPush(); elseif({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
     }

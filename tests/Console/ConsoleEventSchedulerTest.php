@@ -10,7 +10,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
-use Mockery;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
@@ -24,19 +24,21 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $container->instance(EventMutex::class, Mockery::mock(CacheEventMutex::class));
+        $cache = new FakeCacheFactory;
 
-        $container->instance(SchedulingMutex::class, Mockery::mock(CacheSchedulingMutex::class));
+        $container->instance(EventMutex::class, new CacheEventMutex($cache));
 
-        $container->instance(Schedule::class, $this->schedule = new Schedule(Mockery::mock(EventMutex::class)));
+        $container->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
+
+        $container->instance(Schedule::class, $this->schedule = new Schedule);
     }
 
     public function testMutexCanReceiveCustomStore()
     {
-        Container::getInstance()->make(EventMutex::class)->expects('useStore')->with('test');
-        Container::getInstance()->make(SchedulingMutex::class)->expects('useStore')->with('test');
-
         $this->schedule->useCache('test');
+
+        $this->assertSame('test', Container::getInstance()->make(EventMutex::class)->store);
+        $this->assertSame('test', Container::getInstance()->make(SchedulingMutex::class)->store);
     }
 
     public function testExecCreatesNewCommand()

@@ -168,7 +168,13 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->scoped(fn (): stdClass => new stdClass);
+
+        $first = $container->make(stdClass::class);
+        $this->assertSame($first, $container->make(stdClass::class));
+
         $container->forgetScopedInstances();
+
+        $this->assertNotSame($first, $container->make(stdClass::class));
     }
 
     public function testScopedIf()
@@ -888,9 +894,7 @@ class ContainerTest extends TestCase
         $this->expectException(BindingResolutionException::class);
         $container = new Container;
 
-        $instance = $container->make(WildcardOnlyInterface::class);
-
-        $this->assertInstanceOf(WildcardConcrete::class, $instance);
+        $container->make(WildcardOnlyInterface::class);
     }
 
     public function testBindAttributeIsRecheckedAfterEnvironmentResolverIsSet(): void

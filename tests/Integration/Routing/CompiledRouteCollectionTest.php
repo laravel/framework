@@ -315,6 +315,32 @@ class CompiledRouteCollectionTest extends TestCase
         $this->collection()->match(Request::create('/foo'));
     }
 
+    public function testMatchingRespectsHttpsOnlyRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'account', ['https', 'uses' => 'FooController@index', 'as' => 'account']));
+
+        $routes = $this->collection();
+
+        $this->assertSame('account', $routes->match(Request::create('https://localhost/account'))->getName());
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $routes->match(Request::create('http://localhost/account'));
+    }
+
+    public function testMatchingRespectsHttpOnlyRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'account', ['http', 'uses' => 'FooController@index', 'as' => 'account']));
+
+        $routes = $this->collection();
+
+        $this->assertSame('account', $routes->match(Request::create('http://localhost/account'))->getName());
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $routes->match(Request::create('https://localhost/account'));
+    }
+
     public function testMatchingThrowsMethodNotAllowedHttpExceptionWhenMethodIsNotAllowed()
     {
         $this->routeCollection->add($this->newRoute('GET', '/foo', ['uses' => 'FooController@index']));
@@ -516,6 +542,53 @@ class CompiledRouteCollectionTest extends TestCase
 
         // Access to request path info before matching route
         $request->getPathInfo();
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
+    public function testMatchingRootUriWhenServedFromSubdirectory()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('http://example.com/app/', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
+    public function testMatchingRootUriWithRepeatedSlashes()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('http://example.com//'))->getName());
+
+        $request = Request::create('http://example.com/app//', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
+
+        $this->assertSame('foo', $this->collection()->match($request)->getName());
+    }
+
+    public function testMatchingUriWhenServedFromSubdirectory()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $request = Request::create('http://example.com/app/foo/bar/', 'GET', [], [], [], [
+            'SCRIPT_NAME' => '/app/index.php',
+            'PHP_SELF' => '/app/index.php',
+            'SCRIPT_FILENAME' => '/var/www/public/index.php',
+        ]);
 
         $this->assertSame('foo', $this->collection()->match($request)->getName());
     }

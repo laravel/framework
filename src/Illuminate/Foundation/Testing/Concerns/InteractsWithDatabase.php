@@ -100,13 +100,21 @@ trait InteractsWithDatabase
     /**
      * Assert the count of table entries.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  int  $count
+     * @param  iterable<class-string<\Illuminate\Database\Eloquent\Model>|string, int>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  int|null  $count
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseCount($table, int $count, $connection = null)
+    protected function assertDatabaseCount($table, ?int $count = null, $connection = null)
     {
+        if (is_iterable($table)) {
+            foreach ($table as $name => $expected) {
+                $this->assertDatabaseCount($name, $expected, $connection);
+            }
+
+            return $this;
+        }
+
         $this->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), $count)
         );

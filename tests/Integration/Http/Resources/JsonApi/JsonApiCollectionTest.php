@@ -2,10 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ObjectBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserWithLazyTeamAttributeResource;
 
 class JsonApiCollectionTest extends TestCase
 {
@@ -204,5 +208,97 @@ class JsonApiCollectionTest extends TestCase
                     ],
                 ]
             );
+    }
+
+    public function testItIncludesIdenticalBelongsToManyResourcesOnce()
+    {
+        $users = User::factory()->times(2)->create();
+
+        $team = Team::factory()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $users->each(fn ($user) => $user->teams()->attach($team, ['role' => 'Member']));
+
+        $this->getJson('/users?'.http_build_query(['include' => 'teams', 'fields' => ['teams' => 'name']]))
+            ->assertJsonPath('data.0.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('data.1.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('included', [
+                [
+                    'id' => (string) $team->getKey(),
+                    'type' => 'teams',
+                    'attributes' => [
+                        'name' => 'Laravel Team',
+                    ],
+                ],
+            ]);
+    }
+
+    public function testItIncludesIdenticalBelongsToManyResourcesWithLazyAttributesOnce()
+    {
+        $users = User::factory()->times(2)->create();
+
+        $team = Team::factory()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $users->each(fn ($user) => $user->teams()->attach($team, ['role' => 'Member']));
+
+        Route::get('users-with-lazy-team-attributes', function () {
+            return UserWithLazyTeamAttributeResource::collection(User::all());
+        });
+
+        $this->getJson('/users-with-lazy-team-attributes?'.http_build_query(['include' => 'teams']))
+            ->assertOk()
+            ->assertJsonPath('included', [
+                [
+                    'id' => (string) $team->getKey(),
+                    'type' => 'teams',
+                    'attributes' => [
+                        'name' => 'Laravel Team',
+                        'tags' => ['php'],
+                    ],
+                ],
+            ]);
+    }
+
+    public function testItEagerLoadsIncludesForAllResourcesAtOnce()
+    {
+        $users = User::factory()->times(3)->create();
+
+        foreach ($users as $user) {
+            Profile::factory()->create(['user_id' => $user->getKey()]);
+            Post::factory()->create(['user_id' => $user->getKey()]);
+        }
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'author.profile']))
+            ->assertOk()
+            ->assertJsonCount(6, 'included');
+
+        // One query for the count, one for the posts, one for the authors and one for their profiles...
+        $this->assertCount(4, DB::getQueryLog());
+    }
+
+    public function testItCanGenerateJsonApiResponseForObjectBackedResources()
+    {
+        Route::get('things', function () {
+            return ObjectBackedJsonApiResource::collection([(object) ['id' => 99, 'name' => 'test']]);
+        });
+
+        $this->getJson('/things')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    [
+                        'id' => '99',
+                        'type' => 'things',
+                        'attributes' => [
+                            'name' => 'test',
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

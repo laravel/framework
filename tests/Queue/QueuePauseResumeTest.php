@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\Events\QueuePaused;
@@ -11,12 +12,15 @@ use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\Events\QueuesPaused;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class QueuePauseResumeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $manager;
     protected $cache;
 
@@ -30,8 +34,8 @@ class QueuePauseResumeTest extends TestCase
     protected function createManager($cache)
     {
         // Mock the cache facade to return our cache repository
-        $cacheMock = Mockery::mock();
-        $cacheMock->shouldReceive('store')->andReturn($cache);
+        $cacheMock = Double::for(CacheFactory::class);
+        $cacheMock->allows('store')->returns($cache);
 
         $app = [
             'config' => [
@@ -286,6 +290,15 @@ class QueuePauseResumeTest extends TestCase
 
         $this->manager->pauseFor(PauseQueueName::Emails, 30, PauseQueueConnection::Redis);
         $this->assertTrue($this->manager->isPaused('emails', 'redis'));
+    }
+
+    public function testEnumsAreAcceptedWhenCheckingIfAQueueIsPaused()
+    {
+        $this->assertFalse($this->manager->isPaused(PauseQueueName::Emails, PauseQueueConnection::Redis));
+
+        $this->manager->pause('emails', 'redis');
+
+        $this->assertTrue($this->manager->isPaused(PauseQueueName::Emails, PauseQueueConnection::Redis));
     }
 }
 

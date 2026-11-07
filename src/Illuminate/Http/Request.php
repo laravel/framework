@@ -45,7 +45,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * All of the converted files for the request.
      *
-     * @var array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>
+     * @var array<string, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>|null
      */
     protected $convertedFiles;
 
@@ -682,7 +682,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string|null  $param
      * @param  mixed  $default
-     * @return ($param is null ? \Illuminate\Routing\Route : object|string|null)
+     * @return ($param is null ? \Illuminate\Routing\Route|null : object|string|null)
      */
     public function route($param = null, $default = null)
     {

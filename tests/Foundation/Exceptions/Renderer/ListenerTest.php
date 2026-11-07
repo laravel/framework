@@ -2,19 +2,29 @@
 
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
+use Illuminate\Database\Capsule\Manager;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
+    use VerifiesDoubles;
+
+    protected function getRealConnection(): Connection
+    {
+        $capsule = new Manager;
+        $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:'], 'testing');
+
+        return $capsule->getConnection('testing');
+    }
+
     public function test_queries_returns_expected_shape_after_query_executed()
     {
-        $connection = Mockery::mock();
-
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->with(['foo'])->andReturn(['foo']);
+        $connection = $this->getRealConnection();
 
         $event = new QueryExecuted('select * from users where id = ?', ['foo'], 5.2, $connection);
 
@@ -44,9 +54,9 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->times(150)->andReturn('testing');
-        $connection->expects('prepareBindings')->times(100)->andReturnUsing(fn ($b) => $b);
+        $connection = Double::for(Connection::class);
+        $connection->expects('getName')->times(150)->returns('testing');
+        $connection->expects('prepareBindings')->times(100)->resolves(fn ($b) => $b);
 
         for ($i = 0; $i < 150; $i++) {
             $listener->onQueryExecuted(
@@ -63,9 +73,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         $largeSql = str_repeat('x', 5000);
         $listener->onQueryExecuted(
@@ -79,9 +87,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         // Build SQL with 500 placeholders — when truncated to 2000 bytes,
         // only some ? will remain, and bindings should match that count.
@@ -103,9 +109,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         // 1 placeholder but 1000 bindings — only 1 binding should be kept
         $listener->onQueryExecuted(
@@ -119,9 +123,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         $sql = 'select * from users where name = ?';
         $listener->onQueryExecuted(
@@ -136,9 +138,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         $listener->onQueryExecuted(
             new QueryExecuted('select count(*) from users', [], 1.0, $connection)
@@ -152,9 +152,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->getRealConnection();
 
         $sql = 'select * from users where id = ? and name = ? and email = ?';
         $bindings = [1, 'John', 'john@example.com'];

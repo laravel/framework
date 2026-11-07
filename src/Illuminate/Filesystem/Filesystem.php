@@ -26,6 +26,10 @@ class Filesystem
      */
     public function exists($path)
     {
+        if ($this->hasDangerousStreamWrapper($path)) {
+            return false;
+        }
+
         return file_exists($path);
     }
 
@@ -560,7 +564,30 @@ class Filesystem
      */
     public function isFile($file)
     {
+        if ($this->hasDangerousStreamWrapper($file)) {
+            return false;
+        }
+
         return is_file($file);
+    }
+
+    /**
+     * Determine if the given path uses a stream wrapper that could trigger PHP object deserialization.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    protected function hasDangerousStreamWrapper($path)
+    {
+        $path = (string) $path;
+
+        if (! str_starts_with(strtolower($path), 'phar://')) {
+            return false;
+        }
+
+        $running = class_exists(\Phar::class, false) ? \Phar::running() : '';
+
+        return $running === '' || ! str_starts_with($path, $running.'/');
     }
 
     /**

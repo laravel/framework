@@ -7,24 +7,29 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Support\Collection;
 use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testNotificationsCanBeSent()
     {
         $notification = new TestNotification;
         $job = new SendQueuedNotifications('notifiables', $notification);
-        $manager = Mockery::mock(ChannelManager::class);
-        $manager->expects('sendNow')->withArgs(function ($notifiables, $notification, $channels) {
+        $manager = Double::for(ChannelManager::class);
+        $manager->expects('sendNow')->with(Argument::all(function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
                 && $notification instanceof TestNotification
                 && $channels === null;
-        });
+        }));
         $job->handle($manager);
     }
 
@@ -69,6 +74,13 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertTrue($job->failOnTimeout);
     }
+
+    public function testNotificationRespectsCountCrashesAsExceptions()
+    {
+        $this->assertTrue((new SendQueuedNotifications(new NotifiableUser, new CountCrashesAttributeNotification))->countCrashesAsExceptions);
+        $this->assertTrue((new SendQueuedNotifications(new NotifiableUser, new CountCrashesPropertyNotification))->countCrashesAsExceptions);
+        $this->assertFalse((new SendQueuedNotifications(new NotifiableUser, new TestNotification))->countCrashesAsExceptions);
+    }
 }
 
 class TestNotification extends Notification
@@ -78,4 +90,14 @@ class TestNotification extends Notification
 #[FailOnTimeout]
 class FailOnTimeoutNotification extends Notification
 {
+}
+
+#[CountCrashesAsExceptions]
+class CountCrashesAttributeNotification extends Notification
+{
+}
+
+class CountCrashesPropertyNotification extends Notification
+{
+    public $countCrashesAsExceptions = true;
 }

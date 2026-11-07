@@ -12,11 +12,16 @@ on:
 permissions:
   contents: read
 
+env:
+  PHP_SHARED_EXTENSIONS: dom, curl, libxml, mbstring, zip, pdo,  sqlite, pdo_sqlite, gd, imagick, redis, memcached, gmp, igbinary, msgpack, :php-psr
+  PHP_LINUX_EXTENSIONS: pcntl
+  PHP_WINDOWS_EXTENSIONS: pdo_mysql, fileinfo, ftp, intl
+
 jobs:
   linux_tests:
     if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     services:
@@ -61,7 +66,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, igbinary, msgpack, memcached, gmp, :php-psr
+          extensions: ${{ env.PHP_SHARED_EXTENSIONS }}, ${{ env.PHP_LINUX_EXTENSIONS }}
           ini-values: error_reporting=E_ALL
           redis-configure-opts: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           redis-libs: liblz4-dev, liblzf-dev, libzstd-dev
@@ -78,7 +83,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: randomSecret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |
@@ -88,7 +93,7 @@ jobs:
   windows_tests:
     if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
 
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 10
 
     strategy:
@@ -115,7 +120,7 @@ jobs:
         uses: ./.github/actions/setup-php-project
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp, intl, :php-psr
+          extensions: ${{ env.PHP_SHARED_EXTENSIONS }}, ${{ env.PHP_WINDOWS_EXTENSIONS }}
           composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
@@ -125,7 +130,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: windows-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |

@@ -3,8 +3,10 @@
 namespace Illuminate\Broadcasting;
 
 use Ably\AblyRest;
+use Ably\PubSub\Server as AblyServer;
 use Closure;
 use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
@@ -22,6 +24,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
@@ -191,7 +194,8 @@ class BroadcastManager implements FactoryContract
         if ($event instanceof ShouldBroadcastNow ||
             (is_object($event) &&
              method_exists($event, 'shouldBroadcastNow') &&
-             $event->shouldBroadcastNow())) {
+             $event->shouldBroadcastNow()) ||
+            $this->broadcastsToSynchronousMercureConnections($event)) {
             $dispatch = fn () => $this->app->make(BusDispatcherContract::class)
                 ->dispatchNow(new BroadcastEvent(clone $event));
 
@@ -219,6 +223,8 @@ class BroadcastManager implements FactoryContract
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
 
             if ($this->mustBeUniqueAndCannotAcquireLock($broadcastEvent)) {
+                $this->app->make('events')->dispatch(new UniqueJobSkipped($broadcastEvent));
+
                 return;
             }
         }
@@ -396,18 +402,26 @@ class BroadcastManager implements FactoryContract
      */
     protected function createAblyDriver(array $config)
     {
-        return new AblyBroadcaster($this->ably($config));
+        $ably = $this->ably($config);
+
+        return match (true) {
+            $ably instanceof AblyRest => new AblyBroadcaster($ably),
+            default => new Ably2Broadcaster($ably),
+        };
     }
 
     /**
      * Get an Ably instance for the given configuration.
      *
      * @param  array  $config
-     * @return \Ably\AblyRest
+     * @return \Ably\PubSub\PubSubHttpClient|\Ably\AblyRest
      */
     public function ably(array $config)
     {
-        return new AblyRest($config);
+        return match (true) {
+            class_exists(AblyServer::class) => AblyServer::createHttpClient($config),
+            default => new AblyRest($config),
+        };
     }
 
     /**
@@ -452,7 +466,7 @@ class BroadcastManager implements FactoryContract
      * Get the connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {

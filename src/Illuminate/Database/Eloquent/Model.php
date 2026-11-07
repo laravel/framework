@@ -462,10 +462,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->table ??= $table->name ?? null;
         }
 
-        $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
+        $declaresConnection = $reflection->getProperty('connection')->getDeclaringClass()->getName() === static::class;
+
+        if (! $declaresConnection && $reflection->getAttributes(Connection::class) !== []) {
+            $this->connection = static::resolveClassAttribute(Connection::class, 'name');
+        } else {
+            $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
+        }
 
         if ($this->primaryKey === 'id' && $table && $table->key !== null) {
-            $this->primaryKey = $table->key;
+            $this->primaryKey = $table->key === false ? null : $table->key;
         }
 
         if ($this->keyType === 'int' && $table && $table->keyType !== null) {
@@ -476,6 +482,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->incrementing = false;
         } elseif ($table && $table->incrementing !== null) {
             $this->incrementing = $table->incrementing;
+        } elseif ($table && $table->key === false && is_null($this->primaryKey)) {
+            $this->incrementing = false;
         }
 
         if ($this->refreshes === []) {
@@ -914,9 +922,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $className = get_class($this->{$relation});
+        $model = $this->{$relation};
 
-        $this->{$relation}->load($relations[$className] ?? []);
+        $model->load($relations[get_class($model)] ?? $relations[$model->getMorphClass()] ?? []);
 
         return $this;
     }
@@ -1038,9 +1046,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $className = get_class($this->{$relation});
+        $model = $this->{$relation};
 
-        $this->{$relation}->loadAggregate($relations[$className] ?? [], $column, $function);
+        $model->loadAggregate($relations[get_class($model)] ?? $relations[$model->getMorphClass()] ?? [], $column, $function);
 
         return $this;
     }
@@ -1115,7 +1123,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $column
      * @param  float|int  $amount
      * @param  array  $extra
-     * @return int
+     * @return int|false
      */
     protected function increment($column, $amount = 1, array $extra = [])
     {
@@ -1128,7 +1136,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $column
      * @param  float|int  $amount
      * @param  array  $extra
-     * @return int
+     * @return int|false
      */
     protected function decrement($column, $amount = 1, array $extra = [])
     {
@@ -1142,7 +1150,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  float|int  $amount
      * @param  array  $extra
      * @param  string  $method
-     * @return int
+     * @return int|false
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
@@ -1155,6 +1163,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
+
+        $extra = array_merge($extra, array_intersect_key($this->getAttributes(), $extra));
 
         if ($this->fireModelEvent('updating') === false) {
             return false;
@@ -1171,7 +1181,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttribute($column);
+            $this->syncOriginalAttributes(array_merge([$column], $this->refreshes));
         });
     }
 
@@ -1260,7 +1270,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array<string, float|int>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int|false
      */
     protected function incrementEach(array $columns, array $extra = [])
     {
@@ -1272,7 +1282,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array<string, float|int>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int|false
      */
     protected function decrementEach(array $columns, array $extra = [])
     {
@@ -1313,7 +1323,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array<string, float|int>  $columns
      * @param  array<string, mixed>  $extra
      * @param  string  $method
-     * @return int
+     * @return int|false
      */
     protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
     {
@@ -1331,6 +1341,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $this->forceFill($extra);
+
+        $extra = array_merge($extra, array_intersect_key($this->getAttributes(), $extra));
 
         if ($this->fireModelEvent('updating') === false) {
             return false;
@@ -1351,7 +1363,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_keys($columns));
+            $this->syncOriginalAttributes(array_merge(array_keys($columns), $this->refreshes));
         });
     }
 
@@ -1871,7 +1883,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * This method protects developers from running forceDestroy when the trait is missing.
      *
      * @param  \Illuminate\Support\Collection|array|int|string  $ids
-     * @return bool|null
+     * @return int
      */
     public static function forceDestroy($ids)
     {
@@ -2220,6 +2232,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
             ...$this->uniqueIds(),
+            ...$this->refreshes,
             'laravel_through_key',
         ]));
 

@@ -5,6 +5,7 @@ namespace Illuminate\Cache;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DetectsConcurrencyErrors;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\SqlServerConnection;
 use Throwable;
 
 class DatabaseLock extends Lock
@@ -69,15 +70,25 @@ class DatabaseLock extends Lock
      */
     public function acquire()
     {
-        try {
-            $this->connection->table($this->table)->insert([
-                'key' => $this->name,
-                'owner' => $this->owner,
-                'expiration' => $this->expiresAt(),
-            ]);
+        $record = [
+            'key' => $this->name,
+            'owner' => $this->owner,
+            'expiration' => $this->expiresAt(),
+        ];
 
-            $acquired = true;
-        } catch (QueryException) {
+        try {
+            $acquired = $this->connection instanceof SqlServerConnection
+                ? $this->connection->table($this->table)->insert($record)
+                : $this->connection->table($this->table)->insertOrIgnore($record) > 0;
+        } catch (QueryException $e) {
+            if ($this->connection->transactionLevel() > 0 && $this->causedByConcurrencyError($e)) {
+                throw $e;
+            }
+
+            $acquired = false;
+        }
+
+        if (! $acquired) {
             $updated = $this->connection->table($this->table)
                 ->where('key', $this->name)
                 ->where(function ($query) {
@@ -143,7 +154,7 @@ class DatabaseLock extends Lock
                 ->where('owner', $this->owner)
                 ->delete() > 0;
         } catch (Throwable $e) {
-            if ($this->causedByConcurrencyError($e)) {
+            if ($this->causedByConcurrencyError($e) && $this->connection->transactionLevel() === 0) {
                 return true;
             }
 
@@ -177,7 +188,7 @@ class DatabaseLock extends Lock
                 ->where('expiration', '<=', $this->currentTime())
                 ->delete();
         } catch (Throwable $e) {
-            if (! $this->causedByConcurrencyError($e)) {
+            if (! $this->causedByConcurrencyError($e) || $this->connection->transactionLevel() > 0) {
                 throw $e;
             }
         }

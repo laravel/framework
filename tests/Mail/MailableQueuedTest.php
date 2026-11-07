@@ -12,16 +12,24 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
+    use VerifiesDoubles;
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableSent(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -36,6 +44,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableWithAttachmentSent(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -55,6 +64,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableWithAttachmentFromDiskSent(): void
     {
         $app = new Application;
@@ -83,6 +93,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsMessageGroupFromMethodToQueueJob(): void
     {
         $mockedMessageGroupId = 'group-1';
@@ -104,6 +115,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsMessageGroupFromPropertyOverridingMethodToQueueJob(): void
     {
         $mockedMessageGroupId = 'group-1';
@@ -127,6 +139,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsDeduplicatorToQueueJob(): void
     {
         $mockedDeduplicator = fn ($payload, $queue) => 'deduplication-id-1';
@@ -147,6 +160,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedDeduplicator, $pushedJob->deduplicator->getClosure());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableRespectsDelayAttribute(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -164,6 +178,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(30, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableDelayPropertyOverridesAttribute(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -182,6 +197,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(60, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableRespectsQueueAndConnectionAttributes(): void
     {
         $queueFake = new MailableQueueFake(new Application);
@@ -201,6 +217,7 @@ class MailableQueuedTest extends TestCase
         $this->assertSame('redis', $pushedJob->connection);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDelayedQueuedMailableRespectsQueueAndConnectionAttributes(): void
     {
         $queueFake = new MailableQueueFake(new Application);
@@ -221,6 +238,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(30, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -236,7 +254,10 @@ class MailableQueuedTest extends TestCase
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
         $this->assertInstanceOf(SerializableClosure::class, $pushedJob->deduplicator);
-        $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator->getClosure());
+        $this->assertSame(
+            $mailable->deduplicationId('payload', 'queue'),
+            ($pushedJob->deduplicator->getClosure())('payload', 'queue')
+        );
     }
 
     public function testQueueSetsBackedEnumQueueOnMailable(): void
@@ -250,6 +271,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn('emails', SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLaterSetsQueueOnMailable(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -267,6 +289,7 @@ class MailableQueuedTest extends TestCase
         });
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLaterWithoutQueueUsesDefault(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -284,9 +307,32 @@ class MailableQueuedTest extends TestCase
         });
     }
 
+    public function testQueuedMailableRespectsDeleteWhenMissingModelsAndFailOnTimeoutAttributes(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithFailureAttributes);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+        $this->assertTrue($job->failOnTimeout);
+    }
+
+    public function testQueuedMailableRespectsDeleteWhenMissingModelsAndFailOnTimeoutProperties(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithFailureProperties);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+        $this->assertTrue($job->failOnTimeout);
+    }
+
+    public function testQueuedMailableRespectsCountCrashesAsExceptions(): void
+    {
+        $this->assertTrue((new SendQueuedMailable(new MailableQueueableStubWithCountCrashesAttribute))->countCrashesAsExceptions);
+        $this->assertTrue((new SendQueuedMailable(new MailableQueueableStubWithCountCrashesProperty))->countCrashesAsExceptions);
+        $this->assertFalse((new SendQueuedMailable(new MailableQueueableStub))->countCrashesAsExceptions);
+    }
+
     protected function getMocks()
     {
-        return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
+        return ['smtp', Double::for(Factory::class), Double::for(TransportInterface::class)];
     }
 }
 
@@ -371,6 +417,31 @@ class MailableQueueableStubWithDeduplication extends Mailable implements ShouldQ
 class MailableQueueableStubWithQueueAndConnectionAttributes extends MailableQueueableStub
 {
     //
+}
+
+#[DeleteWhenMissingModels]
+#[FailOnTimeout]
+class MailableQueueableStubWithFailureAttributes extends MailableQueueableStub
+{
+    //
+}
+
+class MailableQueueableStubWithFailureProperties extends MailableQueueableStub
+{
+    public $deleteWhenMissingModels = true;
+
+    public $failOnTimeout = true;
+}
+
+#[CountCrashesAsExceptions]
+class MailableQueueableStubWithCountCrashesAttribute extends MailableQueueableStub
+{
+    //
+}
+
+class MailableQueueableStubWithCountCrashesProperty extends MailableQueueableStub
+{
+    public $countCrashesAsExceptions = true;
 }
 
 #[Connection('sqs')]

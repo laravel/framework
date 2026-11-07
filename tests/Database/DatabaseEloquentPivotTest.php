@@ -9,23 +9,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testPropertiesAreSetCorrectly()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
-        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->times(1)->returns('connection');
+        $resolver = Double::for(ConnectionResolverInterface::class);
         $parent->setConnectionResolver($resolver);
-        $connection = Mockery::mock(Connection::class);
-        $resolver->expects('connection')->times(2)->andReturn($connection);
-        $grammar = Mockery::mock(Grammar::class);
-        $connection->expects('getQueryGrammar')->times(2)->andReturn($grammar);
-        $processor = Mockery::mock(Processor::class);
-        $parent->getConnection()->getQueryGrammar()->expects('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $connection = Double::for(Connection::class);
+        $resolver->expects('connection')->times(1)->returns($connection);
+        $grammar = new Grammar($connection);
+        $connection->expects('getQueryGrammar')->times(1)->returns($grammar);
+        $processor = new Processor;
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
@@ -38,8 +40,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testMutatorsAreCalledFromConstructor()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = new DummyModel;
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -48,8 +49,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testFromRawAttributesDoesNotDoubleMutate()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->returns('connection');
 
         $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
 
@@ -58,8 +59,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testFromRawAttributesDoesNotMutate()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->returns('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -68,8 +69,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPropertiesUnchangedAreNotDirty()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
         $this->assertSame([], $pivot->getDirty());
@@ -77,8 +78,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPropertiesChangedAreDirty()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
@@ -87,8 +88,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName,getDates]');
-        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->times(2)->returns('connection');
         $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
 
@@ -98,16 +99,15 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName,getDates]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = Double::for(Model::class)->passthru();
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
     }
 
     public function testKeysCanBeSetProperly()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = new DummyModel;
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
@@ -121,9 +121,9 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
-        $query = Mockery::mock(Builder::class);
-        $query->expects('where')->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
-        $query->expects('delete')->andReturn(true);
+        $query = Double::for(Builder::class);
+        $query->expects('where')->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->returns($query);
+        $query->expects('delete')->returns(true);
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
         $rowsAffected = $pivot->delete();
@@ -139,9 +139,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
     {
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getCreatedAtColumn')->andReturn('parent_created_at');
-        $parent->expects('getUpdatedAtColumn')->andReturn('parent_updated_at');
+        $parent = new DatabaseEloquentPivotTestCustomTimestampsModel;
 
         $pivotWithParent = new Pivot;
         $pivotWithParent->pivotParent = $parent;
@@ -221,4 +219,10 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 class DummyModel extends Model
 {
     //
+}
+
+class DatabaseEloquentPivotTestCustomTimestampsModel extends Model
+{
+    const CREATED_AT = 'parent_created_at';
+    const UPDATED_AT = 'parent_updated_at';
 }

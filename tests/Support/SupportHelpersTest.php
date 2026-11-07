@@ -19,7 +19,6 @@ use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
@@ -51,8 +50,17 @@ class SupportHelpersTest extends TestCase
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
 
-        $html = Mockery::mock(Htmlable::class);
-        $html->expects('toHtml')->andReturn($str);
+        $html = new class($str) implements Htmlable
+        {
+            public function __construct(protected string $html)
+            {
+            }
+
+            public function toHtml()
+            {
+                return $this->html;
+            }
+        };
         $this->assertEquals($str, e($html));
     }
 
@@ -834,9 +842,8 @@ class SupportHelpersTest extends TestCase
             $object->id = 2;
         })->id);
 
-        $mock = Mockery::mock();
-        $mock->expects('foo')->andReturn('bar');
-        $this->assertEquals($mock, tap($mock)->foo());
+        $collection = collect();
+        $this->assertSame($collection, tap($collection)->all());
     }
 
     public function testThrow()

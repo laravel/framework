@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Tests\Support\Fixtures\TestArrayableObject;
 use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
@@ -28,6 +29,8 @@ include_once 'Fixtures/Enums.php';
 
 class SupportArrTest extends TestCase
 {
+    use Concerns\CountsEnumerations;
+
     public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
@@ -104,6 +107,17 @@ class SupportArrTest extends TestCase
         Arr::push($array, 'foo.bar', 'baz');
     }
 
+    public function testPushWorksWithArrayObject()
+    {
+        $array = new ArrayObject(['tags' => ['php']]);
+
+        $this->assertSame($array, Arr::push($array, 'tags', 'laravel', 'symfony'));
+        $this->assertSame(['php', 'laravel', 'symfony'], $array['tags']);
+
+        $this->assertSame($array, Arr::push($array, 'missing', 'first'));
+        $this->assertSame(['first'], $array['missing']);
+    }
+
     public function testCollapse()
     {
         // Normal case: a two-dimensional array with different elements
@@ -126,6 +140,10 @@ class SupportArrTest extends TestCase
         $collection = collect(['baz', 'boom']);
         $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
+
+        // Case including lazy collections
+        $mixedArray = [[1], new LazyCollection([2, 3]), collect([4])];
+        $this->assertEquals([1, 2, 3, 4], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -458,6 +476,23 @@ class SupportArrTest extends TestCase
         $this->assertSame(0, $result);
     }
 
+    public function testFirstIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            Arr::first($collection, fn ($value) => $value === 2);
+        });
+    }
+
+    public function testFirstWorksWithYieldFrom()
+    {
+        $products = (function () {
+            yield from ['Laptop', 'Monitor'];
+            yield from ['Keyboard', 'Mouse'];
+        })();
+
+        $this->assertSame('Laptop', Arr::first($products, fn ($product) => $product === 'Laptop'));
+    }
+
     public function testJoin()
     {
         $this->assertSame('a, b, c', Arr::join(['a', 'b', 'c'], ', '));
@@ -558,6 +593,12 @@ class SupportArrTest extends TestCase
         // Nested arrays containing arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar', ['#zap']])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], Arr::flatten($array));
+    }
+
+    public function testFlattenWithLazyCollections()
+    {
+        $array = [new LazyCollection(['#foo', ['#bar']]), ['#baz', new LazyCollection(['#zap'])]];
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], Arr::flatten($array));
     }
 
     public function testFlattenWithDepth()

@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
@@ -15,7 +16,7 @@ use Symfony\Component\Process\Process;
 
 class PendingProcess
 {
-    use Conditionable;
+    use Conditionable, Macroable;
 
     /**
      * The process factory instance.
@@ -41,14 +42,14 @@ class PendingProcess
     /**
      * The maximum number of seconds the process may run.
      *
-     * @var int|null
+     * @var int|float|null
      */
     public $timeout = 60;
 
     /**
      * The maximum number of seconds the process may go without returning output.
      *
-     * @var int
+     * @var int|float|null
      */
     public $idleTimeout;
 
@@ -138,7 +139,7 @@ class PendingProcess
      */
     public function timeout(CarbonInterval|int $timeout)
     {
-        $this->timeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
+        $this->timeout = $timeout instanceof CarbonInterval ? $timeout->totalSeconds : $timeout;
 
         return $this;
     }
@@ -151,7 +152,7 @@ class PendingProcess
      */
     public function idleTimeout(CarbonInterval|int $timeout)
     {
-        $this->idleTimeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
+        $this->idleTimeout = $timeout instanceof CarbonInterval ? $timeout->totalSeconds : $timeout;
 
         return $this;
     }
@@ -268,7 +269,7 @@ class PendingProcess
      *
      * @param  array<array-key, string>|string|null  $command
      * @param  callable|null  $output
-     * @return \Illuminate\Process\InvokedProcess
+     * @return \Illuminate\Process\InvokedProcess|\Illuminate\Process\FakeInvokedProcess
      *
      * @throws \RuntimeException
      */
@@ -405,10 +406,15 @@ class PendingProcess
      * @return \Illuminate\Process\FakeInvokedProcess
      *
      * @throws \LogicException
+     * @throws \Throwable
      */
     protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {
         $result = $fake($this);
+
+        if (is_int($result)) {
+            $result = new FakeProcessResult(exitCode: $result);
+        }
 
         if (is_string($result) || is_array($result)) {
             $result = new FakeProcessResult(output: $result);
@@ -436,6 +442,8 @@ class PendingProcess
             return (new FakeInvokedProcess($command, $result))->withOutputHandler($output);
         } elseif ($result instanceof FakeProcessSequence) {
             return $this->resolveAsynchronousFake($command, $output, fn () => $result());
+        } elseif ($result instanceof \Throwable) {
+            throw $result;
         }
 
         throw new LogicException('Unsupported asynchronous process fake result provided.');

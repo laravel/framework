@@ -301,7 +301,11 @@ class MySqlGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
-        return 'json_overlaps('.$field.', '.$value.$path.')';
+        if ($path !== '') {
+            $field = 'json_extract('.$field.$path.')';
+        }
+
+        return 'json_overlaps('.$field.', '.$value.')';
     }
 
     /**
@@ -480,7 +484,7 @@ class MySqlGrammar extends Grammar
         if (is_bool($value)) {
             $value = $value ? 'true' : 'false';
         } elseif (is_array($value)) {
-            $value = 'cast(? as json)';
+            $value = $this->compileJsonValueCast('?');
         } else {
             $value = $this->parameter($value);
         }

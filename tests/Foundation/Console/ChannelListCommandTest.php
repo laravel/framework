@@ -2,16 +2,20 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Support\Collection;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ChannelListCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testItDisplaysAnErrorWhenThereAreNoChannels(): void
     {
         $app = $this->makeApplication([]);
@@ -41,8 +45,8 @@ class ChannelListCommandTest extends TestCase
     {
         $laravel = new FoundationApplication(__DIR__);
 
-        $broadcaster = Mockery::mock(BroadcasterContract::class);
-        $broadcaster->expects('getChannels')->andReturn(new Collection($channels));
+        $broadcaster = Double::for(Broadcaster::class);
+        $broadcaster->expects('getChannels')->returns(new Collection($channels));
 
         $laravel->instance(BroadcasterContract::class, $broadcaster);
 

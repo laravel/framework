@@ -410,7 +410,7 @@ class RouteListCommand extends Command
         $routes = $routes->map(
             fn ($route) => array_merge($route, [
                 'action' => $this->formatActionForCli($route),
-                'method' => $route['method'] == implode('|', Router::$verbs) ? 'ANY' : $route['method'],
+                'method' => $route['method'] === implode('|', Router::$verbs) ? 'ANY' : $route['method'],
                 'uri' => $route['domain'] ? ($route['domain'].'/'.ltrim($route['uri'], '/')) : $route['uri'],
             ]),
         );

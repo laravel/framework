@@ -102,7 +102,7 @@ class Route
     /**
      * The array of the matched parameters' original values.
      *
-     * @var array
+     * @var array|null
      */
     protected $originalParameters;
 
@@ -165,7 +165,7 @@ class Route
     /**
      * The validators used by the routes.
      *
-     * @var array
+     * @var array|null
      */
     public static $validators;
 
@@ -1480,9 +1480,17 @@ class Route
     public function toSymfonyRoute()
     {
         return new SymfonyRoute(
-            preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()), $this->getOptionalParameterNames(),
-            $this->wheres, ['utf8' => true],
-            $this->getDomain() ?: '', [], $this->methods
+            preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()),
+            $this->getOptionalParameterNames(),
+            $this->wheres,
+            ['utf8' => true],
+            $this->getDomain() ?: '',
+            match (true) {
+                $this->httpOnly() => ['http'],
+                $this->secure() => ['https'],
+                default => [],
+            },
+            $this->methods
         );
     }
 

@@ -9,11 +9,14 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -142,7 +145,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"foo\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"foo\"') AND [name] in ('bar') AND [default_object_id] <> 0;EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
+        $this->assertSame("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"foo\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"foo\"') AND [name] in ('bar') AND [default_object_id] <> 0;SELECT @sql += 'ALTER TABLE \"foo\" DROP CONSTRAINT ' + [name] + ';' FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'\"foo\"') AND COL_NAME([parent_object_id], [parent_column_id]) in ('bar');EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
     }
 
     public function testDropPrimary()
@@ -203,7 +206,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('alter table "users" drop constraint "users_foo_foreign"', $statements[0]);
-        $this->assertSame('DECLARE @sql NVARCHAR(MAX) = \'\';SELECT @sql += \'ALTER TABLE "users" DROP CONSTRAINT \' + OBJECT_NAME([default_object_id]) + \';\' FROM sys.columns WHERE [object_id] = OBJECT_ID(N\'"users"\') AND [name] in (\'foo\') AND [default_object_id] <> 0;EXEC(@sql);alter table "users" drop column "foo"', $statements[1]);
+        $this->assertSame('DECLARE @sql NVARCHAR(MAX) = \'\';SELECT @sql += \'ALTER TABLE "users" DROP CONSTRAINT \' + OBJECT_NAME([default_object_id]) + \';\' FROM sys.columns WHERE [object_id] = OBJECT_ID(N\'"users"\') AND [name] in (\'foo\') AND [default_object_id] <> 0;SELECT @sql += \'ALTER TABLE "users" DROP CONSTRAINT \' + [name] + \';\' FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N\'"users"\') AND COL_NAME([parent_object_id], [parent_column_id]) in (\'foo\');EXEC(@sql);alter table "users" drop column "foo"', $statements[1]);
     }
 
     public function testDropTimestamps()
@@ -1004,15 +1007,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         ?SqlServerBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(Connection::class);
-        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
+        $connection = Double::for(Connection::class);
+        $connection->allows('getTablePrefix')->returns($prefix);
+        $connection->allows('getConfig')->with('prefix_indexes')->returns(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+        $connection->allows('getSchemaGrammar')->returns($grammar);
+        $connection->allows('getSchemaBuilder')->returns($builder);
 
         return $connection;
     }
@@ -1024,6 +1027,6 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(SqlServerBuilder::class);
+        return Double::for(SqlServerBuilder::class);
     }
 }

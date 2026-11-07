@@ -18,8 +18,8 @@ use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Client\Batch;
 use Illuminate\Http\Client\BatchInProgressException;
 use Illuminate\Http\Client\ConnectionException;
@@ -42,10 +42,10 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use JsonSerializable;
-use Mockery;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,6 +57,7 @@ use RuntimeException;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
+use WeakReference;
 
 class HttpClientTest extends TestCase
 {
@@ -2449,9 +2450,7 @@ class HttpClientTest extends TestCase
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(5)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(5)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake();
@@ -2461,13 +2460,13 @@ class HttpClientTest extends TestCase
         $factory->post('https://example.com');
         $factory->patch('https://example.com');
         $factory->delete('https://example.com');
+        $events->assertDispatchedTimes(RequestSending::class, 5);
+        $events->assertDispatchedTimes(ResponseReceived::class, 5);
     }
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSentAsync()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(5)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(5)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake();
@@ -2480,13 +2479,13 @@ class HttpClientTest extends TestCase
                 $pool->delete('https://example.com'),
             ];
         });
+        $events->assertDispatchedTimes(RequestSending::class, 5);
+        $events->assertDispatchedTimes(ResponseReceived::class, 5);
     }
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredForEveryRetry()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(2)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(2)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake([
@@ -2498,6 +2497,8 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->failed());
 
         $factory->assertSentCount(2);
+        $events->assertDispatchedTimes(RequestSending::class, 2);
+        $events->assertDispatchedTimes(ResponseReceived::class, 2);
     }
 
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
@@ -2520,11 +2521,28 @@ class HttpClientTest extends TestCase
         $this->assertSame('https://example.com', (string) $effectiveUri);
     }
 
+    public function testPendingRequestIsReleasedWithoutGarbageCollectionAfterThrow()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory::response(str_repeat('x', 1024))]);
+
+        gc_disable();
+
+        try {
+            $pendingRequest = $this->factory->throw();
+            $pendingRequest->get('https://example.com');
+
+            $reference = WeakReference::create($pendingRequest);
+            unset($pendingRequest);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
+    }
+
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake(['example.com' => $factory::response('foo', 200)]);
@@ -2533,6 +2551,8 @@ class HttpClientTest extends TestCase
         $clonedClient = clone $client;
 
         $clonedClient->get('https://example.com');
+        $events->assertDispatchedTimes(RequestSending::class, 1);
+        $events->assertDispatchedTimes(ResponseReceived::class, 1);
     }
 
     public function testRequestIsMacroable()
@@ -2834,6 +2854,103 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
         });
+    }
+
+    public function testRetriedMultipartRequestsResendAttachedStreamContents()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return count($bodies) < 3
+                ? ($this->factory::failedConnection())($request)
+                : $this->factory::response(['ok' => true]);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $response = $this->factory
+            ->retry(3, 0)
+            ->attach('file', $stream, 'file.txt')
+            ->post('http://foo.com/upload');
+
+        $this->assertTrue($response->successful());
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasFile('file', 'attached-file-contents', 'file.txt');
+        });
+    }
+
+    public function testAsyncRetriedMultipartRequestsResendAttachedStreamContents()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return count($bodies) < 3
+                ? ($this->factory::failedConnection())($request)
+                : $this->factory::response(['ok' => true]);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $response = $this->factory
+            ->async()
+            ->retry(3, 0)
+            ->attach('file', $stream, 'file.txt')
+            ->post('http://foo.com/upload')
+            ->wait();
+
+        $this->assertTrue($response->successful());
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
+    }
+
+    public function testExhaustedRetriesWithAttachedStreamThrowConnectionException()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return ($this->factory::failedConnection())($request);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry(3, 0)
+                ->attach('file', $stream, 'file.txt')
+                ->post('http://foo.com/upload');
+        } catch (Exception $e) {
+            $exception = $e;
+        }
+
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
     }
 
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
@@ -4739,6 +4856,44 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['third'], $catchCallbacks['third']);
     }
 
+    public function testBatchCatchHookIsCalledWhenThrowingRequestExceptions(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $catchCallbacks = [];
+        $thenCalled = false;
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->throw()->get('https://500.com'),
+                $batch->as('third')->retry(2)->get('https://500.com'),
+            ];
+        })->catch(function (Batch $batch, int|string $key, Response|RequestException $response) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $response;
+        })->then(function () use (&$thenCalled) {
+            $thenCalled = true;
+        });
+
+        $responses = $batch->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertInstanceOf(RequestException::class, $responses['second']);
+        $this->assertInstanceOf(RequestException::class, $responses['third']);
+
+        $this->assertSame(2, $batch->failedRequests);
+        $this->assertTrue($batch->hasFailures());
+        $this->assertFalse($thenCalled);
+
+        $this->assertCount(2, $catchCallbacks);
+        $this->assertArrayNotHasKey('first', $catchCallbacks);
+        $this->assertSame($responses['second'], $catchCallbacks['second']);
+        $this->assertSame($responses['third'], $catchCallbacks['third']);
+    }
+
     public function testBatchThenHookIsCalled(): void
     {
         $this->factory->fake([
@@ -5153,6 +5308,23 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com/docs';
+        });
+    }
+
+    public function testUrlsWithBracesAreNotExpandedWithoutUrlParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('https://api.test/posts?where={"status":"open"}');
+        $this->factory->get('https://api.test/files/{draft}.txt');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://api.test/posts?where=%7B%22status%22:%22open%22%7D'
+                && $request['where'] === '{"status":"open"}';
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://api.test/files/%7Bdraft%7D.txt';
         });
     }
 

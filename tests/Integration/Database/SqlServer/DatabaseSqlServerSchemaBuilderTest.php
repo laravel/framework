@@ -51,6 +51,15 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
         $this->assertSame(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
     }
 
+    public function testDropEnumColumn()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('color');
+        });
+
+        $this->assertFalse(Schema::hasColumn('users', 'color'));
+    }
+
     public function testGetViews()
     {
         DB::statement('create view users_view AS select name, age from users');

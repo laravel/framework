@@ -49,7 +49,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * The message selector.
      *
-     * @var \Illuminate\Translation\MessageSelector
+     * @var \Illuminate\Translation\MessageSelector|null
      */
     protected $selector;
 
@@ -575,7 +575,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function setLocale($locale)
     {
-        if (Str::contains($locale, ['/', '\\'])) {
+        if (Str::contains($locale, ['/', '\\', '..', "\0"])) {
             throw new InvalidArgumentException('Invalid characters present in locale.');
         }
 

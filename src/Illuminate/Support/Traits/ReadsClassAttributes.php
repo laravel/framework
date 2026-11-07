@@ -108,6 +108,7 @@ trait ReadsClassAttributes
 
         return $property->isPublic()
             && $property->isInitialized($target)
+            && ! is_null($target->{$property->getName()})
             && $property->getDeclaringClass()->isSubclassOf($attributeDeclaringClass->getName());
     }
 }

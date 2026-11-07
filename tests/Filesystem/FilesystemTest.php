@@ -6,7 +6,8 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -18,6 +19,8 @@ use function Orchestra\Testbench\terminate;
 
 class FilesystemTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private static $tempDir;
 
     #[BeforeClass]
@@ -200,6 +203,54 @@ class FilesystemTest extends TestCase
         $this->assertTrue($files->missing(self::$tempDir.'/file.txt'));
     }
 
+    public function testExistsReturnsFalseForPharUri()
+    {
+        $files = new Filesystem;
+        $this->assertFalse($files->exists('phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->exists('PHAR:///some/archive.phar/entry'));
+    }
+
+    public function testIsFileReturnsFalseForPharUri()
+    {
+        $files = new Filesystem;
+        $this->assertFalse($files->isFile('phar:///some/archive.phar/entry'));
+        $this->assertFalse($files->isFile('PHAR:///some/archive.phar/entry'));
+    }
+
+    public function testGetThrowsExceptionForPharUri()
+    {
+        $files = new Filesystem;
+        $this->expectException(FileNotFoundException::class);
+        $files->get('phar:///some/archive.phar/entry');
+    }
+
+    #[RequiresPhpExtension('phar')]
+    public function testFilesInsideTheRunningPharCanBeRead()
+    {
+        $phar = self::$tempDir.'/app.phar';
+
+        file_put_contents(self::$tempDir.'/run.php', '<?php
+            require '.var_export(realpath(__DIR__.'/../../vendor/autoload.php'), true).';
+            require __DIR__."/Filesystem.php";
+
+            $files = new Illuminate\Filesystem\Filesystem;
+
+            echo $files->get(Phar::running()."/file.txt"), "|", var_export($files->exists("phar:///some/archive.phar/entry"), true);
+        ');
+
+        file_put_contents(self::$tempDir.'/build.php', '<?php
+            $phar = new Phar('.var_export($phar, true).');
+            $phar->addFile('.var_export(realpath(__DIR__.'/../../src/Illuminate/Filesystem/Filesystem.php'), true).', "Filesystem.php");
+            $phar->addFile('.var_export(self::$tempDir.'/run.php', true).', "run.php");
+            $phar->addFromString("file.txt", "Hello from phar");
+            $phar->setStub(\'<?php Phar::mapPhar("app.phar"); require "phar://app.phar/run.php"; __HALT_COMPILER();\');
+        ');
+
+        exec(escapeshellarg(PHP_BINARY).' -d phar.readonly=0 '.escapeshellarg(self::$tempDir.'/build.php'));
+
+        $this->assertSame('Hello from phar|false', exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($phar)));
+    }
+
     public function testDeleteDirectory()
     {
         mkdir(self::$tempDir.'/foo');
@@ -322,8 +373,8 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/tmp6/foo.txt', '');
         mkdir(self::$tempDir.'/tmp7', 0777, true);
 
-        $files = Mockery::mock(Filesystem::class)->makePartial();
-        $files->expects('deleteDirectory')->andReturn(false);
+        $files = Double::for(Filesystem::class)->passthru();
+        $files->expects('deleteDirectory')->returns(false);
         $this->assertFalse($files->moveDirectory(self::$tempDir.'/tmp6', self::$tempDir.'/tmp7', true));
     }
 

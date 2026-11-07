@@ -9,11 +9,15 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -21,7 +25,6 @@ use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -30,6 +33,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FilesystemAdapterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private $tempDir;
     private $filesystem;
     private $adapter;
@@ -71,8 +76,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
-        $files->shouldReceive('mimeType')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('mimeType')->never();
 
         $files->response('file.txt', null, [
             'Content-Type' => 'text/x-custom',
@@ -83,8 +88,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
-        $files->shouldReceive('size')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('size')->never();
 
         $files->response('file.txt', null, [
             'Content-Length' => 11,
@@ -95,10 +100,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
-            ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
-        $files->shouldReceive('fallbackName')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('fallbackName')->never();
 
         $files->response('file.txt', null, [
             'Content-Disposition' => 'attachment',
@@ -139,6 +142,15 @@ class FilesystemAdapterTest extends TestCase
         $response = $files->download('Hello%World.txt', 'Hello%World.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertSame('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadFilenameWithoutAsciiEquivalent()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $response = $files->download('file.txt', '請求書');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertSame('attachment; filename=___; filename*=utf-8\'\'%E8%AB%8B%E6%B1%82%E6%9B%B8', $response->headers->get('content-disposition'));
     }
 
     public function testExists()
@@ -349,9 +361,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory3 = Double::for(FilesystemFactory::class);
+        $filesystemFactory3->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory3);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->copyToDisk('backup', 'file.txt');
@@ -366,9 +379,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory2 = Double::for(FilesystemFactory::class);
+        $filesystemFactory2->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory2);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
@@ -383,9 +397,10 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => $filesystemAdapter,
-        ]));
+        $filesystemFactory = Double::for(FilesystemFactory::class);
+        $filesystemFactory->expects('disk')->returns($filesystemAdapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -704,15 +719,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
-
-        $exceptionHandler->expects('report')
-            ->andReturnUsing(function (UnableToReadFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to read file from location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -725,21 +732,15 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToReadFile) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToReadFile $e) => str_contains($e->getMessage(), 'Unable to read file from location: foo.txt.'));
     }
 
     public function testReportExceptionsForReadStream()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
-
-        $exceptionHandler->expects('report')
-            ->andReturnUsing(function (UnableToReadFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to read file from location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -752,21 +753,15 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToReadFile) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToReadFile $e) => str_contains($e->getMessage(), 'Unable to read file from location: foo.txt.'));
     }
 
     public function testReportExceptionsForPut()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
-
-        $exceptionHandler->expects('report')
-            ->andReturnUsing(function (UnableToWriteFile $e) {
-                $this->assertStringContainsString(
-                    'Unable to write file at location: foo.txt.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -785,21 +780,15 @@ class FilesystemAdapterTest extends TestCase
         } finally {
             chmod(__DIR__.'/tmp/foo.txt', 0600);
         }
+
+        $exceptionHandler->assertReported(fn (UnableToWriteFile $e) => str_contains($e->getMessage(), 'Unable to write file at location: foo.txt.'));
     }
 
     public function testReportExceptionsForMimeType()
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
-
-        $exceptionHandler->expects('report')
-            ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
-                $this->assertStringContainsString(
-                    'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
-                    $e->getMessage(),
-                );
-            });
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
 
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
@@ -814,6 +803,8 @@ class FilesystemAdapterTest extends TestCase
         } catch (UnableToRetrieveMetadata) {
             $this->fail('Exception was thrown.');
         }
+
+        $exceptionHandler->assertReported(fn (UnableToRetrieveMetadata $e) => str_contains($e->getMessage(), 'Unable to retrieve the mime_type for file at location: unknown.mime-type.'));
     }
 
     public function testGetAllFiles()

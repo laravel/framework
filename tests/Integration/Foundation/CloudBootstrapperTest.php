@@ -5,8 +5,9 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Database\Connectors\ConnectorInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\JsonFormatter;
+use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\CloudBootstrapper;
-use Mockery;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use PDO;
@@ -30,6 +31,17 @@ class CloudBootstrapperTest extends TestCase
         $this->assertSame('write.example.com', $this->app['config']->get('database.connections.mysql.host'));
 
         unset($_SERVER['DB_READ_HOST']);
+    }
+
+    public function test_it_stores_the_exceptions_config_after_configuration_is_loaded()
+    {
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode(['capture_request_payload' => true]);
+
+        CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
+
+        $this->assertSame(['capture_request_payload' => true], $this->app['config']->get('_cloud.exceptions'));
+
+        unset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS']);
     }
 
     public function test_it_does_not_configure_a_read_replica_connection_without_a_read_host()
@@ -86,6 +98,25 @@ class CloudBootstrapperTest extends TestCase
             ['test.pg.laravel.cloud', 'pgsql'],
             ['test-pooler.pg.laravel.cloud', 'pgsql-unpooled'],
         ];
+    }
+
+    #[WithEnv('DB_POOLING', null)]
+    public function test_legacy_pooler_configuration_preserves_existing_pdo_options()
+    {
+        $options = [PDO::ATTR_TIMEOUT => 5, PDO::ATTR_PERSISTENT => true];
+        $this->app['config']->set('database.connections.pgsql', [
+            'driver' => 'pgsql',
+            'host' => 'test-pooler.pg.laravel.cloud',
+            'options' => $options,
+        ]);
+
+        CloudBootstrapper::configureUnpooledPostgresConnection($this->app);
+
+        $this->assertSame(
+            [PDO::ATTR_TIMEOUT => 5, PDO::ATTR_PERSISTENT => true, PDO::ATTR_EMULATE_PREPARES => true],
+            $this->app['config']->get('database.connections.pgsql.options')
+        );
+        $this->assertSame($options, $this->app['config']->get('database.connections.pgsql-unpooled.options'));
     }
 
     #[DataProvider('postgresHosts')]
@@ -237,20 +268,31 @@ class CloudBootstrapperTest extends TestCase
             ]);
         }
         $this->app['config']->set('database.default', 'pgsql');
-        $connector = Mockery::mock(ConnectorInterface::class);
+        $connector = new class implements ConnectorInterface
+        {
+            public array $configs = [];
+
+            public array $pdos = [];
+
+            public function connect(array $config)
+            {
+                $this->configs[] = $config;
+
+                return $this->pdos[] = new PDO('sqlite::memory:');
+            }
+        };
         $this->app->instance('db.connector.pgsql', $connector);
 
         CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
 
-        foreach (['pgsql', 'reporting'] as $name) {
-            $pdo = new PDO('sqlite::memory:');
-            $connector->shouldReceive('connect')->once()->with(Mockery::on(fn ($config) => $config['host'] === "{$name}.pg.laravel.cloud" &&
-                $config['options'][PDO::ATTR_EMULATE_PREPARES] === false
-            ))->andReturn($pdo);
-
+        foreach (['pgsql', 'reporting'] as $index => $name) {
             $connection = $this->app['migrator']->resolveConnection($name);
+
+            $this->assertCount($index + 1, $connector->configs);
+            $this->assertSame("{$name}.pg.laravel.cloud", $connector->configs[$index]['host']);
+            $this->assertFalse($connector->configs[$index]['options'][PDO::ATTR_EMULATE_PREPARES]);
             $this->assertSame("{$name}::direct", $connection->getNameWithReadWriteType());
-            $this->assertSame($pdo, $connection->getPdo());
+            $this->assertSame($connector->pdos[$index], $connection->getPdo());
         }
     }
 
@@ -288,12 +330,46 @@ class CloudBootstrapperTest extends TestCase
 
         $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+        $this->assertSame('auto', $this->app['config']->get('filesystems.disks.test-disk.region'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
 
         [$_ENV['FILESYSTEM_DISK'], $_SERVER['FILESYSTEM_DISK'], $putenvDisk] = $filesystemDisk;
 
         $putenvDisk === false ? putenv('FILESYSTEM_DISK') : putenv('FILESYSTEM_DISK='.$putenvDisk);
+    }
+
+    public function test_it_configures_disks_with_cacheable_credential_providers()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'aws-bucket',
+                'access_key_id' => null,
+                'access_key_secret' => null,
+                'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'url' => null,
+                'endpoint' => 'https://s3-accesspoint.us-east-2.amazonaws.com',
+                'region' => 'us-east-2',
+                'credentials' => 'ecs',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.aws-bucket');
+
+            $this->assertSame('us-east-2', $config['region']);
+            $this->assertSame('ecs', $config['credentials']);
+            $this->assertSame('https://s3-accesspoint.us-east-2.amazonaws.com', $config['endpoint']);
+            $this->assertArrayNotHasKey('ignore_configured_endpoint_urls', $config);
+            $this->assertArrayNotHasKey('auth_mode', $config);
+            $this->assertNull($config['key']);
+            $this->assertNull($config['secret']);
+            $this->assertSame($config, eval('return '.var_export($config, true).';'));
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
     }
 
     public function test_it_does_not_override_a_different_filesystem_disk()
@@ -469,6 +545,20 @@ class CloudBootstrapperTest extends TestCase
         CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
+
+    public function test_it_configures_the_cloud_logging_formatter()
+    {
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+    }
+
+    public function test_it_configures_the_cloud_logging_handler()
+    {
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(SocketHandler::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.handler'));
     }
 
     public function test_it_aliases_cloud_logging_channel()

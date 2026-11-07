@@ -257,6 +257,10 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                     foreach ($app['db']->getConnections() as $connection) {
                         $connection->resetTotalQueryDuration();
                         $connection->allowQueryDurationHandlersToRunAgain();
+
+                        if (Worker::$flushStickyConnections) {
+                            $connection->forgetRecordModificationState();
+                        }
                     }
                 }
 

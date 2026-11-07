@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+SECONDS=0
+
+php_versions=(8.3 8.4 8.5)
+echo "Preparing PHP ${php_versions[*]} and test extensions..."
+
+packages=(ca-certificates curl unzip redis-server memcached)
+
+for version in "${php_versions[@]}"; do
+    for extension in cli curl mbstring xml zip sqlite3 mysql pgsql gd imagick intl gmp bcmath redis memcached igbinary msgpack; do
+        packages+=("php${version}-${extension}")
+    done
+done
+
+missing=()
+
+for package in "${packages[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -qx 'install ok installed'; then
+        missing+=("$package")
+    fi
+done
+
+if ((${#missing[@]})); then
+    if [[ ! -f /etc/apt/sources.list.d/php.list ]]; then
+        sudo apt-get update -qq
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates curl
+
+        keyring=$(mktemp)
+        curl -fsSL https://packages.sury.org/debsuryorg-archive-keyring.deb -o "$keyring"
+
+        sudo dpkg -i "$keyring"
+        rm -f "$keyring"
+
+        echo 'deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ bookworm main' | sudo tee /etc/apt/sources.list.d/php.list >/dev/null
+    fi
+
+    sudo apt-get update -qq
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing[@]}"
+fi
+
+# Only the orb supervisor should own these ports after a snapshot is restored...
+sudo systemctl disable --now redis-server.service memcached.service
+sudo update-alternatives --set php /usr/bin/php8.3
+echo "PHP ready (${SECONDS}s)."
+
+if ! command -v composer >/dev/null 2>&1; then
+    echo 'Installing Composer 2...'
+
+    installer=$(mktemp)
+    curl -fsSL https://getcomposer.org/installer -o "$installer"
+    expected=$(curl -fsSL https://composer.github.io/installer.sig)
+    actual=$(sha384sum "$installer" | cut -d ' ' -f 1)
+
+    if [[ "$actual" != "$expected" ]]; then
+        rm -f "$installer"
+        echo 'Composer installer checksum mismatch.' >&2
+        exit 1
+    fi
+
+    sudo php "$installer" --2 --install-dir=/usr/local/bin --filename=composer
+    rm -f "$installer"
+fi
+
+# Match CI without modifying composer.json...
+export COMPOSER_ROOT_VERSION=13.x-dev
+
+echo 'Installing Composer development dependencies...'
+
+if [[ -f composer.lock ]] && composer validate --no-check-publish --no-check-all >/dev/null 2>&1; then
+    composer install --prefer-dist --no-interaction --no-progress
+else
+    composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+fi
+
+for version in "${php_versions[@]}"; do
+    echo "Checking dependencies on PHP ${version}..."
+    "php${version}" "$(command -v composer)" check-platform-reqs
+done
+
+echo "Orb setup finished (${SECONDS}s)."

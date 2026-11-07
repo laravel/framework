@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentThroughTest;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -31,6 +32,11 @@ class EloquentThroughTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('comment_id');
+        });
+
         $post = tap(new Post(['public' => true]))->save();
         $comment = tap((new Comment)->commentable()->associate($post))->save();
         (new Like())->comment()->associate($comment)->save();
@@ -47,6 +53,17 @@ class EloquentThroughTest extends DatabaseTestCase
         $post = Post::first();
         $this->assertEquals(2, $post->commentLikes()->count());
     }
+
+    public function testMorphManyLocalRelationshipReturnsHasManyThrough()
+    {
+        /** @var Post $post */
+        $post = Post::first();
+        tap((new Comment)->commentable()->associate($post))->save();
+        $post->comments->each(fn ($comment) => $comment->profile()->create());
+
+        $this->assertInstanceOf(HasManyThrough::class, $post->commentProfiles());
+        $this->assertCount(2, $post->commentProfiles);
+    }
 }
 
 class Comment extends Model
@@ -61,6 +78,11 @@ class Comment extends Model
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }
 
@@ -80,6 +102,11 @@ class Post extends Model
     public function commentLikes()
     {
         return $this->through($this->comments())->has('likes');
+    }
+
+    public function commentProfiles()
+    {
+        return $this->through($this->comments())->has('profile');
     }
 
     public function texts()
@@ -118,4 +145,11 @@ class Like extends Model
     {
         return $this->belongsTo(Comment::class);
     }
+}
+
+class Profile extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
 }

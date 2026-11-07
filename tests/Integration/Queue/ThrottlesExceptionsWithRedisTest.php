@@ -6,10 +6,10 @@ use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Support\Str;
 use Mockery;
@@ -64,16 +64,14 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('release')->with(0);
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),
         ]);
+
+        $this->assertTrue($job->isReleased());
+        $this->assertSame(0, $job->releaseDelay);
 
         $this->assertTrue($class::$handled);
     }
@@ -83,20 +81,15 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('release')->withArgs(function ($delay) {
-            // The delay is the remainder of the decay window, less wall clock
-            // seconds elapsed since the first exception opened the circuit.
-            return $delay >= 590 && $delay <= 610;
-        });
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),
         ]);
+
+        $this->assertTrue($job->isReleased());
+        $this->assertGreaterThanOrEqual(590, $job->releaseDelay);
+        $this->assertLessThanOrEqual(610, $job->releaseDelay);
 
         $this->assertFalse($class::$handled);
     }
@@ -106,16 +99,13 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertTrue($class::$handled);
     }

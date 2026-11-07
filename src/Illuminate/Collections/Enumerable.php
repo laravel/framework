@@ -833,7 +833,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the items with the specified keys.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null  $keys
      * @return static
      */
     public function only($keys);
@@ -1207,8 +1207,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  \Closure|string|int|array<array-key, string>|null  $value
+     * @param  \Closure|string|null  $key
      * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null);

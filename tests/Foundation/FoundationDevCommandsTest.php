@@ -11,13 +11,17 @@ use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
-use Mockery;
+use Laravel\Pail\PailServiceProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+require_once __DIR__.'/Fixtures/PailServiceProviderStub.php';
+
 class FoundationDevCommandsTest extends TestCase
 {
+    protected $temporaryBasePath;
+
     protected function setUp(): void
     {
         $ref = new ReflectionClass(DevCommands::class);
@@ -47,10 +51,32 @@ class FoundationDevCommandsTest extends TestCase
 
     protected function tearDown(): void
     {
+        if ($this->temporaryBasePath) {
+            (new Filesystem)->deleteDirectory($this->temporaryBasePath);
+
+            $this->temporaryBasePath = null;
+        }
+
         Facade::clearResolvedInstances();
         Container::setInstance(null);
 
         parent::tearDown();
+    }
+
+    /**
+     * Point the application at an isolated base path so package.json is never touched in the repository.
+     */
+    protected function useTemporaryBasePath(bool $withPackageJson): void
+    {
+        $this->temporaryBasePath = sys_get_temp_dir().'/dev_commands_test_'.uniqid();
+
+        mkdir($this->temporaryBasePath);
+
+        if ($withPackageJson) {
+            touch($this->temporaryBasePath.'/package.json');
+        }
+
+        Application::getInstance()->setBasePath($this->temporaryBasePath);
     }
 
     public function testRegisterAddsCommand()
@@ -348,12 +374,9 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+        $this->useTemporaryBasePath(withPackageJson: true);
 
-        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
-        $provider->shouldReceive('register');
-
-        Application::getInstance()->register($provider);
+        Application::getInstance()->register(PailServiceProvider::class);
 
         DevCommands::registerDefaults();
 
@@ -372,7 +395,7 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsExcludesPailWhenNotInstalled()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+        $this->useTemporaryBasePath(withPackageJson: true);
 
         DevCommands::registerDefaults();
 
@@ -407,7 +430,7 @@ class FoundationDevCommandsTest extends TestCase
 
     public function testRegisterDefaultsExcludesViteWithoutPackageJson()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnFalse();
+        $this->useTemporaryBasePath(withPackageJson: false);
 
         DevCommands::registerDefaults();
 

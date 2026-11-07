@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 
 class AsArrayObject implements Castable
 {
@@ -38,7 +39,11 @@ class AsArrayObject implements Castable
                     return [$key => null];
                 }
 
-                return [$key => Json::encode($value)];
+                if (($json = Json::encode($value)) === false) {
+                    throw JsonEncodingException::forAttribute($model, $key, json_last_error_msg());
+                }
+
+                return [$key => $json];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

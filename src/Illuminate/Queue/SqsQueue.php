@@ -360,6 +360,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
+        $queue = enum_value($queue);
+
         $jobs = array_values((array) $jobs);
 
         if (empty($jobs)) {

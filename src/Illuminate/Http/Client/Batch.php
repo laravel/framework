@@ -4,7 +4,7 @@ namespace Illuminate\Http\Client;
 
 use Carbon\CarbonImmutable;
 use Closure;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
 use Illuminate\Http\Client\Promises\LazyPromise;
@@ -290,6 +290,7 @@ class Batch
                     if (
                         ($result instanceof Response && $result->failed()) ||
                         $result instanceof RequestException ||
+                        $result instanceof GuzzleRequestException ||
                         $result instanceof ConnectionException
                     ) {
                         $this->incrementFailedRequests();
@@ -304,7 +305,11 @@ class Batch
                 'rejected' => function ($reason, $key) {
                     $this->decrementPendingRequests();
 
-                    if ($reason instanceof RequestException || $reason instanceof ConnectionException) {
+                    if (
+                        $reason instanceof RequestException ||
+                        $reason instanceof GuzzleRequestException ||
+                        $reason instanceof ConnectionException
+                    ) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {

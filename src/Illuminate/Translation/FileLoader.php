@@ -60,6 +60,11 @@ class FileLoader implements Loader
      */
     public function load($locale, $group, $namespace = null)
     {
+        if ($this->isUnsafePathSegment($locale) ||
+            ($group !== '*' && $this->isUnsafePathSegment($group, allowSlashes: true))) {
+            return [];
+        }
+
         if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPaths($locale);
         }
@@ -152,11 +157,28 @@ class FileLoader implements Loader
                         throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
                     }
 
-                    $output = array_merge($output, $decoded);
+                    $output = array_replace($output, $decoded);
                 }
 
                 return $output;
             }, []);
+    }
+
+    /**
+     * Determine if the given value is unsafe to use as part of a translation file path.
+     *
+     * @param  mixed  $value
+     * @param  bool  $allowSlashes
+     * @return bool
+     */
+    protected function isUnsafePathSegment($value, $allowSlashes = false)
+    {
+        return ! is_string($value)
+            || $value === ''
+            || str_contains($value, '..')
+            || str_contains($value, '\\')
+            || str_contains($value, "\0")
+            || (! $allowSlashes && str_contains($value, '/'));
     }
 
     /**

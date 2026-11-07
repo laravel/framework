@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\Event;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class ListenerTest extends TestCase
@@ -17,14 +16,23 @@ class ListenerTest extends TestCase
         parent::tearDown();
     }
 
+    public function testClassListenerRunsImmediatelyInsideTransaction()
+    {
+        $manager = new DatabaseTransactionsManager;
+        $this->app->singleton('db.transactions', fn () => $manager);
+
+        Event::listen(ListenerTestEvent::class, ListenerTestListener::class);
+
+        $manager->begin('default', 1);
+
+        Event::dispatch(new ListenerTestEvent);
+
+        $this->assertTrue(ListenerTestListener::$ran);
+    }
+
     public function testClassListenerRunsNormallyIfNoTransactions()
     {
-        $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->shouldNotReceive('addCallback')->once()->andReturn(null);
-
-            return $transactionManager;
-        });
+        $this->app->singleton('db.transactions', fn () => new DatabaseTransactionsManager);
 
         Event::listen(ListenerTestEvent::class, ListenerTestListener::class);
 
@@ -35,18 +43,20 @@ class ListenerTest extends TestCase
 
     public function testClassListenerDoesntRunInsideTransaction()
     {
-        $this->app->singleton('db.transactions', function () {
-            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
-            $transactionManager->expects('addCallback')->andReturn(null);
-
-            return $transactionManager;
-        });
+        $manager = new DatabaseTransactionsManager;
+        $this->app->singleton('db.transactions', fn () => $manager);
 
         Event::listen(ListenerTestEvent::class, ListenerTestListenerAfterCommit::class);
+
+        $manager->begin('default', 1);
 
         Event::dispatch(new ListenerTestEvent);
 
         $this->assertFalse(ListenerTestListenerAfterCommit::$ran);
+
+        $manager->commit('default', 1, 0);
+
+        $this->assertTrue(ListenerTestListenerAfterCommit::$ran);
     }
 }
 

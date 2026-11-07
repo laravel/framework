@@ -16,13 +16,16 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class MaintenanceModeTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
@@ -53,10 +56,10 @@ class MaintenanceModeTest extends TestCase
 
     public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
     {
-        $cache = Mockery::mock(Factory::class, Repository::class);
-        $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
-        $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
-        $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
+        $cache = Double::for(Factory::class, Repository::class);
+        $cache->allows('store')->with('maintenance')->returns($cache);
+        $cache->allows('has')->with('framework:down')->returns(true, false);
+        $cache->expects('get')->with('framework:down')->returns(null);
 
         $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
             $cache, 'maintenance', 'framework:down'
@@ -309,6 +312,29 @@ class MaintenanceModeTest extends TestCase
             'natural language' => ['tomorrow 14:00'],
             'relative time' => ['+2 hours'],
         ];
+    }
+
+    public function testMaintenanceModeRetryDatetimeIsConvertedToGmt(): void
+    {
+        $timezone = date_default_timezone_get();
+
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31 15:30:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 14:30:00 GMT', $data['retry']);
+
+            $this->artisan(DownCommand::class, ['--retry' => '2026-12-31T15:30:00+02:00']);
+
+            $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+            $this->assertSame('Thu, 31 Dec 2026 13:30:00 GMT', $data['retry']);
+        } finally {
+            date_default_timezone_set($timezone);
+        }
     }
 
     public function testMaintenanceModeRetryWithHttpDateHeader(): void

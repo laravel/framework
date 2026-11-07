@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Support\Concerns\TestsInteractsWithDataContract;
 use PHPUnit\Framework\TestCase;
 
 class SupportUriTest extends TestCase
 {
+    use TestsInteractsWithDataContract;
+
     public function test_can_build_special_urls()
     {
         Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
@@ -24,6 +27,7 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of($originalUri = 'https://laravel.com/docs/installation');
 
+        $this->assertSame('https://laravel.com', $uri->origin());
         $this->assertSame('https', $uri->scheme());
         $this->assertNull($uri->user());
         $this->assertNull($uri->password());
@@ -38,6 +42,7 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://taylor:password@laravel.com/docs/installation?version=1#hello');
 
+        $this->assertSame('https://laravel.com', $uri->origin());
         $this->assertSame('taylor', $uri->user());
         $this->assertSame('password', $uri->password());
         $this->assertSame('hello', $uri->fragment());
@@ -53,6 +58,19 @@ class SupportUriTest extends TestCase
 
         $this->assertFalse(Uri::of('https://laravel.com')->isEmpty());
         $this->assertTrue(Uri::of('https://laravel.com')->isNotEmpty());
+    }
+
+    public function test_origin()
+    {
+        $this->assertSame('https://github.com:80', Uri::of('https://github.com:80/a/b#x')->origin());
+        $this->assertSame('https://a.com', Uri::of('https://A.com:443/x')->origin());
+        $this->assertSame('http://a.com', Uri::of('http://a.com:80')->origin());
+        $this->assertSame('wss://a.com:8080', Uri::of('wss://a.com:8080/socket')->origin());
+
+        $this->assertNull(Uri::of('/rel')->origin());
+        $this->assertNull(Uri::of('mailto:x@y.z')->origin());
+        $this->assertNull(Uri::of('file:///etc/hosts')->origin());
+        $this->assertNull(Uri::of('')->origin());
     }
 
     public function test_without_fragment()
@@ -326,6 +344,164 @@ class SupportUriTest extends TestCase
         $uri = new Uri('https://laravel.com/');
 
         $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
+
+    public function test_exists_method()
+    {
+        $this->assertDataExistsContract();
+        $this->assertDataExistsNestedContract();
+    }
+
+    public function test_has_method()
+    {
+        $this->assertDataHasContract();
+        $this->assertDataHasNestedContract();
+    }
+
+    public function test_has_any_method()
+    {
+        $this->assertDataHasAnyContract();
+        $this->assertDataHasAnyNestedContract();
+    }
+
+    public function test_when_has_method()
+    {
+        $this->assertDataWhenHasContract();
+        $this->assertDataWhenHasNestedContract();
+    }
+
+    public function test_filled_method()
+    {
+        $this->assertDataFilledContract();
+        $this->assertDataFilledNestedContract();
+    }
+
+    public function test_is_not_filled_method()
+    {
+        $this->assertDataIsNotFilledContract();
+        $this->assertDataIsNotFilledNestedContract();
+    }
+
+    public function test_any_filled_method()
+    {
+        $this->assertDataAnyFilledContract();
+        $this->assertDataAnyFilledNestedContract();
+    }
+
+    public function test_when_filled_method()
+    {
+        $this->assertDataWhenFilledContract();
+        $this->assertDataWhenFilledNestedContract();
+    }
+
+    public function test_when_enum_method()
+    {
+        $this->assertDataWhenEnumContract();
+    }
+
+    public function test_missing_method()
+    {
+        $this->assertDataMissingContract();
+        $this->assertDataMissingNestedContract();
+    }
+
+    public function test_when_missing_method()
+    {
+        $this->assertDataWhenMissingContract();
+        $this->assertDataWhenMissingNestedContract();
+    }
+
+    public function test_str_method()
+    {
+        $this->assertDataStrContract();
+    }
+
+    public function test_string_method()
+    {
+        $this->assertDataStringContract();
+        $this->assertDataStringStrictContract();
+    }
+
+    public function test_boolean_method()
+    {
+        $this->assertDataBooleanContract();
+        $this->assertDataBooleanStrictContract();
+    }
+
+    public function test_integer_method()
+    {
+        $this->assertDataIntegerContract();
+        $this->assertDataIntegerStrictContract();
+    }
+
+    public function test_float_method()
+    {
+        $this->assertDataFloatContract();
+        $this->assertDataFloatStrictContract();
+    }
+
+    public function test_clamp_method()
+    {
+        $this->assertDataClampContract();
+    }
+
+    public function test_date_method()
+    {
+        $this->assertDataDateContract();
+    }
+
+    public function test_interval_method()
+    {
+        $this->assertDataIntervalContract();
+    }
+
+    public function test_uuid_method()
+    {
+        $this->assertDataUuidContract();
+    }
+
+    public function test_ulid_method()
+    {
+        $this->assertDataUlidContract();
+    }
+
+    public function test_enum_method()
+    {
+        $this->assertDataEnumContract();
+        $this->assertDataEnumNestedContract();
+    }
+
+    public function test_enums_method()
+    {
+        $this->assertDataEnumsContract();
+    }
+
+    public function test_array_method()
+    {
+        $this->assertDataArrayContract();
+    }
+
+    public function test_collect_method()
+    {
+        $this->assertDataCollectContract();
+        $this->assertDataCollectNestedContract();
+    }
+
+    public function test_only_method()
+    {
+        $this->assertDataOnlyContract();
+        $this->assertDataOnlyNestedContract();
+    }
+
+    public function test_except_method()
+    {
+        $this->assertDataExceptContract();
+        $this->assertDataExceptNestedContract();
+    }
+
+    protected static function arrayToDataFactory(array $data)
+    {
+        return Uri::of('https://laravel.com')->withQuery($data)->query();
     }
 }
 

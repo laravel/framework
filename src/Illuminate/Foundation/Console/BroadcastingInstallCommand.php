@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -59,7 +60,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected $driverPackages = [
         'pusher' => ['pusher/pusher-php-server' => '*'],
-        'ably' => ['ably/ably-php' => '*'],
+        'ably' => ['ably/pubsub-server' => '*'],
         'mercure' => ['symfony/mercure' => '^0.8', 'web-token/jwt-library' => '^4.1'],
     ];
 
@@ -401,9 +402,9 @@ class BroadcastingInstallCommand extends Command
             ];
         }
 
-        $filePath = array_filter($filePaths, function ($path) {
+        $filePath = Arr::first($filePaths, function ($path) {
             return file_exists($path);
-        })[0] ?? null;
+        });
 
         if (! $filePath) {
             $this->components->warn("Could not find file [{$filePaths[0]}]. Skipping automatic Echo configuration.");

@@ -2,18 +2,21 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use ArrayObject;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Http\Request;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A256GCM;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\Dir;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\Serializer\CompactSerializer;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -27,6 +30,8 @@ use Symfony\Component\Mercure\Update;
 
 class MercureBroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\MercureBroadcaster
      */
@@ -38,10 +43,10 @@ class MercureBroadcasterTest extends TestCase
     {
         parent::setUp();
 
-        $this->hub = m::mock(HubInterface::class);
-        $this->hub->shouldReceive('getPublicUrl')->andReturn('https://localhost/.well-known/mercure');
-        $this->hub->shouldReceive('getCookieName')->andReturn('__Secure-mercure_access_token');
-        $this->hub->shouldReceive('getFactory')->andReturn($this->tokenFactory());
+        $this->hub = Double::for(HubInterface::class);
+        $this->hub->allows('getPublicUrl')->returns('https://localhost/.well-known/mercure');
+        $this->hub->allows('getCookieName')->returns('__Secure-mercure_access_token');
+        $this->hub->allows('getFactory')->returns($this->tokenFactory());
 
         $this->broadcaster = new MercureBroadcaster($this->hub);
     }
@@ -65,7 +70,6 @@ class MercureBroadcasterTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
         EncryptCookies::flushState();
 
         parent::tearDown();
@@ -82,8 +86,8 @@ class MercureBroadcasterTest extends TestCase
 
     public function testSettingAHubRegistersItsCookieNameAsNeverEncrypted()
     {
-        $hub = m::mock(HubInterface::class);
-        $hub->shouldReceive('getCookieName')->andReturn('custom_mercure_cookie');
+        $hub = Double::for(HubInterface::class);
+        $hub->expects('getCookieName')->returns('custom_mercure_cookie');
 
         $this->broadcaster->setHub($hub);
 
@@ -231,9 +235,25 @@ class MercureBroadcasterTest extends TestCase
         $this->assertSame('strict', $cookie->getSameSite());
     }
 
+    /**
+     * @return \ArrayObject<int, Update>
+     */
+    protected function capturePublishedUpdates(): ArrayObject
+    {
+        $updates = new ArrayObject;
+
+        $this->hub->allows('publish')->resolves(function (Update $update) use ($updates) {
+            $updates[] = $update;
+
+            return 'id';
+        });
+
+        return $updates;
+    }
+
     public function testBroadcastPublishesOneUnprivatedUpdateWhenEveryChannelIsPublic()
     {
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             $data = json_decode($update->getData(), true);
 
             return $update->getTopics() === ['https://laravel.alt/echo/channel/news', 'https://laravel.alt/echo/channel/weather']
@@ -246,22 +266,24 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastPublishesOnePrivateUpdatePerGuardedChannel()
     {
-        foreach (['private-room.1', 'presence-room.2'] as $channel) {
-            $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) use ($channel) {
-                $data = json_decode($update->getData(), true);
-
-                return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
-                    && $update->isPrivate()
-                    && $data['channels'] === [$channel];
-            }));
-        }
+        $updates = $this->capturePublishedUpdates();
 
         $this->broadcaster->broadcast(['private-room.1', 'presence-room.2'], 'MessageSent', []);
+
+        $this->assertCount(2, $updates);
+
+        foreach (['private-room.1', 'presence-room.2'] as $index => $channel) {
+            $data = json_decode($updates[$index]->getData(), true);
+
+            $this->assertSame(['https://laravel.alt/echo/channel/'.$channel], $updates[$index]->getTopics());
+            $this->assertTrue($updates[$index]->isPrivate());
+            $this->assertSame([$channel], $data['channels']);
+        }
     }
 
     public function testBroadcastStripsTheSocketKeyFromThePayloadAndEmbedsItInTheEnvelope()
     {
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             $data = json_decode($update->getData(), true);
 
             return $data['socket'] === 'abcd.1234' && $data['payload'] === ['text' => 'hi'];
@@ -272,7 +294,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastOmitsTheSocketKeyFromTheEnvelopeWhenAbsent()
     {
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return ! array_key_exists('socket', json_decode($update->getData(), true));
         }));
 
@@ -281,20 +303,20 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastSplitsAMixedBatchIntoTwoUpdates()
     {
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
-            return $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate();
-        }));
-
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
-            return $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate();
-        }));
+        $updates = $this->capturePublishedUpdates();
 
         $this->broadcaster->broadcast(['news', 'private-room.1'], 'MessageSent', ['text' => 'hi']);
+
+        $this->assertCount(2, $updates);
+        $this->assertSame(['https://laravel.alt/echo/channel/news'], $updates[0]->getTopics());
+        $this->assertFalse($updates[0]->isPrivate());
+        $this->assertSame(['https://laravel.alt/echo/channel/private-room.1'], $updates[1]->getTopics());
+        $this->assertTrue($updates[1]->isPrivate());
     }
 
     public function testTopicsEncodeChannelNamesIntoASinglePathSegment()
     {
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return $update->getTopics() === ['https://laravel.alt/echo/channel/order%2F1%20%2A%27%28%29%21'];
         }));
 
@@ -305,9 +327,7 @@ class MercureBroadcasterTest extends TestCase
     {
         $this->expectException(BroadcastException::class);
 
-        $this->hub->shouldReceive('publish')->andThrow(
-            new MercureRuntimeException('unreachable')
-        );
+        $this->hub->expects('publish')->throws(new MercureRuntimeException('unreachable'));
 
         $this->broadcaster->broadcast(['news'], 'Tick');
     }
@@ -318,7 +338,7 @@ class MercureBroadcasterTest extends TestCase
             'Failed to send an update.', 0, new RuntimeException('HTTP/2 401 from the hub')
         );
 
-        $this->hub->shouldReceive('publish')->andThrow($hubException);
+        $this->hub->expects('publish')->throws($hubException);
 
         try {
             $this->broadcaster->broadcast(['news'], 'Tick');
@@ -333,7 +353,7 @@ class MercureBroadcasterTest extends TestCase
     {
         $hubException = new RuntimeException('No Mercure hub configured');
 
-        $this->hub->shouldReceive('publish')->andThrow($hubException);
+        $this->hub->expects('publish')->throws($hubException);
 
         try {
             $this->broadcaster->broadcast(['news'], 'Tick');
@@ -504,26 +524,26 @@ class MercureBroadcasterTest extends TestCase
     {
         $broadcaster = $this->encryptedBroadcaster();
 
-        $this->hub->shouldReceive('publish')->once()->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate()
-        ));
-        $this->hub->shouldReceive('publish')->once()->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate()
-        ));
-
-        foreach (['private-encrypted-a', 'private-encrypted-b'] as $channel) {
-            $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) use ($channel) {
-                $data = json_decode($update->getData(), true);
-
-                return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
-                    && $update->isPrivate()
-                    && array_keys($data) === ['channels', 'data']
-                    && $data['channels'] === [$channel]
-                    && count(explode('.', $data['data'])) === 5;
-            }));
-        }
+        $updates = $this->capturePublishedUpdates();
 
         $broadcaster->broadcast(['news', 'private-room.1', 'private-encrypted-a', 'private-encrypted-b'], 'MessageSent', ['text' => 'hi']);
+
+        $this->assertCount(4, $updates);
+        $this->assertSame(['https://laravel.alt/echo/channel/news'], $updates[0]->getTopics());
+        $this->assertFalse($updates[0]->isPrivate());
+        $this->assertSame(['https://laravel.alt/echo/channel/private-room.1'], $updates[1]->getTopics());
+        $this->assertTrue($updates[1]->isPrivate());
+
+        foreach (['private-encrypted-a', 'private-encrypted-b'] as $index => $channel) {
+            $update = $updates[$index + 2];
+            $data = json_decode($update->getData(), true);
+
+            $this->assertSame(['https://laravel.alt/echo/channel/'.$channel], $update->getTopics());
+            $this->assertTrue($update->isPrivate());
+            $this->assertSame(['channels', 'data'], array_keys($data));
+            $this->assertSame([$channel], $data['channels']);
+            $this->assertCount(5, explode('.', $data['data']));
+        }
     }
 
     public function testBroadcastEncryptedUpdateRoundTrips()
@@ -531,7 +551,7 @@ class MercureBroadcasterTest extends TestCase
         $broadcaster = $this->encryptedBroadcaster();
 
         $captured = null;
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) use (&$captured) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use (&$captured) {
             $captured = $update;
 
             return true;
@@ -555,7 +575,7 @@ class MercureBroadcasterTest extends TestCase
         $broadcaster = $this->encryptedBroadcaster();
 
         $captured = null;
-        $this->hub->shouldReceive('publish')->once()->with(m::on(function (Update $update) use (&$captured) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use (&$captured) {
             $captured = $update;
 
             return true;
@@ -660,19 +680,17 @@ class MercureBroadcasterTest extends TestCase
         $this->assertSame([['match' => 'https://app.example.com/broadcasting/channel/private-room.1']], $details[0]['topics']);
         $this->assertSame([['match' => 'https://app.example.com/broadcasting/whisper/private-room.1']], $details[1]['topics']);
 
-        $this->hub->shouldReceive('publish')->once()->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://app.example.com/broadcasting/channel/news']
-        ));
+        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://app.example.com/broadcasting/channel/news']));
 
         $broadcaster->broadcast(['news'], 'Tick');
     }
 
     protected function broadcasterForHub(string $publicUrl)
     {
-        $hub = m::mock(HubInterface::class);
-        $hub->shouldReceive('getPublicUrl')->andReturn($publicUrl);
-        $hub->shouldReceive('getCookieName')->andReturn('__Secure-mercure_access_token');
-        $hub->shouldReceive('getFactory')->andReturn($this->tokenFactory());
+        $hub = Double::for(HubInterface::class);
+        $hub->allows('getPublicUrl')->returns($publicUrl);
+        $hub->allows('getCookieName')->returns('__Secure-mercure_access_token');
+        $hub->allows('getFactory')->returns($this->tokenFactory());
 
         return new MercureBroadcaster($hub);
     }

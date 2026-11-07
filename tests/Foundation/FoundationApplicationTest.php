@@ -3,14 +3,15 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Config\Repository;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
-use Mockery;
+use Illuminate\Support\Testing\Fakes\EventFake;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator as TranslatorImpl;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -22,28 +23,28 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $app['config'] = $config = Mockery::mock(Repository::class);
-        $config->expects('get')->with('app.locale')->andReturn('bar');
-        $config->expects('set')->with('app.locale', 'foo');
-        $app['translator'] = $trans = Mockery::mock(Translator::class);
-        $trans->expects('setLocale')->with('foo');
-        $app['events'] = $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::on(function (LocaleUpdated $event) {
-            return $event->locale === 'foo' && $event->previousLocale === 'bar';
-        }));
+        $app['config'] = $config = new Repository(['app' => ['locale' => 'bar']]);
+        $app['translator'] = $trans = new TranslatorImpl(new ArrayLoader, 'bar');
+        $app['events'] = $events = new EventFake(new Dispatcher);
 
         $app->setLocale('foo');
+
+        $this->assertSame('foo', $config->get('app.locale'));
+        $this->assertSame('foo', $trans->getLocale());
+
+        $events->assertDispatchedOnce(LocaleUpdated::class);
+        $events->assertDispatched(LocaleUpdated::class, function (LocaleUpdated $event) {
+            return $event->locale === 'foo' && $event->previousLocale === 'bar';
+        });
     }
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = Mockery::mock(ApplicationBasicServiceProviderStub::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new ApplicationBasicServiceProviderStub($app);
         $app->register($provider);
 
-        $this->assertArrayHasKey($class, $app->getLoadedProviders());
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
     }
 
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
@@ -90,24 +91,20 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
-        $provider = Mockery::mock(ServiceProvider::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new class($app) extends ServiceProvider {};
         $app->register($provider);
 
-        $this->assertArrayHasKey($class, $app->getLoadedProviders());
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
     }
 
     public function testServiceProvidersCouldBeLoaded()
     {
-        $provider = Mockery::mock(ServiceProvider::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new class($app) extends ServiceProvider {};
         $app->register($provider);
 
-        $this->assertTrue($app->providerIsLoaded($class));
+        $this->assertTrue($app->providerIsLoaded(get_class($provider)));
         $this->assertFalse($app->providerIsLoaded(ApplicationBasicServiceProviderStub::class));
     }
 
@@ -223,6 +220,21 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment('q*'));
         $this->assertFalse($app->environment('qux', 'bar'));
         $this->assertFalse($app->environment(['qux', 'bar']));
+    }
+
+    public function testEnvironmentWithEnums()
+    {
+        $app = new Application;
+        $app['env'] = 'staging';
+
+        $this->assertTrue($app->environment(ApplicationTestEnvironment::Staging));
+        $this->assertTrue($app->environment(ApplicationTestEnvironment::Local, ApplicationTestEnvironment::Staging));
+        $this->assertTrue($app->environment([ApplicationTestEnvironment::Local, ApplicationTestEnvironment::Staging]));
+        $this->assertTrue($app->environment(['local', ApplicationTestEnvironment::Staging]));
+        $this->assertTrue($app->environment(ApplicationTestUnitEnvironment::staging));
+
+        $this->assertFalse($app->environment(ApplicationTestEnvironment::Local));
+        $this->assertFalse($app->environment([ApplicationTestEnvironment::Local, 'production']));
     }
 
     public function testEnvironmentHelpers()
@@ -805,4 +817,15 @@ class FileExistsFake
 
         return false;
     }
+}
+
+enum ApplicationTestEnvironment: string
+{
+    case Local = 'local';
+    case Staging = 'staging';
+}
+
+enum ApplicationTestUnitEnvironment
+{
+    case staging;
 }

@@ -2,9 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +13,7 @@ class SupportTestingEventFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fake = new EventFake(Mockery::mock(Dispatcher::class));
+        $this->fake = new EventFake(new EventDispatcher);
     }
 
     public function testAssertDispatched()
@@ -42,12 +41,8 @@ class SupportTestingEventFakeTest extends TestCase
 
     public function testAssertListening()
     {
-        $listener = ListenerStub::class;
-
-        $dispatcher = Mockery::mock(Dispatcher::class);
-        $dispatcher->expects('getListeners')->andReturn([function ($event, $payload) use ($listener) {
-            return $listener(...array_values($payload));
-        }]);
+        $dispatcher = new EventDispatcher;
+        $dispatcher->listen(EventStub::class, ListenerStub::class);
 
         $fake = new EventFake($dispatcher);
 
@@ -99,6 +94,14 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
     }
 
+    public function testAssertDispatchedWithArrayOfProperties()
+    {
+        $this->fake->dispatch(new EventWithPropertiesStub('pending'));
+
+        $this->fake->assertDispatched(EventWithPropertiesStub::class, ['status' => 'pending']);
+        $this->fake->assertNotDispatched(EventWithPropertiesStub::class, ['status' => 'complete']);
+    }
+
     public function testAssertNotDispatched()
     {
         $this->fake->assertNotDispatched(EventStub::class);
@@ -129,8 +132,11 @@ class SupportTestingEventFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnore()
     {
-        $dispatcher = Mockery::mock(Dispatcher::class);
-        $dispatcher->expects('dispatch');
+        $dispatcher = new EventDispatcher;
+        $passedThrough = [];
+        $dispatcher->listen('*', function ($event, $payload) use (&$passedThrough) {
+            $passedThrough[] = $event;
+        });
 
         $fake = new EventFake($dispatcher, [
             'Foo',
@@ -146,6 +152,7 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertDispatched('Foo');
         $fake->assertDispatched('Bar');
         $fake->assertNotDispatched('Baz');
+        $this->assertSame(['Baz'], $passedThrough);
     }
 
     public function testAssertNothingDispatched()
@@ -172,4 +179,11 @@ class EventStub
 class ListenerStub
 {
     //
+}
+
+class EventWithPropertiesStub
+{
+    public function __construct(public string $status)
+    {
+    }
 }

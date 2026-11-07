@@ -80,7 +80,7 @@ interface Application extends Container
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  ...$environments
+     * @param  \UnitEnum|string|array  ...$environments
      * @return string|bool
      */
     public function environment(...$environments);

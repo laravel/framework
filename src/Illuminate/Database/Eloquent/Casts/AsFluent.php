@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Fluent;
 
 class AsFluent implements Castable
@@ -25,7 +26,15 @@ class AsFluent implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                return isset($value) ? [$key => Json::encode($value)] : null;
+                if (! isset($value)) {
+                    return null;
+                }
+
+                if (($json = Json::encode($value)) === false) {
+                    throw JsonEncodingException::forAttribute($model, $key, json_last_error_msg());
+                }
+
+                return [$key => $json];
             }
         };
     }

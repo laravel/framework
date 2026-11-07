@@ -37,21 +37,21 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The asset root URL.
      *
-     * @var string
+     * @var string|null
      */
     protected $assetRoot;
 
     /**
      * The forced URL root.
      *
-     * @var string
+     * @var string|null
      */
     protected $forcedRoot;
 
     /**
      * The forced scheme for URLs.
      *
-     * @var string
+     * @var string|null
      */
     protected $forceScheme;
 

@@ -6,9 +6,15 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Events\CommandExecuted;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
-use Mockery;
+use Illuminate\Support\Str;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -18,6 +24,7 @@ use RuntimeException;
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -278,11 +285,9 @@ class RedisStoreTest extends TestCase
 
     public function testPutManyCallsPutWhenClustered()
     {
-        $store = Mockery::mock(RedisStore::class)->makePartial();
-        $store->expects('connection')->andReturn(Mockery::mock(PhpRedisClusterConnection::class));
-        $store->expects('put')
-            ->twice()
-            ->andReturn(true);
+        $store = Double::for(RedisStore::class)->passthru();
+        $store->expects('connection')->returns(Double::for(PhpRedisClusterConnection::class));
+        $store->expects('put')->times(2)->returns(true);
 
         $store->putMany([
             'foo' => 'bar',
@@ -330,6 +335,250 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    public function testItStoresAndRetrievesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertNull($store->get('foo'));
+
+        $this->assertTrue($store->put('foo', 'bar', 60));
+        $this->assertTrue($store->put('number', 5, 60));
+        $this->assertTrue($store->put('float', 1.5, 60));
+
+        $this->assertSame('bar', $store->get('foo'));
+        $this->assertEquals(5, $store->get('number'));
+        $this->assertEquals(1.5, $store->get('float'));
+    }
+
+    public function testItStoresAndRetrievesManyValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz'], 60));
+
+        $this->assertSame(
+            ['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz', 'missing' => null],
+            $store->many(['foo', 'fizz', 'norf', 'missing'])
+        );
+    }
+
+    public function testItIncrementsAndDecrementsValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('count', 1, 60);
+
+        $this->assertSame(6, $store->increment('count', 5));
+        $this->assertEquals(6, $store->get('count'));
+        $this->assertSame(4, $store->decrement('count', 2));
+        $this->assertEquals(4, $store->get('count'));
+    }
+
+    public function testItStoresValuesForeverAndCanTouchThem(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+        $connection = $store->connection();
+
+        $this->assertTrue($store->forever('forever', 'value'));
+        $this->assertSame('value', $store->get('forever'));
+        $this->assertSame(-1, $connection->ttl($store->getPrefix().'forever'));
+
+        $store->put('touched', 'value', 10);
+
+        $this->assertTrue($store->touch('touched', 100));
+        $this->assertGreaterThan(10, $connection->ttl($store->getPrefix().'touched'));
+        $this->assertSame('value', $store->get('touched'));
+    }
+
+    public function testFlushStaleTagsRemovesExpiredEntriesAndStopsScanning(): void
+    {
+        $store = Cache::store('redis');
+
+        if ($store->connection() instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Predis cannot SCAN a cluster, so the current tags cannot be listed.');
+        }
+
+        $store->clear();
+
+        // An entry that expired five minutes ago, and one that is still fresh...
+        Carbon::setTestNow(Carbon::now()->subMinutes(5));
+
+        try {
+            $store->tags(['foo'])->put('expired', 'value', 60);
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $store->tags(['foo'])->put('fresh', 'value', 3600);
+
+        $tagSet = $store->getPrefix().'tag:foo:entries';
+
+        $this->assertSame(2, $store->connection()->zcard($tagSet));
+
+        // The scan has to recognise it is back at its starting cursor, or this never returns...
+        $store->flushStaleTags();
+
+        $this->assertSame(1, $store->connection()->zcard($tagSet));
+        $this->assertSame('value', $store->tags(['foo'])->get('fresh'));
+    }
+
+    #[RequiresPhpExtension('redis', '>= 6.1.0')]
+    public function testFlushStaleTagsDoesNotDoublePrefixTheMatchPatternWithScanPrefix(): void
+    {
+        $store = Cache::store('redis');
+
+        if (! $store->connection() instanceof PhpRedisConnection || $store->connection() instanceof PhpRedisClusterConnection) {
+            $this->markTestSkipped('SCAN_PREFIX only applies to a single phpredis connection.');
+        }
+
+        $store->clear();
+
+        Carbon::setTestNow(Carbon::now()->subMinutes(5));
+
+        try {
+            $store->tags(['foo'])->put('expired', 'value', 60);
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $tagSet = $store->getPrefix().'tag:foo:entries';
+
+        $this->assertSame(1, $store->connection()->zcard($tagSet));
+
+        // With SCAN_PREFIX, phpredis prepends the connection prefix to the pattern itself...
+        $store->connection()->client()->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
+
+        try {
+            $store->flushStaleTags();
+        } finally {
+            $store->connection()->client()->setOption(\Redis::OPT_SCAN, \Redis::SCAN_NORETRY);
+        }
+
+        $this->assertSame(0, $store->connection()->zcard($tagSet));
+    }
+
+    public function testItForgetsAndFlushesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('foo', 'bar', 60);
+        $store->put('fizz', 'buzz', 60);
+
+        $this->assertTrue($store->forget('foo'));
+        $this->assertNull($store->get('foo'));
+        $this->assertSame('buzz', $store->get('fizz'));
+
+        $this->assertTrue($store->flush());
+        $this->assertNull($store->get('fizz'));
+    }
+
+    public function testFlushingManyTagsOnlyPassesEachEntrysOwnTagToTheScript()
+    {
+        $store = Cache::store('redis');
+        $connection = $store->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not flush tags with a script.');
+        }
+
+        $store->clear();
+
+        $prefix = $store->getPrefix();
+
+        $store->tags(['people'])->put('person-1', 'Sally', 300);
+        $store->tags(['people', 'artist'])->put('person-2', 'John', 300);
+        $store->tags(['artist'])->forever('person-3', 'Taylor');
+        $store->tags(['other'])->put('person-4', 'Abigail', 300);
+
+        $calls = [];
+
+        $connection->setEventDispatcher($this->app['events']);
+        $connection->listen(function (CommandExecuted $event) use (&$calls) {
+            if ($event->command === 'eval') {
+                [$numberOfKeys, $arguments] = is_array($event->parameters[1])
+                    ? [$event->parameters[2], $event->parameters[1]]
+                    : [$event->parameters[1], array_slice($event->parameters, 2)];
+
+                $calls[] = [
+                    'keys' => array_map(fn ($key) => Str::afterLast($key, ':'), array_slice($arguments, 0, $numberOfKeys)),
+                    'tags' => array_slice($arguments, $numberOfKeys + 1),
+                ];
+            }
+        });
+
+        $store->tags(['people', 'artist', 'empty-1', 'empty-2'])->flush();
+
+        $connection->unsetEventDispatcher();
+
+        $this->assertCount(2, $calls);
+        $this->assertEqualsCanonicalizing(['person-1', 'person-2'], $calls[0]['keys']);
+        $this->assertCount(1, $calls[0]['tags']);
+        $this->assertStringEndsWith('tag:people:entries', $calls[0]['tags'][0]);
+        $this->assertEqualsCanonicalizing(['person-2', 'person-3'], $calls[1]['keys']);
+        $this->assertCount(1, $calls[1]['tags']);
+        $this->assertStringEndsWith('tag:artist:entries', $calls[1]['tags'][0]);
+
+        $this->assertNull($store->tags(['people'])->get('person-1'));
+        $this->assertNull($store->tags(['people', 'artist'])->get('person-2'));
+        $this->assertNull($store->tags(['artist'])->get('person-3'));
+        $this->assertSame('Abigail', $store->tags(['other'])->get('person-4'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:people:entries'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:artist:entries'));
+        $this->assertSame(1, $connection->zcard($prefix.'tag:other:entries'));
+    }
+
+    public function testFlushingTagsWhileASharedKeyIsRewrittenLeavesNoLiveValueUnindexed()
+    {
+        $store = Cache::store('redis');
+        $connection = $store->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not flush tags with a script.');
+        }
+
+        $store->clear();
+
+        $prefix = $store->getPrefix();
+
+        $store->tags(['people', 'artist'])->forever('person', 'Sally');
+
+        $rewritten = false;
+
+        $connection->setEventDispatcher($this->app['events']);
+        $connection->listen(function (CommandExecuted $event) use ($store, &$rewritten) {
+            if ($event->command === 'eval' && ! $rewritten) {
+                $rewritten = true;
+
+                $store->tags(['people', 'artist'])->forever('person', 'John');
+            }
+        });
+
+        $store->tags(['people', 'artist'])->flush();
+
+        $connection->unsetEventDispatcher();
+
+        $this->assertTrue($rewritten);
+
+        $itemKey = $store->tags(['people', 'artist'])->taggedItemKey('person');
+
+        if ($store->tags(['people', 'artist'])->get('person') !== null) {
+            $this->assertContains($itemKey, $connection->zrange($prefix.'tag:people:entries', 0, -1));
+            $this->assertContains($itemKey, $connection->zrange($prefix.'tag:artist:entries', 0, -1));
+        }
+
+        $store->tags(['people'])->flush();
+        $store->tags(['artist'])->flush();
+
+        $this->assertNull($store->tags(['people', 'artist'])->get('person'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:people:entries'));
+        $this->assertSame(0, $connection->zcard($prefix.'tag:artist:entries'));
     }
 
     public function testLocksCanBeFlushed()

@@ -13,6 +13,7 @@ use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\View\Factory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -103,6 +104,7 @@ class MailSesTransportTest extends TestCase
         (new SesTransport($client))->send($message);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSesLocalConfiguration(): void
     {
         $container = new Container;

@@ -4,6 +4,7 @@ namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;
@@ -74,12 +75,12 @@ class ConcurrencyLimiter
      */
     public function block($timeout, $callback = null, $sleep = 250)
     {
-        $starting = time();
+        $starting = Carbon::now()->getTimestamp();
 
         $id = Str::random(20);
 
         while (! $slot = $this->acquire($id)) {
-            if (time() - $timeout >= $starting) {
+            if (Carbon::now()->getTimestamp() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 

@@ -2,16 +2,24 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $builder;
 
     protected $related;
@@ -20,11 +28,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
     }
@@ -35,11 +43,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -50,11 +58,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentBelongsToModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -63,32 +71,33 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testEagerConstraintsAreProperlyAdded()
     {
-        $relation = $this->getRelation();
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('relation.id', ['foreign.value', 'foreign.value.two']);
-        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub];
+        $relation = $this->getRelationWithRealQuery();
+        $models = [$this->newModelWithKey(1), $this->newModelWithKey(2), $this->newModelWithKey(1)];
         $relation->addEagerConstraints($models);
+
+        $this->assertSame('select * from "relation" where "relation"."id" = ? and "relation"."id" in (1, 2)', $relation->toSql());
     }
 
     public function testIdsInEagerConstraintsCanBeZero()
     {
-        $relation = $this->getRelation();
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('relation.id', [0, 'foreign.value']);
-        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
-        $relation->addEagerConstraints($models);
+        $relation = $this->getRelationWithRealQuery();
+        $relation->addEagerConstraints([$this->newModelWithKey(1), new EloquentBelongsToModelStubWithZeroId]);
+
+        $this->assertSame('select * from "relation" where "relation"."id" = ? and "relation"."id" in (0, 1)', $relation->toSql());
     }
 
     public function testIdsInEagerConstraintsCanBeBackedEnum()
     {
-        $relation = $this->getRelation();
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('relation.id', [5, 'foreign.value']);
-        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithBackedEnumCast];
-        $relation->addEagerConstraints($models);
+        $relation = $this->getRelationWithRealQuery();
+        $relation->addEagerConstraints([$this->newModelWithKey(1), new EloquentBelongsToModelStubWithBackedEnumCast]);
+
+        $this->assertSame('select * from "relation" where "relation"."id" = ? and "relation"."id" in (1, 5)', $relation->toSql());
     }
 
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $model->expects('setRelation')->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
@@ -156,82 +165,95 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testAssociateMethodSetsForeignKeyOnModel()
     {
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        $relation = $this->getRelation($parent);
-        $associate = Mockery::mock(Model::class);
-        $associate->expects('getAttribute')->with('id')->andReturn(1);
-        $parent->expects('setAttribute')->with('foreign_key', 1);
-        $parent->expects('setRelation')->with('relation', $associate);
+        $relation = $this->getRelationWithRealQuery();
+        $associate = new EloquentBelongsToRelatedStub;
+        $associate->id = 1;
 
-        $relation->associate($associate);
+        $child = $relation->associate($associate);
+
+        $this->assertSame(1, $child->getAttribute('foreign_key'));
+        $this->assertSame($associate, $child->getRelation('relation'));
     }
 
     public function testDissociateMethodUnsetsForeignKeyOnModel()
     {
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        $relation = $this->getRelation($parent);
-        $parent->expects('setAttribute')->with('foreign_key', null);
+        $relation = $this->getRelationWithRealQuery();
+        $relation->getChild()->setAttribute('foreign_key', 5);
 
+        $child = $relation->dissociate();
+
+        $this->assertNull($child->getAttribute('foreign_key'));
         // Always set relation when we received Model
-        $parent->expects('setRelation')->with('relation', null);
-
-        $relation->dissociate();
+        $this->assertTrue($child->relationLoaded('relation'));
+        $this->assertNull($child->getRelation('relation'));
     }
 
     public function testAssociateMethodSetsForeignKeyOnModelById()
     {
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        $relation = $this->getRelation($parent);
-        $parent->expects('setAttribute')->with('foreign_key', 1);
+        $relation = $this->getRelationWithRealQuery();
+        $relation->getChild()->setRelation('relation', new EloquentBelongsToRelatedStub);
 
+        $child = $relation->associate(1);
+
+        $this->assertSame(1, $child->getAttribute('foreign_key'));
         // Always unset relation when we received id, regardless of dirtiness
-        $parent->shouldReceive('isDirty')->never();
-        $parent->expects('unsetRelation')->with($relation->getRelationName());
-
-        $relation->associate(1);
+        $this->assertFalse($child->relationLoaded('relation'));
     }
 
     public function testDefaultEagerConstraintsWhenIncrementing()
     {
-        $relation = $this->getRelation();
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('relation.id', Mockery::mustBe([]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
-        $relation->addEagerConstraints($models);
+        $relation = $this->getRelationWithRealQuery();
+        $relation->addEagerConstraints([new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub]);
+
+        $this->assertSame('select * from "relation" where "relation"."id" = ? and 0 = 1', $relation->toSql());
     }
 
     public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType()
     {
-        $relation = $this->getRelation(null, 'string');
-        $relation->getQuery()->expects('whereIn')->with('relation.id', Mockery::mustBe([]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
-        $relation->addEagerConstraints($models);
+        $relation = $this->getRelationWithRealQuery('string');
+        $relation->addEagerConstraints([$this->newModelWithKey('abc'), $this->newModelWithKey('1abc')]);
+
+        $this->assertSame('select * from "relation" where "relation"."id" = ? and "relation"."id" in (?, ?)', $relation->toSql());
+        $this->assertSame(['foreign.value', '1abc', 'abc'], $relation->getBindings());
     }
 
-    public function testDefaultEagerConstraintsWhenNotIncrementing()
+    protected function newModelWithKey($key)
     {
-        $relation = $this->getRelation();
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('relation.id', Mockery::mustBe([]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
-        $relation->addEagerConstraints($models);
+        $model = new EloquentBelongsToModelStub;
+        $model->foreign_key = $key;
+
+        return $model;
+    }
+
+    protected function getRelationWithRealQuery($keyType = 'int')
+    {
+        $related = new EloquentBelongsToRelatedStub;
+        $related->setKeyType($keyType);
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $builder = (new Builder(new BaseBuilder($connection, new Grammar($connection), new Processor)))->setModel($related);
+
+        return new BelongsTo($builder, new EloquentBelongsToModelStub, 'foreign_key', 'id', 'relation');
     }
 
     protected function getRelation($parent = null, $keyType = 'int')
     {
-        $this->builder = Mockery::mock(Builder::class);
+        $this->builder = Double::for(Builder::class);
         $this->builder->expects('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = Mockery::mock(Model::class);
-        $this->related->shouldReceive('getKeyType')->andReturn($keyType);
-        $this->related->shouldReceive('getKeyName')->andReturn('id');
-        $this->related->shouldReceive('getTable')->andReturn('relation');
-        $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
-        $this->builder->expects('getModel')->andReturn($this->related);
+        $this->related = Double::for(Model::class);
+        $this->related->allows('getKeyType')->returns($keyType);
+        $this->related->allows('getKeyName')->returns('id');
+        $this->related->allows('getTable')->returns('relation');
+        $this->related->allows('qualifyColumn')->resolves(fn (string $column) => "relation.{$column}");
+        $this->builder->expects('getModel')->returns($this->related);
         $parent = $parent ?: new EloquentBelongsToModelStub;
 
         return new BelongsTo($this->builder, $parent, 'foreign_key', 'id', 'relation');
     }
+}
+
+class EloquentBelongsToRelatedStub extends Model
+{
+    protected $table = 'relation';
 }
 
 class EloquentBelongsToModelStub extends Model

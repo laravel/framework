@@ -6,7 +6,6 @@ use Generator;
 use Illuminate\Console\Command;
 use Illuminate\Console\Concerns\InteractsWithIO;
 use Illuminate\Console\OutputStyle;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -20,15 +19,7 @@ class InteractsWithIOTest extends TestCase
     {
         $command = new CommandInteractsWithIO;
         $bufferedOutput = new BufferedOutput();
-        $output = Mockery::mock(OutputStyle::class, [new ArgvInput(), $bufferedOutput])->makePartial();
-        $command->setOutput($output);
-
-        $output->expects('createProgressBar')
-            ->with(count($iterable))
-            ->andReturnUsing(function ($steps) use ($bufferedOutput) {
-                // we can't mock ProgressBar because it's final, so return a real one
-                return new ProgressBar($bufferedOutput, $steps);
-            });
+        $command->setOutput(new OutputStyle(new ArgvInput(), $bufferedOutput));
 
         $calledTimes = 0;
         $result = $command->withProgressBar($iterable, function ($value, $bar, $key) use (&$calledTimes, $iterable) {
@@ -53,17 +44,9 @@ class InteractsWithIOTest extends TestCase
     {
         $command = new CommandInteractsWithIO;
         $bufferedOutput = new BufferedOutput();
-        $output = Mockery::mock(OutputStyle::class, [new ArgvInput(), $bufferedOutput])->makePartial();
-        $command->setOutput($output);
+        $command->setOutput(new OutputStyle(new ArgvInput(), $bufferedOutput));
 
         $totalSteps = 5;
-
-        $output->expects('createProgressBar')
-            ->with($totalSteps)
-            ->andReturnUsing(function ($steps) use ($bufferedOutput) {
-                // we can't mock ProgressBar because it's final, so return a real one
-                return new ProgressBar($bufferedOutput, $steps);
-            });
 
         $called = false;
         $command->withProgressBar($totalSteps, function ($bar) use (&$called) {

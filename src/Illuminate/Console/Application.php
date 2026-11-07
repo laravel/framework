@@ -41,7 +41,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * The output from the previous command.
      *
-     * @var \Symfony\Component\Console\Output\BufferedOutput
+     * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
     protected $lastOutput;
 
@@ -172,7 +172,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $parameters
-     * @return array<string, \Symfony\Component\Console\Input\ArrayInput>
+     * @return array{0: string, 1: \Symfony\Component\Console\Input\ArrayInput|\Symfony\Component\Console\Input\StringInput}
      */
     protected function parseCommand($command, $parameters)
     {

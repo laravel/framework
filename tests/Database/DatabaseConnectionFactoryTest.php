@@ -7,7 +7,8 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\SqlServerConnection;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,8 @@ use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $db;
 
     protected function setUp(): void
@@ -361,7 +364,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('A driver must be specified.'));
 
-        $container = Mockery::mock(Container::class);
+        $container = new Container;
         $factory = new ConnectionFactory($container);
         $factory->createConnector(['foo']);
     }
@@ -370,18 +373,18 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Unsupported driver [foo]'));
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('bound')->andReturn(false);
-        $factory = new ConnectionFactory($container);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('bound')->returns(false);
+        $factory = new ConnectionFactory($container->instance());
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $container = Mockery::mock(Container::class);
-        $container->expects('bound')->with('db.connector.foo')->andReturn(true);
-        $container->expects('make')->with('db.connector.foo')->andReturn('connector');
-        $factory = new ConnectionFactory($container);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('bound')->with('db.connector.foo')->returns(true);
+        $container->expects('make')->with('db.connector.foo')->returns('connector');
+        $factory = new ConnectionFactory($container->instance());
 
         $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
     }
@@ -423,7 +426,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     protected function callConnectionFactoryMethod($method, ...$arguments)
     {
         return (new ReflectionMethod(ConnectionFactory::class, $method))->invoke(
-            new ConnectionFactory(Mockery::mock(Container::class)),
+            new ConnectionFactory(new Container),
             ...$arguments
         );
     }

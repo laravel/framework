@@ -92,6 +92,36 @@ class CacheArrayStoreTest extends TestCase
         $this->assertNull($store->get('key'));
     }
 
+    public function testTouchDoesNotTreatDotsInMissingKeysAsStoragePath(): void
+    {
+        Carbon::setTestNow();
+
+        $store = new ArrayStore;
+        $store->put('profile', ['name' => 'value'], 30);
+
+        $this->assertFalse($store->touch('profile.value', 60));
+        $this->assertFalse($store->touch('profile.expiresAt', 60));
+        $this->assertFalse($store->touch('profile.value.name', 60));
+
+        $this->assertSame(['profile'], array_keys($store->all()));
+    }
+
+    public function testTouchExtendsTtlOfKeyContainingDots(): void
+    {
+        $key = 'profile.name';
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store = new ArrayStore;
+
+        $store->put($key, 'value', 30);
+        $store->touch($key, 60);
+
+        Carbon::setTestNow($now->addSeconds(45));
+
+        $this->assertSame('value', $store->get($key));
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();

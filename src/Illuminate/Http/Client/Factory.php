@@ -579,7 +579,7 @@ class Factory
     /**
      * Get a collection of the request / response pairs matching the given truth test.
      *
-     * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable  $callback
+     * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable|null  $callback
      * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     public function recorded($callback = null)

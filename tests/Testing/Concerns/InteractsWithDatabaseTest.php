@@ -3,15 +3,20 @@
 namespace Illuminate\Tests\Testing\Concerns;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithDatabaseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         Facade::clearResolvedInstances();
@@ -135,21 +140,25 @@ class InteractsWithDatabaseTest extends TestCase
 
     protected function castAsJson($value, $grammar)
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$grammar.'Grammar';
         $grammar = new $grammarClass($connection);
 
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->allows('getQueryGrammar')->returns($grammar);
 
-        $connection->shouldReceive('raw')->andReturnUsing(function ($value) {
+        $connection->allows('raw')->resolves(function ($value) {
             return new Expression($value);
         });
 
-        $connection->shouldReceive('getPdo->quote')->andReturnUsing(function ($value) {
+        $pdo = Double::for(PDO::class);
+        $pdo->allows('quote')->resolves(function ($value) {
             return "'".$value."'";
         });
+        $connection->allows('getPdo')->returns($pdo);
 
-        DB::shouldReceive('connection')->with(null)->andReturn($connection);
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+        DB::swap($resolver);
 
         $instance = new class
         {

@@ -2,19 +2,23 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\DatabaseManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testParseConnectionNameRecognizesDirectType()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
 
         $this->assertSame(['pgsql', 'direct'], $manager->parseConnectionNamePublic('pgsql::direct'));
         $this->assertSame(['pgsql', 'read'], $manager->parseConnectionNamePublic('pgsql::read'));
@@ -23,7 +27,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testSetPdoForDirectTypeSetsReadAndWritePdosToDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO);
         $directPdo = new DatabaseManagerTestMockPDO;
 
@@ -37,7 +41,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testRefreshPdoConnectionsRefreshesDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
         $freshDirectPdo = new DatabaseManagerTestMockPDO;
         $freshConnection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
@@ -54,6 +58,46 @@ class DatabaseManagerTest extends TestCase
         $this->assertSame($freshDirectPdo, $connection->getReadPdo());
         $this->assertSame($freshDirectPdo, $connection->getDirectPdo());
     }
+
+    public function testSetDefaultConnectionAcceptsEnums()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['database' => ['default' => 'sqlite']]));
+
+        $manager = new DatabaseManager($container, Double::for(ConnectionFactory::class));
+
+        $manager->setDefaultConnection(DatabaseManagerTestBackedConnection::Reporting);
+
+        $this->assertSame('reporting', $manager->getDefaultConnection());
+        $this->assertSame('reporting', $container['config']['database.default']);
+
+        $manager->setDefaultConnection(DatabaseManagerTestUnitConnection::analytics);
+
+        $this->assertSame('analytics', $manager->getDefaultConnection());
+    }
+
+    public function testUsingConnectionAcceptsEnumsAndRestoresTheDefaultConnection()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['database' => ['default' => 'sqlite']]));
+
+        $manager = new DatabaseManager($container, Double::for(ConnectionFactory::class));
+
+        $default = $manager->usingConnection(DatabaseManagerTestBackedConnection::Reporting, fn () => $manager->getDefaultConnection());
+
+        $this->assertSame('reporting', $default);
+        $this->assertSame('sqlite', $manager->getDefaultConnection());
+    }
+}
+
+enum DatabaseManagerTestBackedConnection: string
+{
+    case Reporting = 'reporting';
+}
+
+enum DatabaseManagerTestUnitConnection
+{
+    case analytics;
 }
 
 class DatabaseManagerTestManager extends DatabaseManager

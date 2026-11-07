@@ -44,6 +44,7 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType("Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Database\Eloquent\Relations\Pivot, 'pivot'>", $user->roles());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->get());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->find([1]));
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->findMany([1, 2, 3]));
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->findOrNew([1]));
@@ -64,6 +65,8 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrCreate());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->create());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createQuietly());
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->forceCreate());
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->forceCreateQuietly());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createOrFirst());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->updateOrCreate([]));
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->save(new Role()));
@@ -81,6 +84,10 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->lazy());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->lazyById());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->cursor());
+
+    assertType("Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Types\Relations\Tenant, 'pivot'>", $user->tenantRoles());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Types\Relations\Tenant}>', $user->tenantRoles()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Types\Relations\Tenant}>', $user->tenantRoles()->get());
 
     assertType('Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, Illuminate\Types\Relations\User>', $user->car());
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->getResults());
@@ -127,8 +134,34 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType("Illuminate\Database\Eloquent\Relations\MorphToMany<Illuminate\Types\Relations\Tag, Illuminate\Types\Relations\Post, Illuminate\Database\Eloquent\Relations\MorphPivot, 'pivot'>", $post->tags());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag&object{pivot: Illuminate\Database\Eloquent\Relations\MorphPivot}>', $post->tags()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag&object{pivot: Illuminate\Database\Eloquent\Relations\MorphPivot}>', $post->tags()->get());
 
     assertType('42', Relation::noConstraints(fn () => 42));
+}
+
+function customPivotAccessors(User $user, Post $post, string $accessor, bool $condition): void
+{
+    $roles = $user->customTenantRoles();
+
+    assertType("Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Types\Relations\Tenant, 'tenant'>", $roles);
+    assertType('Illuminate\Types\Relations\Tenant', $roles->firstOrFail()->tenant);
+    assertType('(Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant})|null', $roles->first());
+    assertType('Illuminate\Types\Relations\Tenant', $roles->findOrFail(1)->tenant);
+    assertType('Illuminate\Types\Relations\Tenant', $roles->firstOrNew()->tenant);
+    assertType('Illuminate\Types\Relations\Tenant', $roles->create()->tenant);
+    assertType('Illuminate\Types\Relations\Tenant', $roles->save(new Role())->tenant);
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->get());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->findMany([1, 2]));
+    assertType('Illuminate\Pagination\LengthAwarePaginator<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->paginate());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->cursor());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{tenant: Illuminate\Types\Relations\Tenant}>', $roles->lazy());
+    assertType('Illuminate\Types\Relations\Tenant', $user->tenantRoles()->as('tenant')->firstOrFail()->tenant);
+    assertType('Illuminate\Database\Eloquent\Relations\MorphPivot', $post->tags()->as('tagging')->firstOrFail()->tagging);
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag&object{tagging: Illuminate\Database\Eloquent\Relations\MorphPivot}>', $post->tags()->as('tagging')->get());
+
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->as($accessor)->first());
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->as($condition ? 'one' : 'two')->first());
 }
 
 class User extends Model
@@ -179,6 +212,12 @@ class User extends Model
         assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Types\Relations\Tenant, \'pivot\'>', $belongsToManyShorthand);
 
         return $belongsToMany;
+    }
+
+    /** @return BelongsToMany<Role, $this, Tenant, 'tenant'> */
+    public function customTenantRoles(): BelongsToMany
+    {
+        return $this->tenantRoles()->as('tenant');
     }
 
     /** @return HasOne<Mechanic, $this> */
@@ -256,6 +295,10 @@ class User extends Model
         assertType(
             'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
             $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->parts()),
+        );
+        assertType(
+            'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
+            $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->morphMany(Part::class, 'partable')),
         );
 
         return $hasManyThrough;

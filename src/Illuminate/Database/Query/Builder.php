@@ -29,6 +29,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use SortDirection;
+use Traversable;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
@@ -1676,6 +1677,8 @@ class Builder implements BuilderContract
 
         if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
+        } elseif ($values instanceof Traversable) {
+            $values = iterator_to_array($values, false);
         }
 
         $this->wheres[] = ['type' => $type, 'column' => $column, 'values' => $values, 'boolean' => $boolean, 'not' => $not];
@@ -2282,6 +2285,10 @@ class Builder implements BuilderContract
     {
         if (count($columns) !== count($values)) {
             throw new InvalidArgumentException('The number of columns must match the number of values');
+        }
+
+        if ($this->invalidOperator($operator)) {
+            throw new InvalidArgumentException('Invalid operator passed to whereRowValues method.');
         }
 
         $type = 'RowValues';
@@ -2923,6 +2930,8 @@ class Builder implements BuilderContract
 
         if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
+        } elseif ($values instanceof Traversable) {
+            $values = iterator_to_array($values, false);
         }
 
         $this->havings[] = ['type' => $type, 'column' => $column, 'values' => $values, 'boolean' => $boolean, 'not' => $not];
@@ -3095,7 +3104,7 @@ class Builder implements BuilderContract
      * Add a vector-distance "order by" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @return $this
      *
      * @throws \JsonException
@@ -3214,7 +3223,7 @@ class Builder implements BuilderContract
     /**
      * Alias to set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  int|null  $value
      * @return $this
      */
     public function take($value)
@@ -3225,7 +3234,7 @@ class Builder implements BuilderContract
     /**
      * Set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  int|null  $value
      * @return $this
      */
     public function limit($value)
@@ -3817,8 +3826,8 @@ class Builder implements BuilderContract
      */
     protected function cloneForPaginationCount()
     {
-        return $this->cloneWithout(['orders', 'limit', 'offset'])
-            ->cloneWithoutBindings(['order']);
+        return $this->cloneWithout(['orders', 'limit', 'offset', 'unionOrders', 'unionLimit', 'unionOffset'])
+            ->cloneWithoutBindings(['order', 'unionOrder']);
     }
 
     /**
@@ -3913,7 +3922,7 @@ class Builder implements BuilderContract
     /**
      * Strip off the table name or alias from a column identifier.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $column
      * @return string|null
      */
     protected function stripTableForPluck($column)
@@ -3936,7 +3945,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $queryResult
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromObjectColumn($queryResult, $column, $key)
@@ -3961,7 +3970,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $queryResult
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromArrayColumn($queryResult, $column, $key)
@@ -4361,9 +4370,12 @@ class Builder implements BuilderContract
         $this->applyBeforeQueryCallbacks();
 
         $values = (new Collection($values))->map(function ($value) {
+            if ($value instanceof Collection) {
+                $value = $value->all();
+            }
+
             if (! $value instanceof self && ! $value instanceof EloquentBuilder && ! $value instanceof Relation) {
                 return ['value' => $value, 'bindings' => match (true) {
-                    $value instanceof Collection => $value->all(),
                     $value instanceof UnitEnum => enum_value($value),
                     default => $value,
                 }];

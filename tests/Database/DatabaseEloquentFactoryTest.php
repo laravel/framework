@@ -20,21 +20,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function setUp(): void
     {
         $container = Container::getInstance();
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $app = Mockery::mock(Application::class);
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $container->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $app->allows('getNamespace')->returns('App\\');
+        $container->instance(Application::class, $app->instance());
 
         $db = new DB;
 
@@ -728,9 +731,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        $app = Mockery::mock(Application::class);
-        $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
-        Container::getInstance()->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $app->expects('getNamespace')->returns('Illuminate\\Tests\\Database\\Fixtures\\');
+        Container::getInstance()->instance(Application::class, $app->instance());
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
 
@@ -741,9 +744,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        $app = Mockery::mock(Application::class);
-        $app->shouldReceive('getNamespace')->andReturn('Foo\\');
-        Container::getInstance()->instance(Application::class, $app);
+        $app = Double::for(Application::class, override: true);
+        $app->allows('getNamespace')->returns('Foo\\');
+        Container::getInstance()->instance(Application::class, $app->instance());
 
         Factory::useNamespace('Factories\\');
 
@@ -960,6 +963,24 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, FactoryTestPost::count());
     }
 
+    public function test_recycled_models_do_not_leak_into_later_calls_on_the_same_factory()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->create();
+
+        $factory = FactoryTestPostFactory::new()
+            ->has(FactoryTestCommentFactory::new()->count(2), 'comments');
+
+        $factory->recycle($user)->create();
+        $post = $factory->create();
+
+        $this->assertCount(2, $post->comments);
+        $this->assertNotContains($user->id, $post->comments->pluck('user_id'));
+    }
+
     public function test_no_models_can_be_provided_to_recycle()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
@@ -1011,7 +1032,8 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->make();
 
         $this->assertNull($comment->user_id);
-        $this->assertNull($comment->commentable->id);
+        $this->assertNull($comment->commentable);
+        $this->assertNull($comment->commentable?->id);
     }
 
     public function test_can_default_to_without_parents()

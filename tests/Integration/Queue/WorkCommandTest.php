@@ -8,13 +8,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 
@@ -23,6 +26,7 @@ use RuntimeException;
 class WorkCommandTest extends QueueTestCase
 {
     use DatabaseMigrations;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -30,6 +34,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
+            Worker::$flushStickyConnections = false;
         });
 
         parent::setUp();
@@ -107,6 +112,32 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertTrue(SecondJob::$ran);
+    }
+
+    public function testWorkerDoesNotFlushStickyConnectionsByDefault()
+    {
+        Queue::push(new WritingJob);
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertTrue(DB::connection()->hasModifiedRecords());
+    }
+
+    public function testWorkerCanFlushStickyConnections()
+    {
+        Worker::$flushStickyConnections = true;
+
+        Queue::push(new WritingJob);
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertFalse(DB::connection()->hasModifiedRecords());
     }
 
     public function testMemoryExceeded()
@@ -193,10 +224,10 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$restartable = false;
 
-        $cache = Mockery::mock(Repository::class);
-        $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
-        $cache->expects('get')->with('illuminate:queues:paused')->andReturn(null);
-        $cache->expects('many')->andReturn([]);
+        $cache = Double::for(Repository::class);
+        $cache->expects('get')->with('illuminate:queue:restart')->never();
+        $cache->expects('get')->with('illuminate:queues:paused')->returns(null);
+        $cache->expects('many')->returns([]);
 
         Cache::expects('driver')->times(2)->andReturn($cache);
         Cache::expects('store')->andReturn($cache);
@@ -220,10 +251,10 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$pausable = false;
 
-        $cache = Mockery::mock(Repository::class);
+        $cache = Double::for(Repository::class);
 
-        $cache->expects('get')->times(2)->with('illuminate:queue:restart')->andReturn(null);
-        $cache->shouldNotReceive('many');
+        $cache->expects('get')->times(2)->with('illuminate:queue:restart')->returns(null);
+        $cache->expects('many')->never();
 
         Cache::expects('driver')->times(2)->andReturn($cache);
         Cache::shouldNotReceive('store');
@@ -256,6 +287,20 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
     }
 
+    public function testReleasedJobIsWrittenAsReleased()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        Queue::push(new ReleasingJob);
+
+        $this->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('RELEASED')
+            ->doesntExpectOutputToContain('DONE')
+            ->assertExitCode(0);
+    }
+
     public function testStopReasonIsWritten()
     {
         Queue::push(new FirstJob);
@@ -274,13 +319,36 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
 
+        $connection = config('queue.default');
+
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1,
+            '--queue' => 'high,default',
             '--json' => true,
-        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high,default","status":"stopped","reason":"memory","exit_code":12')
             ->assertExitCode(12);
+    }
+
+    public function testPausedQueueStatusIsWrittenAsJson()
+    {
+        $connection = config('queue.default');
+
+        Queue::pause($connection, 'high');
+
+        Queue::push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+            '--queue' => 'high,default',
+            '--json' => true,
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high","status":"paused"')
+            ->assertExitCode(0);
+
+        $this->assertTrue(FirstJob::$ran);
     }
 }
 
@@ -319,6 +387,30 @@ class ThirdJob implements ShouldQueue
         sleep(1);
 
         static::$ran = true;
+    }
+}
+
+class WritingJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public function handle()
+    {
+        DB::table('users')->insert([
+            'name' => 'BigT',
+            'email' => 'bigt@laravel.com',
+            'password' => 'secret',
+        ]);
+    }
+}
+
+class ReleasingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        $this->release(30);
     }
 }
 

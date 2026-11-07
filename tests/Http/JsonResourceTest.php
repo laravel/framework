@@ -2,10 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class JsonResourceTest extends TestCase
@@ -32,42 +33,42 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $model = new class extends Model {
-        };
+        Container::getInstance()->instance('request', Request::create('/'));
 
-        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
-            ->makePartial()
-            ->expects('jsonSerialize')->andReturn(['foo' => 'bar'])
-            ->getMock();
+        $resource = new JsonResource(['foo' => 'bar']);
 
         // Simulate a JSON error
         json_decode('{');
         $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
-        $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
+        try {
+            $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
+        } finally {
+            Container::getInstance()->forgetInstance('request');
+        }
     }
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $model = new class extends Model {
-        };
+        Container::getInstance()->instance('request', Request::create('/'));
 
-        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
-            ->makePartial()
-            ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
-            ->getMock();
+        try {
+            $resource = new JsonResource(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
 
-        $results = $resource->toPrettyJson();
-        $expected = $resource->toJson(JSON_PRETTY_PRINT);
+            $results = $resource->toPrettyJson();
+            $expected = $resource->toJson(JSON_PRETTY_PRINT);
 
-        $this->assertJsonStringEqualsJsonString($expected, $results);
-        $this->assertSame($expected, $results);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
+            $this->assertJsonStringEqualsJsonString($expected, $results);
+            $this->assertSame($expected, $results);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
 
-        $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
-        $this->assertStringContainsString('"number": 123', $results);
+            $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
+            $this->assertStringContainsString("\n", $results);
+            $this->assertStringContainsString('    ', $results);
+            $this->assertStringContainsString('"number": 123', $results);
+        } finally {
+            Container::getInstance()->forgetInstance('request');
+        }
     }
 }

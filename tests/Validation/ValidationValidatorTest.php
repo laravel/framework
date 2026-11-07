@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
@@ -30,18 +31,21 @@ use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use RuntimeException;
-use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Validator::flushState();
@@ -243,7 +247,7 @@ class ValidationValidatorTest extends TestCase
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -252,7 +256,7 @@ class ValidationValidatorTest extends TestCase
     public function testSometimesCanSkipRequiredRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, [], ['name' => 'sometimes|required']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -261,7 +265,7 @@ class ValidationValidatorTest extends TestCase
     public function testInValidatableRulesReturnsValid()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
     }
@@ -443,12 +447,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, [], ['name' => 'required']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addReplacer('required', 'Foo@bar');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('bar')->andReturn('replaced!');
+        $v->setContainer(new Container);
+        $v->addReplacer('required', ClassBasedValidatorStub::class.'@replace');
         $v->passes();
         $v->messages()->setFormat(':message');
         $this->assertSame('replaced!', $v->messages()->first('name'));
@@ -1314,93 +1314,97 @@ class ValidationValidatorTest extends TestCase
     public function testValidateCurrentPassword()
     {
         // Fails when user is not logged in.
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(true);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(true);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = Double::for(Hasher::class);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
         // Fails when password is incorrect.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(false);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(false);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
         // Succeeds when password is correct.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(true);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(true);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
 
         // We can use a specific guard.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->with('custom')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->with('custom')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(true);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(true);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
     }
@@ -2301,31 +2305,31 @@ class ValidationValidatorTest extends TestCase
 
         // If file is not successfully uploaded validation should fail with a
         // 'uploaded' error message instead of the original rule.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
-        $file->shouldNotReceive('getSize');
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
+        $file->expects('getSize')->never();
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // Even "required" will not run if the file failed to upload.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'required']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'string']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
 
         // Validation shouldn't continue if a file failed to upload.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'file|mimes:pdf|min:10']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
@@ -2469,6 +2473,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testGreaterThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2567,6 +2572,7 @@ class ValidationValidatorTest extends TestCase
         ], $v->messages()->keys());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2608,6 +2614,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testGreaterThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2649,6 +2656,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLessThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3899,6 +3907,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateSize()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3943,6 +3952,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateBetween()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3999,6 +4009,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMin()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4058,6 +4069,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMax()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4207,6 +4219,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testProperMessagesAreReturnedForSizes()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4230,6 +4243,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('file', $v->messages()->first('photo'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtPlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4272,6 +4286,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(4, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtPlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4314,6 +4329,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(2, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtePlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4356,6 +4372,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(4, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtePlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4552,6 +4569,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ["caf\xE9", 'bar']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ["caf\xE9", "caf\xE9"]], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDistinctForTopLevelArrays()
@@ -4581,46 +4604,44 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:connection.users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with('connection');
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id', [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id', [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1,id_col']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id_col', [])->andReturn(2);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id_col', [])->returns(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['users' => [['id' => 1, 'email' => 'foo']]], ['users.*.email' => 'Unique:users,email,[users.*.id]']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', '1', 'id', [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', '1', 'id', [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,NULL,id_col,foo,bar']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->withArgs(function () {
-            return func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
-        })->andReturn(2);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar'])->returns(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
     }
@@ -4631,10 +4652,10 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => 'unique:users', '*.type' => 'exists:user_types',
         ]);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->times(2)->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
-        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
@@ -4646,10 +4667,10 @@ class ValidationValidatorTest extends TestCase
             '*.email' => (new Unique('users'))->where($closure),
             '*.type' => (new Exists('user_types'))->where($closure),
         ]);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->times(2)->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
-        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->returns(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -4658,45 +4679,45 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email,account_id,1,name,taylor']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, ['account_id' => '1', 'name' => 'taylor'])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => ['foo']], ['email' => 'Exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo'], [])->andReturn(0);
+        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo'], [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:connection.users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with('connection');
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => ['foo', 'foo']], ['email' => 'exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo', 'foo'], [])->andReturn(1);
+        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo', 'foo'], [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -4705,20 +4726,21 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['id' => 'foo'], ['id' => 'Integer|Exists:users,id']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
-        $mock->shouldReceive('getCount')->never();
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
+        $mock->expects('getCount')->never();
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['id' => '1'], ['id' => 'Integer|Exists:users,id']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'id', '1', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'id', '1', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4759,6 +4781,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have more than 4 items.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGteMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4799,6 +4822,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have 4 items or more.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4839,6 +4863,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have less than 2 items.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLteMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5028,11 +5053,8 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateEmailWithCustomClassCheck()
     {
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
-
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
-        $v->setContainer($container);
+        $v->setContainer(new Container);
 
         $this->assertFalse($v->passes());
     }
@@ -5428,6 +5450,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($property->getValue());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateImage()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5501,6 +5524,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateImageDoesNotAllowPhpExtensionsOnImageMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5645,6 +5669,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5671,6 +5696,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5701,6 +5727,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateExtension()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5733,6 +5760,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMimeEnforcesPhpCheck()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -6942,6 +6970,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testBeforeAndAfterDoNotThrowOnNonDateValues()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date', 'ends' => 'date|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => ['2000-01-01'], 'ends' => '2013-01-01'], ['start' => 'date_format:Y-m-d', 'ends' => 'date_format:Y-m-d|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => new DateTimeImmutable('2000-01-01')], ['x' => 'date_format:Y-m-d|before:2012-01-01']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testWeakBeforeAndAfter()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -7379,12 +7420,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addExtension('foo', 'Foo@bar');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('bar')->andReturn(false);
+        $v->setContainer(new Container);
+        $v->addExtension('foo', ClassBasedValidatorStub::class.'@bar');
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
@@ -7395,12 +7432,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addExtension('foo', 'Foo');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('validate')->andReturn(false);
+        $v->setContainer(new Container);
+        $v->addExtension('foo', ConventionalValidatorStub::class);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
@@ -9809,6 +9842,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['mouse' => null], $validator->invalid());
     }
 
+    public function testExcludedAttributesDoNotExcludeAttributesSharingTheirName()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['price' => ['amount' => 10], 'price_note' => 'On sale'],
+            ['price' => 'exclude|array', 'price.amount' => 'integer', 'price_note' => 'string']
+        );
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['price_note' => 'On sale'], $validator->validated());
+    }
+
     public function testExcludeWithValuesAreReallyRemoved()
     {
         $validator = new Validator(
@@ -10379,7 +10424,7 @@ class ValidationValidatorTest extends TestCase
 
     protected function getTranslator()
     {
-        return Mockery::mock(TranslatorContract::class);
+        return Double::for(TranslatorContract::class);
     }
 
     public function getIlluminateArrayTranslator()
@@ -10387,6 +10432,27 @@ class ValidationValidatorTest extends TestCase
         return new Translator(
             new ArrayLoader, 'en'
         );
+    }
+}
+
+class ClassBasedValidatorStub
+{
+    public function replace()
+    {
+        return 'replaced!';
+    }
+
+    public function bar()
+    {
+        return false;
+    }
+}
+
+class ConventionalValidatorStub
+{
+    public function validate()
+    {
+        return false;
     }
 }
 

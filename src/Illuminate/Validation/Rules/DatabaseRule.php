@@ -83,7 +83,7 @@ trait DatabaseRule
      * Set a "where" constraint on the query.
      *
      * @param  \Closure|string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|\Closure|array|string|int|bool|null  $value
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|\Closure|array|string|int|float|bool|null  $value
      * @return $this
      */
     public function where($column, $value = null)
@@ -102,6 +102,10 @@ trait DatabaseRule
 
         $value = enum_value($value);
 
+        if ($value === false) {
+            $value = 0;
+        }
+
         $this->wheres[] = ['column' => $column, 'value' => $value];
 
         return $this;
@@ -111,7 +115,7 @@ trait DatabaseRule
      * Set a "where not" constraint on the query.
      *
      * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string|int  $value
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string|int|bool  $value
      * @return $this
      */
     public function whereNot($column, $value)
@@ -121,6 +125,10 @@ trait DatabaseRule
         }
 
         $value = enum_value($value);
+
+        if ($value === false) {
+            $value = 0;
+        }
 
         return $this->where($column, '!'.$value);
     }

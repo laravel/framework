@@ -124,7 +124,7 @@ EOF;
     {
         return (new Collection($slots))
             ->reject(fn ($slot, $name) => $name === '__default')
-            ->map(fn ($slot, $name) => '<x-slot name="'.$name.'" '.((string) $slot->attributes).'>{{ $'.$name.' }}</x-slot>')
+            ->map(fn ($slot, $name) => '<x-slot name="'.$name.'" :attributes="$'.$name.'->attributes">{{ $'.$name.' }}</x-slot>')
             ->implode(PHP_EOL);
     }
 

@@ -207,3 +207,12 @@ assertType('mixed', Arr::random($array));
 assertType('array', Arr::random($array, 2));
 
 assertType('array<string, User>', Arr::prependKeysWith($array, 'user_'));
+
+$pushArray = ['tags' => ['php']];
+assertType('array', Arr::push($pushArray, 'tags', 'laravel'));
+
+$pushObject = new ArrayObject(['tags' => ['php']]);
+assertType('array|ArrayAccess', Arr::push($pushObject, 'tags', 'laravel'));
+
+$pushNumericObject = new ArrayObject([0 => ['php']]);
+assertType('array|ArrayAccess', Arr::push($pushNumericObject, 0, 'laravel'));

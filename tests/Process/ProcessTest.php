@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Process\PendingProcess;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -281,6 +282,16 @@ class ProcessTest extends TestCase
         $this->assertFalse($result->successful());
     }
 
+    public function testProcessFakeExitCodeShorthandWhenStartingProcesses()
+    {
+        $factory = new Factory;
+        $factory->fake(['ls -la' => 1]);
+
+        $result = $factory->start('ls -la')->wait();
+        $this->assertSame(1, $result->exitCode());
+        $this->assertFalse($result->successful());
+    }
+
     public function testBasicProcessFakeWithCustomOutput()
     {
         $factory = new Factory;
@@ -499,6 +510,17 @@ class ProcessTest extends TestCase
         $factory->fake(['cat me' => new RuntimeException('fake exception message')]);
 
         $factory->run('cat me');
+    }
+
+    public function testProcessFakeThrowShorthandWhenStartingProcesses()
+    {
+        $this->expectExceptionObject(new RuntimeException('fake exception message'));
+
+        $factory = new Factory;
+
+        $factory->fake(['cat me' => new RuntimeException('fake exception message')]);
+
+        $factory->start('cat me');
     }
 
     public function testFakeProcessesCanThrow()
@@ -746,6 +768,34 @@ class ProcessTest extends TestCase
         $result = $factory->timeout($timeout)->path(__DIR__)->run('sleep 2; exit 1;');
 
         $result->throw();
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testASubSecondTimeoutCanBeSetWithACarbonInterval()
+    {
+        $factory = new Factory;
+
+        try {
+            $factory->timeout(CarbonInterval::milliseconds(500))->path(__DIR__)->run('sleep 2;');
+
+            $this->fail('The process did not time out.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertSame(0.5, $e->exceededTimeout());
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testASubSecondIdleTimeoutCanBeSetWithACarbonInterval()
+    {
+        $factory = new Factory;
+
+        try {
+            $factory->idleTimeout(CarbonInterval::milliseconds(500))->path(__DIR__)->run('sleep 2;');
+
+            $this->fail('The process did not time out.');
+        } catch (ProcessIdleTimedOutException $e) {
+            $this->assertSame(0.5, $e->exceededTimeout());
+        }
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
@@ -1425,6 +1475,26 @@ class ProcessTest extends TestCase
         $factory->assertRanTimes(function ($process) {
             return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
         }, 2);
+    }
+
+    public function testPendingProcessIsMacroable()
+    {
+        PendingProcess::macro('withTestEnvironment', function () {
+            return $this->env(['TEST_VAR' => 'test_value']);
+        });
+
+        try {
+            $factory = new Factory;
+            $factory->fake();
+
+            $factory->timeout(10)->withTestEnvironment()->run('printenv TEST_VAR');
+
+            $factory->assertRan(function ($process) {
+                return $process->environment === ['TEST_VAR' => 'test_value'] && $process->timeout === 10;
+            });
+        } finally {
+            PendingProcess::flushMacros();
+        }
     }
 
     protected function ls()

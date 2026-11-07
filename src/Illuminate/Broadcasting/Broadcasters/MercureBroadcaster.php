@@ -12,6 +12,7 @@ use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Mercure\Authorization;
 use Symfony\Component\Mercure\Exception\ExceptionInterface as MercureExceptionInterface;
+use Symfony\Component\Mercure\FrankenPhpHub;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\Grant;
@@ -208,6 +209,10 @@ class MercureBroadcaster extends Broadcaster
 
         if ($channels === []) {
             return;
+        }
+
+        if ($this->hub instanceof FrankenPhpHub && ! function_exists('mercure_publish')) {
+            throw new BroadcastException('Mercure broadcasting through FrankenPHP\'s built-in hub is only available to requests served by FrankenPHP. Configure a "url" to broadcast from other processes, such as the CLI or queue workers.');
         }
 
         $socket = Arr::pull($payload, 'socket');

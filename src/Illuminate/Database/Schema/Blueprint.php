@@ -54,21 +54,21 @@ class Blueprint
     /**
      * The storage engine that should be used for the table.
      *
-     * @var string
+     * @var string|null
      */
     public $engine;
 
     /**
      * The default character set that should be used for the table.
      *
-     * @var string
+     * @var string|null
      */
     public $charset;
 
     /**
      * The collation that should be used for the table.
      *
-     * @var string
+     * @var string|null
      */
     public $collation;
 

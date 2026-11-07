@@ -4,12 +4,11 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\Release;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class ReleaseMiddlewareTest extends TestCase
@@ -82,17 +81,14 @@ class ReleaseMiddlewareTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
-        $job->shouldReceive('release')->never();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($class),
         ]);
+
+        $this->assertTrue($job->isDeleted());
+        $this->assertFalse($job->isReleased());
 
         $this->assertTrue($class::$handled);
     }
@@ -102,17 +98,15 @@ class ReleaseMiddlewareTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
-        $job->expects('release')->with($releaseAfter);
-        $job->shouldReceive('delete')->never();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($class),
         ]);
+
+        $this->assertTrue($job->isReleased());
+        $this->assertSame($releaseAfter, $job->releaseDelay);
+        $this->assertFalse($job->isDeleted());
 
         $this->assertFalse($class::$handled);
     }

@@ -493,10 +493,22 @@ trait HasRelationships
      *
      * @param  string  $class
      * @return string
+     *
+     * @throws \Illuminate\Database\ClassMorphViolationException
      */
     public static function getActualClassNameForMorph($class)
     {
-        return Arr::get(Relation::morphMap() ?: [], $class, $class);
+        $morphMap = Relation::morphMap() ?: [];
+
+        if (array_key_exists($class, $morphMap)) {
+            return $morphMap[$class];
+        }
+
+        if (Relation::requiresMorphMap()) {
+            throw new ClassMorphViolationException($class);
+        }
+
+        return $class;
     }
 
     /**
