@@ -19,7 +19,9 @@ use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use JsonException;
 use JsonSerializable;
 use WeakMap;
 
@@ -471,13 +473,25 @@ trait ResolvesJsonApiElements
 
             $relations->push([
                 ...$included,
-                '_uniqueKey' => implode(':', $isUnique === true ? [$id, $type] : [$id, $type, hash('xxh128', serialize($included))]),
+                '_uniqueKey' => implode(':', $isUnique === true ? [$id, $type] : [$id, $type, $this->includedResourceHash($included)]),
             ]);
 
             $index++;
         }
 
         return $relations;
+    }
+
+    /**
+     * Get a hash representing the encoded form of an included resource object.
+     */
+    protected function includedResourceHash(array $included): string
+    {
+        try {
+            return hash('xxh128', json_encode($included, JSON_THROW_ON_ERROR));
+        } catch (JsonException) {
+            return Str::random();
+        }
     }
 
     /**
