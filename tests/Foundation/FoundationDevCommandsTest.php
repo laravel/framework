@@ -11,10 +11,12 @@ use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
-use Mockery;
+use Laravel\Pail\PailServiceProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+
+require_once __DIR__.'/Fixtures/PailServiceProviderStub.php';
 
 class FoundationDevCommandsTest extends TestCase
 {
@@ -374,10 +376,7 @@ class FoundationDevCommandsTest extends TestCase
     {
         $this->useTemporaryBasePath(withPackageJson: true);
 
-        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
-        $provider->shouldReceive('register');
-
-        Application::getInstance()->register($provider);
+        Application::getInstance()->register(PailServiceProvider::class);
 
         DevCommands::registerDefaults();
 

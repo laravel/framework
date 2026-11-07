@@ -9,11 +9,15 @@ use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\QueueFailedOver;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class FailoverQueueTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -21,7 +25,7 @@ class FailoverQueueTest extends TestCase
 
     public function test_push_fails_over_on_exception()
     {
-        $queue = Mockery::mock(QueueManager::class);
+        $queue = Double::for(QueueManager::class);
         $events = new Dispatcher;
         $failedOver = [];
         $events->listen(QueueFailedOver::class, function ($event) use (&$failedOver) {
@@ -32,15 +36,13 @@ class FailoverQueueTest extends TestCase
             'sync',
         ]);
 
-        $redis = Mockery::mock(Queue::class);
-        $queue->expects('connection')->with('redis')->andReturn($redis);
+        $redis = Double::for(Queue::class);
+        $queue->expects('connection')->with('redis')->returns($redis);
 
-        $sync = Mockery::mock(Queue::class);
-        $queue->expects('connection')->with('sync')->andReturn($sync);
+        $sync = Double::for(Queue::class);
+        $queue->expects('connection')->with('sync')->returns($sync);
 
-        $redis->expects('push')->andReturnUsing(
-            fn () => throw new \Exception('error')
-        );
+        $redis->expects('push')->resolves(fn () => throw new \Exception('error'));
 
         $sync->expects('push');
 
@@ -54,14 +56,14 @@ class FailoverQueueTest extends TestCase
 
     public function test_bulk_respects_job_delays()
     {
-        $queue = Mockery::mock(QueueManager::class);
+        $queue = Double::for(QueueManager::class);
         $failover = new FailoverQueue($queue, new Dispatcher, ['sync']);
 
-        $sync = Mockery::mock(Queue::class);
-        $queue->expects('connection')->times(3)->with('sync')->andReturn($sync);
+        $sync = Double::for(Queue::class);
+        $queue->expects('connection')->times(3)->with('sync')->returns($sync);
 
-        $sync->expects('later')->with(15, Mockery::type(FailoverJobWithDelayAttribute::class), '', null);
-        $sync->expects('later')->with(30, Mockery::type(FailoverJobWithDelayProperty::class), '', null);
+        $sync->expects('later')->with(15, Argument::type(FailoverJobWithDelayAttribute::class), '', null);
+        $sync->expects('later')->with(30, Argument::type(FailoverJobWithDelayProperty::class), '', null);
         $sync->expects('push')->with('regular-job', '', null);
 
         $failover->bulk([new FailoverJobWithDelayAttribute, new FailoverJobWithDelayProperty, 'regular-job']);

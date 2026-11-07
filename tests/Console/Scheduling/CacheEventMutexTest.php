@@ -11,11 +11,14 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class CacheEventMutexTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Console\Scheduling\CacheEventMutex
      */
@@ -155,13 +158,13 @@ class CacheEventMutexTest extends TestCase
 
     public function testOverlapsForRunningTaskWithLockThatCannotReportWhetherItIsLocked()
     {
-        $lock = Mockery::mock(Lock::class);
-        $lock->expects('get')->andReturnFalse();
+        $lock = Double::for(Lock::class);
+        $lock->expects('get')->returns(false);
 
-        $store = Mockery::mock(ArrayStore::class);
-        $store->expects('lock')->with($this->event->mutexName(), $this->event->expiresAt * 60)->andReturn($lock);
+        $store = Double::for(ArrayStore::class);
+        $store->expects('lock')->with($this->event->mutexName(), $this->event->expiresAt * 60)->returns($lock->instance());
 
-        $this->cacheFactory->repository = new Repository($store);
+        $this->cacheFactory->repository = new Repository($store->instance());
 
         $this->assertTrue($this->cacheMutex->exists($this->event));
     }

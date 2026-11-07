@@ -5,22 +5,23 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbBuilderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
-        $connection->expects('getConfig')->with('charset')->andReturn('utf8mb4');
-        $connection->expects('getConfig')->with('collation')->andReturn('utf8mb4_unicode_ci');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'create database `my_temporary_database` default character set `utf8mb4` default collate `utf8mb4_unicode_ci`'
-        )->andReturn(true);
+        $connection->expects('getConfig')->with('charset')->returns('utf8mb4');
+        $connection->expects('getConfig')->with('collation')->returns('utf8mb4_unicode_ci');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('create database `my_temporary_database` default character set `utf8mb4` default collate `utf8mb4_unicode_ci`')->returns(true);
 
         $builder = new MariaDbBuilder($connection);
         $builder->createDatabase('my_temporary_database');
@@ -28,13 +29,11 @@ class DatabaseMariaDbBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'drop database if exists `my_database_a`'
-        )->andReturn(true);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('drop database if exists `my_database_a`')->returns(true);
 
         $builder = new MariaDbBuilder($connection);
 

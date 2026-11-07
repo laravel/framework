@@ -5,12 +5,15 @@ namespace Illuminate\Tests\Broadcasting;
 use Ably\PubSub\PubSubHttpClient;
 use Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster;
 use Illuminate\Http\Request;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Ably2BroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster
      */
@@ -24,9 +27,9 @@ class Ably2BroadcasterTest extends TestCase
             $this->markTestSkipped(sprintf('%s class is not available.', PubSubHttpClient::class));
         }
 
-        $this->ably = Mockery::mock(PubSubHttpClient::class, ['abcd:efgh']);
+        $this->ably = Double::for(new PubSubHttpClient('abcd:efgh'));
 
-        $this->broadcaster = Mockery::mock(Ably2Broadcaster::class, [$this->ably])->makePartial();
+        $this->broadcaster = Double::for(Ably2Broadcaster::class)->passthru(new Ably2Broadcaster($this->ably));
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -114,22 +117,22 @@ class Ably2BroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
-        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+        $request = new Request(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
-        $request->shouldReceive('input')
-            ->with('callback', false)
-            ->andReturn(false);
+        $user = new class
+        {
+            public function getAuthIdentifierForBroadcasting()
+            {
+                return 42;
+            }
 
-        $user = Mockery::mock('User');
-        $user->shouldReceive('getAuthIdentifierForBroadcasting')
-            ->andReturn(42);
-        $user->shouldReceive('getAuthIdentifier')
-            ->andReturn(42);
+            public function getAuthIdentifier()
+            {
+                return 42;
+            }
+        };
 
-        $request->expects('user')
-            ->times(2)
-            ->andReturn($user);
+        $request->setUserResolver(fn () => $user);
 
         return $request;
     }
@@ -140,11 +143,9 @@ class Ably2BroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
-        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel]);
+        $request = new Request(['channel_name' => $channel]);
 
-        $request->expects('user')
-            ->andReturn(null);
+        $request->setUserResolver(fn () => null);
 
         return $request;
     }

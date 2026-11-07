@@ -12,9 +12,10 @@ use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use Laravel\Prompts\Prompt;
-use Mockery;
-use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -29,20 +30,18 @@ use function Orchestra\Testbench\default_skeleton_path;
 
 class ConsoleApplicationTest extends TestCase
 {
-    use InteractsWithMockery;
+    use VerifiesDoubles;
 
     protected function tearDown(): void
     {
-        $this->tearDownTheTestEnvironmentUsingMockery();
-
         Prompt::setOutput(new NullOutput);
     }
 
     public function testAddSetsLaravelInstance()
     {
         $artisan = $this->getMockConsole(['addToParent']);
-        $command = Mockery::mock(Command::class);
-        $command->expects('setLaravel')->with(Mockery::type(ApplicationContract::class));
+        $command = Double::for(Command::class);
+        $command->expects('setLaravel')->with(Argument::type(ApplicationContract::class));
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->add($command);
 
@@ -63,7 +62,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = $this->getMockConsole(['addToParent']);
         $command = new SymfonyCommand('foo');
-        $artisan->getLaravel()->expects('make')->with('foo')->andReturn(new SymfonyCommand('foo'));
+        $this->laravel->expects('make')->with('foo')->returns(new SymfonyCommand('foo'));
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->resolve('foo');
 
@@ -300,13 +299,16 @@ class ConsoleApplicationTest extends TestCase
         }
     }
 
+    protected $laravel;
+
     protected function getMockConsole(array $methods)
     {
-        $app = Mockery::mock(ApplicationContract::class, ['version' => '6.0']);
+        $app = $this->laravel = Double::for(ApplicationContract::class, override: true);
+        $app->allows('version')->returns('6.0');
         $events = new EventsDispatcher;
 
         return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
-            $app, $events, 'test-version',
+            $app->instance(), $events, 'test-version',
         ])->getMock();
     }
 }

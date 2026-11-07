@@ -25,8 +25,9 @@ use Illuminate\Tests\Support\Fixtures\TestJsonSerializeWithScalarValueObject;
 use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestTraversableAndJsonSerializableObject;
 use InvalidArgumentException;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -43,6 +44,8 @@ include_once 'Fixtures/Enums.php';
 
 class SupportCollectionTest extends TestCase
 {
+    use VerifiesDoubles;
+
     #[DataProvider('collectionClassProvider')]
     public function testFirstReturnsFirstItemInCollection($collection)
     {
@@ -714,10 +717,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testToArrayCallsToArrayOnEachItemInCollection($collection)
     {
-        $item1 = Mockery::mock(Arrayable::class);
-        $item1->expects('toArray')->andReturn('foo.array');
-        $item2 = Mockery::mock(Arrayable::class);
-        $item2->expects('toArray')->andReturn('bar.array');
+        $item1 = Double::for(Arrayable::class);
+        $item1->expects('toArray')->returns('foo.array');
+        $item2 = Double::for(Arrayable::class);
+        $item2->expects('toArray')->returns('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->toArray();
 
@@ -739,10 +742,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection($collection)
     {
-        $item1 = Mockery::mock(JsonSerializable::class);
-        $item1->expects('jsonSerialize')->andReturn('foo.json');
-        $item2 = Mockery::mock(Arrayable::class);
-        $item2->expects('toArray')->andReturn('bar.array');
+        $item1 = Double::for(JsonSerializable::class);
+        $item1->expects('jsonSerialize')->returns('foo.json');
+        $item2 = Double::for(Arrayable::class);
+        $item2->expects('toArray')->returns('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->jsonSerialize();
 

@@ -9,12 +9,15 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Hashing\BcryptHasher;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $provider = $this->newProvider();
@@ -128,11 +131,11 @@ class AuthDatabaseUserProviderTest extends TestCase
     public function testCredentialValidationFailsGracefullyWithNullPassword()
     {
         $conn = new Connection(new PDO('sqlite::memory:'));
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->shouldReceive('check')->never();
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn(null);
+        $user = Double::for(Authenticatable::class);
+        $user->expects('getAuthPassword')->returns(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);

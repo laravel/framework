@@ -3,18 +3,16 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
-use Mockery;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
@@ -231,26 +229,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     public function testForceDeleteDoesntUpdateExistsPropertyIfFailed()
     {
-        $user = new class() extends SoftDeletesTestUser
-        {
-            public $exists = true;
+        $this->createUsers();
+        $this->connection()->statement('create trigger prevent_user_delete before delete on users begin select raise(abort, \'blocked\'); end');
 
-            public function newModelQuery()
-            {
-                return Mockery::spy(parent::newModelQuery(), function (MockInterface $mock) {
-                    $mock->expects('forceDelete')->andThrow(new Exception());
-                });
-            }
-        };
+        $user = SoftDeletesTestUser::find(2);
 
         $this->assertTrue($user->exists);
 
         try {
             $user->forceDelete();
-        } catch (Exception) {
+            $this->fail('Expected the delete to fail.');
+        } catch (QueryException) {
         }
 
         $this->assertTrue($user->exists);
+        $this->assertNotNull(SoftDeletesTestUser::find(2));
     }
 
     public function testForceDestroyFullyDeletesRecord()
@@ -315,6 +308,29 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(SoftDeletesTestUser::find(2));
     }
 
+    public function testDeleteSetsTheDeletedAtAndUpdatedAtColumnsAndLeavesTheModelClean()
+    {
+        Carbon::setTestNow($now = Carbon::parse('2023-01-02 03:04:05'));
+
+        try {
+            $user = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+            Carbon::setTestNow($now->copy()->addDay());
+
+            $user->delete();
+
+            $this->assertTrue($user->trashed());
+            $this->assertFalse($user->isDirty());
+            $this->assertSame('2023-01-03 03:04:05', $user->deleted_at->toDateTimeString());
+
+            $row = (array) $this->connection()->table('users')->where('id', 1)->first();
+            $this->assertSame('2023-01-03 03:04:05', $row['deleted_at']);
+            $this->assertSame('2023-01-03 03:04:05', $row['updated_at']);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function testRestoreRestoresRecords()
     {
         $this->createUsers();
@@ -329,6 +345,36 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(2, $users);
         $this->assertNull($users->find(1)->deleted_at);
         $this->assertNull($users->find(2)->deleted_at);
+    }
+
+    public function testRestoreIsCancelledWhenRestoringEventReturnsFalse()
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+
+        Eloquent::setEventDispatcher(new Dispatcher);
+
+        try {
+            $this->createUsers();
+
+            SoftDeletesTestUser::restoring(function () {
+                return false;
+            });
+
+            $user = SoftDeletesTestUser::withTrashed()->find(1);
+
+            $this->assertFalse($user->restore());
+            $this->assertNotNull($user->deleted_at);
+            $this->assertNotNull(SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+            $this->assertNull(SoftDeletesTestUser::find(1));
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
     }
 
     public function testRestoreDoesNotFireRestoredEventWhenSavingEventCancelsSave()
@@ -426,6 +472,38 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertSame('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
+    }
+
+    public function testRestoreOrCreateRestoresATrashedRecordOrCreatesANewOne()
+    {
+        $this->createUsers();
+
+        $restored = SoftDeletesTestUser::restoreOrCreate(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame(1, $restored->id);
+        $this->assertFalse($restored->trashed());
+        $this->assertCount(2, SoftDeletesTestUser::all());
+
+        $created = SoftDeletesTestUser::restoreOrCreate(['email' => 'foo@bar.com']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertCount(3, SoftDeletesTestUser::all());
+    }
+
+    public function testCreateOrRestoreRestoresATrashedRecordOrCreatesANewOne()
+    {
+        $this->createUsers();
+
+        $restored = SoftDeletesTestUser::createOrRestore(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame(1, $restored->id);
+        $this->assertFalse($restored->trashed());
+        $this->assertCount(2, SoftDeletesTestUser::all());
+
+        $created = SoftDeletesTestUser::createOrRestore(['email' => 'foo@bar.com']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertCount(3, SoftDeletesTestUser::all());
     }
 
     public function testCreateOrFirst()
