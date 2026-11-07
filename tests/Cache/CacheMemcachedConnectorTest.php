@@ -4,12 +4,16 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\MemcachedConnector;
 use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Memcached;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
+    use VerifiesDoubles;
+
+    #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectly()
     {
         $memcached = $this->memcachedMockWithAddServer();
@@ -24,6 +28,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
+    #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectlyWithPersistentConnection()
     {
         $persistentConnectionId = 'persistent_connection_id';

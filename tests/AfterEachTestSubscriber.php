@@ -19,6 +19,7 @@ final class AfterEachTestSubscriber implements FinishedSubscriber
     public function notify(Finished $event): void
     {
         if (class_exists(\Mockery::class)) {
+            \Mockery::close();
         }
 
         Date::useDefault();
