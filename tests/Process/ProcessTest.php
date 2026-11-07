@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Process\PendingProcess;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -1474,6 +1475,26 @@ class ProcessTest extends TestCase
         $factory->assertRanTimes(function ($process) {
             return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
         }, 2);
+    }
+
+    public function testPendingProcessIsMacroable()
+    {
+        PendingProcess::macro('withTestEnvironment', function () {
+            return $this->env(['TEST_VAR' => 'test_value']);
+        });
+
+        try {
+            $factory = new Factory;
+            $factory->fake();
+
+            $factory->timeout(10)->withTestEnvironment()->run('printenv TEST_VAR');
+
+            $factory->assertRan(function ($process) {
+                return $process->environment === ['TEST_VAR' => 'test_value'] && $process->timeout === 10;
+            });
+        } finally {
+            PendingProcess::flushMacros();
+        }
     }
 
     protected function ls()
