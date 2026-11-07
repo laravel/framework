@@ -93,6 +93,17 @@ class StringRule implements Stringable
     }
 
     /**
+     * The field under validation must match the given character encoding.
+     *
+     * @param  string  $encoding
+     * @return $this
+     */
+    public function encoding(string $encoding): static
+    {
+        return $this->addRule('encoding:'.$encoding);
+    }
+
+    /**
      * The field under validation must end with one of the given values.
      *
      * @param  string  ...$values
