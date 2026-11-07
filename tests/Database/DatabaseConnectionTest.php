@@ -493,7 +493,7 @@ class DatabaseConnectionTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testLostConnectionDuringCommitDiscardsPdoSoTheNextTransactionReconnects()
     {
-        $deadPdo =$this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit'])->getMock();
+        $deadPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit'])->getMock();
         $deadPdo->method('inTransaction')->willReturn(true);
         $deadPdo->expects($this->once())->method('beginTransaction');
         $deadPdo->expects($this->once())->method('commit')->willThrowException(new PDOException('SQLSTATE[08006] [7] no connection to the server'));
