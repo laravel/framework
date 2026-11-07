@@ -101,10 +101,10 @@ class AuthTokenGuardTest extends TestCase
 
     public function testValidateHashesTokenWhenHashingIsEnabled()
     {
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = Double::for(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
-        $provider->expects('retrieveByCredentials')->with(['api_token' => hash('sha256', 'foo')])->andReturn($user);
+        $provider->expects('retrieveByCredentials')->with(['api_token' => hash('sha256', 'foo')])->returns($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
 
         $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', $hash = true);
