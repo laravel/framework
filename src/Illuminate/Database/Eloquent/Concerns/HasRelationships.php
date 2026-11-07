@@ -1154,6 +1154,10 @@ trait HasRelationships
     {
         $this->relations = $relations;
 
+        foreach ($this->relations as $key => $value) {
+            $this->propagateRelationAutoloadCallbackToRelation($key, $value);
+        }
+
         return $this;
     }
 
