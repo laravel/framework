@@ -374,6 +374,144 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    #[DataProvider('createOrFirstValues')]
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(Closure|array $values): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $parent->exists = true;
+        $this->mockConnectionForModel($parent, 'SQLite', [789]);
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+                [],
+            )
+            ->andReturn([]);
+
+        $parent->getConnection()
+            ->expects('insert')
+            ->with(
+                'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )
+            ->andReturnTrue();
+
+        $result = $parent->children()->updateOrCreate(['attr' => 'foo'], $values);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $parent->exists = true;
+        $this->mockConnectionForModel($parent, 'SQLite');
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+                [],
+            )
+            ->andReturn([[
+                'id' => 789,
+                'pivot_id' => 456,
+                'laravel_through_key' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ]]);
+
+        $parent->getConnection()
+            ->expects('update')
+            ->with(
+                'update "child" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 789],
+            )
+            ->andReturn(1);
+
+        $result = $parent->children()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertSame('baz', $result->val);
+    }
+
+    #[DataProvider('createOrFirstValues')]
+    public function testFirstOrNewMethodAcceptsClosureValuesAndInstantiates(Closure|array $values): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $parent->exists = true;
+        $this->mockConnectionForModel($parent, 'SQLite');
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+                [],
+            )
+            ->andReturn([]);
+
+        $result = $parent->children()->firstOrNew(['attr' => 'foo'], $values);
+        $this->assertFalse($result->exists);
+        $this->assertSame('foo', $result->attr);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testFirstOrNewDoesNotInvokeClosureWhenRecordExists(): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $parent->exists = true;
+        $this->mockConnectionForModel($parent, 'SQLite');
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("child"."attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+                [],
+            )
+            ->andReturn([[
+                'id' => 789,
+                'pivot_id' => 456,
+                'laravel_through_key' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $callCount = 0;
+        $result = $parent->children()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'should-not-be-called'];
+        });
+
+        $this->assertSame(0, $callCount);
+        $this->assertTrue($result->exists);
+        $this->assertSame('bar', $result->val);
+    }
+
     public static function createOrFirstValues(): array
     {
         return [
