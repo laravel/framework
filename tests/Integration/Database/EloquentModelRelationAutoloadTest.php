@@ -192,6 +192,46 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         DB::disableQueryLog();
     }
 
+    public function testRelationAutoloadPropagatesWhenUsingSetRelations()
+    {
+        $post1 = Post::create();
+        $comment1 = $post1->comments()->create(['parent_id' => null]);
+        $comment1->likes()->create();
+        $comment1->likes()->create();
+
+        $post2 = Post::create();
+        $comment2 = $post2->comments()->create(['parent_id' => null]);
+        $comment2->likes()->create();
+
+        $posts = Post::get();
+        $commentsByPost = Comment::get()->groupBy('commentable_id');
+
+        $posts->withRelationshipAutoloading();
+
+        foreach ($posts as $post) {
+            $post->setRelations([
+                'comments' => $commentsByPost->get($post->id, $post->newCollection()),
+            ]);
+        }
+
+        DB::enableQueryLog();
+
+        $likes = [];
+
+        foreach ($posts as $post) {
+            foreach ($post->comments as $comment) {
+                $likes = array_merge($likes, $comment->likes->all());
+            }
+        }
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertCount(3, $likes);
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('likes'));
+        $this->assertTrue($posts[1]->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
+    }
+
     public function testRelationAutoloadWithChaperoneRelations()
     {
         Model::automaticallyEagerLoadRelationships();
