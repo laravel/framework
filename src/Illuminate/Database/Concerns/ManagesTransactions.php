@@ -255,6 +255,8 @@ trait ManagesTransactions
 
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
+
+            $this->pdo = null;
         }
 
         throw $e;

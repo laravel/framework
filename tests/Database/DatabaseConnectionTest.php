@@ -490,6 +490,35 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testLostConnectionDuringCommitDiscardsPdoSoTheNextTransactionReconnects()
+    {
+        $deadPdo =$this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit'])->getMock();
+        $deadPdo->method('inTransaction')->willReturn(true);
+        $deadPdo->expects($this->once())->method('beginTransaction');
+        $deadPdo->expects($this->once())->method('commit')->willThrowException(new PDOException('SQLSTATE[08006] [7] no connection to the server'));
+
+        $freshPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit'])->getMock();
+        $freshPdo->expects($this->once())->method('beginTransaction');
+        $freshPdo->expects($this->once())->method('commit');
+
+        $connection = $this->getMockConnection([], $deadPdo);
+        $connection->setReconnector(fn ($connection) => $connection->setPdo($freshPdo));
+
+        try {
+            $connection->transaction(fn () => 'first');
+
+            $this->fail('The lost connection exception was not rethrown.');
+        } catch (PDOException $e) {
+            $this->assertSame('SQLSTATE[08006] [7] no connection to the server', $e->getMessage());
+        }
+
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertNull($connection->getRawPdo());
+
+        $this->assertSame('second', $connection->transaction(fn () => 'second'));
+    }
+
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
         $this->expectException(QueryException::class);
