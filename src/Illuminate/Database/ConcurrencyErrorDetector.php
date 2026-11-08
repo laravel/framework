@@ -10,6 +10,13 @@ use Throwable;
 class ConcurrencyErrorDetector implements ConcurrencyErrorDetectorContract
 {
     /**
+     * The callback that should be used to detect additional concurrency errors.
+     *
+     * @var (callable(\Throwable): bool)|null
+     */
+    protected static $detectUsingCallback;
+
+    /**
      * Determine if the given exception was caused by a concurrency error such as a deadlock or serialization failure.
      *
      * @param  \Throwable  $e
@@ -17,6 +24,10 @@ class ConcurrencyErrorDetector implements ConcurrencyErrorDetectorContract
      */
     public function causedByConcurrencyError(Throwable $e): bool
     {
+        if (static::$detectUsingCallback && call_user_func(static::$detectUsingCallback, $e)) {
+            return true;
+        }
+
         if ($e instanceof PDOException && ($e->getCode() === 40001 || $e->getCode() === '40001')) {
             return true;
         }
@@ -35,5 +46,16 @@ class ConcurrencyErrorDetector implements ConcurrencyErrorDetectorContract
             'WSREP detected deadlock/conflict and aborted the transaction. Try restarting the transaction',
             'Record has changed since last read in table',
         ]);
+    }
+
+    /**
+     * Register a callback to detect additional concurrency errors.
+     *
+     * @param  (callable(\Throwable): bool)|null  $callback
+     * @return void
+     */
+    public static function detectUsing(?callable $callback)
+    {
+        static::$detectUsingCallback = $callback;
     }
 }
