@@ -1070,7 +1070,7 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int') {
+        if (in_array($model->getKeyType(), ['int', 'integer'])) {
             return $this->foreignId($column)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());

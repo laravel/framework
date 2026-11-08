@@ -445,6 +445,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testGenerateRelationshipColumnWithIntegerKeyTypeModel()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignIdFor(Fixtures\Models\EloquentModelUsingIntegerKeyType::class);
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_integer_key_type_id` bigint unsigned not null',
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipColumnWithUuidModel()
     {
         $getSql = function ($grammar) {
