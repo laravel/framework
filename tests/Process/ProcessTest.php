@@ -9,6 +9,7 @@ use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
 use Illuminate\Process\PendingProcess;
+use Illuminate\Process\ProcessResult as ConcreteProcessResult;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -1494,6 +1495,22 @@ class ProcessTest extends TestCase
             });
         } finally {
             PendingProcess::flushMacros();
+        }
+    }
+
+    public function testProcessResultIsMacroable()
+    {
+        ConcreteProcessResult::macro('hasOutput', function () {
+            return $this->output() !== '';
+        });
+
+        try {
+            $result = (new Factory)->path(__DIR__)->run($this->ls());
+
+            $this->assertInstanceOf(ConcreteProcessResult::class, $result);
+            $this->assertTrue($result->hasOutput());
+        } finally {
+            ConcreteProcessResult::flushMacros();
         }
     }
 

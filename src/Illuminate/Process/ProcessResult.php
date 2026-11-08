@@ -4,10 +4,13 @@ namespace Illuminate\Process;
 
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
 class ProcessResult implements ProcessResultContract
 {
+    use Macroable;
+
     /**
      * The underlying process instance.
      *
