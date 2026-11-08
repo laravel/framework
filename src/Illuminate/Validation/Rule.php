@@ -28,6 +28,7 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\InArray;
 use Illuminate\Validation\Rules\InArrayKeys;
 use Illuminate\Validation\Rules\IpAddress;
+use Illuminate\Validation\Rules\ListRule;
 use Illuminate\Validation\Rules\MissingIf;
 use Illuminate\Validation\Rules\MissingUnless;
 use Illuminate\Validation\Rules\MissingWith;
@@ -285,11 +286,11 @@ class Rule
     /**
      * Get a list validation rule.
      *
-     * @return string
+     * @return \Illuminate\Validation\Rules\ListRule
      */
     public static function list()
     {
-        return 'list';
+        return new ListRule;
     }
 
     /**
