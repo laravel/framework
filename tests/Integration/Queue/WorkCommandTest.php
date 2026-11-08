@@ -303,6 +303,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testManuallyFailedJobIsOnlyWrittenAsFailed()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         Queue::push(new ManuallyFailingJob);
 
         $this->artisan('queue:work', [
