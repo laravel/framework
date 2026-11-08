@@ -5,14 +5,13 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Str;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use RuntimeException;
@@ -112,10 +111,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
     public function testReportingExceptions()
     {
-        $this->spy(ExceptionHandler::class)
-            ->expects('report')
-            ->times(2)
-            ->with(Mockery::type(RuntimeException::class), []);
+        Exceptions::fake();
 
         $job = new class
         {
@@ -138,6 +134,9 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
         $middleware->report(fn () => false);
         $middleware->handle($job, $next);
+
+        Exceptions::assertReported(RuntimeException::class);
+        Exceptions::assertReportedCount(2);
     }
 
     public function testItCanBackoffUsingException()
