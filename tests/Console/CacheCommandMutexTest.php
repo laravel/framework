@@ -99,6 +99,28 @@ class CacheCommandMutexTest extends TestCase
         $this->assertFalse($actual);
     }
 
+    public function testExistsDoesNotAcquireTheMutexWithLockProvider()
+    {
+        $store = new ArrayStore;
+        $this->cacheFactory->expects('store')->times(2)->returns($this->cacheRepository);
+        $this->cacheRepository->expects('getStore')->times(4)->returns($store);
+
+        $this->assertFalse($this->mutex->exists($this->command));
+        $this->assertTrue($this->mutex->create($this->command));
+    }
+
+    public function testExistsReturnsTrueWhenMutexIsHeldWithLockProvider()
+    {
+        $store = new ArrayStore;
+        $this->cacheFactory->expects('store')->times(3)->returns($this->cacheRepository);
+        $this->cacheRepository->expects('getStore')->times(6)->returns($store);
+
+        $this->mutex->create($this->command);
+
+        $this->assertTrue($this->mutex->exists($this->command));
+        $this->assertFalse($this->mutex->create($this->command));
+    }
+
     public function testCanCreateMutexWithCustomConnectionWithLockProvider()
     {
         $this->cacheFactory->expects('store')->with('test')->returns($this->cacheRepository);
