@@ -121,4 +121,56 @@ class ValidationArrayRuleTest extends TestCase
         $v = new Validator($trans, ['foo' => ['key_1' => 'bar', 'key_2' => '']], ['foo' => ['required', Rule::array(['key_1', 'key_2'])]]);
         $this->assertTrue($v->passes());
     }
+
+    public function testItCorrectlyFormatsTheFieldComparisonConstraints()
+    {
+        $this->assertSame('array|different:other', (string) Rule::array()->different('other'));
+        $this->assertSame('array|same:other', (string) Rule::array()->same('other'));
+        $this->assertSame('array|gt:other', (string) Rule::array()->greaterThan('other'));
+        $this->assertSame('array|gte:other', (string) Rule::array()->greaterThanOrEqualTo('other'));
+        $this->assertSame('array|lt:other', (string) Rule::array()->lessThan('other'));
+        $this->assertSame('array|lte:other', (string) Rule::array()->lessThanOrEqualTo('other'));
+        $this->assertSame('array:key_1,key_2|gt:other', (string) Rule::array(['key_1', 'key_2'])->greaterThan('other'));
+    }
+
+    public function testFieldComparisonValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['b']], ['foo' => Rule::array()->different('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['a']], ['foo' => Rule::array()->different('bar')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['a']], ['foo' => Rule::array()->same('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['b']], ['foo' => Rule::array()->same('bar')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['a', 'b'], 'bar' => ['c']], ['foo' => Rule::array()->greaterThan('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['c']], ['foo' => Rule::array()->greaterThan('bar')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['c']], ['foo' => Rule::array()->greaterThanOrEqualTo('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => ['c']], ['foo' => Rule::array()->greaterThanOrEqualTo('bar')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['a'], 'bar' => ['c', 'd']], ['foo' => Rule::array()->lessThan('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['a', 'b'], 'bar' => ['c', 'd']], ['foo' => Rule::array()->lessThan('bar')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['a', 'b'], 'bar' => ['c', 'd']], ['foo' => Rule::array()->lessThanOrEqualTo('bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['a', 'b', 'c'], 'bar' => ['c', 'd']], ['foo' => Rule::array()->lessThanOrEqualTo('bar')]);
+        $this->assertTrue($v->fails());
+    }
 }

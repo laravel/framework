@@ -49,6 +49,17 @@ class ArrayRule implements Stringable
     }
 
     /**
+     * The field under validation must have a different value than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function different(string $field): static
+    {
+        return $this->addRule('different:'.$field);
+    }
+
+    /**
      * The field under validation must have exactly the given number of items.
      *
      * @param  int  $value
@@ -57,6 +68,50 @@ class ArrayRule implements Stringable
     public function exactly(int $value): static
     {
         return $this->addRule('size:'.$value);
+    }
+
+    /**
+     * The field under validation must have more items than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function greaterThan(string $field): static
+    {
+        return $this->addRule('gt:'.$field);
+    }
+
+    /**
+     * The field under validation must have at least as many items as the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function greaterThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('gte:'.$field);
+    }
+
+    /**
+     * The field under validation must have fewer items than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function lessThan(string $field): static
+    {
+        return $this->addRule('lt:'.$field);
+    }
+
+    /**
+     * The field under validation must have no more items than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function lessThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('lte:'.$field);
     }
 
     /**
@@ -79,6 +134,17 @@ class ArrayRule implements Stringable
     public function min(int $value): static
     {
         return $this->addRule('min:'.$value);
+    }
+
+    /**
+     * The field under validation must match the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function same(string $field): static
+    {
+        return $this->addRule('same:'.$field);
     }
 
     /**

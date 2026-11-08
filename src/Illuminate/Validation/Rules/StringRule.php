@@ -71,6 +71,17 @@ class StringRule implements Stringable
     }
 
     /**
+     * The field under validation must have a different value than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function different(string $field): static
+    {
+        return $this->addRule('different:'.$field);
+    }
+
+    /**
      * The field under validation must not end with any of the given values.
      *
      * @param  string  ...$values
@@ -115,6 +126,50 @@ class StringRule implements Stringable
     }
 
     /**
+     * The field under validation must be longer than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function greaterThan(string $field): static
+    {
+        return $this->addRule('gt:'.$field);
+    }
+
+    /**
+     * The field under validation must be at least as long as the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function greaterThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('gte:'.$field);
+    }
+
+    /**
+     * The field under validation must be shorter than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function lessThan(string $field): static
+    {
+        return $this->addRule('lt:'.$field);
+    }
+
+    /**
+     * The field under validation must be no longer than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function lessThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('lte:'.$field);
+    }
+
+    /**
      * The field under validation must be entirely lowercase.
      *
      * @return $this
@@ -144,6 +199,17 @@ class StringRule implements Stringable
     public function min(int $value): static
     {
         return $this->addRule('min:'.$value);
+    }
+
+    /**
+     * The field under validation must match the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function same(string $field): static
+    {
+        return $this->addRule('same:'.$field);
     }
 
     /**

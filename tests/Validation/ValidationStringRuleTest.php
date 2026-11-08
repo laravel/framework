@@ -226,4 +226,70 @@ class ValidationStringRuleTest extends TestCase
         $rule = Rule::string()->alpha()->alpha();
         $this->assertSame('string|alpha', (string) $rule);
     }
+
+    public function testFieldComparisonRules()
+    {
+        $this->assertSame('string|different:other', (string) Rule::string()->different('other'));
+        $this->assertSame('string|same:other', (string) Rule::string()->same('other'));
+        $this->assertSame('string|gt:other', (string) Rule::string()->greaterThan('other'));
+        $this->assertSame('string|gte:other', (string) Rule::string()->greaterThanOrEqualTo('other'));
+        $this->assertSame('string|lt:other', (string) Rule::string()->lessThan('other'));
+        $this->assertSame('string|lte:other', (string) Rule::string()->lessThanOrEqualTo('other'));
+    }
+
+    public function testFieldComparisonValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['field' => 'foo', 'other' => 'bar'], ['field' => Rule::string()->different('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'foo', 'other' => 'foo'], ['field' => Rule::string()->different('other')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['field' => 'foo', 'other' => 'foo'], ['field' => Rule::string()->same('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'foo', 'other' => 'bar'], ['field' => Rule::string()->same('other')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['field' => 'long', 'other' => 'abc'], ['field' => Rule::string()->greaterThan('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'abc', 'other' => 'abc'], ['field' => Rule::string()->greaterThan('other')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['field' => 'abc', 'other' => 'abc'], ['field' => Rule::string()->greaterThanOrEqualTo('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'ab', 'other' => 'abc'], ['field' => Rule::string()->greaterThanOrEqualTo('other')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['field' => 'ab', 'other' => 'abc'], ['field' => Rule::string()->lessThan('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'abc', 'other' => 'abc'], ['field' => Rule::string()->lessThan('other')]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['field' => 'abc', 'other' => 'abc'], ['field' => Rule::string()->lessThanOrEqualTo('other')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['field' => 'long', 'other' => 'abc'], ['field' => Rule::string()->lessThanOrEqualTo('other')]);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testFieldComparisonValidationUnderAWildcard()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $data = ['items' => [
+            ['name' => 'foo', 'confirmation' => 'foo'],
+            ['name' => 'bar', 'confirmation' => 'baz'],
+        ]];
+
+        $v = new Validator($trans, $data, ['items.*.name' => Rule::string()->same('items.*.confirmation')]);
+
+        $this->assertTrue($v->fails());
+        $this->assertSame(['items.1.name'], $v->errors()->keys());
+    }
 }
