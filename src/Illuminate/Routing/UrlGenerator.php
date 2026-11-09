@@ -511,6 +511,14 @@ class UrlGenerator implements UrlGeneratorContract
             return false;
         }
 
+        // PHP drops query parameters past "max_input_vars", so read the expiration
+        // from the same raw query string that the signature was verified against.
+        $queryString = (string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'));
+
+        if (preg_match('/^(?:.*&)?expires=([^&]*)/', $queryString, $matches)) {
+            $expires = $matches[1];
+        }
+
         return ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
