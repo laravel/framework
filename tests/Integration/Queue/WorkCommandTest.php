@@ -34,7 +34,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
-            Worker::$flushStickyConnections = false;
+            Worker::$flushStickyConnections = true;
         });
 
         parent::setUp();
@@ -114,22 +114,8 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(SecondJob::$ran);
     }
 
-    public function testWorkerDoesNotFlushStickyConnectionsByDefault()
+    public function testWorkerFlushesStickyConnectionsByDefault()
     {
-        Queue::push(new WritingJob);
-
-        $this->artisan('queue:work', [
-            '--stop-when-empty' => true,
-            '--memory' => 1024,
-        ])->assertExitCode(0);
-
-        $this->assertTrue(DB::connection()->hasModifiedRecords());
-    }
-
-    public function testWorkerCanFlushStickyConnections()
-    {
-        Worker::$flushStickyConnections = true;
-
         Queue::push(new WritingJob);
 
         $this->artisan('queue:work', [
@@ -138,6 +124,20 @@ class WorkCommandTest extends QueueTestCase
         ])->assertExitCode(0);
 
         $this->assertFalse(DB::connection()->hasModifiedRecords());
+    }
+
+    public function testWorkerCanOptOutOfFlushingStickyConnections()
+    {
+        Worker::$flushStickyConnections = false;
+
+        Queue::push(new WritingJob);
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertTrue(DB::connection()->hasModifiedRecords());
     }
 
     public function testMemoryExceeded()
