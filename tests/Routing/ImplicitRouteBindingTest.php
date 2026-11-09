@@ -14,7 +14,9 @@ use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
-use Mockery as m;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -22,6 +24,8 @@ include_once 'Fixtures/Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $originalContainer;
 
     protected function setUp(): void
@@ -155,12 +159,12 @@ class ImplicitRouteBindingTest extends TestCase
     {
         Model::reportRouteModelBindingExceptions($shouldReport);
 
-        $mock = m::mock(ExceptionHandler::class);
+        $mock = Double::for(ExceptionHandler::class);
 
         if ($shouldReport) {
-            $mock->shouldReceive('report')->once()->with(m::type(InvalidValueException::class), []);
+            $mock->expects('report')->with(Argument::type(InvalidValueException::class), []);
         } else {
-            $mock->shouldReceive('report')->never();
+            $mock->expects('report')->never();
         }
 
         $container = Container::getInstance();
@@ -184,8 +188,8 @@ class ImplicitRouteBindingTest extends TestCase
 
     public function testItDoesNotConvertUnrelatedQueryExceptions(): void
     {
-        $mock = m::mock(ExceptionHandler::class);
-        $mock->shouldReceive('report')->never();
+        $mock = Double::for(ExceptionHandler::class);
+        $mock->expects('report')->never();
 
         $container = Container::getInstance();
         $container->instance(ExceptionHandler::class, $mock);
