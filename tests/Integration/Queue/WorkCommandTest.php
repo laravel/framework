@@ -126,9 +126,9 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(DB::connection()->hasModifiedRecords());
     }
 
-    public function testWorkerCanFlushStickyConnections()
+    public function testWorkerCanOptOutOfFlushingStickyConnections()
     {
-        Worker::$flushStickyConnections = true;
+        Worker::$flushStickyConnections = false;
 
         Queue::push(new WritingJob);
 
@@ -137,7 +137,7 @@ class WorkCommandTest extends QueueTestCase
             '--memory' => 1024,
         ])->assertExitCode(0);
 
-        $this->assertFalse(DB::connection()->hasModifiedRecords());
+        $this->assertTrue(DB::connection()->hasModifiedRecords());
     }
 
     public function testMemoryExceeded()
