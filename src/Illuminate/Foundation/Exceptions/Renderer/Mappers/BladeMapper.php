@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Exceptions\Renderer\Mappers;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -140,23 +139,6 @@ class BladeMapper
         }
 
         return $knownPaths;
-    }
-
-    /**
-     * Filter out the view data that should not be shown in the exception report.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function filterViewData(array $data)
-    {
-        return array_filter($data, function ($value, $key) {
-            if ($key === 'app') {
-                return ! $value instanceof Application;
-            }
-
-            return $key !== '__env';
-        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**

@@ -327,21 +327,6 @@ class ApplicationBuilder
     }
 
     /**
-     * Register additional Artisan route paths.
-     *
-     * @param  array  $paths
-     * @return $this
-     */
-    protected function withCommandRouting(array $paths)
-    {
-        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
-        });
-
-        return $this;
-    }
-
-    /**
      * Register the scheduled tasks for the application.
      *
      * @param  callable(\Illuminate\Console\Scheduling\Schedule $schedule): void  $callback
