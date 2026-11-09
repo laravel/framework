@@ -161,12 +161,21 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
 
             $response = isset($callback) ? $callback($this, $contents) : null;
 
+            $result = ! is_null($response) ? $response : $contents;
+
+            // @stack prints a placeholder so pushes from components rendered later
+            // in the same view can still be included. Replace those placeholders
+            // once, on the outermost view, before the stacks are flushed.
+            if ($this->factory->doneRendering()) {
+                $result = $this->factory->substituteDeferredStacks($result);
+            }
+
             // Once we have the contents of the view, we will flush the sections if we are
             // done rendering all views so that there is nothing left hanging over when
             // another view gets rendered in the future by the application developer.
             $this->factory->flushStateIfDoneRendering();
 
-            return ! is_null($response) ? $response : $contents;
+            return $result;
         } catch (Throwable $e) {
             $this->factory->flushState();
 

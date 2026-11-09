@@ -14,7 +14,7 @@ trait CompilesStacks
      */
     protected function compileStack($expression)
     {
-        return "<?php echo \$__env->yieldPushContent{$expression}; ?>";
+        return "<?php echo \$__env->yieldStackPlaceholder{$expression}; ?>";
     }
 
     /**

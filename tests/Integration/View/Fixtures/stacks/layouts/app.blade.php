@@ -1,0 +1,9 @@
+<head>
+@stack('scripts')
+</head>
+<body>
+@yield('content')
+@push('scripts')
+    from-layout
+@endpush
+</body>
