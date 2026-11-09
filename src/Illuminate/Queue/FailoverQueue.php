@@ -270,6 +270,77 @@ class FailoverQueue extends Queue implements QueueContract
      */
     protected function attemptOnAllConnections(string $method, array $arguments, $job = null)
     {
+        if ($this->shouldAttemptAfterCommit($job)) {
+            return $this->attemptAfterCommit($method, $arguments, $job);
+        }
+
+        return $this->attemptOnAllConnectionsNow($method, $arguments, $job);
+    }
+
+    /**
+     * Determine if this push has to wait until the open transaction commits.
+     *
+     * An after-commit job, or a primary connection configured with after_commit,
+     * only registers a callback inside push(). The real push then runs outside
+     * this class's try/catch, so a down connection never fails over.
+     *
+     * @param  mixed  $job
+     * @return bool
+     */
+    protected function shouldAttemptAfterCommit($job)
+    {
+        if ($job === null || ! isset($this->container) || ! $this->container->bound('db.transactions')) {
+            return false;
+        }
+
+        if ($this->container->make('db.transactions')->callbackApplicableTransactions()->isEmpty()) {
+            return false;
+        }
+
+        if ($this->shouldDispatchAfterCommit($job)) {
+            return true;
+        }
+
+        $primary = $this->manager->connection($this->connections[0]);
+
+        return $primary instanceof Queue && (bool) ($primary->dispatchAfterCommit ?? false);
+    }
+
+    /**
+     * Try every connection once no database transaction is still open.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function attemptAfterCommit(string $method, array $arguments, $job, bool $registeredRollback = false)
+    {
+        $transactions = $this->container->make('db.transactions');
+
+        if ($transactions->callbackApplicableTransactions()->isEmpty()) {
+            return $this->attemptOnAllConnectionsNow($method, $arguments, $job);
+        }
+
+        if (! $registeredRollback) {
+            $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
+        }
+
+        $transactions->addCallback(function () use ($method, $arguments, $job) {
+            $this->attemptAfterCommit($method, $arguments, $job, true);
+        });
+
+        return null;
+    }
+
+    /**
+     * Attempt the given method on all connections.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function attemptOnAllConnectionsNow(string $method, array $arguments, $job = null)
+    {
         [$lastException, $failedQueues] = [null, []];
 
         try {
