@@ -5,8 +5,11 @@ namespace Illuminate\Tests\Cache;
 use Closure;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
@@ -116,6 +119,68 @@ class CacheDatabaseStoreTest extends TestCase
 
         $result = $store->put('foo', "\0", 60);
         $this->assertTrue($result);
+    }
+
+    public function testValueIsAddedWithInsertOrIgnore()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['get', 'getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = Double::for(Builder::class);
+        $store->expects($this->once())->method('get')->with('foo')->willReturn(null);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $store->getConnection()->expects('table')->with('table')->returns($table);
+        $table->expects('insertOrIgnore')->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->returns(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
+    }
+
+    public function testValueIsAddedWithNoOpUpsertInRetriedTransactionOnMySql()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['get', 'getTime'])->setConstructorArgs($this->getMySqlMocks())->getMock();
+        $table = Double::for(Builder::class);
+        $grammar = Double::for(Grammar::class);
+        $store->expects($this->once())->method('get')->with('foo')->willReturn(null);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class), 3)->resolves(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->expects('table')->with('table')->times(2)->returns($table);
+        $table->expects('getGrammar')->returns($grammar);
+        $grammar->expects('wrap')->with('key')->returns('`key`');
+        $table->expects('upsert')->with(
+            ['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61],
+            'key',
+            Argument::satisfies(fn ($update) => array_keys($update) === ['key'] && $update['key'] instanceof Expression && $update['key']->getValue($grammar) === '`key`'),
+        )->returns(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
+    }
+
+    public function testValueIsNotAddedWhenUpsertFindsExistingKeyOnMySql()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['get', 'getTime'])->setConstructorArgs($this->getMySqlMocks())->getMock();
+        $table = Double::for(Builder::class);
+        $grammar = Double::for(Grammar::class);
+        $store->expects($this->once())->method('get')->with('foo')->willReturn(null);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $store->getConnection()->expects('transaction')->with(Argument::type(Closure::class), 3)->resolves(function ($closure) {
+            return $closure();
+        });
+        $store->getConnection()->expects('table')->with('table')->times(2)->returns($table);
+        $table->expects('getGrammar')->returns($grammar);
+        $grammar->expects('wrap')->with('key')->returns('`key`');
+        $table->expects('upsert')->returns(0);
+
+        $this->assertFalse($store->add('foo', 'bar', 60));
+    }
+
+    public function testValueIsNotAddedWhenItAlreadyExists()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['get'])->setConstructorArgs($this->getMySqlMocks())->getMock();
+        $store->expects($this->once())->method('get')->with('foo')->willReturn('baz');
+        $store->getConnection()->expects('transaction')->never();
+        $store->getConnection()->expects('table')->never();
+
+        $this->assertFalse($store->add('foo', 'bar', 60));
     }
 
     public function testForeverCallsStoreItemWithReallyLongTime()
@@ -273,6 +338,11 @@ class CacheDatabaseStoreTest extends TestCase
     protected function getMocks()
     {
         return [Double::for(Connection::class), 'table', 'prefix'];
+    }
+
+    protected function getMySqlMocks()
+    {
+        return [Double::for(MySqlConnection::class), 'table', 'prefix'];
     }
 
     protected function getPostgresMocks()
