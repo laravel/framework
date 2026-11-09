@@ -8,6 +8,27 @@ use GuzzleHttp\Psr7\Utils;
 class RequestException extends HttpClientException
 {
     /**
+     * Response headers omitted from truncated exception messages.
+     *
+     * These can carry credentials. dontTruncate() still returns the raw message.
+     *
+     * @var list<string>
+     */
+    private const SENSITIVE_RESPONSE_HEADERS = [
+        'Authorization',
+        'Proxy-Authorization',
+        'Set-Cookie',
+        'Set-Cookie2',
+    ];
+
+    /**
+     * Largest header block included in a truncated exception message.
+     *
+     * @var int
+     */
+    private const TRUNCATED_MESSAGE_HEADER_LIMIT = 2048;
+
+    /**
      * The response instance.
      *
      * @var \Illuminate\Http\Client\Response
@@ -120,12 +141,33 @@ class RequestException extends HttpClientException
             // and let the truncation limit apply to the body alone. Counting
             // headers toward the default 120 characters would usually leave no body.
             if (is_string($summary)) {
-                $summary = Message::toString($psrResponse->withBody(Utils::streamFor(''))).$summary;
+                $summary = $this->truncatedMessageHeaders($psrResponse).$summary;
             }
         } elseif (($body = $psrResponse->getBody())->isSeekable() && $body->isReadable()) {
             $summary = Message::toString($psrResponse);
         }
 
         return is_null($summary) ? $message : $message.":\n{$summary}\n";
+    }
+
+    /**
+     * Status line and headers for a truncated exception message.
+     *
+     * @param  \Psr\Http\Message\ResponseInterface  $psrResponse
+     * @return string
+     */
+    protected function truncatedMessageHeaders($psrResponse)
+    {
+        foreach (self::SENSITIVE_RESPONSE_HEADERS as $header) {
+            $psrResponse = $psrResponse->withoutHeader($header);
+        }
+
+        $headers = Message::toString($psrResponse->withBody(Utils::streamFor('')));
+
+        if (strlen($headers) <= self::TRUNCATED_MESSAGE_HEADER_LIMIT) {
+            return $headers;
+        }
+
+        return substr($headers, 0, self::TRUNCATED_MESSAGE_HEADER_LIMIT)." (truncated...)\r\n\r\n";
     }
 }

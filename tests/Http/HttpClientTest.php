@@ -1769,6 +1769,37 @@ class HttpClientTest extends TestCase
         $this->assertStringNotContainsString('(truncated...)', $full);
     }
 
+    public function testTruncatedRequestExceptionOmitsSecretsAndLimitsHeaderSize()
+    {
+        $cookie = 'laravel_session='.str_repeat('a', 40);
+        $huge = str_repeat('h', 5000);
+
+        $response = new Psr7Response(429, [
+            'Content-Type' => 'application/json',
+            'Retry-After' => '30',
+            'Set-Cookie' => $cookie,
+            'Authorization' => 'Bearer secret-token',
+            'X-Debug' => $huge,
+        ], '{"error":"slow down"}');
+
+        $message = (new RequestException(new Response($response)))->getMessage();
+
+        $this->assertStringContainsString('Retry-After: 30', $message);
+        $this->assertStringContainsString('{"error":"slow down"}', $message);
+        $this->assertStringNotContainsString('laravel_session', $message);
+        $this->assertStringNotContainsString('secret-token', $message);
+        $this->assertStringNotContainsString($huge, $message);
+        $this->assertLessThan(2500, strlen($message));
+
+        RequestException::dontTruncate();
+
+        $full = (new RequestException(new Response($response)))->getMessage();
+
+        $this->assertStringContainsString($cookie, $full);
+        $this->assertStringContainsString('secret-token', $full);
+        $this->assertStringContainsString($huge, $full);
+    }
+
     public function testRequestLevelTruncationLevelOnRequestException()
     {
         RequestException::truncateAt(60);
