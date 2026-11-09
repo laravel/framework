@@ -1743,6 +1743,32 @@ class HttpClientTest extends TestCase
         throw tap(new RequestException(new Response($response)), fn ($exception) => $exception->report());
     }
 
+    public function testTruncatedRequestExceptionKeepsResponseHeaders()
+    {
+        $body = '<html>'.str_repeat('x', 300).'</html>';
+
+        $response = new Psr7Response(405, [
+            'Content-Type' => 'text/html; charset=utf-8',
+            'Retry-After' => '60',
+        ], $body);
+
+        $message = (new RequestException(new Response($response)))->getMessage();
+
+        $this->assertStringContainsString("HTTP/1.1 405 Method Not Allowed\r\n", $message);
+        $this->assertStringContainsString("Content-Type: text/html; charset=utf-8\r\n", $message);
+        $this->assertStringContainsString("Retry-After: 60\r\n", $message);
+        $this->assertStringContainsString('(truncated...)', $message);
+        $this->assertStringNotContainsString(str_repeat('x', 300), $message);
+
+        RequestException::dontTruncate();
+
+        $full = (new RequestException(new Response($response)))->getMessage();
+
+        $this->assertStringContainsString("Retry-After: 60\r\n", $full);
+        $this->assertStringContainsString($body, $full);
+        $this->assertStringNotContainsString('(truncated...)', $full);
+    }
+
     public function testRequestLevelTruncationLevelOnRequestException()
     {
         RequestException::truncateAt(60);
@@ -1759,12 +1785,12 @@ class HttpClientTest extends TestCase
         }
 
         // Ensure the exception message is truncated according to the request level truncation setting.
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $exception->report();
 
         // Ensure that the truncation level is not changed when reporting the exception.
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
     }
@@ -1809,7 +1835,7 @@ class HttpClientTest extends TestCase
 
         $exception->report();
 
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertFalse(RequestException::$truncateAt);
     }
@@ -1826,7 +1852,7 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertInstanceOf(RequestException::class, $exception);
-        $this->assertSame("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"er (truncated...)\n", $exception->getMessage());
         $this->assertFalse(RequestException::$truncateAt);
     }
 
