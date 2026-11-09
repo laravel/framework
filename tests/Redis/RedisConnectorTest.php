@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Redis\RedisServiceProvider;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
@@ -37,6 +41,35 @@ class RedisConnectorTest extends TestCase
         $this->assertEquals($host, $phpRedisClient->getHost());
         $this->assertEquals($port, $phpRedisClient->getPort());
         $this->assertSame('default', $phpRedisClient->client('GETNAME'));
+    }
+
+    public function testApplicationCanUseDifferentClientsForNamedConnections()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+        $app = new Application;
+        $app->instance('config', new Repository([
+            'database' => ['redis' => [
+                'client' => 'phpredis',
+                'default' => ['host' => $host, 'port' => $port, 'database' => 5],
+                'other' => ['client' => 'predis', 'url' => "redis://{$host}:{$port}/5"],
+            ]],
+        ]));
+        (new RedisServiceProvider($app))->register();
+
+        $redis = $app->make('redis');
+        $other = $redis->connection('other');
+        $default = $app->make('redis.connection');
+
+        $this->assertInstanceOf(PredisConnection::class, $other);
+        $this->assertInstanceOf(PhpRedisConnection::class, $default);
+        $this->assertSame($other, $redis->connection('other'));
+
+        $default->set('mixed-redis-clients', 'from-phpredis');
+        $this->assertSame('from-phpredis', $other->get('mixed-redis-clients'));
+
+        $other->set('mixed-redis-clients', 'from-predis');
+        $this->assertSame('from-predis', $default->get('mixed-redis-clients'));
     }
 
     public function testUrl()

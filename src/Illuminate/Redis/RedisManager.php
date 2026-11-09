@@ -109,8 +109,11 @@ class RedisManager implements Factory
         $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
-            return $this->connector()->connect(
-                $this->parseConnectionConfiguration($this->config[$name]),
+            $config = $this->config[$name];
+            $client = is_array($config) ? Arr::pull($config, 'client') : null;
+
+            return $this->connectorFor($name, $client)->connect(
+                $this->parseConnectionConfiguration($config),
                 array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.'.$name, Arr::get($options, 'parameters', []))])
             );
         }
@@ -130,10 +133,17 @@ class RedisManager implements Factory
      */
     protected function resolveCluster($name)
     {
-        return $this->connector()->connectToCluster(
+        $config = $this->config['clusters'][$name];
+        $client = null;
+
+        if (is_array($config['options'] ?? null)) {
+            $client = Arr::pull($config['options'], 'client');
+        }
+
+        return $this->connectorFor($name, $client)->connectToCluster(
             array_map(function ($config) {
                 return $this->parseConnectionConfiguration($config);
-            }, $this->config['clusters'][$name]),
+            }, $config),
             $this->config['clusters']['options'] ?? [],
             $this->config['options'] ?? []
         );
@@ -164,13 +174,33 @@ class RedisManager implements Factory
      */
     protected function connector()
     {
-        $customCreator = $this->customCreators[$this->driver] ?? null;
+        return $this->makeConnector($this->driver);
+    }
+
+    private function connectorFor($name, $client)
+    {
+        if ($client === null) {
+            return $this->connector();
+        }
+
+        if (! is_string($client) || $client === '') {
+            throw new InvalidArgumentException("The Redis client for connection [{$name}] must be a non-empty string.");
+        }
+
+        $connector = $client === $this->driver ? $this->connector() : $this->makeConnector($client);
+
+        return $connector ?? throw new InvalidArgumentException("Redis client [{$client}] for connection [{$name}] is not supported.");
+    }
+
+    private function makeConnector($driver)
+    {
+        $customCreator = $this->customCreators[$driver] ?? null;
 
         if ($customCreator) {
             return $customCreator();
         }
 
-        return match ($this->driver) {
+        return match ($driver) {
             'predis' => new PredisConnector,
             'phpredis' => new PhpRedisConnector,
             default => null,
