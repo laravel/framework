@@ -34,7 +34,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
-            Worker::$flushStickyConnections = false;
+            Worker::$flushStickyConnections = true;
         });
 
         parent::setUp();
@@ -114,7 +114,7 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(SecondJob::$ran);
     }
 
-    public function testWorkerDoesNotFlushStickyConnectionsByDefault()
+    public function testWorkerFlushesStickyConnectionsByDefault()
     {
         Queue::push(new WritingJob);
 
@@ -123,7 +123,7 @@ class WorkCommandTest extends QueueTestCase
             '--memory' => 1024,
         ])->assertExitCode(0);
 
-        $this->assertTrue(DB::connection()->hasModifiedRecords());
+        $this->assertFalse(DB::connection()->hasModifiedRecords());
     }
 
     public function testWorkerCanOptOutOfFlushingStickyConnections()
