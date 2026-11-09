@@ -3566,6 +3566,17 @@ return [
                 'description' => 'Only list the failed jobs for the specified queue',
             ],
             [
+                'name' => 'summary',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Summarize the failed jobs grouped by connection, queue and job name',
+            ],
+            [
                 'name' => 'json',
                 'shortcut' => null,
                 'negatable' => false,

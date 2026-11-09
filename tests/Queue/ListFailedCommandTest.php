@@ -93,6 +93,112 @@ class ListFailedCommandTest extends TestCase
         ]), $output);
     }
 
+    public function testItSummarizesFailedJobsAsJson()
+    {
+        $output = $this->runCommandWithFailedJobs([
+            $this->failedJob('1', 'default', 'App\\Jobs\\SendEmail', '2026-05-18 12:00:00'),
+            $this->failedJob('2', 'default', 'App\\Jobs\\ProcessPodcast', '2026-05-18 09:00:00'),
+            $this->failedJob('3', 'default', 'App\\Jobs\\SendEmail', '2026-05-17 08:30:00'),
+            $this->failedJob('4', 'default', 'App\\Jobs\\SendEmail', '2026-05-19 18:45:00'),
+            $this->failedJob('5', 'emails', 'App\\Jobs\\SendEmail', '2026-05-18 10:00:00'),
+        ], ['--summary' => true, '--json' => true]);
+
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            [
+                'first_failed_at' => '2026-05-17 08:30:00',
+                'last_failed_at' => '2026-05-19 18:45:00',
+                'connection' => 'redis',
+                'queue' => 'default',
+                'class' => 'App\\Jobs\\SendEmail',
+                'count' => 3,
+            ],
+            [
+                'first_failed_at' => '2026-05-18 10:00:00',
+                'last_failed_at' => '2026-05-18 10:00:00',
+                'connection' => 'redis',
+                'queue' => 'emails',
+                'class' => 'App\\Jobs\\SendEmail',
+                'count' => 1,
+            ],
+            [
+                'first_failed_at' => '2026-05-18 09:00:00',
+                'last_failed_at' => '2026-05-18 09:00:00',
+                'connection' => 'redis',
+                'queue' => 'default',
+                'class' => 'App\\Jobs\\ProcessPodcast',
+                'count' => 1,
+            ],
+        ]), $output);
+    }
+
+    public function testItSummarizesFailedJobsAsTable()
+    {
+        $output = $this->runCommandWithFailedJobs([
+            $this->failedJob('1', 'default', 'App\\Jobs\\SendEmail', '2026-05-18 12:00:00'),
+            $this->failedJob('2', 'default', 'App\\Jobs\\SendEmail', '2026-05-17 08:30:00'),
+        ], ['--summary' => true]);
+
+        $this->assertStringContainsString('First Occurrence', $output);
+        $this->assertStringContainsString('Last Occurrence', $output);
+        $this->assertStringContainsString('Connection@Queue', $output);
+        $this->assertMatchesRegularExpression(
+            '/2026-05-17 08:30:00\s*\|\s*2026-05-18 12:00:00\s*\|\s*redis@default\s*\|\s*App\\\\Jobs\\\\SendEmail\s*\|\s+2 \|/',
+            $output
+        );
+    }
+
+    public function testItSummarizesFailedJobsForTheGivenQueue()
+    {
+        $output = $this->runCommandWithFailedJobs([
+            $this->failedJob('1', 'default', 'App\\Jobs\\SendEmail', '2026-05-18 12:00:00'),
+            $this->failedJob('2', 'emails', 'App\\Jobs\\SendEmail', '2026-05-18 13:00:00'),
+        ], ['--summary' => true, '--json' => true, '--queue' => 'emails']);
+
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            [
+                'first_failed_at' => '2026-05-18 13:00:00',
+                'last_failed_at' => '2026-05-18 13:00:00',
+                'connection' => 'redis',
+                'queue' => 'emails',
+                'class' => 'App\\Jobs\\SendEmail',
+                'count' => 1,
+            ],
+        ]), $output);
+    }
+
+    public function testItSummarizesFailedJobsPerConnection()
+    {
+        $output = $this->runCommandWithFailedJobs([
+            $this->failedJob('1', 'default', 'App\\Jobs\\SendEmail', '2026-05-18 12:00:00', 'redis'),
+            $this->failedJob('2', 'default', 'App\\Jobs\\SendEmail', '2026-05-18 11:00:00', 'sqs'),
+        ], ['--summary' => true]);
+
+        $this->assertStringContainsString('redis@default', $output);
+        $this->assertStringContainsString('sqs@default', $output);
+    }
+
+    public function testItSummarizesEmptyFailedJobs()
+    {
+        $this->assertJsonStringEqualsJsonString('[]', $this->runCommandWithFailedJobs([], ['--summary' => true, '--json' => true]));
+        $this->assertStringContainsString('No failed jobs found.', $this->runCommandWithFailedJobs([], ['--summary' => true]));
+    }
+
+    protected function failedJob(string $id, string $queue, string $class, string $failedAt, string $connection = 'redis'): object
+    {
+        return (object) [
+            'id' => $id,
+            'connection' => $connection,
+            'queue' => $queue,
+            'payload' => json_encode([
+                'displayName' => $class,
+                'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+                'data' => ['command' => 'O:8:"'.$class.'":0:{}'],
+            ]),
+            'exception' => 'Exception stack trace',
+            'failed_at' => $failedAt,
+        ];
+    }
+
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
     {
         $container = new Application;

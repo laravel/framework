@@ -4,8 +4,10 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Helper\TableStyle;
 
 #[AsCommand(name: 'queue:failed')]
 class ListFailedCommand extends Command
@@ -17,6 +19,7 @@ class ListFailedCommand extends Command
      */
     protected $signature = 'queue:failed
                             {--queue= : Only list the failed jobs for the specified queue}
+                            {--summary : Summarize the failed jobs grouped by connection, queue and job name}
                             {--json : Output the failed jobs as JSON}';
 
     /**
@@ -42,6 +45,10 @@ class ListFailedCommand extends Command
     {
         $jobs = $this->getFailedJobs();
 
+        if ($this->option('summary')) {
+            return $this->handleSummary($jobs);
+        }
+
         if ($this->option('json')) {
             return $this->displayFailedJobsAsJson($jobs);
         }
@@ -53,6 +60,70 @@ class ListFailedCommand extends Command
         $this->newLine();
         $this->displayFailedJobs($jobs);
         $this->newLine();
+    }
+
+    /**
+     * Display a summary of the failed jobs.
+     *
+     * @param  array  $jobs
+     * @return void
+     */
+    protected function handleSummary(array $jobs)
+    {
+        $summary = $this->summarizeFailedJobs($jobs);
+
+        if ($this->option('json')) {
+            return $this->output->writeln($summary->toJson());
+        }
+
+        if ($summary->isEmpty()) {
+            return $this->components->info('No failed jobs found.');
+        }
+
+        $this->newLine();
+
+        $this->table(
+            ['First Occurrence', 'Last Occurrence', 'Connection@Queue', 'Job', 'Count'],
+            $summary->map(fn ($row) => [
+                $row['first_failed_at'],
+                $row['last_failed_at'],
+                $row['connection'].'@'.$row['queue'],
+                $row['class'],
+                $row['count'],
+            ])->all(),
+            'default',
+            [4 => (new TableStyle)->setPadType(STR_PAD_LEFT)],
+        );
+
+        $this->newLine();
+    }
+
+    /**
+     * Summarize the failed jobs grouped by connection, queue and job name.
+     *
+     * @param  array  $jobs
+     * @return \Illuminate\Support\Collection<int, array{first_failed_at: string, last_failed_at: string, connection: string, queue: string, class: string, count: int}>
+     */
+    protected function summarizeFailedJobs(array $jobs)
+    {
+        return (new Collection($jobs))
+            ->map(fn ($job) => [
+                'connection' => (string) $job[1],
+                'queue' => (string) $job[2],
+                'class' => (string) $job[3],
+                'failed_at' => Carbon::parse((string) $job[4]),
+            ])
+            ->groupBy(fn ($job) => "{$job['connection']}@{$job['queue']}|{$job['class']}")
+            ->map(fn ($group) => [
+                'first_failed_at' => $group->min('failed_at')->toDateTimeString(),
+                'last_failed_at' => $group->max('failed_at')->toDateTimeString(),
+                'connection' => $group->first()['connection'],
+                'queue' => $group->first()['queue'],
+                'class' => $group->first()['class'],
+                'count' => $group->count(),
+            ])
+            ->sortBy([['count', 'desc'], ['last_failed_at', 'desc']])
+            ->values();
     }
 
     /**
