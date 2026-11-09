@@ -7,8 +7,14 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\Attributes\WithMigration;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use RuntimeException;
+use Throwable;
+
+use function Orchestra\Testbench\terminate;
 
 #[WithMigration('cache')]
 class DatabaseCacheStoreTest extends DatabaseTestCase
@@ -122,6 +128,85 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $this->assertTrue($result);
         $this->assertSame('new-bar', $store->get('foo'));
+    }
+
+    #[RequiresDatabase(['mysql', 'mariadb'])]
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresPhpExtension('pcntl')]
+    public function testConcurrentAddOperationsOnExpiredCacheDoNotDeadlock()
+    {
+        $keys = ['foo', 'bar', 'baz', 'qux'];
+
+        foreach ($keys as $key) {
+            $this->insertToCacheTable($key, 'old', -60);
+        }
+
+        for ($round = 1; $round <= 10; $round++) {
+            DB::table($this->getCacheTableName())->update(['expiration' => 1]);
+
+            // Each worker opens its own connection rather than sharing the parent's socket
+            DB::disconnect();
+
+            // Allow for time to fork and connect, so each process hits cache at roughly the same time
+            $startAt = microtime(true) + 0.1;
+            $pids = [];
+
+            for ($worker = 0; $worker < 16; $worker++) {
+                if (($pid = pcntl_fork()) === 0) {
+                    DB::connection()->getPdo();
+
+                    while (microtime(true) < $startAt) {
+                        usleep(100);
+                    }
+
+                    try {
+                        $added = 0;
+
+                        foreach ($keys as $i => $key) {
+                            if ($this->getStore()->add($key, 'new', 60)) {
+                                $added |= 1 << $i;
+                            }
+                        }
+
+                        terminate($this, $added);
+                    } catch (Throwable) {
+                        terminate($this, 255);
+                    }
+                }
+
+                $pids[] = $pid;
+            }
+
+            $statuses = [];
+
+            foreach ($pids as $pid) {
+                pcntl_waitpid($pid, $status);
+                $statuses[] = pcntl_wexitstatus($status);
+            }
+
+            $this->assertNotContains(255, $statuses, "A worker failed to add the cache items in round {$round}.");
+
+            foreach ($keys as $i => $key) {
+                $this->assertCount(1, array_filter($statuses, fn ($status) => $status & (1 << $i)), "Exactly one worker should add [{$key}] in round {$round}.");
+            }
+        }
+    }
+
+    public function testAddOperationShouldNotUpdateCacheInsertedAfterExistenceCheck()
+    {
+        $store = new class(DB::connection(), $this->getCacheTableName(), config('cache.prefix')) extends DatabaseStore
+        {
+            public function get($key)
+            {
+                return null;
+            }
+        };
+
+        $this->insertToCacheTable('foo', 'bar', 60);
+        $result = $store->add('foo', 'new-bar', 60);
+
+        $this->assertFalse($result);
+        $this->assertSame('bar', $this->getStore()->get('foo'));
     }
 
     public function testGetOperationReturnNullIfExpired()
