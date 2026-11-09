@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\Attributes\WithMigration;
+use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use RuntimeException;
@@ -194,13 +195,25 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
     public function testAddOperationShouldNotUpdateCacheInsertedAfterExistenceCheck()
     {
-        $store = new class(DB::connection(), $this->getCacheTableName(), config('cache.prefix')) extends DatabaseStore
-        {
-            public function get($key)
-            {
-                return null;
-            }
-        };
+        $store = $this->getStoreThatMissesExistingItems(DB::connection());
+
+        $this->insertToCacheTable('foo', 'bar', 60);
+        $result = $store->add('foo', 'new-bar', 60);
+
+        $this->assertFalse($result);
+        $this->assertSame('bar', $this->getStore()->get('foo'));
+    }
+
+    #[RequiresDatabase(['mysql', 'mariadb'])]
+    public function testAddOperationShouldNotUpdateCacheInsertedAfterExistenceCheckWhenFoundRowsIsEnabled()
+    {
+        $name = DB::getDefaultConnection();
+
+        config(["database.connections.{$name}-found-rows" => array_replace_recursive(
+            config("database.connections.{$name}"), ['options' => [Mysql::ATTR_FOUND_ROWS => true]]
+        )]);
+
+        $store = $this->getStoreThatMissesExistingItems(DB::connection("{$name}-found-rows"));
 
         $this->insertToCacheTable('foo', 'bar', 60);
         $result = $store->add('foo', 'new-bar', 60);
@@ -419,6 +432,23 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     protected function getStore()
     {
         return Cache::store('database');
+    }
+
+    /**
+     * Get a store whose existence check always misses, as if another process inserted the item afterwards.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @return \Illuminate\Cache\DatabaseStore
+     */
+    protected function getStoreThatMissesExistingItems($connection)
+    {
+        return new class($connection, $this->getCacheTableName(), config('cache.prefix')) extends DatabaseStore
+        {
+            public function get($key)
+            {
+                return null;
+            }
+        };
     }
 
     protected function getCacheTableName()

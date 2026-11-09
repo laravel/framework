@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use Pdo\Mysql;
 use RuntimeException;
 
 class DatabaseStore implements CanFlushLocks, LockProvider, Store
@@ -223,7 +224,10 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
-        if ($this->getConnection() instanceof MySqlConnection) {
+        // With FOUND_ROWS enabled, MySQL reports an unchanged duplicate row as affected
+        // so the upsert below could not tell an existing key from a new one
+        if ($this->getConnection() instanceof MySqlConnection &&
+            ! ($this->getConnection()->getConfig('options')[Mysql::ATTR_FOUND_ROWS] ?? false)) {
             return $this->connection->transaction(fn () => $this->table()->upsert(
                 ['key' => $key, 'value' => $value, 'expiration' => $expiration],
                 'key',

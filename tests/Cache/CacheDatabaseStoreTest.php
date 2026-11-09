@@ -14,6 +14,7 @@ use Illuminate\Database\SQLiteConnection;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
+use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -171,6 +172,20 @@ class CacheDatabaseStoreTest extends TestCase
         $table->expects('upsert')->returns(0);
 
         $this->assertFalse($store->add('foo', 'bar', 60));
+    }
+
+    public function testValueIsAddedWithInsertOrIgnoreOnMySqlWhenFoundRowsIsEnabled()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['get', 'getTime'])->setConstructorArgs($this->getMySqlMocks([Mysql::ATTR_FOUND_ROWS => true]))->getMock();
+        $table = Double::for(Builder::class);
+        $store->expects($this->once())->method('get')->with('foo')->willReturn(null);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $store->getConnection()->expects('transaction')->never();
+        $store->getConnection()->expects('table')->with('table')->returns($table);
+        $table->expects('upsert')->never();
+        $table->expects('insertOrIgnore')->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->returns(1);
+
+        $this->assertTrue($store->add('foo', 'bar', 60));
     }
 
     public function testValueIsNotAddedWhenItAlreadyExists()
@@ -340,9 +355,12 @@ class CacheDatabaseStoreTest extends TestCase
         return [Double::for(Connection::class), 'table', 'prefix'];
     }
 
-    protected function getMySqlMocks()
+    protected function getMySqlMocks(array $options = [])
     {
-        return [Double::for(MySqlConnection::class), 'table', 'prefix'];
+        $connection = Double::for(MySqlConnection::class);
+        $connection->allows('getConfig')->with('options')->returns($options);
+
+        return [$connection, 'table', 'prefix'];
     }
 
     protected function getPostgresMocks()
