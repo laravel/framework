@@ -462,7 +462,7 @@ class Validator implements ValidatorContract
     /**
      * Add an after validation callback that only runs if no errors have been recorded.
      *
-     * @param  callable|array|string  $callback
+     * @param  (callable(\Illuminate\Validation\Validator): mixed)|array<int, object|callable>  $callback
      * @return $this
      */
     public function afterValid($callback)
