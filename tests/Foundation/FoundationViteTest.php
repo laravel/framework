@@ -1777,9 +1777,12 @@ class FoundationViteTest extends TestCase
         app(Vite::class)('resources/js/app.js');
         app()->forgetScopedInstances();
         $this->assertCount(1, app(Vite::class)->preloadedAssets());
+        $nonce = app(Vite::class)->useCspNonce();
+        $this->assertNotNull($nonce);
 
         app(Vite::class)->flush();
         $this->assertCount(0, app(Vite::class)->preloadedAssets());
+        $this->assertNull(app(Vite::class)->cspNonce());
     }
 
     protected function cleanViteManifest($path = 'build')
