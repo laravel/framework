@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\ValidationServiceProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -406,6 +407,23 @@ class ValidationRulesTest extends TestCase
 
         $this->assertTrue($this->passes($schema, ['people' => [['age' => 1], ['age' => 2]]]));
         $this->assertFalse($this->passes($schema, ['people' => [['age' => 1], ['age' => -1]]]));
+    }
+
+    public function test_a_schema_within_the_node_limit_builds_rules()
+    {
+        $schema = ['type' => 'object', 'properties' => array_fill(0, JsonSchema::MAX_NODES, ['type' => 'string'])];
+
+        $this->assertCount(JsonSchema::MAX_NODES, JsonSchema::rules($schema));
+    }
+
+    public function test_a_schema_beyond_the_node_limit_is_refused()
+    {
+        $schema = ['type' => 'object', 'properties' => array_fill(0, JsonSchema::MAX_NODES + 1, ['type' => 'string'])];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('it expands beyond ['.JsonSchema::MAX_NODES.'] fragments');
+
+        JsonSchema::rules($schema);
     }
 
     /**

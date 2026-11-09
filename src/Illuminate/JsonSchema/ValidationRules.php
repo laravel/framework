@@ -9,18 +9,26 @@ use Illuminate\JsonSchema\Rules\RejectEmptyString;
 use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 
 class ValidationRules
 {
+    /**
+     * The number of schema fragments converted so far.
+     */
+    protected int $nodes = 0;
+
     /**
      * Get the validation rules for the properties of the given object schema.
      *
      * @param  \Illuminate\JsonSchema\Types\Type|array<string, mixed>  $schema
      * @return array<string, array<int, mixed>>
+     *
+     * @throws \InvalidArgumentException
      */
     public static function for(Type|array $schema): array
     {
-        return static::properties($schema instanceof Type ? $schema->toArray() : $schema);
+        return (new static)->properties($schema instanceof Type ? $schema->toArray() : $schema);
     }
 
     /**
@@ -29,7 +37,7 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<string, array<int, mixed>>
      */
-    protected static function properties(array $schema, ?string $prefix = null): array
+    protected function properties(array $schema, ?string $prefix = null): array
     {
         $required = array_map('strval', $schema['required'] ?? []);
 
@@ -42,7 +50,7 @@ class ValidationRules
                 $attribute = "{$prefix}.{$attribute}";
             }
 
-            $rules += static::rules(
+            $rules += $this->rules(
                 $property, $attribute, in_array((string) $name, $required, true), ! is_null($prefix),
             );
         }
@@ -56,26 +64,32 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<string, array<int, mixed>>
      */
-    protected static function rules(array $schema, string $attribute, bool $required, bool $nested = false): array
+    protected function rules(array $schema, string $attribute, bool $required, bool $nested = false): array
     {
-        $rules = static::presenceRules($schema, $required, $nested);
-
-        if (isset($schema['anyOf'])) {
-            return [$attribute => [...$rules, static::anyOf($schema['anyOf']), ...static::enumRules($schema)]];
+        if (++$this->nodes > JsonSchema::MAX_NODES) {
+            throw new InvalidArgumentException(
+                'The JSON Schema is too large to convert to validation rules; it expands beyond ['.JsonSchema::MAX_NODES.'] fragments.'
+            );
         }
 
-        $types = static::types($schema);
+        $rules = $this->presenceRules($schema, $required, $nested);
+
+        if (isset($schema['anyOf'])) {
+            return [$attribute => [...$rules, $this->anyOf($schema['anyOf']), ...$this->enumRules($schema)]];
+        }
+
+        $types = $this->types($schema);
 
         if (count($types) > 1) {
             $branches = array_map(fn (string $type) => [...$schema, 'type' => $type], $types);
 
-            return [$attribute => [...$rules, static::anyOf($branches)]];
+            return [$attribute => [...$rules, $this->anyOf($branches)]];
         }
 
         $type = $types[0] ?? null;
 
-        return [$attribute => [...$rules, ...static::typeRules($type, $schema)]]
-            + static::nestedRules($type, $schema, $attribute);
+        return [$attribute => [...$rules, ...$this->typeRules($type, $schema)]]
+            + $this->nestedRules($type, $schema, $attribute);
     }
 
     /**
@@ -84,9 +98,9 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, mixed>
      */
-    protected static function presenceRules(array $schema, bool $required, bool $nested): array
+    protected function presenceRules(array $schema, bool $required, bool $nested): array
     {
-        $nullable = static::isNullable($schema);
+        $nullable = $this->isNullable($schema);
 
         if ($required && ! $nested) {
             return $nullable ? ['present', 'nullable', new RejectEmptyString] : ['required'];
@@ -106,17 +120,17 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<string, array<int, mixed>>
      */
-    protected static function nestedRules(?string $type, array $schema, string $attribute): array
+    protected function nestedRules(?string $type, array $schema, string $attribute): array
     {
         if ($type === 'object') {
-            return static::properties($schema, $attribute);
+            return $this->properties($schema, $attribute);
         }
 
         if ($type !== 'array') {
             return [];
         }
 
-        $rules = isset($schema['items']) ? static::rules($schema['items'], "{$attribute}.*", false) : [];
+        $rules = isset($schema['items']) ? $this->rules($schema['items'], "{$attribute}.*", false) : [];
 
         if ($schema['uniqueItems'] ?? false) {
             $rules["{$attribute}.*"][] = 'distinct';
@@ -131,19 +145,19 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, mixed>
      */
-    protected static function typeRules(?string $type, array $schema): array
+    protected function typeRules(?string $type, array $schema): array
     {
         $rules = match ($type) {
-            'string' => ['string', ...static::stringRules($schema)],
-            'integer' => ['integer', ...static::numberRules($schema)],
-            'number' => ['numeric', ...static::numberRules($schema)],
+            'string' => ['string', ...$this->stringRules($schema)],
+            'integer' => ['integer', ...$this->numberRules($schema)],
+            'number' => ['numeric', ...$this->numberRules($schema)],
             'boolean' => ['boolean'],
-            'array' => static::arrayRules($schema),
-            'object' => static::objectRules($schema),
+            'array' => $this->arrayRules($schema),
+            'object' => $this->objectRules($schema),
             default => [],
         };
 
-        return [...$rules, ...static::enumRules($schema)];
+        return [...$rules, ...$this->enumRules($schema)];
     }
 
     /**
@@ -152,15 +166,15 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function stringRules(array $schema): array
+    protected function stringRules(array $schema): array
     {
-        $rules = static::bounds($schema, 'minLength', 'maxLength');
+        $rules = $this->bounds($schema, 'minLength', 'maxLength');
 
         if (isset($schema['pattern'])) {
-            $rules[] = 'regex:/'.static::escapeDelimiter($schema['pattern']).'/u';
+            $rules[] = 'regex:/'.$this->escapeDelimiter($schema['pattern']).'/u';
         }
 
-        return [...$rules, ...static::formatRules($schema['format'] ?? null)];
+        return [...$rules, ...$this->formatRules($schema['format'] ?? null)];
     }
 
     /**
@@ -168,7 +182,7 @@ class ValidationRules
      *
      * @return array<int, string>
      */
-    protected static function formatRules(?string $format): array
+    protected function formatRules(?string $format): array
     {
         return match ($format) {
             'email' => ['email'],
@@ -186,9 +200,9 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function numberRules(array $schema): array
+    protected function numberRules(array $schema): array
     {
-        $rules = static::bounds($schema, 'minimum', 'maximum');
+        $rules = $this->bounds($schema, 'minimum', 'maximum');
 
         if (isset($schema['multipleOf'])) {
             $rules[] = "multiple_of:{$schema['multipleOf']}";
@@ -203,9 +217,9 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, mixed>
      */
-    protected static function arrayRules(array $schema): array
+    protected function arrayRules(array $schema): array
     {
-        $rules = ['list', ...static::bounds($schema, 'minItems', 'maxItems')];
+        $rules = ['list', ...$this->bounds($schema, 'minItems', 'maxItems')];
 
         if ($schema['uniqueItems'] ?? false) {
             $rules[] = new DistinctArrayItems;
@@ -220,18 +234,18 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function objectRules(array $schema): array
+    protected function objectRules(array $schema): array
     {
         $rules = ['array'];
 
         if (($schema['additionalProperties'] ?? null) === false) {
             $keys = array_map('strval', array_keys($schema['properties'] ?? []));
 
-            $rules = $keys === [] ? ['array', 'max:0'] : ['array:'.static::parameters($keys)];
+            $rules = $keys === [] ? ['array', 'max:0'] : ['array:'.$this->parameters($keys)];
         }
 
         if (! empty($schema['required'])) {
-            $rules[] = 'required_array_keys:'.static::parameters(array_map('strval', $schema['required']));
+            $rules[] = 'required_array_keys:'.$this->parameters(array_map('strval', $schema['required']));
         }
 
         return $rules;
@@ -243,7 +257,7 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, mixed>
      */
-    protected static function enumRules(array $schema): array
+    protected function enumRules(array $schema): array
     {
         if (! isset($schema['enum'])) {
             return [];
@@ -259,12 +273,12 @@ class ValidationRules
      *
      * @param  array<int, array<string, mixed>>  $schemas
      */
-    protected static function anyOf(array $schemas): MatchesAnyOf
+    protected function anyOf(array $schemas): MatchesAnyOf
     {
         $schemas = array_filter($schemas, fn (array $schema) => ($schema['type'] ?? null) !== 'null');
 
         return new MatchesAnyOf(array_values(array_map(
-            fn (array $schema) => static::rules($schema, 'value', true), $schemas,
+            fn (array $schema) => $this->rules($schema, 'value', true), $schemas,
         )));
     }
 
@@ -274,7 +288,7 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function bounds(array $schema, string $min, string $max): array
+    protected function bounds(array $schema, string $min, string $max): array
     {
         $rules = [];
 
@@ -295,7 +309,7 @@ class ValidationRules
      * @param  array<string, mixed>  $schema
      * @return array<int, string>
      */
-    protected static function types(array $schema): array
+    protected function types(array $schema): array
     {
         return array_values(array_diff(Arr::wrap($schema['type'] ?? null), ['null']));
     }
@@ -305,7 +319,7 @@ class ValidationRules
      *
      * @param  array<string, mixed>  $schema
      */
-    protected static function isNullable(array $schema): bool
+    protected function isNullable(array $schema): bool
     {
         return in_array('null', Arr::wrap($schema['type'] ?? null), true)
             || in_array('null', array_column($schema['anyOf'] ?? [], 'type'), true);
@@ -316,7 +330,7 @@ class ValidationRules
      *
      * @param  array<int, string>  $values
      */
-    protected static function parameters(array $values): string
+    protected function parameters(array $values): string
     {
         return implode(',', array_map(fn (string $value) => '"'.str_replace('"', '""', $value).'"', $values));
     }
@@ -324,7 +338,7 @@ class ValidationRules
     /**
      * Escape each "/" in the pattern that is not already escaped by an odd number of backslashes.
      */
-    protected static function escapeDelimiter(string $pattern): string
+    protected function escapeDelimiter(string $pattern): string
     {
         return preg_replace('~(?<!\\\\)((?:\\\\\\\\)*)/~', '$1\\/', $pattern);
     }
