@@ -53,6 +53,42 @@ BLADE));
         $this->assertStringContainsString('<div>page</div>', $flat);
     }
 
+    public function testEarlierStackKeepsContentFromBeforeTheNextStack()
+    {
+        $html = $this->flatten(Blade::render(<<<'BLADE'
+@push('scripts')
+one
+@endpush
+[@stack('scripts')]
+@push('scripts')
+two
+@endpush
+[@stack('scripts')]
+@push('scripts')
+three
+@endpush
+BLADE));
+
+        $second = strrpos($html, '[');
+        $firstStack = substr($html, 0, $second);
+        $secondStack = substr($html, $second);
+
+        $this->assertStringContainsString('one', $firstStack);
+        $this->assertStringNotContainsString('two', $firstStack);
+        $this->assertStringNotContainsString('three', $firstStack);
+        $this->assertStringContainsString('one', $secondStack);
+        $this->assertStringContainsString('two', $secondStack);
+        $this->assertStringContainsString('three', $secondStack);
+    }
+
+    public function testIncludedViewCanPushIntoALaterStack()
+    {
+        $html = $this->flatten(Blade::render("@include('partial')[@stack('scripts')]"));
+
+        $this->assertSame('[from-include ]', $html);
+        $this->assertStringNotContainsString('##stack-placeholder-', $html);
+    }
+
     public function testExplicitYieldPushContentIsNotDeferred()
     {
         $html = $this->flatten(Blade::render(<<<'BLADE'

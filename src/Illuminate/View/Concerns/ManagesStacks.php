@@ -111,11 +111,7 @@ trait ManagesStacks
             $this->pushes[$section][$this->renderCount] .= $content;
         }
 
-        $this->stackOperations[] = [
-            'section' => $section,
-            'content' => $content,
-            'prepend' => false,
-        ];
+        $this->recordStackOperation($section, $content, false);
     }
 
     /**
@@ -173,10 +169,30 @@ trait ManagesStacks
             $this->prepends[$section][$this->renderCount] = $content.$this->prepends[$section][$this->renderCount];
         }
 
+        $this->recordStackOperation($section, $content, true);
+    }
+
+    /**
+     * Remember a stack operation that happens after a placeholder exists.
+     *
+     * Pushes before the first @stack are already in that stack's snapshot, so
+     * they are not stored again.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @param  bool  $prepend
+     * @return void
+     */
+    protected function recordStackOperation($section, $content, $prepend)
+    {
+        if ($this->deferredStackPlaceholders === []) {
+            return;
+        }
+
         $this->stackOperations[] = [
             'section' => $section,
             'content' => $content,
-            'prepend' => true,
+            'prepend' => $prepend,
         ];
     }
 
