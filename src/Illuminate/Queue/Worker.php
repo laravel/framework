@@ -204,7 +204,7 @@ class Worker
      *
      * @var bool
      */
-    public static $flushStickyConnections = false;
+    public static $flushStickyConnections = true;
 
     /**
      * Create a new queue worker.
