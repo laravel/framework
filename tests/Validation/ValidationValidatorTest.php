@@ -159,6 +159,107 @@ class ValidationValidatorTest extends TestCase
         unset($_SERVER['__validator.after.test']);
     }
 
+    public function testAfterValidCallbacksAreCalledWhenValidationPasses()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => 1], ['id' => 'integer']);
+        $v->setContainer(new Container);
+
+        $called = false;
+
+        $v->afterValid(function ($validator) use (&$called, $v) {
+            $called = true;
+
+            $this->assertSame($v, $validator);
+        });
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($called);
+    }
+
+    public function testAfterValidCallbacksAreSkippedWhenRulesFail()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => [1, 2]], ['id' => 'integer']);
+        $v->setContainer(new Container);
+
+        $called = false;
+
+        $v->afterValid(function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertFalse($v->passes());
+        $this->assertFalse($called);
+        $this->assertTrue($v->errors()->has('id'));
+    }
+
+    public function testAfterValidCallbacksAreSkippedWhenEarlierAfterCallbackAddsError()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => 1], ['id' => 'integer']);
+        $v->setContainer(new Container);
+
+        $called = false;
+
+        $v->after(function ($validator) {
+            $validator->errors()->add('id', 'Invalid.');
+        });
+
+        $v->afterValid(function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertFalse($v->passes());
+        $this->assertFalse($called);
+    }
+
+    public function testAfterCallbacksAreStillCalledWhenRulesFail()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => [1, 2]], ['id' => 'integer']);
+        $v->setContainer(new Container);
+
+        $called = false;
+
+        $v->after(function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertFalse($v->passes());
+        $this->assertTrue($called);
+    }
+
+    public function testAfterValidAcceptsAnArrayOfCallbacks()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => 1], ['id' => 'integer']);
+        $v->setContainer(new Container);
+
+        $called = false;
+
+        $rule = new class
+        {
+            public $called = false;
+
+            public function after($validator)
+            {
+                $this->called = true;
+            }
+        };
+
+        $v->afterValid([
+            function () use (&$called) {
+                $called = true;
+            },
+            $rule,
+        ]);
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($called);
+        $this->assertTrue($rule->called);
+    }
+
     public function testSometimesWorksOnArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();

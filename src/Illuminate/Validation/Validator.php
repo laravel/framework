@@ -460,6 +460,31 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Add an after validation callback that only runs if no errors have been recorded.
+     *
+     * @param  callable|array|string  $callback
+     * @return $this
+     */
+    public function afterValid($callback)
+    {
+        if (is_array($callback) && ! is_callable($callback)) {
+            foreach ($callback as $rule) {
+                $this->afterValid(method_exists($rule, 'after') ? $rule->after(...) : $rule);
+            }
+
+            return $this;
+        }
+
+        $this->after[] = function () use ($callback) {
+            if ($this->messages->isEmpty()) {
+                $callback($this);
+            }
+        };
+
+        return $this;
+    }
+
+    /**
      * Determine if the data passes the validation rules.
      *
      * @return bool
