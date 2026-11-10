@@ -20,10 +20,8 @@ class JsonFormatter extends MonologJsonFormatter
             return array_merge($this->getExceptionContext($e, $depth), $response);
         }
 
-        if ((! method_exists($handler, 'isReporting')) || ! $handler->isReporting($e)) {
-            if (method_exists($handler, 'buildContextForException')
-                && is_array($normalizedHandlerExceptionContext = $this->normalize($handler->buildContextForException($e), $depth + 1))
-            ) {
+        if (! $handler->isReporting($e)) {
+            if (is_array($normalizedHandlerExceptionContext = $this->normalize($handler->buildContextForException($e), $depth + 1))) {
                 $response = array_merge(
                     $normalizedHandlerExceptionContext,
                     $response
