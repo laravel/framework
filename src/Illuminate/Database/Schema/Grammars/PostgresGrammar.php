@@ -108,6 +108,7 @@ class PostgresGrammar extends Grammar
     public function compileViews($schema)
     {
         return 'select viewname as name, schemaname as schema, definition from pg_views where '
+            ."not exists (select 1 from pg_depend d where d.objid = format('%I.%I', schemaname, viewname)::regclass and d.deptype = 'e') and "
             .$this->compileSchemaWhereClause($schema, 'schemaname')
             .' order by schemaname, viewname';
     }
