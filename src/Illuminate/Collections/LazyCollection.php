@@ -11,6 +11,7 @@ use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\TransformsToResourceCollection;
 use InvalidArgumentException;
 use IteratorAggregate;
 use stdClass;
@@ -29,7 +30,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues, Macroable, TransformsToResourceCollection;
 
     /**
      * The source from which to generate items.
@@ -1923,6 +1924,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $key = is_null($key) || is_array($key) || $key instanceof Closure ? $key : explode('.', $key);
 
         return [$value, $key];
+    }
+
+    /**
+     * Get a base Support lazy collection instance from this collection.
+     *
+     * @return \Illuminate\Support\LazyCollection<TKey, TValue>
+     */
+    public function toBase()
+    {
+        return new self($this);
     }
 
     /**

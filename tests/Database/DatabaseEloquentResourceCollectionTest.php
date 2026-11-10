@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceCollectionAttribute;
@@ -91,5 +93,52 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
 
         $this->assertInstanceOf(AnonymousResourceCollection::class, $resource);
         $this->assertCount(2, $resource->collection);
+    }
+
+    public function testLazyCollectionCanTransformToExplicitResource()
+    {
+        $collection = new LazyCollection([
+            new EloquentResourceCollectionTestModel(),
+        ]);
+
+        $resource = $collection->toResourceCollection(EloquentResourceCollectionTestResource::class);
+
+        $this->assertInstanceOf(JsonResource::class, $resource);
+        $this->assertInstanceOf(LazyCollection::class, $resource->collection);
+    }
+
+    public function testLazyCollectionCanTransformToResourceViaUseResourceAttribute()
+    {
+        $collection = new LazyCollection([
+            new EloquentResourceTestResourceModelWithUseResourceCollectionAttribute(),
+        ]);
+
+        $resource = $collection->toResourceCollection();
+
+        $this->assertInstanceOf(EloquentResourceTestJsonResourceCollection::class, $resource);
+        $this->assertInstanceOf(LazyCollection::class, $resource->collection);
+    }
+
+    public function testLazyCollectionCanTransformToResourceViaUseResourceCollectionAttribute()
+    {
+        $collection = new LazyCollection([
+            new EloquentResourceTestResourceModelWithUseResourceAttribute(),
+        ]);
+
+        $resource = $collection->toResourceCollection();
+
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $resource);
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource->collection->first());
+        $this->assertInstanceOf(LazyCollection::class, $resource->collection);
+    }
+
+    public function testEmptyLazyCollectionCanTransformToResource()
+    {
+        $collection = new LazyCollection([]);
+
+        $resource = $collection->toResourceCollection();
+
+        $this->assertInstanceOf(ResourceCollection::class, $resource);
+        $this->assertCount(0, $resource);
     }
 }

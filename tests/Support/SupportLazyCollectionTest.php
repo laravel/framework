@@ -534,4 +534,26 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertFalse($collection->has(['a', 'b']));
         $this->assertTrue($collection->has('a'));
     }
+
+    public function testToBase()
+    {
+        $collection = new LazyCollection([1, 2, 3]);
+
+        $base = $collection->toBase();
+
+        $this->assertInstanceOf(LazyCollection::class, $base);
+        $this->assertSame([1, 2, 3], $base->all());
+    }
+
+    public function testSubclassToBaseReturnsBaseLazyCollection()
+    {
+        $subclass = new class([1, 2, 3]) extends LazyCollection
+        {
+        };
+
+        $base = $subclass->toBase();
+
+        $this->assertSame(LazyCollection::class, get_class($base));
+        $this->assertSame([1, 2, 3], $base->all());
+    }
 }

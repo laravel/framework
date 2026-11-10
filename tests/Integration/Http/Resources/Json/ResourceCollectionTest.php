@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -56,6 +57,19 @@ class ResourceCollectionTest extends TestCase
             [
                 'list' => ['id' => 1],
                 'total' => 1,
+            ],
+        ];
+
+        yield [
+            new ResourceCollection(new LazyCollection([
+                new Fluent(['id' => 1]),
+                new Fluent(['id' => 2]),
+                new Fluent(['id' => 3]),
+            ])),
+            [
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3],
             ],
         ];
     }
