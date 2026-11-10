@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Connectors\PredisConnector;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Predis\Connection\ConnectionException;
+use Predis\Connection\NodeConnectionInterface;
 use Predis\Retry\Retry;
 use Predis\Retry\Strategy\EqualBackoff;
 use Predis\Retry\Strategy\ExponentialBackoff;
@@ -238,6 +241,86 @@ class PredisConnectorTest extends TestCase
         ]);
     }
 
+    public function testConnectionAutomaticallyRetriesReadOnlyCommandAfterLosingTheConnection()
+    {
+        $client = new FailingPredisClient($this->connectionException(), failures: 1, result: 'bar');
+
+        $connection = new PredisConnection($client);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame([['get', ['foo']], ['get', ['foo']]], $client->calls);
+    }
+
+    public function testConnectionAutomaticallyRetriesIdempotentWriteAfterLosingTheConnection()
+    {
+        $client = new FailingPredisClient($this->connectionException(), failures: 1, result: true);
+
+        $connection = new PredisConnection($client);
+
+        $this->assertTrue($connection->command('set', ['foo', 'bar']));
+        $this->assertCount(2, $client->calls);
+    }
+
+    public function testConnectionDoesNotAutomaticallyRetryNonIdempotentWrite()
+    {
+        $client = new FailingPredisClient($exception = $this->connectionException(), failures: 1);
+
+        $connection = new PredisConnection($client);
+
+        try {
+            $connection->command('incr', ['foo']);
+            $this->fail('Expected ConnectionException was not thrown.');
+        } catch (ConnectionException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertCount(1, $client->calls);
+    }
+
+    public function testConnectionDoesNotAutomaticallyRetrySetWithOptions()
+    {
+        $client = new FailingPredisClient($exception = $this->connectionException(), failures: 1);
+
+        $connection = new PredisConnection($client);
+
+        try {
+            $connection->command('set', ['foo', 'bar', 'EX', 60]);
+            $this->fail('Expected ConnectionException was not thrown.');
+        } catch (ConnectionException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertCount(1, $client->calls);
+    }
+
+    public function testConnectionStopsRetryingAfterConfiguredAttempts()
+    {
+        $client = new FailingPredisClient($exception = $this->connectionException(), failures: 4);
+
+        $connection = new PredisConnection($client, ['command_retries' => 2]);
+
+        try {
+            $connection->command('get', ['foo']);
+            $this->fail('Expected ConnectionException was not thrown.');
+        } catch (ConnectionException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertCount(3, $client->calls);
+    }
+
+    public function testConnectPassesCommandRetriesToTheConnection()
+    {
+        $connection = (new TestablePredisConnector)->connect(['host' => '127.0.0.1', 'command_retries' => 2], []);
+
+        $this->assertSame(2, (fn () => $this->config['command_retries'])->call($connection));
+    }
+
+    protected function connectionException()
+    {
+        return new ConnectionException($this->createStub(NodeConnectionInterface::class), 'Stream is already at the end');
+    }
+
     protected function requiresPredisRetrySupport()
     {
         if (! class_exists(Retry::class)) {
@@ -256,5 +339,28 @@ class TestablePredisConnector extends PredisConnector
     public function testFormatHost(array $config): array
     {
         return $this->formatHost($config);
+    }
+}
+
+class FailingPredisClient
+{
+    public array $calls = [];
+
+    public function __construct(
+        protected ConnectionException $exception,
+        protected int $failures,
+        protected mixed $result = null,
+    ) {
+    }
+
+    public function __call($method, $parameters)
+    {
+        $this->calls[] = [$method, $parameters];
+
+        if ($this->failures-- > 0) {
+            throw $this->exception;
+        }
+
+        return $this->result;
     }
 }

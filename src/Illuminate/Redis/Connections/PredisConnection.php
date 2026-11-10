@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Predis\Command\Argument\ArrayableArgument;
+use Predis\Connection\ConnectionException;
 
 /**
  * @mixin \Predis\Client
@@ -20,13 +21,22 @@ class PredisConnection extends Connection implements ConnectionContract
     protected $client;
 
     /**
+     * The connection configuration array.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * Create a new Predis connection.
      *
      * @param  \Predis\Client  $client
+     * @param  array  $config
      */
-    public function __construct($client)
+    public function __construct($client, array $config = [])
     {
         $this->client = $client;
+        $this->config = $config;
     }
 
     /**
@@ -101,6 +111,34 @@ class PredisConnection extends Connection implements ConnectionContract
         }
 
         unset($loop);
+    }
+
+    /**
+     * Run a command against the Redis database.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \Predis\Connection\ConnectionException
+     */
+    public function command($method, array $parameters = [])
+    {
+        $retries = max(
+            $this->isRetryable($method, $parameters) ? 1 : 0,
+            (int) ($this->config['command_retries'] ?? 0),
+        );
+
+        while (true) {
+            try {
+                return parent::command($method, $parameters);
+            } catch (ConnectionException $e) {
+                // Predis already dropped the broken connection, so the next attempt reconnects.
+                if ($retries-- === 0) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     /**
