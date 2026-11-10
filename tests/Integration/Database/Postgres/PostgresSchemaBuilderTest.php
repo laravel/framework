@@ -262,4 +262,21 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertContains('public_table_body_fulltext', $indexNames);
         $this->assertContains('table_raw_index', $indexNames);
     }
+
+    public function testDropAllViewsIgnoresViewsOwnedByExtensions()
+    {
+        DB::statement('create extension if not exists pg_stat_statements schema public');
+        DB::statement('create view public.foo (id) as select 1');
+
+        try {
+            $this->assertFalse(Schema::hasView('public.pg_stat_statements'));
+
+            Schema::dropAllViews();
+
+            $this->assertFalse(Schema::hasView('public.foo'));
+            $this->assertTrue((bool) DB::scalar("select exists (select 1 from pg_views where viewname = 'pg_stat_statements')"));
+        } finally {
+            DB::statement('drop extension if exists pg_stat_statements');
+        }
+    }
 }
