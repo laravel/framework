@@ -13,6 +13,7 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -839,12 +840,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request));
     }
 
-    public function testSignatureExpirationIsReadFromTheRawQueryString()
+    #[TestWith(['QUERY_STRING'])]
+    #[TestWith(['VAPOR_RAW_QUERY_STRING'])]
+    public function testSignatureExpirationIsReadFromTheRawQueryString(string $serverKey)
     {
         Carbon::setTestNow($now = Carbon::now());
 
         $request = Request::create('http://www.foo.com/foo', server: [
-            'QUERY_STRING' => sprintf('expires=%d', $now->addMinutes(10)->timestamp),
+            $serverKey => sprintf('expires=%d', $now->addMinutes(10)->timestamp),
         ]);
 
         $url = new UrlGenerator(new RouteCollection, $request);
