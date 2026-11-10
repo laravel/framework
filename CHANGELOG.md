@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.70.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.72.0...12.x)
+
+## [v12.72.0](https://github.com/laravel/framework/compare/v12.70.2...v12.72.0) - 2026-11-10
+
+* [12.x] Fallback retrieving `expires` query string from `QUERY_STRING` header by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62349
+* [12.x] Return each event's own expression and timezone from `schedule:list --json` by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/62358
+* [12.x] Enforce valid email address comply with RFC 5321 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62347
+* [12.x] Fix temporary signed URL expiration bypass via numeric query-fragment parameter smuggling by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62401
+* [12.x] Fix nested sometimes validation rules are skipped when the value is `__missing__` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62402
+* [12.x] Allows to retrieves `expires` from `$_SERVER['VAPOR_RAW_QUERY_STRING']` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62391
 
 ## [v12.70.2](https://github.com/laravel/framework/compare/v12.70.1...v12.70.2) - 2026-10-27
 
