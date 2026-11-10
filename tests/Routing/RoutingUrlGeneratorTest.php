@@ -858,6 +858,19 @@ class RoutingUrlGeneratorTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    #[TestWith(['QUERY_STRING'])]
+    #[TestWith(['VAPOR_RAW_QUERY_STRING'])]
+    public function testSignatureExpirationRejectsArraysFromTheRawQueryString(string $serverKey)
+    {
+        $request = Request::create('http://www.foo.com/foo');
+        $request->server->set($serverKey, 'expires[]=99999999999');
+
+        $url = new UrlGenerator(new RouteCollection, $request);
+
+        $this->assertNull($request->query('expires'));
+        $this->assertFalse($url->signatureHasNotExpired($request));
+    }
+
     public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
     {
         $url = new UrlGenerator(
@@ -886,6 +899,23 @@ class RoutingUrlGeneratorTest extends TestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    public function testSignedUrlWithArrayExpiresReturnsFalse()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        // ?expires[]=99999999999 is truthy but comparing timestamp > array is always
+        // false in PHP, so without the guard the URL would never appear expired.
+        $request = Request::create('http://www.foo.com/foo?expires[]=99999999999');
+
+        $this->assertFalse($url->signatureHasNotExpired($request));
     }
 
     public function testSignedUrlDoesNotTrustForwardedPrefixToChangeThePathBeingVerified()
