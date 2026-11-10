@@ -142,6 +142,18 @@ class ValidatedInputTest extends TestCase
         $this->assertDataBooleanStrictNativeValuesContract();
     }
 
+    public function test_when_true_method()
+    {
+        $this->assertDataWhenTrueContract();
+        $this->assertDataWhenTrueNestedContract();
+    }
+
+    public function test_when_false_method()
+    {
+        $this->assertDataWhenFalseContract();
+        $this->assertDataWhenFalseNestedContract();
+    }
+
     public function test_integer_method()
     {
         $this->assertDataIntegerContract();

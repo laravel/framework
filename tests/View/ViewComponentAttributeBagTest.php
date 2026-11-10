@@ -348,6 +348,16 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertDataBooleanStrictNativeValuesContract();
     }
 
+    public function testWhenTrue()
+    {
+        $this->assertDataWhenTrueContract();
+    }
+
+    public function testWhenFalse()
+    {
+        $this->assertDataWhenFalseContract();
+    }
+
     public function testInteger()
     {
         $this->assertDataIntegerContract();

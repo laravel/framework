@@ -740,6 +740,194 @@ trait TestsInteractsWithDataContract
         $this->assertFalse($data->boolean('false', null, true));
     }
 
+    protected function assertDataWhenTrueContract()
+    {
+        $data = static::arrayToDataFactory([
+            'bool_true' => true,
+            'int_one' => 1,
+            'string_one' => '1',
+            'string_true' => 'true',
+            'string_on' => 'on',
+            'string_yes' => 'yes',
+            'string_zero' => '0',
+            'string_false' => 'false',
+            'int_zero' => 0,
+            'bool_false' => false,
+            'string_off' => 'off',
+            'string_no' => 'no',
+        ]);
+
+        $triggered = [];
+
+        foreach (['bool_true', 'int_one', 'string_one', 'string_true', 'string_on', 'string_yes'] as $key) {
+            $data->whenTrue($key, function ($value) use (&$triggered, $key) {
+                $triggered[$key] = $value;
+            });
+        }
+
+        $this->assertSame([
+            'bool_true' => true,
+            'int_one' => true,
+            'string_one' => true,
+            'string_true' => true,
+            'string_on' => true,
+            'string_yes' => true,
+        ], $triggered);
+
+        $notTriggered = [];
+        $defaultsTriggered = [];
+
+        foreach (['string_zero', 'string_false', 'int_zero', 'bool_false', 'string_off', 'string_no', 'missing_key'] as $key) {
+            $data->whenTrue($key, function () use (&$notTriggered, $key) {
+                $notTriggered[] = $key;
+            }, function () use (&$defaultsTriggered, $key) {
+                $defaultsTriggered[] = $key;
+            });
+        }
+
+        $this->assertEmpty($notTriggered);
+        $this->assertSame([
+            'string_zero',
+            'string_false',
+            'int_zero',
+            'bool_false',
+            'string_off',
+            'string_no',
+            'missing_key',
+        ], $defaultsTriggered);
+
+        $this->assertSame('callback-result', $data->whenTrue('bool_true', fn ($val) => 'callback-result'));
+        $this->assertSame($data, $data->whenTrue('bool_true', fn () => null));
+        $this->assertSame($data, $data->whenTrue('missing_key', fn () => 'callback-result'));
+        $this->assertSame('default-result', $data->whenTrue('missing_key', fn () => 'callback-result', fn () => 'default-result'));
+        $this->assertSame('default-result', $data->whenTrue('bool_false', fn () => 'callback-result', fn () => 'default-result'));
+    }
+
+    protected function assertDataWhenTrueNestedContract()
+    {
+        $data = static::arrayToDataFactory([
+            'nested' => [
+                'active' => true,
+                'inactive' => false,
+            ],
+        ]);
+
+        $active = false;
+        $inactive = false;
+        $missing = false;
+
+        $data->whenTrue('nested.active', function ($value) use (&$active) {
+            $active = $value;
+        });
+
+        $data->whenTrue('nested.inactive', function () use (&$inactive) {
+            $inactive = true;
+        });
+
+        $data->whenTrue('nested.missing', function () {
+        }, function () use (&$missing) {
+            $missing = true;
+        });
+
+        $this->assertTrue($active);
+        $this->assertFalse($inactive);
+        $this->assertTrue($missing);
+    }
+
+    protected function assertDataWhenFalseContract()
+    {
+        $data = static::arrayToDataFactory([
+            'string_zero' => '0',
+            'string_false' => 'false',
+            'bool_false' => false,
+            'int_zero' => 0,
+            'string_off' => 'off',
+            'string_no' => 'no',
+            'bool_true' => true,
+            'int_one' => 1,
+            'string_one' => '1',
+            'string_true' => 'true',
+            'string_on' => 'on',
+            'string_yes' => 'yes',
+        ]);
+
+        $triggered = [];
+
+        foreach (['string_zero', 'string_false', 'bool_false', 'int_zero', 'string_off', 'string_no'] as $key) {
+            $data->whenFalse($key, function ($value) use (&$triggered, $key) {
+                $triggered[$key] = $value;
+            });
+        }
+
+        $this->assertSame([
+            'string_zero' => false,
+            'string_false' => false,
+            'bool_false' => false,
+            'int_zero' => false,
+            'string_off' => false,
+            'string_no' => false,
+        ], $triggered);
+
+        $notTriggered = [];
+        $defaultsTriggered = [];
+
+        foreach (['bool_true', 'int_one', 'string_one', 'string_true', 'string_on', 'string_yes', 'missing_key'] as $key) {
+            $data->whenFalse($key, function () use (&$notTriggered, $key) {
+                $notTriggered[] = $key;
+            }, function () use (&$defaultsTriggered, $key) {
+                $defaultsTriggered[] = $key;
+            });
+        }
+
+        $this->assertEmpty($notTriggered);
+        $this->assertSame([
+            'bool_true',
+            'int_one',
+            'string_one',
+            'string_true',
+            'string_on',
+            'string_yes',
+            'missing_key',
+        ], $defaultsTriggered);
+
+        $this->assertSame('callback-result', $data->whenFalse('bool_false', fn ($val) => 'callback-result'));
+        $this->assertSame($data, $data->whenFalse('bool_false', fn () => null));
+        $this->assertSame($data, $data->whenFalse('missing_key', fn () => 'callback-result'));
+        $this->assertSame('default-result', $data->whenFalse('missing_key', fn () => 'callback-result', fn () => 'default-result'));
+        $this->assertSame('default-result', $data->whenFalse('bool_true', fn () => 'callback-result', fn () => 'default-result'));
+    }
+
+    protected function assertDataWhenFalseNestedContract()
+    {
+        $data = static::arrayToDataFactory([
+            'nested' => [
+                'active' => true,
+                'inactive' => false,
+            ],
+        ]);
+
+        $active = false;
+        $inactive = null;
+        $missing = false;
+
+        $data->whenFalse('nested.inactive', function ($value) use (&$inactive) {
+            $inactive = $value;
+        });
+
+        $data->whenFalse('nested.active', function () use (&$active) {
+            $active = true;
+        });
+
+        $data->whenFalse('nested.missing', function () {
+        }, function () use (&$missing) {
+            $missing = true;
+        });
+
+        $this->assertSame(false, $inactive);
+        $this->assertFalse($active);
+        $this->assertTrue($missing);
+    }
+
     protected function assertDataClampContract()
     {
         $data = static::arrayToDataFactory([
@@ -1086,9 +1274,21 @@ trait TestsInteractsWithDataContract
             $filled = true;
         });
 
+        $whenTrue = $whenFalse = null;
+
+        $data->whenTrue('city', function () use (&$whenTrue) {
+            $whenTrue = true;
+        });
+
+        $data->whenFalse('city', function ($value) use (&$whenFalse) {
+            $whenFalse = $value;
+        });
+
         $this->assertNull($city);
         $this->assertFalse($missing);
         $this->assertFalse($filled);
+        $this->assertNull($whenTrue);
+        $this->assertSame(false, $whenFalse);
 
         $this->assertSame('', $data->string('city')->value());
         $this->assertFalse($data->boolean('city'));

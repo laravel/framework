@@ -93,6 +93,18 @@ class CommandInputTest extends TestCase
         $this->assertDataBooleanStrictNativeValuesContract();
     }
 
+    public function testWhenTrueMethod()
+    {
+        $this->assertDataWhenTrueContract();
+        $this->assertDataWhenTrueNestedContract();
+    }
+
+    public function testWhenFalseMethod()
+    {
+        $this->assertDataWhenFalseContract();
+        $this->assertDataWhenFalseNestedContract();
+    }
+
     public function testIntegerMethod()
     {
         $this->assertDataIntegerContract();

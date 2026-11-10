@@ -299,6 +299,54 @@ trait InteractsWithData
     }
 
     /**
+     * Apply the callback if the given key is a truthy boolean value.
+     *
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
+     * @param  string  $key
+     * @param  callable(bool): TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
+     */
+    public function whenTrue($key, callable $callback, ?callable $default = null)
+    {
+        if ($this->boolean($key)) {
+            return $callback(true) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply the callback if the instance contains the given key and it is a falsy boolean value.
+     *
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
+     * @param  string  $key
+     * @param  callable(bool): TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
+     */
+    public function whenFalse($key, callable $callback, ?callable $default = null)
+    {
+        if ($this->has($key) && ! $this->boolean($key)) {
+            return $callback(false) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
      * Retrieve data as an integer value.
      *
      * When strict, values that are not valid integers return the default.
