@@ -7909,6 +7909,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
     }
 
+    public function testValidateImplicitEachWithAsterisksRequiredIfAndEmptyKey()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'users' => [
+                '' => ['role' => 'admin'],
+            ],
+        ], [
+            'users.*.invite_code' => ['Required_if:users.*.role,admin'],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('users..invite_code'));
+    }
+
     public function testValidateImplicitEachWithAsterisksRequiredUnless()
     {
         $trans = $this->getIlluminateArrayTranslator();
