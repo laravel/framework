@@ -233,9 +233,25 @@ class FilesystemTest extends TestCase
             require '.var_export(realpath(__DIR__.'/../../vendor/autoload.php'), true).';
             require __DIR__."/Filesystem.php";
 
-            $files = new Illuminate\Filesystem\Filesystem;
+            $files = new class extends Illuminate\Filesystem\Filesystem
+            {
+                public function allows($path)
+                {
+                    return ! $this->hasDangerousStreamWrapper($path);
+                }
+            };
 
-            echo $files->get(Phar::running()."/file.txt"), "|", var_export($files->exists("phar:///some/archive.phar/entry"), true);
+            $running = Phar::running();
+
+            echo $files->get($running."/file.txt"), "|", $files->get($running."/dir/file.txt"), "|", json_encode([
+                $files->allows($running."\\\\file.txt"),
+                $files->allows($running."\\\\dir/file.txt"),
+                $files->allows($running."\\\\dir\\\\file.txt"),
+                $files->allows($running.".evil/file.txt"),
+                $files->allows($running."X/file.txt"),
+                $files->allows($running."X\\\\file.txt"),
+                $files->exists("phar:///some/archive.phar/entry"),
+            ]);
         ');
 
         file_put_contents(self::$tempDir.'/build.php', '<?php
@@ -243,12 +259,13 @@ class FilesystemTest extends TestCase
             $phar->addFile('.var_export(realpath(__DIR__.'/../../src/Illuminate/Filesystem/Filesystem.php'), true).', "Filesystem.php");
             $phar->addFile('.var_export(self::$tempDir.'/run.php', true).', "run.php");
             $phar->addFromString("file.txt", "Hello from phar");
+            $phar->addFromString("dir/file.txt", "Hello from nested");
             $phar->setStub(\'<?php Phar::mapPhar("app.phar"); require "phar://app.phar/run.php"; __HALT_COMPILER();\');
         ');
 
         exec(escapeshellarg(PHP_BINARY).' -d phar.readonly=0 '.escapeshellarg(self::$tempDir.'/build.php'));
 
-        $this->assertSame('Hello from phar|false', exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($phar)));
+        $this->assertSame('Hello from phar|Hello from nested|[true,true,true,false,false,false,false]', exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($phar)));
     }
 
     public function testDeleteDirectory()
