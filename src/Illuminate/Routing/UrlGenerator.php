@@ -508,9 +508,9 @@ class UrlGenerator implements UrlGeneratorContract
 
         if (is_null($expires)) {
             $queries = HeaderUtils::parseQuery(match (true) {
-                isset($request->server->has('VAPOR_RAW_QUERY_STRING')) => $request->server->has('VAPOR_RAW_QUERY_STRING'),
+                $request->server->has('VAPOR_RAW_QUERY_STRING') => $request->server->get('VAPOR_RAW_QUERY_STRING'),
                 default => $request->getQueryString() ?? '',
-            ));
+            });
 
             if (isset($queries['expires'])) {
                 $expires = $queries['expires'];
