@@ -89,7 +89,7 @@ class ValidationData
 
         $value = Arr::get($masterData, $attribute, new UndefinedValue);
 
-        if (UndefinedValue::equalsTo($value) === false) {
+        if (! $value instanceof UndefinedValue) {
             Arr::set($results, $attribute, $value);
         }
 
