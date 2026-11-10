@@ -852,6 +852,24 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
     }
 
+    public function testNumericQueryParametersAreUrlEncoded()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $this->assertSame('http://www.foo.com/foo?a=1&expires%3D', $url->route('foo', ['a' => 1, 'expires=']));
+
+        $request = Request::create($url->temporarySignedRoute('foo', Carbon::now()->addSecond(), [0 => 'expires=']));
+
+        $this->assertNotSame('', $request->query('expires'));
+        $this->assertTrue($url->hasValidSignature($request));
+    }
+
     #[TestWith(['QUERY_STRING'])]
     #[TestWith(['VAPOR_RAW_QUERY_STRING'])]
     public function testSignatureExpirationIsReadFromTheRawQueryString(string $serverKey)
