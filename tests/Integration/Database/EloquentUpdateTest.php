@@ -92,6 +92,25 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame('Engineer: Abdul', $record->job.': '.$record->name);
     }
 
+    public function testTouchQualifiesUpdatedAtColumnOnQueriesWithJoins()
+    {
+        TestUpdateModel2::forceCreate([
+            'name' => Str::random(),
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        TestUpdateModel3::forceCreate([
+            'counter' => 1,
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        $affected = TestUpdateModel2::join('test_model3', 'test_model3.id', '=', 'test_model2.id')->touch();
+
+        $this->assertSame(1, $affected);
+        $this->assertNotSame('2000-01-01 00:00:00', TestUpdateModel2::find(1)->updated_at->toDateTimeString());
+        $this->assertSame('2000-01-01 00:00:00', TestUpdateModel3::find(1)->updated_at->toDateTimeString());
+    }
+
     public function testSoftDeleteWithJoins()
     {
         TestUpdateModel1::create([
