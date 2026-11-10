@@ -39,6 +39,31 @@ class CookieSessionHandlerTest extends TestCase
         $this->assertTrue($secureSessionValueCookie->isSecure());
     }
 
+    public function testCookieSessionSurvivesInvalidUtf8Input()
+    {
+        Route::post('/form', function () {
+            session()->put('user_id', 1);
+
+            return back()->withInput();
+        })->middleware('web');
+
+        Route::get('/form', fn () => [
+            'user_id' => session('user_id'),
+            'name' => bin2hex(old('name', '')),
+        ])->middleware('web');
+
+        $response = $this->post('/form', ['name' => "\xB1"]);
+
+        $sessionId = $response->getCookie('laravel_session')->getValue();
+
+        $this->app['session']->forgetDrivers();
+
+        $this->withCookies([
+            'laravel_session' => $sessionId,
+            $sessionId => $response->getCookie($sessionId)->getValue(),
+        ])->get('/form')->assertExactJson(['user_id' => 1, 'name' => 'b1']);
+    }
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));

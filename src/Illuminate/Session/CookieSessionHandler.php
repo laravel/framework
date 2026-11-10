@@ -105,7 +105,7 @@ class CookieSessionHandler implements SessionHandlerInterface
 
         if (! is_null($decoded = json_decode($value, true)) && is_array($decoded) &&
             isset($decoded['expires']) && $this->currentTime() <= $decoded['expires']) {
-            return $decoded['data'];
+            return ($decoded['base64'] ?? false) ? base64_decode($decoded['data']) : $decoded['data'];
         }
 
         return '';
@@ -118,10 +118,13 @@ class CookieSessionHandler implements SessionHandlerInterface
      */
     public function write($sessionId, $data): bool
     {
-        $this->cookie->queue($sessionId, json_encode([
-            'data' => $data,
-            'expires' => $this->availableAt($this->minutes * 60),
-        ]), $this->expireOnClose ? 0 : $this->minutes);
+        $payload = ['data' => $data, 'expires' => $this->availableAt($this->minutes * 60)];
+
+        if (! mb_check_encoding($data, 'UTF-8')) {
+            $payload = ['data' => base64_encode($data), 'base64' => true] + $payload;
+        }
+
+        $this->cookie->queue($sessionId, json_encode($payload), $this->expireOnClose ? 0 : $this->minutes);
 
         return true;
     }
