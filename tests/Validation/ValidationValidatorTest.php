@@ -138,6 +138,57 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[DataProvider('nestedSometimesMissingStringProvider')]
+    public function testSometimesValidatesNestedMissingString($data, $attribute, $failedAttribute, $rule, $failedRule)
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [$attribute => 'sometimes|'.$rule]);
+
+        $this->assertFalse($v->passes());
+        $this->assertArrayHasKey($failedRule, $v->failed()[$failedAttribute]);
+    }
+
+    public static function nestedSometimesMissingStringProvider()
+    {
+        return [
+            'nested integer' => [['profile' => ['age' => '__missing__']], 'profile.age', 'profile.age', 'integer', 'Integer'],
+            'nested in' => [['profile' => ['status' => '__missing__']], 'profile.status', 'profile.status', 'in:active,inactive', 'In'],
+            'wildcard' => [['items' => [['quantity' => '__missing__']]], 'items.*.quantity', 'items.0.quantity', 'integer', 'Integer'],
+            'terminal wildcard' => [['items' => ['__missing__']], 'items.*', 'items.0', 'integer', 'Integer'],
+            'multiple wildcards' => [['groups' => [['items' => [['quantity' => '__missing__']]]]], 'groups.*.items.*.quantity', 'groups.0.items.0.quantity', 'integer', 'Integer'],
+        ];
+    }
+
+    #[DataProvider('nestedSometimesMissingStringProvider')]
+    public function testSometimesRejectsInvalidNestedDataFromValidated($data, $attribute, $failedAttribute, $rule, $failedRule)
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [$attribute => 'sometimes|'.$rule]);
+
+        $this->expectException(ValidationException::class);
+
+        $v->validated();
+    }
+
+    public function testSometimesAllowsMissingAndValidNestedValues()
+    {
+        $data = ['items' => [['quantity' => '__missing__'], [], ['quantity' => null]]];
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [
+            'items.*.quantity' => 'sometimes|nullable|in:__missing__',
+        ]);
+
+        $this->assertTrue($v->passes());
+        $this->assertSame(['items' => [0 => ['quantity' => '__missing__'], 2 => ['quantity' => null]]], $v->validated());
+    }
+
+    public function testSometimesDistinguishesMissingFromNullNestedValues()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['items' => [[], ['quantity' => null]]], [
+            'items.*.quantity' => 'sometimes|required|integer',
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame(['items.1.quantity' => ['Required' => []]], $v->failed());
+    }
+
     public function testAfterCallbacksAreCalledWithValidatorInstance()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -8164,6 +8215,13 @@ class ValidationValidatorTest extends TestCase
 
         $data = ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]];
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
+
+        $data = ['cat' => ['name' => '__missing__', 'age' => null]];
+        $this->assertSame(['cat' => ['name' => '__missing__']], ValidationData::extractDataFromPath('cat.name', $data));
+        $this->assertSame(['cat' => ['age' => null]], ValidationData::extractDataFromPath('cat.age', $data));
+        $this->assertSame([], ValidationData::extractDataFromPath('cat.absent', $data));
+        $this->assertSame($data, ValidationData::extractDataFromPath(null, $data));
+        $this->assertSame([], ValidationData::extractDataFromPath(null, []));
     }
 
     public function testParsingTablesFromModels()
