@@ -248,6 +248,11 @@ class ExceptionReportingTest extends TestCase
             {
                 return $this->inner->buildContextForException($e);
             }
+
+            public function shouldStopRetries(Throwable $e)
+            {
+                return $this->inner->shouldStopRetries($e);
+            }
         });
 
         $this->app->make(ExceptionHandler::class);
@@ -4448,6 +4453,11 @@ class ExceptionHandlerWithoutContextForException implements ExceptionHandler
     {
         return [];
     }
+
+    public function shouldStopRetries(Throwable $e)
+    {
+        return false;
+    }
 }
 
 class ExceptionHandlerWithoutReportable implements ExceptionHandler
@@ -4480,6 +4490,11 @@ class ExceptionHandlerWithoutReportable implements ExceptionHandler
     public function buildContextForException(Throwable $e)
     {
         return [];
+    }
+
+    public function shouldStopRetries(Throwable $e)
+    {
+        return false;
     }
 }
 
@@ -4615,6 +4630,11 @@ class ExceptionHandlerThatThrowsFromContextForException implements ExceptionHand
     public function buildContextForException(Throwable $e)
     {
         return [];
+    }
+
+    public function shouldStopRetries(Throwable $e)
+    {
+        return false;
     }
 
     public function contextForException(Throwable $e)

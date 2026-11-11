@@ -51,6 +51,11 @@ class EventPingTest extends TestCase
             {
                 return [];
             }
+
+            public function shouldStopRetries(Throwable $e)
+            {
+                return false;
+            }
         };
 
         $this->swap(ExceptionHandler::class, $handler);

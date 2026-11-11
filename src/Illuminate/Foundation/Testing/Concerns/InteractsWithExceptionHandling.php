@@ -177,6 +177,17 @@ trait InteractsWithExceptionHandling
             {
                 return [];
             }
+
+            /**
+             * Determine if the exception should stop job retries.
+             *
+             * @param  \Throwable  $e
+             * @return bool
+             */
+            public function shouldStopRetries(Throwable $e)
+            {
+                return $this->originalHandler->shouldStopRetries($e);
+            }
         };
 
         $currentExceptionHandler = app(ExceptionHandler::class);

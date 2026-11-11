@@ -4,9 +4,6 @@ namespace Illuminate\Contracts\Debug;
 
 use Throwable;
 
-/**
- * @method bool shouldStopRetries(\Throwable $e)
- */
 interface ExceptionHandler
 {
     /**
@@ -62,4 +59,12 @@ interface ExceptionHandler
      * @return array<array-key, mixed>
      */
     public function buildContextForException(Throwable $e);
+
+    /**
+     * Determine if the exception should stop job retries.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldStopRetries(Throwable $e);
 }
