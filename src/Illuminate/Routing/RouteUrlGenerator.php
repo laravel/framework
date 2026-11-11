@@ -435,7 +435,9 @@ class RouteUrlGenerator
         if (count($keyed) < count($parameters)) {
             $query .= '&'.implode(
                 '&', array_map(
-                    fn ($value) => rawurlencode((string) $value),
+                    fn ($value) => $value instanceof EncodedParameter
+                        ? $value->value()
+                        : rawurlencode((string) $value),
                     $this->getNumericParameters($parameters)
                 )
             );
