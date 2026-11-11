@@ -517,6 +517,10 @@ class UrlGenerator implements UrlGeneratorContract
             }
         }
 
+        if ($expires !== null && ! is_string($expires)) {
+            return false;
+        }
+
         return ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
