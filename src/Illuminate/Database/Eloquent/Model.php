@@ -482,6 +482,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if the class attributes should override the inherited properties.
+     *
      * @return array
      */
     protected static function resolveClassAttributeOverrides()
