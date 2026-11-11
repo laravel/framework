@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Exceptions\Renderer;
 
+use Illuminate\Http\Request;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -75,6 +76,31 @@ class RenderBladeFilesTest extends TestCase
         $this->assertStringContainsString('data-tippy-content="', $html);
         $this->assertStringNotContainsString('<br', $html);
         $this->assertStringContainsString('&lt;script&gt;bad()&lt;/script&gt;', $html);
+    }
+
+    public function testRequestUrlIsRenderedSafelyInJavaScript(): void
+    {
+        $url = "http://localhost/');alert(1);//";
+        $encodedUrl = 'http:\/\/localhost\/\u0027);alert(1);';
+
+        $request = Request::create($url);
+        $exception = new class
+        {
+            public function httpStatusCode()
+            {
+                return 500;
+            }
+        };
+
+        $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/request-url.blade.php');
+
+        $html = (string) $this->app['view']->file($path, compact('exception', 'request'))->render();
+
+        $this->assertStringContainsString(
+            "await window.copyToClipboard('{$encodedUrl}');",
+            $html,
+        );
+        $this->assertStringNotContainsString("await window.copyToClipboard('".$request->fullUrl()."');", $html);
     }
 
     public function testRoutingTooltipRendersMultilineSafely(): void
