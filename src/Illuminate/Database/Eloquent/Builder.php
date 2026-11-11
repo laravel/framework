@@ -1380,6 +1380,10 @@ class Builder implements BuilderContract
             return false;
         }
 
+        if (! empty($this->query->joins)) {
+            $column = $this->qualifyColumn($column);
+        }
+
         return $this->toBase()->update([$column => $time]);
     }
 
