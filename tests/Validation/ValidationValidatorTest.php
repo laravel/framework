@@ -3882,6 +3882,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 1.23], ['foo' => 'Decimal:0,3']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1e5'], ['foo' => 'Decimal:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.5e3'], ['foo' => 'Decimal:0,3']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateInt()
