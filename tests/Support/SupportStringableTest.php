@@ -114,6 +114,35 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('A')->isNotEmpty());
     }
 
+    public function testIsBlank()
+    {
+        $this->assertTrue($this->stringable('')->isBlank());
+        $this->assertTrue($this->stringable(null)->isBlank());
+        $this->assertTrue($this->stringable('   ')->isBlank());
+        $this->assertTrue($this->stringable("\t\n\r\0\x0B")->isBlank());
+        $this->assertTrue(str('<p>   </p>')->stripTags()->isBlank());
+
+        $this->assertFalse($this->stringable('A')->isBlank());
+        $this->assertFalse($this->stringable('0')->isBlank());
+        $this->assertFalse($this->stringable("\u{00A0}")->isBlank());
+        $this->assertFalse($this->stringable("\u{200B}")->isBlank());
+    }
+
+    public function testIsNotBlank()
+    {
+        $this->assertFalse($this->stringable('')->isNotBlank());
+        $this->assertFalse($this->stringable(null)->isNotBlank());
+        $this->assertFalse($this->stringable('   ')->isNotBlank());
+        $this->assertFalse($this->stringable("\t\n\r\0\x0B")->isNotBlank());
+        $this->assertFalse(str('<p>   </p>')->stripTags()->isNotBlank());
+
+        $this->assertTrue($this->stringable('A')->isNotBlank());
+        $this->assertTrue($this->stringable('0')->isNotBlank());
+        $this->assertTrue($this->stringable("\u{00A0}")->isNotBlank());
+        $this->assertTrue($this->stringable("\u{200B}")->isNotBlank());
+        $this->assertTrue(str('<p>Hello</p>')->stripTags()->isNotBlank());
+    }
+
     public function testCounted()
     {
         $this->assertSame('1 order', (string) $this->stringable('order')->counted(1));
