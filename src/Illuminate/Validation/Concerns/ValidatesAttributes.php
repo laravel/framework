@@ -1072,13 +1072,9 @@ trait ValidatesAttributes
     {
         $verifier = $this->getPresenceVerifier($connection);
 
-        $extra = $this->getExtraConditions(
-            array_values(array_slice($parameters, 2))
-        );
-
-        if ($this->currentRule instanceof Exists) {
-            $extra = array_merge($extra, $this->currentRule->queryCallbacks());
-        }
+        $extra = $this->currentRule instanceof Exists
+            ? $this->currentRule->queryConditions()
+            : $this->getExtraConditions(array_values(array_slice($parameters, 2)));
 
         return is_array($value)
             ? $verifier->getMultiCount($table, $column, $value, $extra)
@@ -1121,11 +1117,9 @@ trait ValidatesAttributes
         // data store like Redis, etc. We will use it to determine uniqueness.
         $verifier = $this->getPresenceVerifier($connection);
 
-        $extra = $this->getUniqueExtra($parameters);
-
-        if ($this->currentRule instanceof Unique) {
-            $extra = array_merge($extra, $this->currentRule->queryCallbacks());
-        }
+        $extra = $this->currentRule instanceof Unique
+            ? $this->currentRule->queryConditions()
+            : $this->getUniqueExtra($parameters);
 
         return $verifier->getCount(
             $table, $column, $value, $id, $idColumn, $extra

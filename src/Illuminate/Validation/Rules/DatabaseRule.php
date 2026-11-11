@@ -106,7 +106,7 @@ trait DatabaseRule
             $value = 0;
         }
 
-        $this->wheres[] = ['column' => $column, 'value' => $value];
+        $this->wheres[] = ['column' => $column, 'operator' => '=', 'value' => (string) $value];
 
         return $this;
     }
@@ -130,7 +130,9 @@ trait DatabaseRule
             $value = 0;
         }
 
-        return $this->where($column, '!'.$value);
+        $this->wheres[] = ['column' => $column, 'operator' => '!=', 'value' => (string) $value];
+
+        return $this;
     }
 
     /**
@@ -141,7 +143,9 @@ trait DatabaseRule
      */
     public function whereNull($column)
     {
-        return $this->where($column, 'NULL');
+        $this->wheres[] = ['column' => $column, 'operator' => 'NULL', 'value' => null];
+
+        return $this;
     }
 
     /**
@@ -152,7 +156,9 @@ trait DatabaseRule
      */
     public function whereNotNull($column)
     {
-        return $this->where($column, 'NOT_NULL');
+        $this->wheres[] = ['column' => $column, 'operator' => 'NOT_NULL', 'value' => null];
+
+        return $this;
     }
 
     /**
@@ -233,6 +239,42 @@ trait DatabaseRule
     }
 
     /**
+     * Get the extra conditions for the presence verifier.
+     *
+     * @return array
+     */
+    public function queryConditions()
+    {
+        $conditions = [];
+
+        foreach ($this->wheres as ['column' => $column, 'operator' => $operator, 'value' => $value]) {
+            if ($operator === '=' && ($value === 'NULL' || $value === 'NOT_NULL' || str_starts_with($value, '!'))) {
+                $conditions[] = fn ($query) => $query->where($column, '=', $value);
+            } else {
+                $conditions[$column] = $this->formatWhereValue($operator, $value);
+            }
+        }
+
+        return array_merge($conditions, $this->using);
+    }
+
+    /**
+     * Format a "where" clause value as the presence verifier reads it.
+     *
+     * @param  string  $operator
+     * @param  string|null  $value
+     * @return string
+     */
+    protected function formatWhereValue($operator, $value)
+    {
+        return match ($operator) {
+            '=' => $value,
+            '!=' => '!'.$value,
+            default => $operator,
+        };
+    }
+
+    /**
      * Format the where clauses.
      *
      * @return string
@@ -240,7 +282,7 @@ trait DatabaseRule
     protected function formatWheres()
     {
         return (new Collection($this->wheres))
-            ->map(fn ($where) => $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"')
+            ->map(fn ($where) => $where['column'].','.'"'.str_replace('"', '""', $this->formatWhereValue($where['operator'], $where['value'])).'"')
             ->implode(',');
     }
 }
