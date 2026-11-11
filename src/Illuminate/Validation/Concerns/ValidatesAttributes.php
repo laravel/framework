@@ -2159,7 +2159,7 @@ trait ValidatesAttributes
 
         $this->requireParameterCount(1, $parameters, 'not_regex');
 
-        return preg_match($parameters[0], $value) < 1;
+        return preg_match($parameters[0], $value) === 0;
     }
 
     /**
