@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\JobRetryRequested;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use RuntimeException;
@@ -89,9 +88,7 @@ class RetryCommand extends Command
         if (count($ids) === 1 && $ids[0] === 'all') {
             $failer = $this->laravel['queue.failer'];
 
-            return method_exists($failer, 'ids')
-                ? $failer->ids()
-                : Arr::pluck($failer->all(), 'id');
+            return $failer->ids();
         }
 
         if ($queue = $this->option('queue')) {
@@ -115,12 +112,7 @@ class RetryCommand extends Command
     {
         $failer = $this->laravel['queue.failer'];
 
-        $ids = method_exists($failer, 'ids')
-            ? $failer->ids($queue)
-            : (new Collection($failer->all()))
-                ->where('queue', $queue)
-                ->pluck('id')
-                ->toArray();
+        $ids = $failer->ids($queue);
 
         if (count($ids) === 0) {
             $this->components->error("Unable to find failed jobs for queue [{$queue}].");
