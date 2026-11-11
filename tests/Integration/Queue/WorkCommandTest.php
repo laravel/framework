@@ -301,6 +301,20 @@ class WorkCommandTest extends QueueTestCase
             ->assertExitCode(0);
     }
 
+    public function testManuallyFailedJobIsOnlyWrittenAsFailed()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        Queue::push(new ManuallyFailingJob);
+
+        $this->artisan('queue:work', [
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('FAIL')
+            ->doesntExpectOutputToContain('DONE')
+            ->assertExitCode(0);
+    }
+
     public function testStopReasonIsWritten()
     {
         Queue::push(new FirstJob);
@@ -411,6 +425,16 @@ class ReleasingJob implements ShouldQueue
     public function handle()
     {
         $this->release(30);
+    }
+}
+
+class ManuallyFailingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        $this->fail('Manually failed.');
     }
 }
 
