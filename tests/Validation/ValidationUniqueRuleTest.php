@@ -164,6 +164,18 @@ class ValidationUniqueRuleTest extends TestCase
         $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
     }
 
+    public function testItComparesWhereValuesLiterally()
+    {
+        EloquentModelStub::create(['id_column' => 1, 'type' => 'admin']);
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['id_column' => 1], [
+            'id_column' => (new Unique('table', 'id_column'))->where('type', '!user'),
+        ]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Model::getConnectionResolver()));
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testItValidatesUniqueRuleWithWhereInAndWhereNotIn()
     {
         EloquentModelStub::create(['id_column' => 1, 'type' => 'admin']);

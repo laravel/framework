@@ -4,11 +4,13 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Str;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ValidationExistsRuleTest extends TestCase
@@ -221,6 +223,32 @@ class ValidationExistsRuleTest extends TestCase
 
         $v->setData(['id' => 4]);
         $this->assertTrue($v->passes());
+    }
+
+    #[DataProvider('literalWhereValuesProvider')]
+    public function testWhereComparesValuesLiterally(Exists $rule, int $id, bool $passes)
+    {
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'NOT_NULL']);
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['id' => $id], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $this->assertSame($passes, $v->passes());
+    }
+
+    public static function literalWhereValuesProvider()
+    {
+        $breakout = 'x\\",id,NOT_NULL,type,"';
+
+        return [
+            'NOT_NULL is not "is not null"' => [(new Exists('users', 'id'))->where('type', 'NOT_NULL'), 1, false],
+            'NOT_NULL matches itself' => [(new Exists('users', 'id'))->where('type', 'NOT_NULL'), 2, true],
+            'leading ! is not "not equal"' => [(new Exists('users', 'id'))->where('type', '!bar'), 1, false],
+            'Stringable NOT_NULL' => [(new Exists('users', 'id'))->where('type', Str::of('NOT_NULL')), 1, false],
+            'backslash cannot override another where' => [(new Exists('users', 'id'))->where('id', 2)->where('type', $breakout.'!'), 1, false],
+            'whereNot backslash cannot add wheres' => [(new Exists('users', 'id'))->whereNot('type', $breakout.'foo'), 2, true],
+        ];
     }
 
     public function testItIgnoresSoftDeletes()
