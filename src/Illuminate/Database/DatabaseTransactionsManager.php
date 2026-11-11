@@ -63,6 +63,8 @@ class DatabaseTransactionsManager
      * @param  int  $levelBeingCommitted
      * @param  int  $newTransactionLevel
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>|array{}
+     *
+     * @phpstan-return ($newTransactionLevel is 0 ? \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord> : \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>|array{})
      */
     public function commit($connection, $levelBeingCommitted, $newTransactionLevel)
     {
