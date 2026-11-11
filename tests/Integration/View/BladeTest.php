@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
+use Illuminate\View\RawTemplate;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -69,6 +70,29 @@ class BladeTest extends TestCase
         $component = new HelloComponent('Taylor');
 
         $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
+    public function test_rendering_raw_template_component_instance()
+    {
+        $component = new RawTemplateHelloComponent('Taylor');
+
+        $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
+    public function test_rendering_raw_template_closure_component_instance()
+    {
+        $component = new RawTemplateClosureComponent('Taylor');
+
+        $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
+    public function test_raw_template_is_never_resolved_as_a_view_name()
+    {
+        $this->assertTrue(View::exists('hello'));
+
+        $component = new RawTemplateViewNameComponent;
+
+        $this->assertSame('hello', Blade::renderComponent($component));
     }
 
     public function test_basic_blade_rendering()
@@ -301,5 +325,39 @@ class HelloComponent extends Component
     public function render()
     {
         return 'Hello {{ $name }}';
+    }
+}
+
+class RawTemplateHelloComponent extends Component
+{
+    public function __construct(public string $name)
+    {
+    }
+
+    public function render(): RawTemplate
+    {
+        return Blade::rawTemplate('Hello {{ $name }}');
+    }
+}
+
+class RawTemplateClosureComponent extends Component
+{
+    public function __construct(public string $name)
+    {
+    }
+
+    public function render()
+    {
+        return function (array $data) {
+            return Blade::rawTemplate('Hello {{ $name }}');
+        };
+    }
+}
+
+class RawTemplateViewNameComponent extends Component
+{
+    public function render(): RawTemplate
+    {
+        return Blade::rawTemplate('hello');
     }
 }
