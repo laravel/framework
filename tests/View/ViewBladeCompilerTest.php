@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
-use Illuminate\View\RawTemplate;
 use InvalidArgumentException;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
@@ -307,16 +306,6 @@ class ViewBladeCompilerTest extends TestCase
 
         $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
         $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
-    }
-
-    public function testRawTemplateCanBeCreated()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-
-        $template = $compiler->rawTemplate('<div>{{ $title }}</div>');
-
-        $this->assertInstanceOf(RawTemplate::class, $template);
-        $this->assertSame('<div>{{ $title }}</div>', $template->template);
     }
 
     public function testAnonymousComponentNamespacesCanBeStored()

@@ -2,7 +2,6 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Component;
 use Illuminate\View\RawTemplate;
 
@@ -21,6 +20,6 @@ class {{ class }} extends Component
      */
     public function render(): RawTemplate
     {
-        return Blade::rawTemplate({{ view }});
+        return new RawTemplate({{ view }});
     }
 }

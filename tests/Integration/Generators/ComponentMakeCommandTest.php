@@ -38,11 +38,10 @@ class ComponentMakeCommandTest extends TestCase
         $this->assertFileContains([
             'namespace App\View\Components;',
             'use Illuminate\View\Component;',
-            'use Illuminate\Support\Facades\Blade;',
             'use Illuminate\View\RawTemplate;',
             'class Foo extends Component',
             'public function render(): RawTemplate',
-            "return Blade::rawTemplate(<<<'blade'",
+            "return new RawTemplate(<<<'blade'",
             '{{--',
         ], 'app/View/Components/Foo.php');
 

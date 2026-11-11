@@ -336,7 +336,7 @@ class RawTemplateHelloComponent extends Component
 
     public function render(): RawTemplate
     {
-        return Blade::rawTemplate('Hello {{ $name }}');
+        return new RawTemplate('Hello {{ $name }}');
     }
 }
 
@@ -349,7 +349,7 @@ class RawTemplateClosureComponent extends Component
     public function render()
     {
         return function (array $data) {
-            return Blade::rawTemplate('Hello {{ $name }}');
+            return new RawTemplate('Hello {{ $name }}');
         };
     }
 }
@@ -358,6 +358,6 @@ class RawTemplateViewNameComponent extends Component
 {
     public function render(): RawTemplate
     {
-        return Blade::rawTemplate('hello');
+        return new RawTemplate('hello');
     }
 }

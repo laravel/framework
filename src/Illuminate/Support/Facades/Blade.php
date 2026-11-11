@@ -8,7 +8,6 @@ namespace Illuminate\Support\Facades;
  * @method static void setPath(string $path)
  * @method static string compileString(string $value)
  * @method static string render(string $string, array $data = [], bool $deleteCachedView = false)
- * @method static \Illuminate\View\RawTemplate rawTemplate(string $template)
  * @method static string renderComponent(\Illuminate\View\Component $component)
  * @method static string stripParentheses(string $expression)
  * @method static void extend(callable $compiler)

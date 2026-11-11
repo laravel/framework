@@ -12,7 +12,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
-use Illuminate\View\RawTemplate;
 use InvalidArgumentException;
 use ParseError;
 
@@ -366,17 +365,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 @unlink($view->getPath());
             }
         });
-    }
-
-    /**
-     * Create a raw Blade template that will be compiled and executed.
-     *
-     * @param  literal-string  $template
-     * @return \Illuminate\View\RawTemplate
-     */
-    public function rawTemplate(string $template): RawTemplate
-    {
-        return new RawTemplate($template);
     }
 
     /**
