@@ -24,7 +24,10 @@ for package in "${packages[@]}"; do
 done
 
 if ((${#missing[@]})); then
-    if [[ ! -f /etc/apt/sources.list.d/php.list ]]; then
+    codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
+    php_source="deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ ${codename} main"
+
+    if [[ "$(cat /etc/apt/sources.list.d/php.list 2>/dev/null)" != "$php_source" ]]; then
         sudo apt-get update -qq
         sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates curl
 
@@ -34,7 +37,7 @@ if ((${#missing[@]})); then
         sudo dpkg -i "$keyring"
         rm -f "$keyring"
 
-        echo 'deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ bookworm main' | sudo tee /etc/apt/sources.list.d/php.list >/dev/null
+        echo "$php_source" | sudo tee /etc/apt/sources.list.d/php.list >/dev/null
     fi
 
     sudo apt-get update -qq
