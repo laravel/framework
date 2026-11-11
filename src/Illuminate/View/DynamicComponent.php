@@ -62,7 +62,7 @@ EOF;
         return function ($data) use ($template) {
             $bindings = $this->bindings($class = $this->classForComponent());
 
-            return str_replace(
+            return new RawTemplate(str_replace(
                 [
                     '{{ component }}',
                     '{{ props }}',
@@ -80,7 +80,7 @@ EOF;
                     '{{ $slot ?? "" }}',
                 ],
                 $template
-            );
+            ));
         };
     }
 

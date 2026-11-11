@@ -15,6 +15,7 @@ use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\RawTemplate;
 use Illuminate\View\View;
+use InvalidArgumentException;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
@@ -53,14 +54,18 @@ class ComponentTest extends TestCase
         Component::resolveComponentsUsing(null);
     }
 
-    public function testInlineViewsGetCreated()
+    public function testStringsThatAreNotViewNamesThrowAnException()
     {
-        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
-        $this->viewFactory->expects('exists')->returns(false);
-        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+        $this->viewFactory->expects('exists')->with('Hello {{ $title }}')->returns(false);
+        $this->viewFactory->expects('addNamespace')->never();
 
-        $component = new TestInlineViewComponent;
-        $this->assertSame('__components::57b7a54afa0eb51fd9b88eec031c9e9e', $component->resolveView());
+        $component = new TestViewNameOrRawTemplateComponent('Hello {{ $title }}');
+
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'View [Hello {{ $title }}] not found. Inline component templates must be returned using Blade::rawTemplate().'
+        ));
+
+        $component->resolveView();
     }
 
     public function testRawTemplatesGetCreated()
@@ -170,38 +175,47 @@ class ComponentTest extends TestCase
         $this->assertSame($view, $component->resolveView());
     }
 
-    public function testRenderingStringClosureFromComponent()
+    public function testStringsReturnedFromClosuresThatAreNotViewNamesThrowAnException()
     {
-        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
-        $this->viewFactory->expects('exists')->returns(false);
-        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+        $this->viewFactory->expects('exists')->with('<p>Hello {{ $title }}</p>')->returns(false);
+        $this->viewFactory->expects('addNamespace')->never();
 
-        $component = new class() extends Component
+        $component = new class extends Component
         {
-            protected $title;
-
-            public function __construct($title = 'World')
-            {
-                $this->title = $title;
-            }
-
             public function render()
             {
                 return function (array $data) {
-                    return "<p>Hello {$this->title}</p>";
+                    return '<p>Hello {{ $title }}</p>';
                 };
             }
         };
 
         $closure = $component->resolveView();
 
-        $viewPath = $closure([]);
-
         $this->assertInstanceOf(Closure::class, $closure);
-        $this->assertSame('__components::9cc08f5001b343c093ee1a396da820dc', $viewPath);
 
-        $hash = str_replace('__components::', '', $viewPath);
-        $this->assertSame('<p>Hello World</p>', file_get_contents("/tmp/{$hash}.blade.php"));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Blade::rawTemplate()');
+
+        $closure([]);
+    }
+
+    public function testViewNamesReturnedFromClosuresGetReturned()
+    {
+        $this->viewFactory->expects('exists')->with('alert')->returns(true);
+        $this->viewFactory->expects('addNamespace')->never();
+
+        $component = new class extends Component
+        {
+            public function render()
+            {
+                return function (array $data) {
+                    return 'alert';
+                };
+            }
+        };
+
+        $this->assertSame('alert', $component->resolveView()([]));
     }
 
     public function testRegularViewsGetReturnedUsingViewMethod()
@@ -278,7 +292,7 @@ class ComponentTest extends TestCase
 
     public function testResolveComponentsUsing()
     {
-        $component = new TestInlineViewComponent;
+        $component = new TestRawTemplateComponent;
 
         Component::resolveComponentsUsing(function ($class, $data) use ($component) {
             $this->assertSame(Component::class, $class, 'It takes the component class name as the first parameter.');
@@ -315,84 +329,39 @@ class ComponentTest extends TestCase
         $this->assertSame('alert', $component->resolveView());
     }
 
-    public function testBladeViewCacheWithInlineViewComponent()
+    public function testBladeViewCacheWithRawTemplateComponentWhereRenderDependsOnProps()
     {
-        $component = new TestInlineViewComponent;
+        $componentA = new TestViewNameOrRawTemplateComponent(new RawTemplate('A'));
+        $componentB = new TestViewNameOrRawTemplateComponent(new RawTemplate('B'));
 
-        $this->viewFactory->expects('exists')->times(2)->returns(false);
-
+        $this->viewFactory->expects('exists')->never();
         $this->config->expects('get')->times(2)->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp')->times(2);
 
-        $this->viewFactory->expects('addNamespace')
-            ->with('__components', '/tmp')
-            ->times(2);
-
-        $compiledViewName = '__components::57b7a54afa0eb51fd9b88eec031c9e9e';
-        $contents = '::Hello {{ $title }}';
-        $cacheKey = $component::class.$contents;
-
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-
-        $cache = (fn () => $component::$bladeViewCache)->call($component);
-        $this->assertSame([$cacheKey => $compiledViewName], $cache);
-
-        $component::flushCache();
-
-        $cache = (fn () => $component::$bladeViewCache)->call($component);
-        $this->assertSame([], $cache);
-
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-        $this->assertSame($compiledViewName, $component->resolveView());
-    }
-
-    public function testBladeViewCacheWithInlineViewComponentWhereRenderDependsOnProps()
-    {
-        $componentA = new TestInlineViewComponentWhereRenderDependsOnProps('A');
-        $componentB = new TestInlineViewComponentWhereRenderDependsOnProps('B');
-
-        $this->viewFactory->expects('exists')->times(2)->returns(false);
-
-        $this->config->expects('get')->times(2)->with('view.compiled')->returns('/tmp');
-
-        $this->viewFactory->expects('addNamespace')
-            ->with('__components', '/tmp')
-            ->times(2);
-
-        $compiledViewNameA = '__components::9b0498cbe3839becd0d496e05c553485';
-        $compiledViewNameB = '__components::9d1b9bc4078a3e7274d3766ca02423f3';
-        $cacheAKey = $componentA::class.'::A';
-        $cacheBKey = $componentB::class.'::B';
+        $compiledViewNameA = '__components::'.hash('xxh128', 'A');
+        $compiledViewNameB = '__components::'.hash('xxh128', 'B');
 
         $this->assertSame($compiledViewNameA, $componentA->resolveView());
         $this->assertSame($compiledViewNameA, $componentA->resolveView());
         $this->assertSame($compiledViewNameB, $componentB->resolveView());
         $this->assertSame($compiledViewNameB, $componentB->resolveView());
 
-        $cacheA = (fn () => $componentA::$bladeViewCache)->call($componentA);
-        $cacheB = (fn () => $componentB::$bladeViewCache)->call($componentB);
-        $this->assertSame($cacheA, $cacheB);
+        $cache = (fn () => $componentA::$rawTemplateViewCache)->call($componentA);
         $this->assertSame([
-            $cacheAKey => $compiledViewNameA,
-            $cacheBKey => $compiledViewNameB,
-        ], $cacheA);
+            $componentA::class.'::A' => $compiledViewNameA,
+            $componentB::class.'::B' => $compiledViewNameB,
+        ], $cache);
 
         $componentA::flushCache();
 
-        $cacheA = (fn () => $componentA::$bladeViewCache)->call($componentA);
-        $cacheB = (fn () => $componentB::$bladeViewCache)->call($componentB);
-        $this->assertSame($cacheA, $cacheB);
-        $this->assertSame([], $cacheA);
+        $cache = (fn () => $componentB::$rawTemplateViewCache)->call($componentB);
+        $this->assertSame([], $cache);
     }
 
     public function testFactoryGetsSharedBetweenComponents()
     {
         $regular = new TestRegularViewNameViewComponent;
-        $inline = new TestInlineViewComponent;
+        $inline = new TestRawTemplateComponent;
 
         $getFactory = fn ($component) => (fn () => $component->factory())->call($component);
 
@@ -485,21 +454,6 @@ class TestComponentWithStaticAndIgnoredProperties extends Component
     public function render()
     {
         return 'Hello';
-    }
-}
-
-class TestInlineViewComponent extends Component
-{
-    public $title;
-
-    public function __construct($title = 'foo')
-    {
-        $this->title = $title;
-    }
-
-    public function render()
-    {
-        return 'Hello {{ $title }}';
     }
 }
 

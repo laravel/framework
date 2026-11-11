@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
 use Illuminate\Testing\TestComponent;
 use Illuminate\View\Component;
+use Illuminate\View\RawTemplate;
 use Orchestra\Testbench\TestCase;
 
 class InteractsWithViewsTest extends TestCase
@@ -31,7 +32,7 @@ class InteractsWithViewsTest extends TestCase
 
             public function render()
             {
-                return 'rendered content';
+                return new RawTemplate('rendered content');
             }
         };
 
@@ -50,7 +51,7 @@ class InteractsWithViewsTest extends TestCase
         {
             public function render()
             {
-                return 'rendered content';
+                return new RawTemplate('rendered content');
             }
         };
 

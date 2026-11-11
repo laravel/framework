@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -50,7 +51,7 @@ abstract class Component
     protected static $componentsResolver;
 
     /**
-     * The cache of blade view names, keyed by contents.
+     * The cache of blade view names, keyed by view name.
      *
      * @var array<string, string>
      */
@@ -177,24 +178,28 @@ abstract class Component
     }
 
     /**
-     * Create a Blade view with the raw component string content.
+     * Ensure the given view name exists and return it.
      *
-     * @param  string  $contents
+     * @param  string  $view
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
-    protected function extractBladeViewFromString($contents)
+    protected function extractBladeViewFromString($view)
     {
-        $key = sprintf('%s::%s', static::class, $contents);
+        $key = sprintf('%s::%s', static::class, $view);
 
         if (isset(static::$bladeViewCache[$key])) {
             return static::$bladeViewCache[$key];
         }
 
-        if ($this->factory()->exists($contents)) {
-            return static::$bladeViewCache[$key] = $contents;
+        if ($this->factory()->exists($view)) {
+            return static::$bladeViewCache[$key] = $view;
         }
 
-        return static::$bladeViewCache[$key] = $this->createBladeViewFromString($this->factory(), $contents);
+        throw new InvalidArgumentException(
+            "View [{$view}] not found. Inline component templates must be returned using Blade::rawTemplate()."
+        );
     }
 
     /**
