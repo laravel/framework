@@ -353,7 +353,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             public function render()
             {
-                return new RawTemplate($this->template);
+                return $this->template;
             }
         };
 

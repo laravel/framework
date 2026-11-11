@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
 use Illuminate\View\RawTemplate;
-use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -73,6 +72,13 @@ class BladeTest extends TestCase
         $this->assertSame('Hello Taylor', Blade::renderComponent($component));
     }
 
+    public function test_rendering_raw_template_component_instance()
+    {
+        $component = new RawTemplateHelloComponent('Taylor');
+
+        $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
     public function test_rendering_raw_template_closure_component_instance()
     {
         $component = new RawTemplateClosureComponent('Taylor');
@@ -87,26 +93,6 @@ class BladeTest extends TestCase
         $component = new RawTemplateViewNameComponent;
 
         $this->assertSame('hello', Blade::renderComponent($component));
-    }
-
-    public function test_rendering_blade_string_that_matches_a_view_name()
-    {
-        $this->assertTrue(View::exists('hello'));
-
-        $this->assertSame('hello', Blade::render('hello'));
-    }
-
-    public function test_rendering_component_returning_a_view_name()
-    {
-        $this->assertSame('Hello Taylor', trim(Blade::renderComponent(new ViewNameComponent('Taylor'))));
-    }
-
-    public function test_rendering_component_returning_a_template_string_throws()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Blade::rawTemplate()');
-
-        Blade::renderComponent(new TemplateStringComponent);
     }
 
     public function test_basic_blade_rendering()
@@ -338,6 +324,18 @@ class HelloComponent extends Component
 
     public function render()
     {
+        return 'Hello {{ $name }}';
+    }
+}
+
+class RawTemplateHelloComponent extends Component
+{
+    public function __construct(public string $name)
+    {
+    }
+
+    public function render(): RawTemplate
+    {
         return Blade::rawTemplate('Hello {{ $name }}');
     }
 }
@@ -361,25 +359,5 @@ class RawTemplateViewNameComponent extends Component
     public function render(): RawTemplate
     {
         return Blade::rawTemplate('hello');
-    }
-}
-
-class ViewNameComponent extends Component
-{
-    public function __construct(public string $name)
-    {
-    }
-
-    public function render()
-    {
-        return 'hello';
-    }
-}
-
-class TemplateStringComponent extends Component
-{
-    public function render()
-    {
-        return 'Hello {{ $name }}';
     }
 }
