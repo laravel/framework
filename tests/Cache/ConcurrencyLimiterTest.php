@@ -64,6 +64,9 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testItReleasesLockIfTaskTookTooLong()
     {
+        Sleep::fake(syncWithCarbon: true);
+        Carbon::setTestNow(Carbon::now()->startOfSecond());
+
         $store = [];
 
         $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->repository->getStore(), 'key', 1, 1);
@@ -80,7 +83,7 @@ class ConcurrencyLimiterTest extends TestCase
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        usleep(1.2 * 1000000);
+        Sleep::usleep(1.2 * 1000000);
 
         $lock->block(0, function () use (&$store) {
             $store[] = 3;
@@ -91,6 +94,9 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
     {
+        Sleep::fake(syncWithCarbon: true);
+        Carbon::setTestNow(Carbon::now()->startOfSecond());
+
         $store = [];
 
         $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->repository->getStore(), 'key', 1, 2);
@@ -116,6 +122,9 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testItFailsAfterRetryTimeout()
     {
+        Sleep::fake(syncWithCarbon: true);
+        Carbon::setTestNow(Carbon::now()->startOfSecond());
+
         $store = [];
 
         $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->repository->getStore(), 'key', 1, 10);
@@ -138,7 +147,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testRetryTimeoutRespectsFakedSleep()
     {
         Sleep::fake(syncWithCarbon: true);
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow(Carbon::now()->startOfSecond());
 
         $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->repository->getStore(), 'key', 1, 10);
 

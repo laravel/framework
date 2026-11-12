@@ -9,6 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -19,6 +20,13 @@ use Orchestra\Testbench\TestCase;
 class ForgotPasswordTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Sleep::fake();
+    }
 
     protected function tearDown(): void
     {
