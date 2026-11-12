@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -27,6 +28,7 @@ use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Carbon;
 use Throwable;
 
@@ -815,15 +817,44 @@ class Worker
             return;
         }
 
-        if (! $this->cache->get('job-exceptions:'.$uuid)) {
-            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
-        }
+        $key = 'job-exceptions:'.$uuid;
 
-        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
-            $this->cache->forget('job-exceptions:'.$uuid);
+        $exceptions = $this->withoutCacheSerializationOrCompression(function () use ($key) {
+            if (! $this->cache->get($key)) {
+                $this->cache->put($key, 0, Carbon::now()->addDay());
+            }
+
+            return $this->cache->increment($key);
+        });
+
+        if ($maxExceptions <= $exceptions) {
+            $this->cache->forget($key);
 
             $this->failJob($job, $e);
         }
+    }
+
+    /**
+     * Execute the given callback without cache serialization or compression when applicable.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function withoutCacheSerializationOrCompression(callable $callback)
+    {
+        $store = $this->cache->getStore();
+
+        if (! $store instanceof RedisStore) {
+            return $callback();
+        }
+
+        $connection = $store->connection();
+
+        if (! $connection instanceof PhpRedisConnection) {
+            return $callback();
+        }
+
+        return $connection->withoutSerializationOrCompression($callback);
     }
 
     /**
