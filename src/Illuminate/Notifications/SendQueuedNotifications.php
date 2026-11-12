@@ -14,10 +14,12 @@ use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class SendQueuedNotifications implements ShouldQueue
@@ -195,7 +197,9 @@ class SendQueuedNotifications implements ShouldQueue
     public function retryUntil()
     {
         if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->retryUntil)) {
-            return;
+            $retryFor = $this->getAttributeValue($this->notification, RetryFor::class);
+
+            return is_null($retryFor) ? null : Carbon::now()->addSeconds($retryFor);
         }
 
         return $this->notification->retryUntil ?? $this->notification->retryUntil();

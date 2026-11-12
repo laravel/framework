@@ -6,12 +6,14 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\SqsQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use JMac\Testing\Double;
@@ -180,6 +182,32 @@ class QueueRetryCommandTest extends TestCase
         $failer->expects('forget')->with(1);
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue]);
+    }
+
+    public function testRefreshesTheRetryUntilTimestampWhenTheJobDefinesRetryForAttribute()
+    {
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
+
+        $job = $this->failedJob(
+            id: '1',
+            connection: 'database',
+            queue: 'default',
+            payload: ['retryUntil' => 0],
+            job: new QueueRetryCommandTestJobWithRetryForAttribute
+        );
+
+        $failer->expects('find')->with('1')->returns($job);
+        $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
+            return json_decode($payload, true)['retryUntil'] === Carbon::now()->addSeconds(90)->getTimestamp();
+        }), 'default', []);
+        $failer->expects('forget')->with(1);
+
+        $this->runRetryCommand(['id' => ['1']], $failer, ['database' => $queue]);
+
+        Carbon::setTestNow();
     }
 
     public function testPassesQueueableOptionsToTheQueueWhenRetryingASingleJob()
@@ -739,6 +767,12 @@ class QueueRetryCommandTestJobWithRetryUntil
     {
         return $this->retryUntil;
     }
+}
+
+#[RetryFor(90)]
+class QueueRetryCommandTestJobWithRetryForAttribute
+{
+    //
 }
 
 class QueueRetryCommandTestJobWithMissingModel
