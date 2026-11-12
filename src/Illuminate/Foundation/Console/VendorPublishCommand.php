@@ -58,6 +58,7 @@ class VendorPublishCommand extends Command
     protected $signature = 'vendor:publish
                     {--existing : Publish and overwrite only the files that have already been published}
                     {--force : Overwrite any existing files}
+                    {--merge : Merge missing keys into configuration files that have already been published}
                     {--all : Publish assets for all service providers without prompt}
                     {--provider= : The service provider that has assets you want to publish}
                     {--tag=* : One or many tags that have assets you want to publish}';
@@ -257,6 +258,28 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
+        if ($this->shouldMerge($to, $this->files->exists($to)) &&
+            ! is_null($merged = $this->mergeContents($existing = $this->files->get($to), $this->files->get($from)))) {
+            if ($merged === $existing) {
+                $this->components->twoColumnDetail(sprintf(
+                    'File [%s] is already up to date',
+                    str_replace(base_path().'/', '', realpath($to)),
+                ), '<fg=yellow;options=bold>SKIPPED</>');
+
+                return;
+            }
+
+            $this->files->put($to, $merged);
+
+            $this->components->task(sprintf(
+                'Merging file [%s] into [%s]',
+                str_replace(base_path().'/', '', realpath($from)),
+                str_replace(base_path().'/', '', realpath($to)),
+            ));
+
+            return;
+        }
+
         if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
             || ($this->option('existing') && $this->files->exists($to))) {
             $to = $this->ensureMigrationNameIsUpToDate($from, $to);
@@ -312,6 +335,16 @@ class VendorPublishCommand extends Command
         foreach ($manager->listContents('from://', true)->sortByPath() as $file) {
             $path = Str::after($file['path'], 'from://');
 
+            if ($file['type'] === 'file' &&
+                $this->shouldMerge($path, $manager->fileExists('to://'.$path)) &&
+                ! is_null($merged = $this->mergeContents($existing = $manager->read('to://'.$path), $manager->read($file['path'])))) {
+                if ($merged !== $existing) {
+                    $manager->write('to://'.$path, $merged);
+                }
+
+                continue;
+            }
+
             if (
                 $file['type'] === 'file'
                 && (
@@ -324,6 +357,32 @@ class VendorPublishCommand extends Command
                 $manager->write('to://'.$path, $manager->read($file['path']));
             }
         }
+    }
+
+    /**
+     * Determine if the given destination should be merged into rather than published.
+     *
+     * @param  string  $to
+     * @param  bool  $exists
+     * @return bool
+     */
+    protected function shouldMerge($to, $exists)
+    {
+        return $this->option('merge') && $exists && str_ends_with($to, '.php');
+    }
+
+    /**
+     * Merge the keys missing from the existing configuration file in from the package's file.
+     *
+     * Returns null when the files are not configuration files that can be merged.
+     *
+     * @param  string  $existing
+     * @param  string  $incoming
+     * @return string|null
+     */
+    protected function mergeContents($existing, $incoming)
+    {
+        return (new ConfigFileMerger)->merge($existing, $incoming);
     }
 
     /**

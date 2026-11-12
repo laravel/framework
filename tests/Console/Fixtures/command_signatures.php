@@ -3382,6 +3382,17 @@ return [
                 'description' => 'Overwrite any existing files',
             ],
             [
+                'name' => 'merge',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Merge missing keys into configuration files that have already been published',
+            ],
+            [
                 'name' => 'all',
                 'shortcut' => null,
                 'negatable' => false,
