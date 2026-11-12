@@ -6,16 +6,21 @@ use DateTimeInterface;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:retry')]
 class RetryCommand extends Command
 {
+    use InteractsWithTime, ReadsQueueAttributes;
+
     /**
      * The console command signature.
      *
@@ -206,12 +211,18 @@ class RetryCommand extends Command
             return json_encode($payload);
         }
 
-        if (is_object($instance) && ! $instance instanceof \__PHP_Incomplete_Class && method_exists($instance, 'retryUntil')) {
+        if (! is_object($instance) || $instance instanceof \__PHP_Incomplete_Class) {
+            return json_encode($payload);
+        }
+
+        if (method_exists($instance, 'retryUntil')) {
             $retryUntil = $instance->retryUntil();
 
             $payload['retryUntil'] = $retryUntil instanceof DateTimeInterface
                 ? $retryUntil->getTimestamp()
                 : $retryUntil;
+        } elseif (! is_null($retryFor = $this->getAttributeValue($instance, RetryFor::class))) {
+            $payload['retryUntil'] = $this->availableAt($retryFor);
         }
 
         return json_encode($payload);

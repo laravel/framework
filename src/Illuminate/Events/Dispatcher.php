@@ -28,10 +28,12 @@ use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Attributes\UniqueFor;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
@@ -738,6 +740,19 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Get the retry expiration defined by the listener's "RetryFor" attribute.
+     *
+     * @param  mixed  $listener
+     * @return \DateTimeInterface|null
+     */
+    protected function getListenerRetryForExpiration($listener)
+    {
+        $retryFor = $this->getAttributeValue($listener, RetryFor::class);
+
+        return is_null($retryFor) ? null : Carbon::now()->addSeconds($retryFor);
+    }
+
+    /**
      * Propagate listener options to the job.
      *
      * @param  mixed  $listener
@@ -757,7 +772,7 @@ class Dispatcher implements DispatcherContract
 
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : $this->getAttributeValue($listener, Backoff::class, 'backoff');
             $job->maxExceptions = $this->getAttributeValue($listener, MaxExceptions::class, 'maxExceptions');
-            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
+            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : $this->getListenerRetryForExpiration($listener);
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $this->getAttributeValue($listener, Timeout::class, 'timeout');
             $job->failOnTimeout = $this->getAttributeValue($listener, FailOnTimeout::class, 'failOnTimeout') ?? false;
