@@ -83,4 +83,26 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', 123, 'id', []));
     }
+
+    public function testIntegersAndBooleansAreComparedAsStrings()
+    {
+        $conn = Double::for(ConnectionInterface::class);
+        $db = new ConnectionResolver;
+        $db->addConnection('connection', $conn);
+        $verifier = new DatabasePresenceVerifier($db);
+        $verifier->setConnection('connection');
+        $builder = Double::for(Builder::class);
+        $conn->expects('table')->with('table')->times(2)->returns($builder);
+        $builder->expects('useWritePdo')->times(2)->returns($builder);
+        $builder->expects('where')->with('column', '=', '0')->returns($builder);
+        $builder->expects('count')->with()->returns(0);
+
+        $this->assertSame(0, $verifier->getCount('table', 'column', 0));
+
+        $builder->expects('whereIn')->with('column', ['0', '1', '7', 'value'])->returns($builder);
+        $builder->expects('distinct')->returns($builder);
+        $builder->expects('count')->with('column')->returns(0);
+
+        $this->assertSame(0, $verifier->getMultiCount('table', 'column', [false, true, 7, 'value']));
+    }
 }
