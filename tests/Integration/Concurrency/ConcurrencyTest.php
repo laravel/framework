@@ -9,16 +9,18 @@ use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Context;
+use Orchestra\Testbench\Attributes\UsesVendor;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
+#[UsesVendor]
 #[WithEnv('APP_KEY', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class ConcurrencyTest extends TestCase
 {
-    protected function setUp(): void
+    public function testWorkCanBeDistributed()
     {
         $this->defineCacheRoutes(<<<PHP
 <?php
@@ -33,11 +35,6 @@ Route::any('/concurrency', function () {
 });
 PHP);
 
-        parent::setUp();
-    }
-
-    public function testWorkCanBeDistributed()
-    {
         $response = $this->get('concurrency')
             ->assertOk();
 
@@ -227,17 +224,17 @@ PHP);
     {
         [$first, $second, $third] = Concurrency::driver($driver)->run([
             function () {
-                usleep(1000000);
+                usleep(200000);
 
                 return 'first';
             },
             function () {
-                usleep(500000);
+                usleep(100000);
 
                 return 'second';
             },
             function () {
-                usleep(200000);
+                usleep(20000);
 
                 return 'third';
             },

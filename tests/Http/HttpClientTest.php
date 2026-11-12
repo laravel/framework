@@ -2485,6 +2485,8 @@ class HttpClientTest extends TestCase
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredForEveryRetry()
     {
+        Sleep::fake();
+
         $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
@@ -2572,6 +2574,8 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionIsThrownWhenRetriesExhausted()
     {
+        Sleep::fake();
+
         $this->factory->fake([
             '*' => $this->factory::response(['error'], 403),
         ]);
@@ -2674,6 +2678,8 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
     {
+        Sleep::fake();
+
         $this->factory->fake([
             '*' => $this->factory::response(['error'], 403),
         ]);
@@ -2808,6 +2814,8 @@ class HttpClientTest extends TestCase
 
     public function testRequestCanBeModifiedInRetryCallback()
     {
+        Sleep::fake();
+
         $this->factory->fake([
             '*' => $this->factory->sequence()
                 ->push(['error'], 500)

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Sleep;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,13 @@ use UnexpectedValueException;
 class AuthPasswordBrokerTest extends TestCase
 {
     use VerifiesDoubles;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Sleep::fake();
+    }
 
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
