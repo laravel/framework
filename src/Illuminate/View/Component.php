@@ -85,9 +85,16 @@ abstract class Component
     protected static $ignoredParameterNames = [];
 
     /**
+     * The cache of blade view names for raw templates, keyed by template.
+     *
+     * @var array<string, string>
+     */
+    protected static $rawTemplateViewCache = [];
+
+    /**
      * Get the view / view contents that represent the component.
      *
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Illuminate\View\RawTemplate|\Closure|string
      */
     abstract public function render();
 
@@ -156,6 +163,10 @@ abstract class Component
                 return $view;
             }
 
+            if ($view instanceof RawTemplate) {
+                return $this->createBladeViewFromRawTemplate($view);
+            }
+
             return $this->extractBladeViewFromString($view);
         };
 
@@ -184,6 +195,21 @@ abstract class Component
         }
 
         return static::$bladeViewCache[$key] = $this->createBladeViewFromString($this->factory(), $contents);
+    }
+
+    /**
+     * Create a Blade view from the given raw template.
+     *
+     * @param  \Illuminate\View\RawTemplate  $template
+     * @return string
+     */
+    protected function createBladeViewFromRawTemplate(RawTemplate $template)
+    {
+        $key = sprintf('%s::%s', static::class, $template->template);
+
+        return static::$rawTemplateViewCache[$key] ??= $this->createBladeViewFromString(
+            $this->factory(), $template->template
+        );
     }
 
     /**
@@ -451,6 +477,7 @@ abstract class Component
     public static function flushCache()
     {
         static::$bladeViewCache = [];
+        static::$rawTemplateViewCache = [];
         static::$constructorParametersCache = [];
         static::$methodCache = [];
         static::$propertyCache = [];
