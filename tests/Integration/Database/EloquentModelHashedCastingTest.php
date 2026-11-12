@@ -21,7 +21,7 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
     public function testHashedWithBcrypt()
     {
         Config::set('hashing.driver', 'bcrypt');
-        Config::set('hashing.bcrypt.rounds', 13);
+        Config::set('hashing.bcrypt.rounds', 5);
 
         $subject = HashedCast::create([
             'password' => 'password',
@@ -29,7 +29,7 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
 
         $this->assertTrue(password_verify('password', $subject->password));
         $this->assertSame('2y', password_get_info($subject->password)['algo']);
-        $this->assertSame(13, password_get_info($subject->password)['options']['cost']);
+        $this->assertSame(5, password_get_info($subject->password)['options']['cost']);
         $this->assertDatabaseHas('hashed_casts', [
             'id' => $subject->id,
             'password' => $subject->password,

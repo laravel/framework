@@ -120,7 +120,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
             $table->timestamp('created_at')->nullable();
         });
 
-        return new DatabaseTokenRepository($connection, new BcryptHasher, 'table', 'key');
+        return new DatabaseTokenRepository($connection, new BcryptHasher(['rounds' => 4]), 'table', 'key');
     }
 
     protected function insertToken(DatabaseTokenRepository $repo, $email, $token, Carbon $createdAt)
