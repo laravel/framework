@@ -580,6 +580,14 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertSame('primary', $model->getConnectionName());
     }
+
+    public function test_other_class_attributes_are_ignored(): void
+    {
+        $model = new ModelWithOtherClassAttributes;
+
+        $this->assertSame('custom_table_name', $model->getTable());
+        $this->assertSame(['name'], $model->getFillable());
+    }
 }
 
 enum ConnectionUnitEnum
@@ -1026,4 +1034,11 @@ trait TraitUsingConnectionAttribute
 class ModelOverridingTraitConnectionAttribute extends Model
 {
     use TraitUsingConnectionAttribute;
+}
+
+#[\SomeUnknownAttribute]
+#[Table('custom_table_name')]
+#[Fillable(['name'])]
+class ModelWithOtherClassAttributes extends Model
+{
 }

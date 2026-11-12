@@ -36,6 +36,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Stringable;
@@ -2777,31 +2778,55 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class ??= static::class;
 
-        $cacheKey = $class.'@'.$attributeClass.'@'.$property;
+        $attributes = static::$classAttributes[$class] ??= static::collectClassAttributes($class);
 
-        if (array_key_exists($cacheKey, static::$classAttributes)) {
-            return static::$classAttributes[$cacheKey];
+        if (! isset($attributes[$attributeClass])) {
+            $attributes[$attributeClass] = $attributes[strtolower($attributeClass)] ?? false;
+
+            static::$classAttributes[$class][$attributeClass] = $attributes[$attributeClass];
         }
+
+        $instance = $attributes[$attributeClass];
+
+        if ($instance === false) {
+            return null;
+        }
+
+        if ($instance instanceof ReflectionAttribute) {
+            try {
+                $instance = $instance->newInstance();
+            } catch (Exception) {
+                static::$classAttributes[$class][$attributeClass] = false;
+
+                return null;
+            }
+
+            static::$classAttributes[$class][$attributeClass] = $instance;
+        }
+
+        return $property ? $instance->{$property} : $instance;
+    }
+
+    /**
+     * Collect the attributes declared on the given class, its traits, and its parents.
+     *
+     * The first attribute found for each name wins, so the class takes priority over its traits and parents.
+     * Names are lowercased since PHP class names are case-insensitive. Lookups are then cached under the requested name.
+     *
+     * @param  string  $class
+     * @return array<string, \ReflectionAttribute|object|false>
+     */
+    protected static function collectClassAttributes(string $class)
+    {
+        $attributes = [];
 
         try {
             $reflection = new ReflectionClass($class);
 
             do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    $instance = $attributes[0]->newInstance();
-
-                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
-                }
-
-                foreach ($reflection->getTraits() as $trait) {
-                    $attributes = $trait->getAttributes($attributeClass);
-
-                    if (count($attributes) > 0) {
-                        $instance = $attributes[0]->newInstance();
-
-                        return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
+                foreach ([$reflection, ...$reflection->getTraits()] as $target) {
+                    foreach ($target->getAttributes() as $attribute) {
+                        $attributes[strtolower($attribute->getName())] ??= $attribute;
                     }
                 }
             } while ($reflection = $reflection->getParentClass());
@@ -2809,7 +2834,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             //
         }
 
-        return static::$classAttributes[$cacheKey] = null;
+        return $attributes;
     }
 
     /**
