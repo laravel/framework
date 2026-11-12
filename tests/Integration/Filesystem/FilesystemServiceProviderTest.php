@@ -49,4 +49,26 @@ class FilesystemServiceProviderTest extends TestCase
 
         $this->assertCount(2, $this->app->make('config')->get('filesystems.disks'));
     }
+
+    public function test_a_disk_set_to_null_is_not_served_and_does_not_conflict(): void
+    {
+        config(['filesystems.disks' => [
+            'local' => null,
+            'private' => [
+                'driver' => 'local',
+                'root' => storage_path('app/private'),
+                'serve' => true,
+            ],
+        ]]);
+
+        (new FilesystemServiceProvider($this->app))->boot();
+
+        $names = array_map(
+            fn ($route) => $route->getName(),
+            $this->app['router']->getRoutes()->getRoutes()
+        );
+
+        $this->assertContains('storage.private', $names);
+        $this->assertNotContains('storage.local', $names);
+    }
 }
