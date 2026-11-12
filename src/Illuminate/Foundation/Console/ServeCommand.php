@@ -90,6 +90,8 @@ class ServeCommand extends Command
         'LARAVEL_SAIL',
         'PATH',
         'PHP_IDE_CONFIG',
+        'PHPRC',
+        'PHP_INI_SCAN_DIR',
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
