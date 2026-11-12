@@ -69,4 +69,20 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', 123, 'id', []));
     }
+
+    public function testIntegersAndBooleansAreComparedAsStrings()
+    {
+        $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));
+        $verifier->setConnection('connection');
+        $db->shouldReceive('connection')->twice()->with('connection')->andReturn($conn = m::mock(stdClass::class));
+        $conn->shouldReceive('table')->twice()->with('table')->andReturn($builder = m::mock(stdClass::class));
+        $builder->shouldReceive('useWritePdo')->twice()->andReturn($builder);
+        $builder->shouldReceive('where')->once()->with('column', '=', m::on(fn ($value) => $value === '0'))->andReturn($builder);
+        $builder->shouldReceive('whereIn')->once()->with('column', m::on(fn ($values) => $values === ['0', '1', '7', 'value']))->andReturn($builder);
+        $builder->shouldReceive('distinct')->once()->andReturn($builder);
+        $builder->shouldReceive('count')->twice()->andReturn(0);
+
+        $this->assertSame(0, $verifier->getCount('table', 'column', 0));
+        $this->assertSame(0, $verifier->getMultiCount('table', 'column', [false, true, 7, 'value']));
+    }
 }
