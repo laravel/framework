@@ -69,7 +69,17 @@ class Reflector
      */
     public static function getClassAttribute($objectOrClass, $attribute, $ascend = false)
     {
-        return static::getClassAttributes($objectOrClass, $attribute, $ascend)->flatten()->first();
+        $reflectionClass = new ReflectionClass($objectOrClass);
+
+        do {
+            $attributes = $reflectionClass->getAttributes($attribute);
+
+            if ($attributes !== []) {
+                return $attributes[0]->newInstance();
+            }
+        } while ($ascend && false !== $reflectionClass = $reflectionClass->getParentClass());
+
+        return null;
     }
 
     /**
