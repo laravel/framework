@@ -224,17 +224,17 @@ PHP);
     {
         [$first, $second, $third] = Concurrency::driver($driver)->run([
             function () {
-                usleep(1000000);
+                usleep(200000);
 
                 return 'first';
             },
             function () {
-                usleep(500000);
+                usleep(100000);
 
                 return 'second';
             },
             function () {
-                usleep(200000);
+                usleep(20000);
 
                 return 'third';
             },
