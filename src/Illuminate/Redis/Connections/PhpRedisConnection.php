@@ -544,7 +544,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function eval($script, $numberOfKeys, ...$arguments)
     {
-        return $this->command('eval', [$script, $arguments, $numberOfKeys]);
+        $this->client?->clearLastError();
+
+        $result = $this->command('eval', [$script, $arguments, $numberOfKeys]);
+
+        if ($result === false && ($error = $this->client?->getLastError())) {
+            throw new RedisException($error);
+        }
+
+        return $result;
     }
 
     /**
