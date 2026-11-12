@@ -6,9 +6,12 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
+use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\DynamicComponent;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use ReflectionProperty;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -226,6 +229,30 @@ class BladeTest extends TestCase
         $this->assertSame(trim($static), trim($dynamic));
     }
 
+    public function test_dynamic_component_renders_bound_attributes_like_class_component_tag()
+    {
+        Blade::component('attributes-hello', AttributesHelloComponent::class);
+        (new ReflectionProperty(DynamicComponent::class, 'compiler'))->setValue(null, null);
+
+        $data = [
+            'name' => 'Taylor & Co',
+            'title' => '"Quotes" & <tags>',
+            'bag' => new ComponentAttributeBag(['class' => 'a&amp;b']),
+        ];
+
+        foreach ([':title="$title"', 'title="{{ $title }}"', ':class="$title" :attributes="$bag"'] as $attributes) {
+            $static = Blade::render('<x-attributes-hello :name="$name" '.$attributes.' />', $data);
+            $dynamic = Blade::render('<x-dynamic-component component="attributes-hello" :name="$name" '.$attributes.' />', $data);
+
+            $this->assertSame(trim($static), trim($dynamic));
+        }
+
+        $this->assertSame(
+            '<div title="&quot;Quotes&quot; &amp; &lt;tags&gt;">Hello Taylor &amp; Co</div>',
+            trim(Blade::render('<x-dynamic-component component="attributes-hello" :name="$name" :title="$title" />', $data))
+        );
+    }
+
     public function test_no_name_passed_to_slot_uses_default_name()
     {
         $content = Blade::render('<x-link href="#"><x-slot>default slot</x-slot></x-link>');
@@ -296,5 +323,17 @@ class HelloComponent extends Component
     public function render()
     {
         return 'Hello {{ $name }}';
+    }
+}
+
+class AttributesHelloComponent extends Component
+{
+    public function __construct(public string $name)
+    {
+    }
+
+    public function render()
+    {
+        return '<div {{ $attributes }}>Hello {{ $name }}</div>';
     }
 }

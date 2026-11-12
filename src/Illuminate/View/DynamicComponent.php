@@ -6,6 +6,7 @@ use BackedEnum;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 
 use function Illuminate\Support\enum_value;
@@ -32,6 +33,20 @@ class DynamicComponent extends Component
      * @var array
      */
     protected static $componentClasses = [];
+
+    /**
+     * The names of the attributes that were bound on the component tag.
+     *
+     * @var array
+     */
+    protected $boundAttributes = [];
+
+    /**
+     * The methods that should be ignored.
+     *
+     * @var array
+     */
+    protected $except = ['withBoundAttributes'];
 
     /**
      * Create a new component instance.
@@ -82,6 +97,40 @@ EOF;
                 $template
             );
         };
+    }
+
+    /**
+     * Set the names of the attributes that were bound on the component tag.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withBoundAttributes(array $attributes)
+    {
+        $this->boundAttributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Set the extra attributes that the component should make available.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withAttributes(array $attributes)
+    {
+        if ($this->boundAttributes && class_exists($class = $this->classForComponent())) {
+            [$data] = $this->compiler()->partitionDataAndAttributes($class, $attributes);
+
+            foreach ($this->boundAttributes as $key) {
+                if (array_key_exists($key, $attributes) && ! $data->has($key)) {
+                    $attributes[$key] = BladeCompiler::sanitizeComponentAttribute($attributes[$key]);
+                }
+            }
+        }
+
+        return parent::withAttributes($attributes);
     }
 
     /**
