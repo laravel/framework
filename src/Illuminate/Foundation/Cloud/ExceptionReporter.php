@@ -181,7 +181,12 @@ class ExceptionReporter
             }
 
             return ! $this->config['stop'];
-        } catch (Throwable) {
+        } catch (Throwable $failure) {
+            error_log(str_replace("\n", ' ', sprintf(
+                'Laravel Cloud: Failed reporting exception. %s: %s',
+                $failure::class, $failure->getMessage(),
+            )));
+
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
