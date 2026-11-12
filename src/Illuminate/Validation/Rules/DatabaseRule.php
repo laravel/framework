@@ -250,6 +250,12 @@ trait DatabaseRule
         foreach ($this->wheres as ['column' => $column, 'operator' => $operator, 'value' => $value]) {
             if ($operator === '=' && ($value === 'NULL' || $value === 'NOT_NULL' || str_starts_with($value, '!'))) {
                 $conditions[] = fn ($query) => $query->where($column, '=', $value);
+            } elseif (array_key_exists($column, $conditions)) {
+                $conditions[] = fn ($query) => match ($operator) {
+                    'NULL' => $query->whereNull($column),
+                    'NOT_NULL' => $query->whereNotNull($column),
+                    default => $query->where($column, $operator, $value),
+                };
             } else {
                 $conditions[$column] = $this->formatWhereValue($operator, $value);
             }
