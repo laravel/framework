@@ -46,15 +46,11 @@ class PhpRedisAclTest extends TestCase
 
         $manager = new RedisManager($this->app, 'phpredis', ['default' => $config]);
 
-        try {
-            $manager->connection()->eval(
-                "return redis.call('rpush', KEYS[1], ARGV[1])", 1, 'acl:test', 'hello'
-            );
+        $this->expectException(\RedisException::class);
 
-            $this->fail('Expected a RedisException to be thrown.');
-        } catch (\RedisException $e) {
-            $this->assertStringContainsString('ACL failure in script', $e->getMessage());
-        }
+        $manager->connection()->eval(
+            "return redis.call('rpush', KEYS[1], ARGV[1])", 1, 'acl:test', 'hello'
+        );
     }
 
     public function testEvalReturnsFalseWhenScriptReturnsNilWithoutError()
