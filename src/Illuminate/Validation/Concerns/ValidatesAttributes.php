@@ -1251,7 +1251,20 @@ trait ValidatesAttributes
         $count = count($segments);
 
         for ($i = 0; $i < $count; $i += 2) {
-            $extra[$segments[$i]] = $segments[$i + 1];
+            [$column, $value] = [$segments[$i], $segments[$i + 1]];
+
+            if (! array_key_exists($column, $extra)) {
+                $extra[$column] = $value;
+
+                continue;
+            }
+
+            $extra[] = fn ($query) => match (true) {
+                $value === 'NULL' => $query->whereNull($column),
+                $value === 'NOT_NULL' => $query->whereNotNull($column),
+                str_starts_with($value, '!') => $query->where($column, '!=', mb_substr($value, 1)),
+                default => $query->where($column, $value),
+            };
         }
 
         return $extra;
