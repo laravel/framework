@@ -142,11 +142,15 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
         }
 
         // A single endpoint can enforce cluster slots even when the client is not cluster-aware.
-        $values = $connection->pipeline(function ($pipeline) use ($keys) {
-            foreach ($keys as $key) {
-                $pipeline->get($this->prefix.$key);
-            }
-        });
+        $prefixedKeys = array_map(fn ($key) => $this->prefix.$key, $keys);
+
+        $values = $connection instanceof PhpRedisConnection
+            ? $connection->getManyViaPipeline($prefixedKeys)
+            : $connection->pipeline(function ($pipeline) use ($prefixedKeys) {
+                foreach ($prefixedKeys as $key) {
+                    $pipeline->get($key);
+                }
+            });
 
         if ($values === false) {
             return $this->manyAlias($keys);

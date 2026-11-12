@@ -484,11 +484,46 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         try {
+            return $this->executePipeline($pipeline, $callback);
+        } catch (Throwable $e) {
+            $this->rebuildClientOnLostConnection($e);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Get multiple values using a pipeline that can safely be retried after a disconnect.
+     *
+     * @param  array  $keys
+     * @return array|false
+     *
+     * @internal
+     */
+    public function getManyViaPipeline(array $keys)
+    {
+        return $this->retryOnceOnLostConnection(function () use ($keys) {
+            return $this->executePipeline($this->client()->pipeline(), function ($pipeline) use ($keys) {
+                foreach ($keys as $key) {
+                    $pipeline->get($key);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a pipeline and discard it if queuing or execution fails.
+     *
+     * @param  \Redis  $pipeline
+     * @param  callable  $callback
+     * @return array|false
+     */
+    protected function executePipeline($pipeline, callable $callback)
+    {
+        try {
             return tap($pipeline, $callback)->exec();
         } catch (Throwable $e) {
             rescue(fn () => $this->client()->discard(), null, false);
-
-            $this->rebuildClientOnLostConnection($e);
 
             throw $e;
         }
@@ -728,6 +763,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             'read error on connection',
             'READONLY',
             'Connection lost',
+            'Connection closed',
             'Error processing response from Redis node',
             'Connection reset by peer',
             "Can't communicate with any node in the cluster",
