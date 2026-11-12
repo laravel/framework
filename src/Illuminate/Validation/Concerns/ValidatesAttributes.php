@@ -985,6 +985,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if (strlen((string) $value) > 254) {
+            return false;
+        }
+
         if (preg_match('/[\r\n]/', (string) $value) > 0) {
             return false;
         }
