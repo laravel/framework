@@ -190,6 +190,21 @@ interface Session
     public function setPreviousUrl($url);
 
     /**
+     * Get the previous route name from the session.
+     *
+     * @return string|null
+     */
+    public function previousRoute();
+
+    /**
+     * Set the "previous" route name in the session.
+     *
+     * @param  string|null  $route
+     * @return void
+     */
+    public function setPreviousRoute($route);
+
+    /**
      * Get the session handler instance.
      *
      * @return \SessionHandlerInterface
