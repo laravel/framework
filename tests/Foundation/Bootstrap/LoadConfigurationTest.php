@@ -3,14 +3,20 @@
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Closure;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class LoadConfigurationTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testLoadsBaseConfiguration()
     {
         $app = new Application();
@@ -41,6 +47,26 @@ class LoadConfigurationTest extends TestCase
         (new LoadConfiguration)->bootstrap($app);
 
         $this->assertNull($app['config']['app.name']);
+    }
+
+    public function testDontLoadBaseConfigurationOnAnyApplicationImplementation()
+    {
+        $app = Double::for(ApplicationContract::class, override: true);
+        $app->expects('configPath')->returns(__DIR__.'/../Fixtures/config');
+        $app->expects('shouldMergeFrameworkConfiguration')->returns(false);
+
+        $loader = new class extends LoadConfiguration
+        {
+            public function loadFiles($app, $repository)
+            {
+                $this->loadConfigurationFiles($app, $repository);
+            }
+        };
+
+        $loader->loadFiles($app->instance(), $config = new Repository);
+
+        $this->assertNull($config['app.name']);
+        $this->assertSame('bar', $config['custom.foo']);
     }
 
     public function testLoadsConfigurationInIsolation()

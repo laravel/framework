@@ -238,6 +238,13 @@ interface Application extends Container
     public function shouldSkipMiddleware();
 
     /**
+     * Determine if the framework's base configuration should be merged.
+     *
+     * @return bool
+     */
+    public function shouldMergeFrameworkConfiguration();
+
+    /**
      * Register a terminating callback with the application.
      *
      * @param  callable|string  $callback
