@@ -446,20 +446,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $table = static::resolveClassAttribute(Table::class);
 
-        $reflection = new ReflectionClass(static::class);
+        $overrides = static::$classAttributes[static::class.'@overrides'] ??= static::resolveClassAttributeOverrides();
 
-        $declaresTable = $reflection->hasProperty('table')
-            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
-
-        if (! $declaresTable && $reflection->getAttributes(Table::class) !== []) {
+        if ($overrides['table']) {
             $this->table = $table->name ?? null;
         } else {
             $this->table ??= $table->name ?? null;
         }
 
-        $declaresConnection = $reflection->getProperty('connection')->getDeclaringClass()->getName() === static::class;
-
-        if (! $declaresConnection && $reflection->getAttributes(Connection::class) !== []) {
+        if ($overrides['connection']) {
             $this->connection = static::resolveClassAttribute(Connection::class, 'name');
         } else {
             $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
@@ -484,6 +479,26 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($this->refreshes === []) {
             $this->refreshes = static::resolveClassAttribute(Refreshes::class, 'columns') ?? [];
         }
+    }
+
+    /**
+     * Determine if the class attributes should override the inherited properties.
+     *
+     * @return array
+     */
+    protected static function resolveClassAttributeOverrides()
+    {
+        $reflection = new ReflectionClass(static::class);
+
+        $declaresTable = $reflection->hasProperty('table')
+            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
+
+        $declaresConnection = $reflection->getProperty('connection')->getDeclaringClass()->getName() === static::class;
+
+        return [
+            'table' => ! $declaresTable && $reflection->getAttributes(Table::class) !== [],
+            'connection' => ! $declaresConnection && $reflection->getAttributes(Connection::class) !== [],
+        ];
     }
 
     /**
