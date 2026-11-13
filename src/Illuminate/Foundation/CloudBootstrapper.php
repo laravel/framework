@@ -377,8 +377,11 @@ class CloudBootstrapper
                     $handler->reportable($exceptionReporter);
 
                     $reportableRegistered = true;
-                } catch (Throwable) {
-                    //
+                } catch (Throwable $e) {
+                    error_log(str_replace("\n", ' ', sprintf(
+                        'Laravel Cloud: Failed registering exception reporter. %s: %s',
+                        $e::class, $e->getMessage(),
+                    )));
                 }
             };
 
@@ -419,8 +422,11 @@ class CloudBootstrapper
                 $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
                 $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
             }
-        } catch (Throwable) {
-            return;
+        } catch (Throwable $e) {
+            error_log(str_replace("\n", ' ', sprintf(
+                'Laravel Cloud: Failed registering exception reporting. %s: %s',
+                $e::class, $e->getMessage(),
+            )));
         }
     }
 

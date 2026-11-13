@@ -60,7 +60,12 @@ class Events
             $this->write($this->format($payloads));
 
             return true;
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            error_log(str_replace("\n", ' ', sprintf(
+                'Laravel Cloud: Dropped %d event(s). %s: %s',
+                count($payloads), $e::class, $e->getMessage(),
+            )));
+
             return false;
         }
     }
