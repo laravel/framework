@@ -279,4 +279,26 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
             DB::statement('drop extension if exists pg_stat_statements');
         }
     }
+
+    public function testDropAllTablesIgnoresTablesOwnedByExtensions()
+    {
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
+        DB::statement('create table public.extension_table (id integer)');
+        DB::statement('alter extension plpgsql add table public.extension_table');
+
+        try {
+            Schema::dropAllTables();
+
+            $this->artisan('migrate:install');
+
+            $this->assertFalse(Schema::hasTable('public.table'));
+            $this->assertTrue(Schema::hasTable('public.extension_table'));
+        } finally {
+            DB::statement('alter extension plpgsql drop table public.extension_table');
+            DB::statement('drop table public.extension_table');
+        }
+    }
 }
