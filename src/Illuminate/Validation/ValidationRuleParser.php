@@ -76,7 +76,7 @@ class ValidationRuleParser
 
                 unset($rules[$key]);
             } else {
-                $rules[$key] = $this->explodeExplicitRule($rule, $key);
+                $rules[$key] = $this->explodeExplicitRule($rules[$key], $key);
             }
         }
 

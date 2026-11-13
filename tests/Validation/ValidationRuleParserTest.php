@@ -108,6 +108,30 @@ class ValidationRuleParserTest extends TestCase
         $this->assertIsObject($parser->explode(['foo' => []]));
     }
 
+    public function testExplicitRulesAreMergedWithWildcardRulesListedBeforeThem()
+    {
+        $parser = new ValidationRuleParser(['items' => [['name' => 'foo']]]);
+
+        $results = $parser->explode([
+            'items.*.value' => 'present',
+            'items.0.value' => ['nullable', 'array'],
+        ]);
+
+        $this->assertEquals(['items.0.value' => ['nullable', 'array', 'present']], $results->rules);
+    }
+
+    public function testExplicitRulesAreMergedWithWildcardRulesListedAfterThem()
+    {
+        $parser = new ValidationRuleParser(['items' => [['name' => 'foo']]]);
+
+        $results = $parser->explode([
+            'items.0.value' => ['nullable', 'array'],
+            'items.*.value' => 'present',
+        ]);
+
+        $this->assertEquals(['items.0.value' => ['nullable', 'array', 'present']], $results->rules);
+    }
+
     public function testConditionalRulesWithDefault()
     {
         $isAdmin = true;
