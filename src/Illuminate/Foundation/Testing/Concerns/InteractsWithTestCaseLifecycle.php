@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migrator;
@@ -131,6 +132,8 @@ trait InteractsWithTestCaseLifecycle
 
             ParallelTesting::callTearDownTestCaseCallbacks($this);
 
+            $this->disconnectDatabaseConnections();
+
             $this->app->flush();
 
             $this->app = null;
@@ -183,6 +186,23 @@ trait InteractsWithTestCaseLifecycle
 
         if ($this->callbackException) {
             throw $this->callbackException;
+        }
+    }
+
+    protected function disconnectDatabaseConnections(): void
+    {
+        if (! $this->app->resolved('db')) {
+            return;
+        }
+
+        $database = $this->app->make('db');
+
+        if (! $database instanceof DatabaseManager) {
+            return;
+        }
+
+        foreach ($database->getConnections() as $connection) {
+            $connection->disconnect();
         }
     }
 
