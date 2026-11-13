@@ -27,6 +27,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
+use ReflectionMethod;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ValueError;
@@ -922,13 +923,73 @@ trait ValidatesAttributes
      */
     public function validateDistinct($attribute, $value, $parameters)
     {
-        $data = Arr::except($this->getDistinctValues($attribute), $attribute);
+        $ignoreCase = in_array('ignore_case', $parameters) && is_string($value) && mb_check_encoding($value, 'UTF-8');
+        $comparison = null;
 
-        if (in_array('ignore_case', $parameters) && is_string($value) && mb_check_encoding($value, 'UTF-8')) {
+        if ($ignoreCase && ! preg_match('/[^\x20-\x7E]/', $value)) {
+            $comparison = $this->getDistinctComparisonData($attribute);
+        }
+
+        $data = $comparison['values'] ?? $this->getDistinctValues($attribute);
+
+        if (isset($comparison['counts'])) {
+            $count = $comparison['counts'][strtolower($value)] ?? 0;
+
+            if (isset($data[$attribute]) && strcasecmp($data[$attribute], $value) === 0) {
+                $count--;
+            }
+
+            return $count === 0;
+        }
+
+        $data = Arr::except($data, $attribute);
+
+        if ($ignoreCase) {
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
         return ! in_array($value, array_values($data), in_array('strict', $parameters));
+    }
+
+    /**
+     * Get cached values and counts for case-insensitive distinct comparisons.
+     *
+     * @param  string|int  $attribute
+     * @return array{values: array, counts: array<array-key, int>|null}|null
+     */
+    protected function getDistinctComparisonData($attribute): ?array
+    {
+        if (! property_exists($this, 'distinctComparisonData') || ! property_exists($this, 'distinctValues')) {
+            return null;
+        }
+
+        // Custom comparison scopes may vary between attributes in the same group.
+        if ((new ReflectionMethod($this, 'getDistinctValues'))->getDeclaringClass()->getName() !== self::class) {
+            return null;
+        }
+
+        $attributeName = $this->getPrimaryAttribute($attribute);
+
+        if (! isset($this->distinctComparisonData[$attributeName])) {
+            $values = $this->getDistinctValues($attribute);
+            $counts = [];
+
+            foreach ($values as $value) {
+                // Preserve PCRE's Unicode, anchoring, and type-conversion behavior.
+                if (! is_string($value) || preg_match('/[^\x20-\x7E]/', $value)) {
+                    $counts = null;
+
+                    break;
+                }
+
+                $key = strtolower($value);
+                $counts[$key] = ($counts[$key] ?? 0) + 1;
+            }
+
+            $this->distinctComparisonData[$attributeName] = ['values' => $values, 'counts' => $counts];
+        }
+
+        return $this->distinctComparisonData[$attributeName];
     }
 
     /**

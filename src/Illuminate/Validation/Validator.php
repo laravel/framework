@@ -118,6 +118,13 @@ class Validator implements ValidatorContract
     protected $distinctValues = [];
 
     /**
+     * The cached values and case-insensitive counts for distinct comparisons.
+     *
+     * @var array<array-key, array{values: array, counts: array<array-key, int>|null}>
+     */
+    protected $distinctComparisonData = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -468,7 +475,7 @@ class Validator implements ValidatorContract
     {
         $this->messages = new MessageBag;
 
-        [$this->distinctValues, $this->failedRules] = [[], []];
+        [$this->distinctValues, $this->distinctComparisonData, $this->failedRules] = [[], [], []];
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
