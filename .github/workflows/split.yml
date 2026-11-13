@@ -1,0 +1,97 @@
+name: split
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  # Scheduled runs only fire from the default branch, so they fan out to every supported branch as a retry net for failed push runs.
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+# Built from source because the committed bin/splitsh-lite needs OpenSSL 1.1, which current Ubuntu no longer ships.
+env:
+  SPLITSH_LITE_REF: 36e0e74cfef34487bf15f0bbaff7260b9ce9c021
+  GIT2GO_REF: c1ec21d89caa0cdb0aefd6f6b8f95648418a3543 # v34.0.0, the libgit2 1.5 binding splitsh-lite requires
+
+jobs:
+  split:
+    if: github.repository == 'laravel/framework'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ github.event_name == 'schedule' && fromJSON('["master", "13.x", "12.x", "11.x"]') || fromJSON(format('["{0}"]', github.ref_name)) }}
+
+    concurrency:
+      group: split-${{ matrix.branch }}
+      cancel-in-progress: false
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+
+    name: Split ${{ matrix.branch }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - name: Restore splitsh-lite
+        id: splitsh-lite
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/splitsh-lite
+          key: splitsh-lite-${{ runner.os }}-${{ runner.arch }}-${{ env.SPLITSH_LITE_REF }}-${{ env.GIT2GO_REF }}
+
+      - name: Set up Go
+        if: steps.splitsh-lite.outputs.cache-hit != 'true'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.22'
+          cache: false
+
+      # Links libgit2 statically, so the binary only depends on libc.
+      - name: Build splitsh-lite
+        if: steps.splitsh-lite.outputs.cache-hit != 'true'
+        working-directory: ${{ runner.temp }}
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q cmake pkg-config python3
+          git clone -q https://github.com/splitsh/lite lite
+          cd lite
+          git checkout -q "$SPLITSH_LITE_REF"
+          go mod vendor
+          rm -rf vendor/github.com/libgit2/git2go
+          git clone -q https://github.com/libgit2/git2go vendor/github.com/libgit2/git2go/v34
+          git -C vendor/github.com/libgit2/git2go/v34 checkout -q "$GIT2GO_REF"
+          git -C vendor/github.com/libgit2/git2go/v34 submodule update -q --init --depth 1
+          make -C vendor/github.com/libgit2/git2go/v34 install-static
+          PKG_CONFIG_PATH="$PWD/vendor/github.com/libgit2/git2go/v34/static-build/build" go build -tags static -o "$RUNNER_TEMP/splitsh-lite" .
+
+      - name: Set up SSH
+        run: |
+          echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > "$RUNNER_TEMP/known_hosts"
+          eval "$(ssh-agent -s -a "$RUNNER_TEMP/ssh-agent.sock")"
+          ssh-add - <<< "$SSH_PRIVATE_KEY"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          echo "GIT_SSH_COMMAND=ssh -o UserKnownHostsFile=$RUNNER_TEMP/known_hosts -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SUBSPLIT }}
+
+      # No splitsh.db cache: it references split commits that only exist in the illuminate/* repos,
+      # so a fresh checkout fails with "object not found". A cold split of every component takes about a minute.
+      - name: Split components
+        run: bash ./bin/split.sh
+        env:
+          SPLITSH_LITE: ${{ runner.temp }}/splitsh-lite
