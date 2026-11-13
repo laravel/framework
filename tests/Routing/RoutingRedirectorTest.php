@@ -10,6 +10,7 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
@@ -121,6 +122,61 @@ class RoutingRedirectorTest extends TestCase
         $this->url->expects('previous')->returns('http://foo.com/bar');
         $response = $this->redirect->back();
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
+    }
+
+    public static function differentOriginUrls()
+    {
+        return [
+            'different host' => ['http://bar.com/bar'],
+            'different scheme' => ['https://foo.com/bar'],
+            'different port' => ['http://foo.com:8080/bar'],
+        ];
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackDoesNotEnforceSameOriginByDefault($previousUrl)
+    {
+        $this->url->expects('previous')->returns($previousUrl);
+
+        $response = $this->redirect->back();
+
+        $this->assertSame($previousUrl, $response->getTargetUrl());
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackEnforcesSameOriginWhenConfigEnabled($previousUrl)
+    {
+        config(['app.enforce_same_origin_redirects' => true]);
+
+        $this->url->expects('previous')->returns($previousUrl);
+
+        $response = $this->redirect->back();
+
+        $this->assertSame('/', $response->getTargetUrl());
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackCanOverrideConfigToDisableEnforcement($previousUrl)
+    {
+        config(['app.enforce_same_origin_redirects' => true]);
+
+        $this->url->expects('previous')->returns($previousUrl);
+
+        $response = $this->redirect->back(enforceSameOrigin: false);
+
+        $this->assertSame($previousUrl, $response->getTargetUrl());
+    }
+
+    #[DataProvider('differentOriginUrls')]
+    public function testBackCanOverrideConfigToEnableEnforcement($previousUrl)
+    {
+        config(['app.enforce_same_origin_redirects' => false]);
+
+        $this->url->expects('previous')->returns($previousUrl);
+
+        $response = $this->redirect->back(enforceSameOrigin: true);
+
+        $this->assertSame('/', $response->getTargetUrl());
     }
 
     public function testAwayDoesntValidateTheUrl()
