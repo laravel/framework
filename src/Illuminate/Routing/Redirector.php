@@ -40,11 +40,16 @@ class Redirector
      * @param  int  $status
      * @param  array  $headers
      * @param  mixed  $fallback
+     * @param  bool|null  $enforceSameOrigin
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function back($status = 302, $headers = [], $fallback = false)
+    public function back($status = 302, $headers = [], $fallback = false, $enforceSameOrigin = null)
     {
-        return $this->createRedirect($this->generator->previous($fallback), $status, $headers);
+        $enforceSameOrigin ??= config('app.enforce_same_origin_redirects', false);
+
+        $redirect = $this->createRedirect($this->generator->previous($fallback), $status, $headers);
+
+        return $enforceSameOrigin ? $redirect->enforceSameOrigin('/') : $redirect;
     }
 
     /**
