@@ -1287,6 +1287,25 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute the given callback without recording its record modifications.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function withoutRecordingModifications(Closure $callback): mixed
+    {
+        $recordsModified = $this->recordsModified;
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->recordsModified = $recordsModified;
+        }
+    }
+
+    /**
      * Indicate that the connection should use the write PDO connection for reads.
      *
      * @param  bool  $value

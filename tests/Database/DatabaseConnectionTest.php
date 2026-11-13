@@ -809,6 +809,15 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame($writePdo, $connection->getReadPdo());
     }
 
+    public function testWithoutRecordingModifications()
+    {
+        $connection = new MySqlConnection(new DatabaseConnectionTestMockPDO);
+
+        $connection->withoutRecordingModifications(fn ($connection) => $connection->recordsHaveBeenModified());
+
+        $this->assertFalse($connection->hasModifiedRecords());
+    }
+
     #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {
