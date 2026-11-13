@@ -69,6 +69,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void recordsHaveBeenModified(bool $value = true)
  * @method static \Illuminate\Database\Connection setRecordModificationState(bool $value)
  * @method static void forgetRecordModificationState()
+ * @method static mixed withoutAffectingStickiness(\Closure $callback)
  * @method static \Illuminate\Database\Connection useWriteConnectionWhenReading(bool $value = true)
  * @method static mixed usingWritePdo(\Closure $callback)
  * @method static \PDO getPdo()
