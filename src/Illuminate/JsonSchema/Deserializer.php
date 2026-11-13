@@ -9,7 +9,7 @@ class Deserializer
     /**
      * The maximum number of schema fragments that may be expanded.
      */
-    protected const MAX_NODES = 20000;
+    protected const MAX_NODES = JsonSchema::MAX_NODES;
 
     /**
      * The root schema being deserialized (used to resolve local $refs).

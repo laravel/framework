@@ -17,6 +17,9 @@
         "php": "^8.3",
         "illuminate/contracts": "^13.0"
     },
+    "suggest": {
+        "illuminate/validation": "Required to use JsonSchema::rules()"
+    },
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
