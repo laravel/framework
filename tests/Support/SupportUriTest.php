@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use Illuminate\Tests\Support\Concerns\TestsInteractsWithDataContract;
+use League\Uri\Contracts\UriInterface;
 use PHPUnit\Framework\TestCase;
 
 class SupportUriTest extends TestCase
@@ -157,6 +160,61 @@ class SupportUriTest extends TestCase
         $this->assertInstanceOf(Stringable::class, $stringable);
         $this->assertSame('https://laravel.com/docs/installation?version=1#hello', (string) $stringable);
         $this->assertSame($uri->value(), (string) $stringable);
+    }
+
+    public function test_redirect()
+    {
+        $uri = Uri::of('https://laravel.com/docs');
+
+        $redirect = $uri->redirect();
+
+        $this->assertInstanceOf(RedirectResponse::class, $redirect);
+        $this->assertSame('https://laravel.com/docs', $redirect->getTargetUrl());
+        $this->assertSame(302, $redirect->getStatusCode());
+
+        $permanent = $uri->redirect(301, ['X-From' => 'uri']);
+
+        $this->assertSame(301, $permanent->getStatusCode());
+        $this->assertSame('uri', $permanent->headers->get('X-From'));
+        $this->assertSame('https://laravel.com/docs', $permanent->getTargetUrl());
+    }
+
+    public function test_to_response()
+    {
+        $uri = Uri::of('https://laravel.com/docs/installation');
+
+        $response = $uri->toResponse(Request::create('/'));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame('https://laravel.com/docs/installation', $response->getTargetUrl());
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function test_to_html()
+    {
+        $uri = Uri::of('https://laravel.com/docs?version=1');
+
+        $this->assertSame('https://laravel.com/docs?version=1', $uri->toHtml());
+        $this->assertSame($uri->value(), $uri->toHtml());
+    }
+
+    public function test_get_uri()
+    {
+        $uri = Uri::of('https://laravel.com/docs#intro');
+
+        $this->assertInstanceOf(UriInterface::class, $uri->getUri());
+        $this->assertSame('https', $uri->getUri()->getScheme());
+        $this->assertSame('laravel.com', $uri->getUri()->getHost());
+        $this->assertSame('/docs', $uri->getUri()->getPath());
+        $this->assertSame('intro', $uri->getUri()->getFragment());
+    }
+
+    public function test_json_serialize()
+    {
+        $uri = Uri::of('https://laravel.com/docs?version=1');
+
+        $this->assertSame($uri->value(), $uri->jsonSerialize());
+        $this->assertSame($uri->value(), json_decode(json_encode($uri)));
     }
 
     public function test_complicated_query_string_manipulation()
