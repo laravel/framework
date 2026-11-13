@@ -842,6 +842,41 @@ class SessionStoreTest extends TestCase
         $this->assertSame("https://laravel.com/\u{FFFD}", $session->get('url.intended'));
     }
 
+    public function testJsonSerializedSessionWithValidationErrorsCanBeSavedMultipleTimes()
+    {
+        $session = new Store('name', $handler = new ArraySessionHandler(10), $this->getSessionId(), 'json');
+        $session->start();
+
+        $errorBag = new ViewErrorBag;
+        $errorBag->put('default', new MessageBag(['email' => ['The email field is required.']]));
+        $session->put('errors', $errorBag);
+
+        $session->save();
+        $this->assertInstanceOf(ViewErrorBag::class, $session->get('errors'));
+
+        $session->save();
+        $this->assertInstanceOf(ViewErrorBag::class, $session->get('errors'));
+
+        $reloaded = new Store('name', $handler, $this->getSessionId(), 'json');
+        $reloaded->start();
+
+        $this->assertInstanceOf(ViewErrorBag::class, $reloaded->get('errors'));
+        $this->assertSame(['email' => ['The email field is required.']], $reloaded->get('errors')->getBags()['default']->getMessages());
+    }
+
+    public function testJsonSerializedSessionWithNonViewErrorBagErrorsValue()
+    {
+        $session = new Store('name', $handler = new ArraySessionHandler(10), $this->getSessionId(), 'json');
+        $session->start();
+        $session->put('errors', ['custom' => 'Something went wrong']);
+        $session->save();
+
+        $reloaded = new Store('name', $handler, $this->getSessionId(), 'json');
+        $reloaded->start();
+
+        $this->assertSame(['custom' => 'Something went wrong'], $reloaded->get('errors'));
+    }
+
     public function testItIsMacroable()
     {
         $this->getSession()->macro('foo', function () {

@@ -162,9 +162,19 @@ class Store implements Session
             return;
         }
 
+        $errors = $this->get('errors');
+
+        if (! is_array($errors)) {
+            return;
+        }
+
         $errorBag = new ViewErrorBag;
 
-        foreach ($this->get('errors') as $key => $value) {
+        foreach ($errors as $key => $value) {
+            if (! is_array($value) || ! isset($value['messages'], $value['format']) || ! is_array($value['messages'])) {
+                return;
+            }
+
             $messageBag = new MessageBag($value['messages']);
 
             $errorBag->put($key, $messageBag->setFormat($value['format']));
@@ -182,10 +192,10 @@ class Store implements Session
     {
         $this->ageFlashData();
 
-        $this->prepareErrorBagForSerialization();
-
         $this->handler->write($this->getId(), $this->prepareForStorage(
-            $this->serialization === 'json' ? json_encode($this->attributes, JSON_INVALID_UTF8_SUBSTITUTE) : serialize($this->attributes)
+            $this->serialization === 'json'
+                ? json_encode($this->prepareErrorBagForSerialization(), JSON_INVALID_UTF8_SUBSTITUTE)
+                : serialize($this->attributes)
         ));
 
         $this->started = false;
@@ -194,24 +204,28 @@ class Store implements Session
     /**
      * Prepare the ViewErrorBag instance for JSON serialization.
      *
-     * @return void
+     * @return array
      */
     protected function prepareErrorBagForSerialization()
     {
-        if ($this->serialization !== 'json' || $this->missing('errors')) {
-            return;
+        $attributes = $this->attributes;
+
+        if ($this->serialization !== 'json' || ! ($attributes['errors'] ?? null) instanceof ViewErrorBag) {
+            return $attributes;
         }
 
         $errors = [];
 
-        foreach ($this->attributes['errors']->getBags() as $key => $value) {
+        foreach ($attributes['errors']->getBags() as $key => $value) {
             $errors[$key] = [
                 'format' => $value->getFormat(),
                 'messages' => $value->getMessages(),
             ];
         }
 
-        $this->attributes['errors'] = $errors;
+        $attributes['errors'] = $errors;
+
+        return $attributes;
     }
 
     /**
