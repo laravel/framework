@@ -15,7 +15,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
@@ -500,7 +499,7 @@ trait BuildsQueries
                     $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($source, $previousColumn);
 
                     $builder->where(
-                        $originalColumn !== $previousColumn && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
+                        $this->shouldWrapCursorColumnAsExpression($originalColumn, $previousColumn) ? new Expression($originalColumn) : $originalColumn,
                         '=',
                         $cursor->parameter($previousColumn)
                     );
@@ -520,7 +519,7 @@ trait BuildsQueries
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($source, $column);
 
                     $secondBuilder->where(
-                        $originalColumn !== $column && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
+                        $this->shouldWrapCursorColumnAsExpression($originalColumn, $column) ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
@@ -535,7 +534,7 @@ trait BuildsQueries
                         $originalColumn = $this->getOriginalColumnNameForCursorPagination($union, $column);
                         $union->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $union) {
                             $unionBuilder->where(
-                                $originalColumn !== $column && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
+                                $this->shouldWrapCursorColumnAsExpression($originalColumn, $column) ? new Expression($originalColumn) : $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
                                 $cursor->parameter($column)
                             );
@@ -567,6 +566,22 @@ trait BuildsQueries
             'cursorName' => $cursorName,
             'parameters' => $orders->pluck('column')->toArray(),
         ]);
+    }
+
+    /**
+     * Determine whether a cursor pagination column should be wrapped as a raw expression.
+     *
+     * Aliased expressions such as "score * 10" or "UPPER(name)" must be wrapped,
+     * while simple identifiers can be used as column names.
+     *
+     * @param  string  $originalColumn
+     * @param  string  $column
+     * @return bool
+     */
+    protected function shouldWrapCursorColumnAsExpression($originalColumn, $column)
+    {
+        return $originalColumn !== $column
+            && ! preg_match('/^(?:[A-Za-z0-9_]+|"[^"]+"|`[^`]+`|\[[^\]]+\])(?:\.(?:[A-Za-z0-9_]+|"[^"]+"|`[^`]+`|\[[^\]]+\]))*$/', trim($originalColumn));
     }
 
     /**

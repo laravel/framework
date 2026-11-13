@@ -277,6 +277,28 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertEquals([1, 1], collect($second->items())->pluck('id')->all());
     }
 
+    public function testPaginationWithAliasedExpressionWithoutParentheses()
+    {
+        TestPost::fillAndInsert([
+            ['title' => 'a', 'user_id' => 1],
+            ['title' => 'b', 'user_id' => 2],
+            ['title' => 'c', 'user_id' => 3],
+            ['title' => 'd', 'user_id' => 4],
+        ]);
+
+        $query = fn () => TestPost::query()
+            ->select('id')
+            ->selectRaw('user_id * 10 as label')
+            ->orderBy('label')
+            ->orderBy('id');
+
+        $first = $query()->cursorPaginate(2);
+        $second = $query()->cursorPaginate(2, ['*'], 'cursor', $first->nextCursor());
+
+        $this->assertSame([30, 40], collect($second->items())->pluck('label')->map(fn ($value) => (int) $value)->all());
+        $this->assertEquals([3, 4], collect($second->items())->pluck('id')->all());
+    }
+
     public function testPaginationWithAliasedOrderBy()
     {
         TestUser::fillAndInsert([[], [], [], [], [], []]);
