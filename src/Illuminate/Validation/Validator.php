@@ -104,6 +104,13 @@ class Validator implements ValidatorContract
     protected $implicitAttributes = [];
 
     /**
+     * The cached sets of expanded wildcard attributes indexed by type and name.
+     *
+     * @var array|null
+     */
+    protected $implicitAttributeKeys;
+
+    /**
      * The callback that should be used to format the attribute.
      *
      * @var callable|null
@@ -778,7 +785,15 @@ class Validator implements ValidatorContract
     protected function getPrimaryAttribute($attribute)
     {
         foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed, true)) {
+            if (! isset($this->implicitAttributeKeys[$unparsed])) {
+                $this->implicitAttributeKeys[$unparsed] = [];
+
+                foreach ($parsed as $expanded) {
+                    $this->implicitAttributeKeys[$unparsed][gettype($expanded)][$expanded] = true;
+                }
+            }
+
+            if (isset($this->implicitAttributeKeys[$unparsed][gettype($attribute)][$attribute])) {
                 return $unparsed;
             }
         }
@@ -1321,6 +1336,8 @@ class Validator implements ValidatorContract
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
         );
+
+        $this->implicitAttributeKeys = null;
     }
 
     /**
@@ -1339,6 +1356,8 @@ class Validator implements ValidatorContract
             $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
             $this->implicitAttributes = array_merge($response->implicitAttributes, $this->implicitAttributes);
+
+            $this->implicitAttributeKeys = null;
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
                 if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! str_ends_with($key, '.*')))) {
