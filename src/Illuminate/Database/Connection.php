@@ -1287,14 +1287,14 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Execute the given callback without recording its record modifications.
+     * Execute the given callback without affecting the connection's read / write stickiness.
      *
      * @template TReturn
      *
      * @param  (\Closure($this): TReturn)  $callback
      * @return TReturn
      */
-    public function withoutRecordingModifications(Closure $callback): mixed
+    public function withoutAffectingStickiness(Closure $callback): mixed
     {
         $recordsModified = $this->recordsModified;
 
