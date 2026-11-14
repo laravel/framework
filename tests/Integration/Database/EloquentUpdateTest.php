@@ -134,8 +134,8 @@ class EloquentUpdateTest extends DatabaseTestCase
         $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')->increment('counter');
 
         $this->assertSame(1, $affected);
-        $this->assertSame(2, TestUpdateModel3::find(1)->counter);
-        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+        $this->assertEquals(2, TestUpdateModel3::find(1)->counter);
+        $this->assertEquals(10, TestUpdateModel6::find(1)->counter);
         $this->assertNotSame('2000-01-01 00:00:00', TestUpdateModel3::find(1)->updated_at->toDateTimeString());
         $this->assertSame('2000-01-01 00:00:00', TestUpdateModel6::find(1)->updated_at->toDateTimeString());
     }
@@ -155,8 +155,8 @@ class EloquentUpdateTest extends DatabaseTestCase
         $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')->decrement('counter');
 
         $this->assertSame(1, $affected);
-        $this->assertSame(4, TestUpdateModel3::find(1)->counter);
-        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+        $this->assertEquals(4, TestUpdateModel3::find(1)->counter);
+        $this->assertEquals(10, TestUpdateModel6::find(1)->counter);
     }
 
     public function testIncrementEachQualifiesColumnsOnQueriesWithJoins()
@@ -173,8 +173,8 @@ class EloquentUpdateTest extends DatabaseTestCase
             ->incrementEach(['counter' => 2]);
 
         $this->assertSame(1, $affected);
-        $this->assertSame(3, TestUpdateModel3::find(1)->counter);
-        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+        $this->assertEquals(3, TestUpdateModel3::find(1)->counter);
+        $this->assertEquals(10, TestUpdateModel6::find(1)->counter);
     }
 
     public function testTouchQualifiesCustomColumnOnQueriesWithJoins()
