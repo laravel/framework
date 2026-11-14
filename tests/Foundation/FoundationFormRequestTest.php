@@ -679,6 +679,34 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['password' => 'secret123'], $request->validated());
     }
 
+    public function testFailOnUnknownFieldsAllowsWildcardConfirmationFields()
+    {
+        $request = $this->createRequest(
+            ['users' => [['password' => 'secret123', 'password_confirmation' => 'secret123']]],
+            FoundationTestFormRequestFailOnUnknownFieldsWildcardConfirmedStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertSame(['users' => [['password' => 'secret123']]], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsRejectsUnrelatedWildcardConfirmationFields()
+    {
+        $request = $this->createRequest(
+            ['users' => [['password' => 'secret123', 'password_confirmation' => 'secret123', 'email_confirmation' => 'a@b.com']]],
+            FoundationTestFormRequestFailOnUnknownFieldsWildcardConfirmedStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('users.0.email_confirmation'));
+    }
+
     // public function testFailOnUnknownFieldsRejectsConfirmationFieldsWithoutConfirmedRule()
     // {
     //     FormRequest::failOnUnknownFields();
@@ -1275,6 +1303,20 @@ class FoundationTestFormRequestUnconfirmedFieldStub extends FormRequest
     public function rules()
     {
         return ['password' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsWildcardConfirmedStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['users.*.password' => 'required|confirmed'];
     }
 
     public function authorize()
