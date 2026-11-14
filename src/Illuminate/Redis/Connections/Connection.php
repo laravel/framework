@@ -21,6 +21,70 @@ abstract class Connection
     }
 
     /**
+     * The commands that may be safely retried after reconnecting.
+     *
+     * @var list<string>
+     */
+    protected const RETRYABLE_COMMANDS = [
+        'bitcount',
+        'bitpos',
+        'dbsize',
+        'dump',
+        'exists',
+        'geodist',
+        'geohash',
+        'geopos',
+        'geosearch',
+        'get',
+        'getbit',
+        'getrange',
+        'hexists',
+        'hget',
+        'hgetall',
+        'hkeys',
+        'hlen',
+        'hmget',
+        'hmset',
+        'hstrlen',
+        'hvals',
+        'keys',
+        'lindex',
+        'llen',
+        'lpos',
+        'lrange',
+        'mget',
+        'mset',
+        'ping',
+        'pttl',
+        'randomkey',
+        'scard',
+        'sdiff',
+        'sinter',
+        'sismember',
+        'smembers',
+        'smismember',
+        'srandmember',
+        'strlen',
+        'sunion',
+        'time',
+        'ttl',
+        'type',
+        'xinfo',
+        'xlen',
+        'xpending',
+        'xrange',
+        'xrevrange',
+        'zcard',
+        'zcount',
+        'zlexcount',
+        'zmscore',
+        'zrange',
+        'zrank',
+        'zrevrank',
+        'zscore',
+    ];
+
+    /**
      * The Redis client.
      *
      * @var \Redis
@@ -137,6 +201,24 @@ abstract class Connection
         ));
 
         return $result;
+    }
+
+    /**
+     * Determine whether the command may be safely retried.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function isRetryable($method, array $parameters)
+    {
+        $method = strtolower($method);
+
+        if ($method === 'set') {
+            return ! isset($parameters[2]);
+        }
+
+        return in_array($method, static::RETRYABLE_COMMANDS, true);
     }
 
     /**
