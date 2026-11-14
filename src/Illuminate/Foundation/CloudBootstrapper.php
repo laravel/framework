@@ -236,19 +236,19 @@ class CloudBootstrapper
 
         $config = json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], associative: true, flags: JSON_THROW_ON_ERROR);
 
-        $config['connection']['after_commit'] ??= env('CLOUD_QUEUE_AFTER_COMMIT', false);
+        $config['connection']['after_commit'] ??= Env::get('CLOUD_QUEUE_AFTER_COMMIT', false);
 
         $config['connection']['overflow'] ??= [
-            'enabled' => env('CLOUD_QUEUE_OVERFLOW_ENABLED', false),
-            'store' => env('CLOUD_QUEUE_OVERFLOW_STORE'),
-            'always' => env('CLOUD_QUEUE_OVERFLOW_ALWAYS', false),
-            'delete_after_processing' => env('CLOUD_QUEUE_OVERFLOW_DELETE_AFTER_PROCESSING', true),
+            'enabled' => Env::get('CLOUD_QUEUE_OVERFLOW_ENABLED', false),
+            'store' => Env::get('CLOUD_QUEUE_OVERFLOW_STORE'),
+            'always' => Env::get('CLOUD_QUEUE_OVERFLOW_ALWAYS', false),
+            'delete_after_processing' => Env::get('CLOUD_QUEUE_OVERFLOW_DELETE_AFTER_PROCESSING', true),
         ];
 
         $config['connection']['credential_cache'] ??= [
-            'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
-            'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
-            'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
+            'enabled' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
+            'store' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
+            'fallback_store' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
         ];
 
         $app['config']->set('queue.connections.cloud', $config);
@@ -264,9 +264,9 @@ class CloudBootstrapper
         foreach ($app['config']->get('queue.connections', []) as $name => $connection) {
             if (($connection['driver'] ?? null) === 'sqs' && ! isset($connection['credential_cache'])) {
                 $app['config']->set("queue.connections.{$name}.credential_cache", [
-                    'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
-                    'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
-                    'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
+                    'enabled' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
+                    'store' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
+                    'fallback_store' => Env::get('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
                 ]);
             }
         }

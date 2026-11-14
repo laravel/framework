@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -14,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => Env::get('MAIL_MAILER', 'log'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,14 +41,14 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'scheme' => Env::get('MAIL_SCHEME'),
+            'url' => Env::get('MAIL_URL'),
+            'host' => Env::get('MAIL_HOST', '127.0.0.1'),
+            'port' => Env::get('MAIL_PORT', 2525),
+            'username' => Env::get('MAIL_USERNAME'),
+            'password' => Env::get('MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => Env::get('MAIL_EHLO_DOMAIN', parse_url((string) Env::get('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
         'ses' => [
@@ -55,7 +57,7 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+            // 'message_stream_id' => Env::get('POSTMARK_MESSAGE_STREAM_ID'),
             // 'client' => [
             //     'timeout' => 5,
             // ],
@@ -67,12 +69,12 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path' => Env::get('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => Env::get('MAIL_LOG_CHANNEL'),
         ],
 
         'array' => [
@@ -111,8 +113,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => Env::get('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => Env::get('MAIL_FROM_NAME', 'Example'),
     ],
 
     /*
@@ -127,7 +129,7 @@ return [
     */
 
     'markdown' => [
-        'theme' => env('MAIL_MARKDOWN_THEME', 'default'),
+        'theme' => Env::get('MAIL_MARKDOWN_THEME', 'default'),
 
         'paths' => [
             resource_path('views/vendor/mail'),
