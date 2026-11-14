@@ -95,6 +95,7 @@ class PostgresGrammar extends Grammar
         return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
             ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
             ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and "
+            ."not exists (select 1 from pg_depend d where d.objid = c.oid and d.deptype = 'e') and "
             .$this->compileSchemaWhereClause($schema, 'n.nspname')
             .' order by n.nspname, c.relname';
     }
