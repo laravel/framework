@@ -281,22 +281,41 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function isKnownField(string $inputKey, array $allowedKeys): bool
     {
+        $confirmationBaseKey = str_ends_with($inputKey, '_confirmation')
+            ? substr($inputKey, 0, -13)
+            : null;
+
         foreach ($allowedKeys as $ruleKey) {
-            if ($ruleKey === $inputKey) {
+            if ($this->matchesRuleKey($inputKey, $ruleKey)) {
                 return true;
             }
 
-            if (str_ends_with($inputKey, '_confirmation') &&
-                $ruleKey === substr($inputKey, 0, -13)) {
+            if ($confirmationBaseKey !== null && $this->matchesRuleKey($confirmationBaseKey, $ruleKey)) {
                 return true;
             }
+        }
 
-            if (str_contains($ruleKey, '*')) {
-                $pattern = '/^'.str_replace('\*', '(?:[^.\\\\]|\\\\.)+', preg_quote($ruleKey, '/')).'$/';
+        return false;
+    }
 
-                if (preg_match($pattern, $inputKey)) {
-                    return true;
-                }
+    /**
+     * Determine if the given input key matches a validation rule key.
+     *
+     * @param  string  $inputKey
+     * @param  string  $ruleKey
+     * @return bool
+     */
+    protected function matchesRuleKey(string $inputKey, string $ruleKey): bool
+    {
+        if ($ruleKey === $inputKey) {
+            return true;
+        }
+
+        if (str_contains($ruleKey, '*')) {
+            $pattern = '/^'.str_replace('\*', '(?:[^.\\\\]|\\\\.)+', preg_quote($ruleKey, '/')).'$/';
+
+            if (preg_match($pattern, $inputKey)) {
+                return true;
             }
         }
 
