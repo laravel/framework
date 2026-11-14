@@ -29,7 +29,15 @@ class EloquentUpdateTest extends DatabaseTestCase
         Schema::create('test_model3', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('counter');
+            $table->timestamp('published_at')->nullable();
             $table->softDeletes();
+            $table->timestamps();
+        });
+
+        Schema::create('test_model6', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('counter')->default(0);
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
 
@@ -109,6 +117,83 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(1, $affected);
         $this->assertNotSame('2000-01-01 00:00:00', TestUpdateModel2::find(1)->updated_at->toDateTimeString());
         $this->assertSame('2000-01-01 00:00:00', TestUpdateModel3::find(1)->updated_at->toDateTimeString());
+    }
+
+    public function testIncrementQualifiesColumnOnQueriesWithJoins()
+    {
+        TestUpdateModel3::forceCreate([
+            'counter' => 1,
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        TestUpdateModel6::forceCreate([
+            'counter' => 10,
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')->increment('counter');
+
+        $this->assertSame(1, $affected);
+        $this->assertSame(2, TestUpdateModel3::find(1)->counter);
+        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+        $this->assertNotSame('2000-01-01 00:00:00', TestUpdateModel3::find(1)->updated_at->toDateTimeString());
+        $this->assertSame('2000-01-01 00:00:00', TestUpdateModel6::find(1)->updated_at->toDateTimeString());
+    }
+
+    public function testDecrementQualifiesColumnOnQueriesWithJoins()
+    {
+        TestUpdateModel3::forceCreate([
+            'counter' => 5,
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        TestUpdateModel6::forceCreate([
+            'counter' => 10,
+            'updated_at' => '2000-01-01 00:00:00',
+        ]);
+
+        $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')->decrement('counter');
+
+        $this->assertSame(1, $affected);
+        $this->assertSame(4, TestUpdateModel3::find(1)->counter);
+        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+    }
+
+    public function testIncrementEachQualifiesColumnsOnQueriesWithJoins()
+    {
+        TestUpdateModel3::forceCreate([
+            'counter' => 1,
+        ]);
+
+        TestUpdateModel6::forceCreate([
+            'counter' => 10,
+        ]);
+
+        $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')
+            ->incrementEach(['counter' => 2]);
+
+        $this->assertSame(1, $affected);
+        $this->assertSame(3, TestUpdateModel3::find(1)->counter);
+        $this->assertSame(10, TestUpdateModel6::find(1)->counter);
+    }
+
+    public function testTouchQualifiesCustomColumnOnQueriesWithJoins()
+    {
+        TestUpdateModel3::forceCreate([
+            'counter' => 1,
+            'published_at' => '2000-01-01 00:00:00',
+        ]);
+
+        TestUpdateModel6::forceCreate([
+            'counter' => 10,
+            'published_at' => '2000-01-01 00:00:00',
+        ]);
+
+        $affected = TestUpdateModel3::join('test_model6', 'test_model6.id', '=', 'test_model3.id')->touch('published_at');
+
+        $this->assertSame(1, $affected);
+        $this->assertNotSame('2000-01-01 00:00:00', TestUpdateModel3::find(1)->published_at->toDateTimeString());
+        $this->assertSame('2000-01-01 00:00:00', TestUpdateModel6::find(1)->published_at->toDateTimeString());
     }
 
     public function testSoftDeleteWithJoins()
@@ -342,8 +427,15 @@ class TestUpdateModel3 extends Model
     use SoftDeletes;
 
     public $table = 'test_model3';
-    protected $fillable = ['counter'];
-    protected $casts = ['deleted_at' => 'datetime'];
+    protected $fillable = ['counter', 'published_at'];
+    protected $casts = ['deleted_at' => 'datetime', 'published_at' => 'datetime'];
+}
+
+class TestUpdateModel6 extends Model
+{
+    public $table = 'test_model6';
+    protected $guarded = [];
+    protected $casts = ['published_at' => 'datetime'];
 }
 
 class TestUpdateModel4 extends Model
