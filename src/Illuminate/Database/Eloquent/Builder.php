@@ -1369,7 +1369,13 @@ class Builder implements BuilderContract
         $time = $this->model->freshTimestamp();
 
         if ($column) {
-            $columns = (new BaseCollection(Arr::wrap($column)))->mapWithKeys(fn ($column) => [$column => $time])->all();
+            $columns = (new BaseCollection(Arr::wrap($column)))->mapWithKeys(function ($column) use ($time) {
+                if (! empty($this->query->joins)) {
+                    $column = $this->qualifyColumn($column);
+                }
+
+                return [$column => $time];
+            })->all();
 
             return $this->toBase()->update($columns);
         }
@@ -1398,7 +1404,7 @@ class Builder implements BuilderContract
     public function increment($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->increment(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $this->qualifyColumnForJoins($column), $amount, $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1413,7 +1419,7 @@ class Builder implements BuilderContract
     public function decrement($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->decrement(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $this->qualifyColumnForJoins($column), $amount, $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1427,7 +1433,7 @@ class Builder implements BuilderContract
     public function incrementEach(array $columns, array $extra = [])
     {
         return $this->toBase()->incrementEach(
-            $columns, $this->addUpdatedAtColumn($extra)
+            $this->qualifyColumnsForJoins($columns), $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1441,8 +1447,44 @@ class Builder implements BuilderContract
     public function decrementEach(array $columns, array $extra = [])
     {
         return $this->toBase()->decrementEach(
-            $columns, $this->addUpdatedAtColumn($extra)
+            $this->qualifyColumnsForJoins($columns), $this->addUpdatedAtColumn($extra)
         );
+    }
+
+    /**
+     * Qualify the given column when the query has joins.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return string|\Illuminate\Contracts\Database\Query\Expression
+     */
+    protected function qualifyColumnForJoins($column)
+    {
+        if (! empty($this->query->joins) && is_string($column)) {
+            return $this->qualifyColumn($column);
+        }
+
+        return $column;
+    }
+
+    /**
+     * Qualify the given column names when the query has joins.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function qualifyColumnsForJoins(array $columns)
+    {
+        if (empty($this->query->joins)) {
+            return $columns;
+        }
+
+        $qualified = [];
+
+        foreach ($columns as $column => $value) {
+            $qualified[$this->qualifyColumn($column)] = $value;
+        }
+
+        return $qualified;
     }
 
     /**
