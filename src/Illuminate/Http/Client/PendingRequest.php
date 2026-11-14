@@ -514,13 +514,10 @@ class PendingRequest
      */
     protected function hasRequestHeader($name)
     {
-        foreach (array_keys($this->options['headers'] ?? []) as $header) {
-            if (strcasecmp((string) $header, (string) $name) === 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(
+            array_keys($this->options['headers'] ?? []),
+            fn ($header) => strcasecmp((string) $header, (string) $name) === 0
+        );
     }
 
     /**
