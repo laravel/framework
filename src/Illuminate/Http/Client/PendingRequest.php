@@ -474,6 +474,53 @@ class PendingRequest
     }
 
     /**
+     * Add the given header to the request if it is not already present.
+     *
+     * Header names are compared case-insensitively.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withHeaderIfMissing($name, $value)
+    {
+        return $this->hasRequestHeader($name) ? $this : $this->withHeader($name, $value);
+    }
+
+    /**
+     * Add the given headers to the request if they are not already present.
+     *
+     * Header names are compared case-insensitively.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withHeadersIfMissing(array $headers)
+    {
+        foreach ($headers as $name => $value) {
+            $this->withHeaderIfMissing($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine if the request already has the given header.
+     *
+     * Header names are compared case-insensitively.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function hasRequestHeader($name)
+    {
+        return array_any(
+            array_keys($this->options['headers'] ?? []),
+            fn ($header) => strcasecmp((string) $header, (string) $name) === 0
+        );
+    }
+
+    /**
      * Replace the given headers on the request.
      *
      * @param  array  $headers
