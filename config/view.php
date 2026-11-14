@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -28,7 +30,7 @@ return [
     |
     */
 
-    'compiled' => env(
+    'compiled' => Env::get(
         'VIEW_COMPILED_PATH',
         realpath(storage_path('framework/views'))
     ),

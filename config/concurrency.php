@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -15,6 +17,6 @@ return [
     |
     */
 
-    'default' => env('CONCURRENCY_DRIVER', 'process'),
+    'default' => Env::get('CONCURRENCY_DRIVER', 'process'),
 
 ];

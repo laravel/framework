@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,7 +17,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => Env::get('APP_NAME', 'Laravel'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,7 +30,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env' => Env::get('APP_ENV', 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +43,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool) Env::get('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,11 +56,11 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => Env::get('APP_URL', 'http://localhost'),
 
-    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+    'frontend_url' => Env::get('FRONTEND_URL', 'http://localhost:3000'),
 
-    'asset_url' => env('ASSET_URL'),
+    'asset_url' => Env::get('ASSET_URL'),
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +86,7 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => Env::get('APP_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -98,7 +99,7 @@ return [
     |
     */
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => Env::get('APP_FALLBACK_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -111,7 +112,7 @@ return [
     |
     */
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => Env::get('APP_FAKER_LOCALE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -126,11 +127,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key' => Env::get('APP_KEY'),
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+            explode(',', (string) Env::get('APP_PREVIOUS_KEYS', ''))
         ),
     ],
 
@@ -148,8 +149,8 @@ return [
     */
 
     'maintenance' => [
-        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'driver' => Env::get('APP_MAINTENANCE_DRIVER', 'file'),
+        'store' => Env::get('APP_MAINTENANCE_STORE', 'database'),
     ],
 
     /*

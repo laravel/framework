@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -15,6 +17,6 @@ return [
     |
     */
 
-    'default' => env('IMAGE_DRIVER', 'gd'),
+    'default' => Env::get('IMAGE_DRIVER', 'gd'),
 
 ];

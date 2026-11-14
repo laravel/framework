@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => Env::get('APP_NAME', 'Laravel'),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +28,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env' => Env::get('APP_ENV', 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +41,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool) Env::get('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => Env::get('APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,11 +80,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => Env::get('APP_LOCALE', 'en'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => Env::get('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => Env::get('APP_FAKER_LOCALE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -97,11 +99,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key' => Env::get('APP_KEY'),
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', ''))
+            explode(',', Env::get('APP_PREVIOUS_KEYS', ''))
         ),
     ],
 
@@ -119,8 +121,8 @@ return [
     */
 
     'maintenance' => [
-        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'driver' => Env::get('APP_MAINTENANCE_DRIVER', 'file'),
+        'store' => Env::get('APP_MAINTENANCE_STORE', 'database'),
     ],
 
 ];

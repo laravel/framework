@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 
 return [
@@ -18,7 +19,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => Env::get('SESSION_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,9 +33,9 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => (int) Env::get('SESSION_LIFETIME', 120),
 
-    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+    'expire_on_close' => Env::get('SESSION_EXPIRE_ON_CLOSE', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +48,7 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    'encrypt' => Env::get('SESSION_ENCRYPT', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +74,7 @@ return [
     |
     */
 
-    'connection' => env('SESSION_CONNECTION'),
+    'connection' => Env::get('SESSION_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +87,7 @@ return [
     |
     */
 
-    'table' => env('SESSION_TABLE', 'sessions'),
+    'table' => Env::get('SESSION_TABLE', 'sessions'),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +102,7 @@ return [
     |
     */
 
-    'store' => env('SESSION_STORE'),
+    'store' => Env::get('SESSION_STORE'),
 
     /*
     |--------------------------------------------------------------------------
@@ -127,9 +128,9 @@ return [
     |
     */
 
-    'cookie' => env(
+    'cookie' => Env::get(
         'SESSION_COOKIE',
-        Str::snake((string) env('APP_NAME', 'laravel')).'_session'
+        Str::snake((string) Env::get('APP_NAME', 'laravel')).'_session'
     ),
 
     /*
@@ -143,7 +144,7 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+    'path' => Env::get('SESSION_PATH', '/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -156,7 +157,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => Env::get('SESSION_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +170,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => Env::get('SESSION_SECURE_COOKIE'),
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +183,7 @@ return [
     |
     */
 
-    'http_only' => env('SESSION_HTTP_ONLY', true),
+    'http_only' => Env::get('SESSION_HTTP_ONLY', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -199,7 +200,7 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+    'same_site' => Env::get('SESSION_SAME_SITE', 'lax'),
 
     /*
     |--------------------------------------------------------------------------
@@ -212,6 +213,6 @@ return [
     |
     */
 
-    'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+    'partitioned' => Env::get('SESSION_PARTITIONED_COOKIE', false),
 
 ];

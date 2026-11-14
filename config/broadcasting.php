@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -15,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'null'),
+    'default' => Env::get('BROADCAST_CONNECTION', 'null'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,14 +34,14 @@ return [
 
         'reverb' => [
             'driver' => 'reverb',
-            'key' => env('REVERB_APP_KEY'),
-            'secret' => env('REVERB_APP_SECRET'),
-            'app_id' => env('REVERB_APP_ID'),
+            'key' => Env::get('REVERB_APP_KEY'),
+            'secret' => Env::get('REVERB_APP_SECRET'),
+            'app_id' => Env::get('REVERB_APP_ID'),
             'options' => [
-                'host' => env('REVERB_HOST'),
-                'port' => env('REVERB_PORT', 443),
-                'scheme' => env('REVERB_SCHEME', 'https'),
-                'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                'host' => Env::get('REVERB_HOST'),
+                'port' => Env::get('REVERB_PORT', 443),
+                'scheme' => Env::get('REVERB_SCHEME', 'https'),
+                'useTLS' => Env::get('REVERB_SCHEME', 'https') === 'https',
             ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
@@ -48,16 +50,16 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
+            'key' => Env::get('PUSHER_APP_KEY'),
+            'secret' => Env::get('PUSHER_APP_SECRET'),
+            'app_id' => Env::get('PUSHER_APP_ID'),
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
-                'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
-                'port' => env('PUSHER_PORT', 443),
-                'scheme' => env('PUSHER_SCHEME', 'https'),
+                'cluster' => Env::get('PUSHER_APP_CLUSTER'),
+                'host' => Env::get('PUSHER_HOST') ?: 'api-'.Env::get('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
+                'port' => Env::get('PUSHER_PORT', 443),
+                'scheme' => Env::get('PUSHER_SCHEME', 'https'),
                 'encrypted' => true,
-                'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
+                'useTLS' => Env::get('PUSHER_SCHEME', 'https') === 'https',
             ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
@@ -66,22 +68,22 @@ return [
 
         'ably' => [
             'driver' => 'ably',
-            'key' => env('ABLY_KEY'),
+            'key' => Env::get('ABLY_KEY'),
         ],
 
         'mercure' => [
             'driver' => 'mercure',
-            'url' => env('MERCURE_URL'),
-            'public_url' => env('MERCURE_PUBLIC_URL'),
-            'secret' => env('MERCURE_JWT_SECRET'),
-            'encryption_key' => env('MERCURE_ENCRYPTION_KEY'),
+            'url' => Env::get('MERCURE_URL'),
+            'public_url' => Env::get('MERCURE_PUBLIC_URL'),
+            'secret' => Env::get('MERCURE_JWT_SECRET'),
+            'encryption_key' => Env::get('MERCURE_ENCRYPTION_KEY'),
             'claims' => [
-                'iss' => env('MERCURE_JWT_ISSUER'),
-                'client_id' => env('APP_NAME'),
+                'iss' => Env::get('MERCURE_JWT_ISSUER'),
+                'client_id' => Env::get('APP_NAME'),
             ],
-            'cookie_name' => env('MERCURE_COOKIE_NAME'),
-            'subscribe_expiration' => (int) env('MERCURE_SUBSCRIBE_EXPIRATION', 5),
-            'async' => (bool) env('MERCURE_ASYNC', false),
+            'cookie_name' => Env::get('MERCURE_COOKIE_NAME'),
+            'subscribe_expiration' => (int) Env::get('MERCURE_SUBSCRIBE_EXPIRATION', 5),
+            'async' => (bool) Env::get('MERCURE_ASYNC', false),
         ],
 
         'log' => [

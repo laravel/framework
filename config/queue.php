@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'database'),
+    'default' => Env::get('QUEUE_CONNECTION', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -37,45 +39,45 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_QUEUE_CONNECTION'),
-            'table' => env('DB_QUEUE_TABLE', 'jobs'),
-            'queue' => env('DB_QUEUE', 'default'),
-            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'connection' => Env::get('DB_QUEUE_CONNECTION'),
+            'table' => Env::get('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => Env::get('DB_QUEUE', 'default'),
+            'retry_after' => (int) Env::get('DB_QUEUE_RETRY_AFTER', 90),
             'after_commit' => false,
         ],
 
         'beanstalkd' => [
             'driver' => 'beanstalkd',
-            'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
-            'queue' => env('BEANSTALKD_QUEUE', 'default'),
-            'retry_after' => (int) env('BEANSTALKD_QUEUE_RETRY_AFTER', 90),
+            'host' => Env::get('BEANSTALKD_QUEUE_HOST', 'localhost'),
+            'queue' => Env::get('BEANSTALKD_QUEUE', 'default'),
+            'retry_after' => (int) Env::get('BEANSTALKD_QUEUE_RETRY_AFTER', 90),
             'block_for' => 0,
             'after_commit' => false,
         ],
 
         'sqs' => [
             'driver' => 'sqs',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'prefix' => env('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
-            'queue' => env('SQS_QUEUE', 'default'),
-            'suffix' => env('SQS_SUFFIX'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'key' => Env::get('AWS_ACCESS_KEY_ID'),
+            'secret' => Env::get('AWS_SECRET_ACCESS_KEY'),
+            'prefix' => Env::get('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => Env::get('SQS_QUEUE', 'default'),
+            'suffix' => Env::get('SQS_SUFFIX'),
+            'region' => Env::get('AWS_DEFAULT_REGION', 'us-east-1'),
             'after_commit' => false,
             'overflow' => [
-                'enabled' => env('SQS_OVERFLOW_ENABLED', false),
-                'store' => env('SQS_OVERFLOW_STORE'),
+                'enabled' => Env::get('SQS_OVERFLOW_ENABLED', false),
+                'store' => Env::get('SQS_OVERFLOW_STORE'),
                 'always' => false,
                 'delete_after_processing' => true,
-                'flush_on_clear' => env('SQS_OVERFLOW_FLUSH_ON_CLEAR', false),
+                'flush_on_clear' => Env::get('SQS_OVERFLOW_FLUSH_ON_CLEAR', false),
             ],
         ],
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            'connection' => Env::get('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => Env::get('REDIS_QUEUE', 'default'),
+            'retry_after' => (int) Env::get('REDIS_QUEUE_RETRY_AFTER', 90),
             'block_for' => null,
             'after_commit' => false,
         ],
@@ -110,7 +112,7 @@ return [
     */
 
     'batching' => [
-        'database' => env('DB_CONNECTION', 'sqlite'),
+        'database' => Env::get('DB_CONNECTION', 'sqlite'),
         'table' => 'job_batches',
     ],
 
@@ -128,8 +130,8 @@ return [
     */
 
     'failed' => [
-        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'sqlite'),
+        'driver' => Env::get('QUEUE_FAILED_DRIVER', 'database-uuids'),
+        'database' => Env::get('DB_CONNECTION', 'sqlite'),
         'table' => 'failed_jobs',
     ],
 

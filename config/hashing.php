@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Env;
+
 return [
 
     /*
@@ -15,7 +17,7 @@ return [
     |
     */
 
-    'driver' => env('HASH_DRIVER', 'bcrypt'),
+    'driver' => Env::get('HASH_DRIVER', 'bcrypt'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,9 +31,9 @@ return [
     */
 
     'bcrypt' => [
-        'rounds' => env('BCRYPT_ROUNDS', 12),
-        'verify' => env('HASH_VERIFY', true),
-        'limit' => env('BCRYPT_LIMIT', null),
+        'rounds' => Env::get('BCRYPT_ROUNDS', 12),
+        'verify' => Env::get('HASH_VERIFY', true),
+        'limit' => Env::get('BCRYPT_LIMIT', null),
     ],
 
     /*
@@ -46,10 +48,10 @@ return [
     */
 
     'argon' => [
-        'memory' => env('ARGON_MEMORY', 65536),
-        'threads' => env('ARGON_THREADS', 1),
-        'time' => env('ARGON_TIME', 4),
-        'verify' => env('HASH_VERIFY', true),
+        'memory' => Env::get('ARGON_MEMORY', 65536),
+        'threads' => Env::get('ARGON_THREADS', 1),
+        'time' => Env::get('ARGON_TIME', 4),
+        'verify' => Env::get('HASH_VERIFY', true),
     ],
 
     /*
