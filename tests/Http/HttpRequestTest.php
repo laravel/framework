@@ -963,6 +963,24 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => 'baz'], 'boom' => 'breeze'], $request->all());
     }
 
+    public function test_all_without_files_does_not_copy_nested_arrays()
+    {
+        $request = Request::create('/', 'POST', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], '{"records":['.str_repeat('[0],', 19999).'[0]]}');
+        $original = $request->json()->all();
+        $before = memory_get_usage();
+
+        $input = $request->all();
+
+        $this->assertLessThan(1024 * 1024, memory_get_usage() - $before);
+        $this->assertSame($original, $input);
+
+        $input['records'][0][0] = 1;
+
+        $this->assertSame(0, $request->input('records.0.0'));
+    }
+
     public function testAllInputWithNumericKeysReturnsInputAfterReplace()
     {
         $request1 = Request::create('/', 'POST', [0 => 'A', 1 => 'B', 2 => 'C']);
