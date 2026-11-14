@@ -4,10 +4,11 @@ set -e
 set -x
 
 CURRENT_BRANCH="13.x"
+SPLITSH_LITE="${SPLITSH_LITE:-./bin/splitsh-lite}"
 
 function split()
 {
-    SHA1=`./bin/splitsh-lite --prefix=$1`
+    SHA1=`$SPLITSH_LITE --prefix=$1`
     git push $2 "$SHA1:refs/heads/$CURRENT_BRANCH" -f
 }
 
