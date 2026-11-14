@@ -124,7 +124,8 @@ class PredisConnection extends Connection implements ConnectionContract
      */
     public function command($method, array $parameters = [])
     {
-        $retries = max(
+        // Pipelines and transactions may have partially or fully executed their callback, so they are never retried...
+        $retries = in_array(strtolower($method), ['pipeline', 'transaction'], true) ? 0 : max(
             $this->isRetryable($method, $parameters) ? 1 : 0,
             (int) ($this->config['command_retries'] ?? 0),
         );

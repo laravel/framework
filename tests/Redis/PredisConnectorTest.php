@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Connectors\PredisConnector;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Predis\Connection\ConnectionException;
 use Predis\Connection\NodeConnectionInterface;
@@ -307,6 +308,28 @@ class PredisConnectorTest extends TestCase
         }
 
         $this->assertCount(3, $client->calls);
+    }
+
+    #[DataProvider('pipelineAndTransactionMethods')]
+    public function testConnectionDoesNotRetryPipelinesOrTransactionsEvenWhenCommandRetriesAreConfigured($method)
+    {
+        $client = new FailingPredisClient($exception = $this->connectionException(), failures: 1);
+
+        $connection = new PredisConnection($client, ['command_retries' => 2]);
+
+        try {
+            $connection->{$method}(fn ($pipe) => $pipe->incr('foo'));
+            $this->fail('Expected ConnectionException was not thrown.');
+        } catch (ConnectionException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertCount(1, $client->calls);
+    }
+
+    public static function pipelineAndTransactionMethods()
+    {
+        return [['pipeline'], ['transaction'], ['Pipeline']];
     }
 
     public function testConnectPassesCommandRetriesToTheConnection()
