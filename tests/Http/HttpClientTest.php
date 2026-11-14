@@ -1653,6 +1653,49 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testWithHeaderIfMissingDoesNotOverrideExistingHeader()
+    {
+        $this->factory->fake();
+
+        $this->factory
+            ->withHeader('X-Test-Header', 'foo')
+            ->withHeaderIfMissing('X-Test-Header', 'bar')
+            ->withHeaderIfMissing('x-test-header', 'baz')
+            ->withHeaderIfMissing('Accept', 'application/json')
+            ->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeaders([
+                    'X-Test-Header' => 'foo',
+                    'Accept' => 'application/json',
+                ]);
+        });
+    }
+
+    public function testWithHeadersIfMissingDoesNotOverrideExistingHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory
+            ->withHeaders(['X-Test-Header' => 'foo', 'Accept' => 'application/json'])
+            ->withHeadersIfMissing([
+                'x-test-header' => 'bar',
+                'Accept' => 'text/plain',
+                'X-Request-Id' => 'abc',
+            ])
+            ->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeaders([
+                    'X-Test-Header' => 'foo',
+                    'Accept' => 'application/json',
+                    'X-Request-Id' => 'abc',
+                ]);
+        });
+    }
+
     public function testExceptionAccessorOnSuccess()
     {
         $resp = new Response(new Psr7Response());
