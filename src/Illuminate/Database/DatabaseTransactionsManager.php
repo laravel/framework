@@ -137,17 +137,15 @@ class DatabaseTransactionsManager
                                      $transaction->level > $newTransactionLevel
             )->values();
 
-            if ($this->currentTransaction) {
-                do {
-                    $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction[$connection]);
+            while (
+                isset($this->currentTransaction[$connection]) &&
+                $this->currentTransaction[$connection]->level > $newTransactionLevel
+            ) {
+                $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction[$connection]);
 
-                    $this->currentTransaction[$connection]->executeCallbacksForRollback();
+                $this->currentTransaction[$connection]->executeCallbacksForRollback();
 
-                    $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
-                } while (
-                    isset($this->currentTransaction[$connection]) &&
-                    $this->currentTransaction[$connection]->level > $newTransactionLevel
-                );
+                $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
             }
         }
     }

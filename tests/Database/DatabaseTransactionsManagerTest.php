@@ -448,4 +448,45 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertCount(1, $manager->getPendingTransactions());
         $this->assertCount(2, $manager->getCommittedTransactions());
     }
+
+    public function testRollbackWithNonZeroLevelDoesNotFailWhenAnotherConnectionHasActiveTransaction()
+    {
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('admin', 1);
+        $manager->rollback('default', 1);
+
+        $this->assertCount(1, $manager->getPendingTransactions());
+        $this->assertSame('admin', $manager->getPendingTransactions()[0]->connection);
+    }
+
+    public function testRollbackWithNonZeroLevelDoesNotFailAfterConnectionPreviouslyCommitted()
+    {
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->commit('default', 1, 0);
+
+        $manager->rollback('default', 1);
+
+        $this->assertCount(0, $manager->getPendingTransactions());
+    }
+
+    public function testRollbackWithLevelEqualToCurrentTransactionDoesNotRollbackCurrentTransaction()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->rollback('default', 1);
+
+        $this->assertCount(0, $callbacks);
+        $this->assertCount(1, $manager->getPendingTransactions());
+    }
 }
