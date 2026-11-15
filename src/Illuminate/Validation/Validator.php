@@ -433,6 +433,19 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Replace the placeholders in the top-level keys of the given array.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function replaceKeyPlaceholders(array $data)
+    {
+        $keys = array_map(fn ($key) => $this->replacePlaceholderInString((string) $key), array_keys($data));
+
+        return array_combine($keys, $data);
+    }
+
+    /**
      * Replace each field parameter dot placeholder with dot.
      *
      * @param  array  $parameters

@@ -457,7 +457,7 @@ trait ValidatesAttributes
             return true;
         }
 
-        return empty(array_diff_key($value, array_fill_keys($parameters, '')));
+        return empty(array_diff_key($this->replaceKeyPlaceholders($value), array_fill_keys($parameters, '')));
     }
 
     /**
@@ -476,7 +476,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return empty(array_diff_key($value, array_fill_keys($parameters, '')));
+        return empty(array_diff_key($this->replaceKeyPlaceholders($value), array_fill_keys($parameters, '')));
     }
 
     /**
@@ -504,6 +504,8 @@ trait ValidatesAttributes
         if (! is_array($value)) {
             return false;
         }
+
+        $value = $this->replaceKeyPlaceholders($value);
 
         return array_all($parameters, fn ($param) => Arr::exists($value, $param));
     }
@@ -1625,6 +1627,8 @@ trait ValidatesAttributes
         if (empty($parameters)) {
             return false;
         }
+
+        $value = $this->replaceKeyPlaceholders($value);
 
         return array_any($parameters, fn ($param) => Arr::exists($value, $param));
     }

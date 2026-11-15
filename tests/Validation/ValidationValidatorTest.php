@@ -1362,6 +1362,33 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testArrayKeyRulesMatchKeysContainingDotsAndAsterisks()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $data = ['settings' => ['app.name' => 'Laravel', 'mail.*' => true]];
+
+        $v = new Validator($trans, $data, ['settings' => 'array:app.name,mail.*']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['settings' => 'array:app.name']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['settings' => 'array_keys:app.name,mail.*']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['settings' => 'required_array_keys:app.name,mail.*']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['settings' => 'required_array_keys:app.name,app.url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['settings' => 'in_array_keys:app.url,app.name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['items' => [['app.name' => 'Laravel']]], ['items.*' => 'array:app.name|required_array_keys:app.name']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateCurrentPassword()
     {
         // Fails when user is not logged in.
