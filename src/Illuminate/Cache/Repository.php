@@ -619,26 +619,26 @@ class Repository implements ArrayAccess, CacheContract
     public function rememberValid($key, $ttl, Closure $callback, Closure $validator)
     {
         $key = enum_value($key);
-    
+
         $freshKey = self::REMEMBER_VALID_CREATED_KEY_PREFIX.$key;
-    
+
         $value = $this->get($key);
-    
+
         if (! is_null($value) && ! is_null($this->get($freshKey))) {
             return $value;
         }
-    
+
         $newValue = $callback();
 
         $valid = ! is_null($newValue) && $validator($newValue);
 
         if ($valid) {
             $ttl = value($ttl, $newValue);
-    
+
             if ($this->forever($key, $newValue)) {
                 $this->put($freshKey, true, $ttl);
             }
-    
+
             return $newValue;
         }
 
@@ -648,7 +648,7 @@ class Repository implements ArrayAccess, CacheContract
 
             return $value;
         }
-    
+
         return $newValue;
     }
 
