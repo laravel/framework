@@ -48,6 +48,13 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * The cache key prefix used to track when a remember-valid cache value was last refreshed.
+     *
+     * @var string
+     */
+    const REMEMBER_VALID_CREATED_KEY_PREFIX = 'illuminate:cache:remember-valid:created:';
+
+    /**
      * The cache key prefix used to track when a flexible cache value was last refreshed.
      *
      * @var string
@@ -596,6 +603,53 @@ class Repository implements ArrayAccess, CacheContract
         $this->put($key, $value, value($ttl, $value));
 
         return [$value, false];
+    }
+
+    /**
+     * Get an item from the cache, or execute a callback and cache its result if valid.
+     *
+     * @template TCacheValue
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @param  \Closure(TCacheValue): bool  $validator
+     * @return TCacheValue
+     */
+    public function rememberValid($key, $ttl, Closure $callback, Closure $validator)
+    {
+        $key = enum_value($key);
+    
+        $freshKey = self::REMEMBER_VALID_CREATED_KEY_PREFIX.$key;
+    
+        $value = $this->get($key);
+    
+        if (! is_null($value) && ! is_null($this->get($freshKey))) {
+            return $value;
+        }
+    
+        $newValue = $callback();
+
+        $valid = ! is_null($newValue) && $validator($newValue);
+
+        if ($valid) {
+            $ttl = value($ttl, $newValue);
+    
+            if ($this->forever($key, $newValue)) {
+                $this->put($freshKey, true, $ttl);
+            }
+    
+            return $newValue;
+        }
+
+        if (! is_null($value)) {
+            // Keep the stale value and use the TTL as a cooldown before trying again.
+            $this->put($freshKey, true, value($ttl, $value));
+
+            return $value;
+        }
+    
+        return $newValue;
     }
 
     /**
