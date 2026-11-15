@@ -302,7 +302,9 @@ class Batch
 
                     return $result;
                 },
-                'rejected' => function ($reason, $key) {
+                'rejected' => function ($reason, $key) use (&$results) {
+                    $results[$key] = $reason;
+
                     $this->decrementPendingRequests();
 
                     if (

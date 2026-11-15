@@ -5049,6 +5049,39 @@ class HttpClientTest extends TestCase
         $this->assertSame(0, $batch->failedRequests);
     }
 
+    public function testBatchPreservesKeysForRejectedPromises(): void
+    {
+        $this->factory->preventStrayRequests();
+
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+        ]);
+
+        $finallyResults = [];
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://stray.com'),
+                $batch->as('third')->get('https://201.com'),
+            ];
+        })->finally(function (Batch $batch, array $results) use (&$finallyResults) {
+            $finallyResults = $results;
+        });
+
+        $responses = $batch->send();
+
+        $this->assertSame(['first', 'second', 'third'], array_keys($responses));
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertInstanceOf(StrayRequestException::class, $responses['second']);
+        $this->assertSame(201, $responses['third']->status());
+
+        $this->assertSame(['first', 'second', 'third'], array_keys($finallyResults));
+        $this->assertSame($responses, $finallyResults);
+        $this->assertSame(0, $batch->pendingRequests);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
