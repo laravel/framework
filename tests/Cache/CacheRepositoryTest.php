@@ -175,6 +175,102 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame(['bar', false], $result);
     }
 
+    public function testRememberValidReturnsCachedValueWhenFresh()
+    {
+        $repo = new Repository(new ArrayStore);
+        $callback = function () {
+            return 'valid';
+        };
+
+        $repo->rememberValid('foo', 10, $callback, fn ($value) => true);
+
+        $result = $repo->rememberValid(
+            'foo',
+            10,
+            fn () => $this->fail('The callback should not be called.'),
+            fn ($value) => $this->fail('The validator should not be called.'),
+        );
+
+        $this->assertSame('valid', $result);
+    }
+
+    public function testRememberValidRetainsCachedValueUntilCooldownExpiresAfterInvalidRefresh()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        $repo->rememberValid('foo', 10, fn () => 'valid', fn ($value) => true);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $attempts = 0;
+        $callback = function () use (&$attempts) {
+            $attempts++;
+
+            return 'invalid';
+        };
+
+        $result = $repo->rememberValid('foo', 10, $callback, fn ($value) => false);
+
+        $this->assertSame('valid', $result);
+        $this->assertSame(1, $attempts);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(9));
+
+        $result = $repo->rememberValid('foo', 10, $callback, fn ($value) => false);
+
+        $this->assertSame('valid', $result);
+        $this->assertSame(1, $attempts);
+
+        Carbon::setTestNow(Carbon::now()->addSecond());
+
+        $result = $repo->rememberValid('foo', 10, $callback, fn ($value) => false);
+
+        $this->assertSame('valid', $result);
+        $this->assertSame(2, $attempts);
+    }
+
+    public function testRememberValidReplacesCachedValueAfterValidRefresh()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        $repo->rememberValid('foo', 10, fn () => 'old', fn ($value) => true);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $result = $repo->rememberValid('foo', 10, fn () => 'new', fn ($value) => true);
+
+        $this->assertSame('new', $result);
+
+        $result = $repo->rememberValid(
+            'foo',
+            10,
+            fn () => $this->fail('The callback should not be called.'),
+            fn ($value) => false,
+        );
+
+        $this->assertSame('new', $result);
+    }
+
+    public function testRememberValidDoesNotCacheAnInvalidInitialValue()
+    {
+        $repo = new Repository(new ArrayStore);
+        $attempts = 0;
+        $callback = function () use (&$attempts) {
+            $attempts++;
+
+            return 'invalid';
+        };
+
+        $result = $repo->rememberValid('foo', 10, $callback, fn ($value) => false);
+
+        $this->assertSame('invalid', $result);
+        $this->assertNull($repo->get('foo'));
+
+        $repo->rememberValid('foo', 10, $callback, fn ($value) => false);
+
+        $this->assertSame(2, $attempts);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
