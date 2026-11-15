@@ -74,7 +74,7 @@ abstract class Queue
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $queue
      * @param  string  $job
      * @param  mixed  $data
      * @return mixed
@@ -87,7 +87,7 @@ abstract class Queue
     /**
      * Push a new job onto a specific queue after (n) seconds.
      *
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
@@ -103,7 +103,7 @@ abstract class Queue
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)

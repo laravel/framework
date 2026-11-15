@@ -12,6 +12,8 @@ use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 class SyncQueue extends Queue implements QueueContract
 {
     /**
@@ -27,7 +29,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -38,7 +40,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the number of pending jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function pendingSize($queue = null)
@@ -49,7 +51,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the number of delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function delayedSize($queue = null)
@@ -60,7 +62,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the number of reserved jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function reservedSize($queue = null)
@@ -111,7 +113,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the pending jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function pendingJobs($queue = null): Collection
@@ -122,7 +124,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the delayed jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function delayedJobs($queue = null): Collection
@@ -133,7 +135,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the reserved jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function reservedJobs($queue = null): Collection
@@ -174,7 +176,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int|null
      */
     public function creationTimeOfOldestPendingJob($queue = null)
@@ -187,7 +189,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      *
      * @throws \Throwable
@@ -211,13 +213,15 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      *
      * @throws \Throwable
      */
     protected function executeJob($job, $data = '', $queue = null)
     {
+        $queue = enum_value($queue);
+
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
 
         try {
@@ -333,7 +337,7 @@ class SyncQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -348,7 +352,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -359,7 +363,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
