@@ -40,6 +40,7 @@ use Mockery;
  * @method static bool forever(\UnitEnum|string $key, mixed $value)
  * @method static mixed remember(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
  * @method static array rememberWithWarmth(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
+ * @method static mixed rememberValid(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback, \Closure $validator)
  * @method static mixed sear(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed rememberForever(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed flexible(\UnitEnum|string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
