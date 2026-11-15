@@ -2,8 +2,12 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class TrustProxiesTest extends TestCase
@@ -14,6 +18,138 @@ class TrustProxiesTest extends TestCase
      * @var int
      */
     protected $headerAll = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    #[BackupGlobals(true)]
+    #[TestWith(['example.on-forge.com', false, false, false])]
+    #[TestWith(['example.on-vapor.com', false, false, false])]
+    #[TestWith(['example.on-forge.com', true, false, true])]
+    #[TestWith(['example.on-vapor.com', false, true, true])]
+    #[TestWith(['example.on-forge.com', false, true, false])]
+    #[TestWith(['example.on-vapor.com', true, false, false])]
+    #[TestWith(['example.com', true, false, false])]
+    #[TestWith(['example.com', false, true, false])]
+    #[TestWith(['example.on-forge.com.attacker.com', true, false, false])]
+    #[TestWith(['example.on-vapor.com.attacker.com', false, true, false])]
+    public function test_platform_proxy_detection_requires_matching_environment_and_host($host, $forge, $vapor, $trusted)
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+
+        if ($vapor) {
+            $_ENV['VAPOR_SSM_PATH'] = '/vapor/environment';
+        }
+
+        $container = Container::getInstance();
+        Container::setInstance(new Container)->instance('config', new Repository);
+
+        try {
+            $request = $this->createProxiedRequest();
+            $request->headers->set('Host', $host);
+
+            if ($forge) {
+                $request->server->set('FORGE_SERVER_ID', '123');
+            }
+
+            (new TrustProxies)->handle($request, function ($request) use ($host, $trusted) {
+                $this->assertSame($trusted ? ['192.168.10.10'] : [], $request->getTrustedProxies());
+                $this->assertSame($trusted ? '173.174.200.38' : '192.168.10.10', $request->ip());
+                $this->assertSame($trusted, $request->isSecure());
+                $this->assertSame($host, $request->getHost());
+                $this->assertSame($trusted ? 443 : 80, $request->getPort());
+                $this->assertSame($trusted ? '/prefix' : '', $request->getBaseUrl());
+                $this->assertSame($trusted ? null : 'serversforhackers.com', $request->headers->get('X-Forwarded-Host'));
+            });
+        } finally {
+            Container::setInstance($container);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith(['example.on-forge.com'])]
+    #[TestWith(['example.on-vapor.com'])]
+    public function test_client_supplied_platform_headers_do_not_enable_proxy_trust($host)
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+
+        $container = Container::getInstance();
+        Container::setInstance(new Container)->instance('config', new Repository);
+
+        try {
+            $request = $this->createProxiedRequest([
+                'HTTP_FORGE_SERVER_ID' => '123',
+                'HTTP_VAPOR_SSM_PATH' => '/vapor/environment',
+            ]);
+            $request->headers->set('Host', $host);
+
+            (new TrustProxies)->handle($request, function ($request) use ($host) {
+                $this->assertSame([], $request->getTrustedProxies());
+                $this->assertSame('192.168.10.10', $request->ip());
+                $this->assertFalse($request->isSecure());
+                $this->assertSame('http://'.$host, $request->getSchemeAndHttpHost());
+            });
+        } finally {
+            Container::setInstance($container);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith(['example.on-forge.com', true, false, true])]
+    #[TestWith(['example.on-vapor.com', false, true, true])]
+    #[TestWith(['example.on-forge.com', false, false, false])]
+    #[TestWith(['example.on-vapor.com', false, false, false])]
+    public function test_explicit_proxy_configuration_takes_precedence_over_platform_detection($host, $forge, $vapor, $platform)
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+
+        if ($vapor) {
+            $_ENV['VAPOR_SSM_PATH'] = '/vapor/environment';
+        }
+
+        $container = Container::getInstance();
+        Container::setInstance(new Container)->instance('config', new Repository([
+            'trustedproxy' => ['proxies' => ['192.168.10.11']],
+        ]));
+
+        try {
+            $request = $this->createProxiedRequest();
+            $request->headers->set('Host', $host);
+
+            if ($forge) {
+                $request->server->set('FORGE_SERVER_ID', '123');
+            }
+
+            (new TrustProxies)->handle($request, function ($request) use ($platform) {
+                $this->assertSame(['192.168.10.11'], $request->getTrustedProxies());
+                $this->assertSame('192.168.10.10', $request->ip());
+                $this->assertFalse($request->isSecure());
+                $this->assertSame($platform ? null : 'serversforhackers.com', $request->headers->get('X-Forwarded-Host'));
+            });
+        } finally {
+            Container::setInstance($container);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    public function test_laravel_cloud_still_trusts_the_calling_proxy_by_default()
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+        $_SERVER['LARAVEL_CLOUD'] = '1';
+
+        $container = Container::getInstance();
+        Container::setInstance(new Container)->instance('config', new Repository);
+
+        try {
+            $request = $this->createProxiedRequest();
+
+            (new TrustProxies)->handle($request, function ($request) {
+                $this->assertSame(['192.168.10.10'], $request->getTrustedProxies());
+                $this->assertSame('173.174.200.38', $request->ip());
+                $this->assertTrue($request->isSecure());
+                $this->assertSame('serversforhackers.com', $request->getHost());
+            });
+        } finally {
+            Container::setInstance($container);
+        }
+    }
 
     /**
      * Test that Symfony does indeed NOT trust X-Forwarded-*
