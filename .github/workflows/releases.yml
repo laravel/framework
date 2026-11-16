@@ -8,12 +8,14 @@ on:
         required: true
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
   release:
     runs-on: ubuntu-26.04
-    timeout-minutes: 10
+    # Waits on in-flight splits, then clones and tags 37 component repos.
+    timeout-minutes: 30
 
     name: Release ${{ inputs.version }}
 
@@ -58,6 +60,21 @@ jobs:
           script: |
               core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
 
+      # Component tags point at each illuminate/* branch head, so this branch's in-flight split must land first.
+      # Matched by job name because scheduled runs split every branch from master.
+      - name: Wait for component split
+        run: |
+          for RUN_ID in $(gh run list --workflow split.yml --json databaseId,status --jq '.[] | select(.status != "completed") | .databaseId'); do
+            gh run watch "$RUN_ID" > /dev/null
+            if gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == $ENV.JOB) | .conclusion' | grep -qx failure; then
+              echo "$JOB failed in run $RUN_ID, aborting release."
+              exit 1
+            fi
+          done
+        env:
+          JOB: Split ${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update Application.php version
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
@@ -66,17 +83,18 @@ jobs:
         with:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
-      - name: SSH into splitter server
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
-        with:
-          host: 104.248.56.26
-          username: forge
-          key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
-          script: |
-            cd laravel-${{ github.ref_name }}
-            git pull origin ${{ github.ref_name }}
-            bash ./bin/release.sh v${{ steps.version.outputs.version }}
-          script_stop: true
+      - name: Set up SSH
+        run: |
+          echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > "$RUNNER_TEMP/known_hosts"
+          eval "$(ssh-agent -s -a "$RUNNER_TEMP/ssh-agent.sock")"
+          ssh-add - <<< "$SSH_PRIVATE_KEY"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          echo "GIT_SSH_COMMAND=ssh -o UserKnownHostsFile=$RUNNER_TEMP/known_hosts -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_SUBSPLIT }}
+
+      - name: Tag framework and components
+        run: bash ./bin/release.sh v${{ steps.version.outputs.version }}
 
       - name: Generate release notes
         id: generated-notes
