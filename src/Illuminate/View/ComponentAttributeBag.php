@@ -237,6 +237,10 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     public function merge(array $attributeDefaults = [], $escape = true)
     {
         $attributeDefaults = array_map(function ($value) use ($escape) {
+            if ($value instanceof AppendableAttributeValue) {
+                return $value;
+            }
+
             return $this->shouldEscapeAttributeValue($escape, $value)
                 ? e($value)
                 : $value;
@@ -266,6 +270,12 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
 
+        foreach ($attributeDefaults as $key => $value) {
+            if ($value instanceof AppendableAttributeValue) {
+                $attributeDefaults[$key] = $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape);
+            }
+        }
+
         return new static(array_merge($attributeDefaults, $attributes));
     }
 
@@ -282,9 +292,15 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
             return false;
         }
 
-        return ! is_object($value) &&
-               ! is_null($value) &&
-               ! is_bool($value);
+        if (is_null($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Htmlable) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
