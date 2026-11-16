@@ -19,7 +19,7 @@ class TrustProxiesTest extends TestCase
      */
     protected $headerAll = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_X_FORWARDED_AWS_ELB;
 
-    #[BackupGlobals(true)]
+    #[BackupGlobals(false)]
     #[TestWith(['example.on-forge.com', false, false, false])]
     #[TestWith(['example.on-vapor.com', false, false, false])]
     #[TestWith(['example.on-forge.com', true, false, true])]
@@ -63,7 +63,7 @@ class TrustProxiesTest extends TestCase
         }
     }
 
-    #[BackupGlobals(true)]
+    #[BackupGlobals(false)]
     #[TestWith(['example.on-forge.com'])]
     #[TestWith(['example.on-vapor.com'])]
     public function test_client_supplied_platform_headers_do_not_enable_proxy_trust($host)
@@ -91,7 +91,7 @@ class TrustProxiesTest extends TestCase
         }
     }
 
-    #[BackupGlobals(true)]
+    #[BackupGlobals(false)]
     #[TestWith(['example.on-forge.com', true, false, true])]
     #[TestWith(['example.on-vapor.com', false, true, true])]
     #[TestWith(['example.on-forge.com', false, false, false])]
@@ -128,7 +128,7 @@ class TrustProxiesTest extends TestCase
         }
     }
 
-    #[BackupGlobals(true)]
+    #[BackupGlobals(false)]
     public function test_laravel_cloud_still_trusts_the_calling_proxy_by_default()
     {
         unset($_ENV['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
