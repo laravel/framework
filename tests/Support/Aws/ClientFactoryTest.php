@@ -260,6 +260,58 @@ class ClientFactoryTest extends TestCase
         }
     }
 
+    public function testCacheStoresThatNeedTheCachedCredentialsDoNotRecurse()
+    {
+        $this->credentialsFile(['default' => 'file-key']);
+
+        $factory = $this->factory();
+        $config = ['region' => 'us-east-1', 'profile' => 'default', 'credential_cache' => ['enabled' => true]];
+
+        // Like DynamoDB, this store signs its own requests with the credentials it's caching...
+        $store = new class extends ArrayStore
+        {
+            public $client;
+
+            public $depth = 0;
+
+            public $maxDepth = 0;
+
+            public function get($key)
+            {
+                $this->maxDepth = max($this->maxDepth, ++$this->depth);
+
+                try {
+                    if ($this->depth < 10) {
+                        ($this->client)()->getCredentials()->wait();
+                    }
+
+                    return parent::get($key);
+                } finally {
+                    $this->depth--;
+                }
+            }
+        };
+
+        $store->client = fn () => $factory->make(DynamoDbClient::class, $config, 'cache.stores.dynamodb');
+
+        $this->container->instance('cache', new class(new Repository($store))
+        {
+            public function __construct(public $repository)
+            {
+            }
+
+            public function store($name = null)
+            {
+                return $this->repository;
+            }
+        });
+
+        $sqs = $factory->make(SqsClient::class, $config, 'queue.connections.sqs');
+
+        $this->assertSame('file-key', $sqs->getCredentials()->wait()->getAccessKeyId());
+        $this->assertSame(1, $store->maxDepth);
+    }
+
     public function testSourcesWithObjectsAreNotSharedAcrossProcesses()
     {
         $repository = $this->arrayCache();

@@ -374,7 +374,25 @@ class ClientFactory
             ! empty($options['fallback_store']) ? fn () => $this->cache()->store($options['fallback_store']) : null,
         );
 
-        return fn () => $cache->resolve($key, $provider);
+        $resolving = false;
+        $direct = null;
+
+        return function () use ($cache, $key, $provider, &$resolving, &$direct) {
+            if ($resolving) {
+                return $direct ??= $provider();
+            }
+
+            $resolving = true;
+
+            try {
+                return $cache->resolve($key, function () use ($provider, &$direct) {
+                    return $direct ??= $provider();
+                });
+            } finally {
+                $resolving = false;
+                $direct = null;
+            }
+        };
     }
 
     /**
