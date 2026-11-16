@@ -377,11 +377,8 @@ class CloudBootstrapper
                     $handler->reportable($exceptionReporter);
 
                     $reportableRegistered = true;
-                } catch (Throwable $e) {
-                    error_log('Laravel Cloud: EXCEPTION_REPORTER_REGISTRATION_FAILED '.json_encode([
-                        'exception' => $e::class,
-                        'message' => $e->getMessage(),
-                    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
+                } catch (Throwable) {
+                    //
                 }
             };
 
@@ -422,11 +419,8 @@ class CloudBootstrapper
                 $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
                 $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
             }
-        } catch (Throwable $e) {
-            error_log('Laravel Cloud: EXCEPTION_REPORTING_SETUP_FAILED '.json_encode([
-                'exception' => $e::class,
-                'message' => $e->getMessage(),
-            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
+        } catch (Throwable) {
+            return;
         }
     }
 

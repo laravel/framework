@@ -259,12 +259,10 @@ class ExceptionReportingTest extends TestCase
     {
         unset($this->app[ExceptionHandler::class]);
         $this->app->singleton(ExceptionHandler::class, ExceptionHandlerWithoutReportable::class);
-        $log = $this->captureErrorLog();
 
         $this->setupExceptionReporting();
 
         $this->assertInstanceOf(ExceptionHandlerWithoutReportable::class, $this->app[ExceptionHandler::class]);
-        $this->assertStringContainsString('Laravel Cloud: EXCEPTION_REPORTER_REGISTRATION_FAILED {"exception":"Error","message":"Call to undefined method', file_get_contents($log));
     }
 
     public function testItEmitsExceptionsAsEvents(): void
