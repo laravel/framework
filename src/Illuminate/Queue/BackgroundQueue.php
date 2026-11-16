@@ -11,7 +11,7 @@ class BackgroundQueue extends SyncQueue
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      *
      * @throws \Throwable
