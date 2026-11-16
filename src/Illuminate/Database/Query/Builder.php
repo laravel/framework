@@ -541,7 +541,7 @@ class Builder implements BuilderContract
     public function from($table, $as = null)
     {
         if ($this->isQueryable($table)) {
-            return $this->fromSub($table, $as);
+            return $this->fromSub($table, $as ?? '');
         }
 
         $this->from = $as ? "{$table} as {$as}" : $table;
