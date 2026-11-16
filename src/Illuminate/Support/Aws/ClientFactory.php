@@ -377,17 +377,19 @@ class ClientFactory
         $resolving = false;
         $direct = null;
 
-        return function () use ($cache, $key, $provider, &$resolving, &$direct) {
+        $resolveDirectly = function () use ($provider, &$direct) {
+            return $direct ??= $provider();
+        };
+
+        return function () use ($cache, $key, $resolveDirectly, &$resolving, &$direct) {
             if ($resolving) {
-                return $direct ??= $provider();
+                return $resolveDirectly();
             }
 
             $resolving = true;
 
             try {
-                return $cache->resolve($key, function () use ($provider, &$direct) {
-                    return $direct ??= $provider();
-                });
+                return $cache->resolve($key, $resolveDirectly);
             } finally {
                 $resolving = false;
                 $direct = null;
