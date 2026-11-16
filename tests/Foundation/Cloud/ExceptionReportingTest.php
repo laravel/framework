@@ -264,7 +264,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
 
         $this->assertInstanceOf(ExceptionHandlerWithoutReportable::class, $this->app[ExceptionHandler::class]);
-        $this->assertStringContainsString('Laravel Cloud: Failed registering exception reporter. Error: Call to undefined method', file_get_contents($log));
+        $this->assertStringContainsString('Laravel Cloud: EXCEPTION_REPORTER_REGISTRATION_FAILED {"exception":"Error","message":"Call to undefined method', file_get_contents($log));
     }
 
     public function testItEmitsExceptionsAsEvents(): void
@@ -4037,10 +4037,12 @@ class ExceptionReportingTest extends TestCase
 
         $lines = file($log, FILE_IGNORE_NEW_LINES);
         $this->assertCount(1, $lines);
-        $this->assertStringEndsWith(
-            'Laravel Cloud: Dropped 2 event(s). RuntimeException: Failed configuring socket timeout --- closed: true',
-            $lines[0],
-        );
+        $this->assertStringContainsString('Laravel Cloud: EVENTS_DROPPED {', $lines[0]);
+        $this->assertSame([
+            'events' => 2,
+            'exception' => RuntimeException::class,
+            'message' => "Failed configuring socket timeout\n---\nclosed: true",
+        ], json_decode(explode('Laravel Cloud: EVENTS_DROPPED ', $lines[0], 2)[1], associative: true));
     }
 
     public function testItDoesNotCaptureSyncJobContext(): void

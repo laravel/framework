@@ -182,10 +182,10 @@ class ExceptionReporter
 
             return ! $this->config['stop'];
         } catch (Throwable $failure) {
-            error_log(str_replace("\n", ' ', sprintf(
-                'Laravel Cloud: Failed reporting exception. %s: %s',
-                $failure::class, $failure->getMessage(),
-            )));
+            error_log('Laravel Cloud: EXCEPTION_REPORT_FAILED '.json_encode([
+                'exception' => $failure::class,
+                'message' => $failure->getMessage(),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
 
             return null;
         } finally {

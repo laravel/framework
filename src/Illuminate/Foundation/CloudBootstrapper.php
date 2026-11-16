@@ -378,10 +378,10 @@ class CloudBootstrapper
 
                     $reportableRegistered = true;
                 } catch (Throwable $e) {
-                    error_log(str_replace("\n", ' ', sprintf(
-                        'Laravel Cloud: Failed registering exception reporter. %s: %s',
-                        $e::class, $e->getMessage(),
-                    )));
+                    error_log('Laravel Cloud: EXCEPTION_REPORTER_REGISTRATION_FAILED '.json_encode([
+                        'exception' => $e::class,
+                        'message' => $e->getMessage(),
+                    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
                 }
             };
 
@@ -423,10 +423,10 @@ class CloudBootstrapper
                 $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
             }
         } catch (Throwable $e) {
-            error_log(str_replace("\n", ' ', sprintf(
-                'Laravel Cloud: Failed registering exception reporting. %s: %s',
-                $e::class, $e->getMessage(),
-            )));
+            error_log('Laravel Cloud: EXCEPTION_REPORTING_SETUP_FAILED '.json_encode([
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
         }
     }
 

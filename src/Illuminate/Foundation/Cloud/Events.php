@@ -61,10 +61,11 @@ class Events
 
             return true;
         } catch (Throwable $e) {
-            error_log(str_replace("\n", ' ', sprintf(
-                'Laravel Cloud: Dropped %d event(s). %s: %s',
-                count($payloads), $e::class, $e->getMessage(),
-            )));
+            error_log('Laravel Cloud: EVENTS_DROPPED '.json_encode([
+                'events' => count($payloads),
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
 
             return false;
         }
