@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Stringable;
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
 
@@ -433,5 +436,44 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertFalse($bag->exists('missing'));
         $this->assertTrue($bag->exists(['name']));
         $this->assertFalse($bag->exists(['missing']));
+    }
+
+    public function testStringableAttributesAreEscaped()
+    {
+        $xssPayload = 'x" onmouseover=alert(1) data-x="';
+
+        // Plain strings are escaped
+        $bag = new ComponentAttributeBag();
+        $bag = $bag->merge(['title' => $xssPayload]);
+        $this->assertSame('title="x&quot; onmouseover=alert(1) data-x=&quot;"', (string) $bag);
+
+        // Stringable objects should also be escaped
+        $bag = new ComponentAttributeBag();
+        $bag = $bag->merge(['title' => new Stringable($xssPayload)]);
+        $this->assertSame('title="x&quot; onmouseover=alert(1) data-x=&quot;"', (string) $bag);
+    }
+
+    public function testHtmlableAttributesAreNotEscaped()
+    {
+        // Htmlable objects should not be escaped
+        $bag = new ComponentAttributeBag();
+        $bag = $bag->merge(['title' => new HtmlString('<em>safe</em>')]);
+        $this->assertSame('title="<em>safe</em>"', (string) $bag);
+    }
+
+    public function testStringableAttributesInPrependsAreEscaped()
+    {
+        $xssPayload = 'x" onmouseover=alert(1) data-x="';
+
+        $bag = new ComponentAttributeBag(['class' => 'bar']);
+        $bag = $bag->merge(['class' => $bag->prepends(new Stringable($xssPayload))]);
+        $this->assertStringContainsString('x&quot; onmouseover=alert(1) data-x=&quot;', (string) $bag);
+    }
+
+    public function testHtmlableAttributesInPrependsAreNotEscaped()
+    {
+        $bag = new ComponentAttributeBag(['class' => 'bar']);
+        $bag = $bag->merge(['class' => $bag->prepends(new HtmlString('<em>safe</em>'))]);
+        $this->assertStringContainsString('<em>safe</em>', (string) $bag);
     }
 }
