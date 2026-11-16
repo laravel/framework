@@ -3548,6 +3548,37 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('Anytown', $model->address_line_two);
     }
 
+    public function testGuardedAttributesCannotBeBypassed()
+    {
+        // Test that guarded attributes with set-mutators cannot be bypassed
+        // via alternate spellings (e.g., 'is-admin' vs 'is_admin', 'ro-le' vs 'role')
+        // This addresses the vulnerability where normalized key paths (Str::studly/camel)
+        // could bypass literal guard comparisons.
+        $model = new GuardedAttributeTestModel;
+
+        GuardedAttributeTestModel::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['id', 'is_admin', 'role', 'name']);
+
+        // Test: attempt to bypass guard using hyphenated spelling of 'is_admin' (classic mutator)
+        $model->fill(['is-admin' => true, 'name' => 'Test User']);
+        $this->assertFalse($model->is_admin, 'Guarded attribute (classic mutator) with hyphen spelling should not be fillable');
+        $this->assertSame('Test User', $model->name, 'Non-guarded attributes should still be fillable');
+
+        // Test: attempt to bypass guard using hyphenated spelling of 'role' (Attribute mutator)
+        $model = new GuardedAttributeTestModel;
+        $model->fill(['ro-le' => 'admin', 'name' => 'Test User']);
+        $this->assertNull($model->role, 'Guarded attribute (Attribute mutator) with hyphen spelling should not be fillable');
+        $this->assertSame('Test User', $model->name, 'Non-guarded attributes should work');
+
+        // Test: control - exact guarded keys should also be blocked
+        $model = new GuardedAttributeTestModel;
+        $model->fill(['is_admin' => true, 'role' => 'admin', 'name' => 'Test User']);
+        $this->assertFalse($model->is_admin, 'Exact guarded key (classic mutator) should be protected');
+        $this->assertNull($model->role, 'Exact guarded key (Attribute mutator) should be protected');
+        $this->assertSame('Test User', $model->name, 'Non-guarded attributes should work');
+    }
+
     public function testCollectedByAttribute()
     {
         $model = new EloquentModelWithCollectedByAttribute;
@@ -4502,4 +4533,27 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+class GuardedAttributeTestModel extends Model
+{
+    protected $guarded = ['is_admin', 'role'];
+
+    public $attributes = [
+        'is_admin' => false,
+        'role' => null,
+        'name' => null,
+    ];
+
+    public function setIsAdminAttribute($value)
+    {
+        $this->attributes['is_admin'] = (bool) $value;
+    }
+
+    protected function role(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => ['role' => (string) $value]
+        );
+    }
 }

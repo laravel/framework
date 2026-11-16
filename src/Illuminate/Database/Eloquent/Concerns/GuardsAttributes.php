@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Str;
+
 trait GuardsAttributes
 {
     /**
@@ -203,9 +205,25 @@ trait GuardsAttributes
             return false;
         }
 
-        return $this->getGuarded() == ['*'] ||
-               ! empty(preg_grep('/^'.preg_quote($key, '/').'$/i', $this->getGuarded())) ||
-               ! $this->isGuardableColumn($key);
+        if ($this->getGuarded() == ['*']) {
+            return true;
+        }
+
+        // Normalize the key to match against guarded list by using the same
+        // normalization applied in attribute resolution paths (studly/camel).
+        // This prevents bypass via alternate spellings like 'is-admin' vs 'is_admin'.
+        $normalizedKey = Str::studly($key);
+
+        foreach ($this->getGuarded() as $guardedKey) {
+            // Compare both the raw key (for backward compatibility with exact matches)
+            // and the normalized key (to prevent bypass via delimiter/case variations).
+            if (preg_match('/^'.preg_quote($key, '/').'$/i', $guardedKey) ||
+                preg_match('/^'.preg_quote($normalizedKey, '/').'$/i', Str::studly($guardedKey))) {
+                return true;
+            }
+        }
+
+        return ! $this->isGuardableColumn($key);
     }
 
     /**
