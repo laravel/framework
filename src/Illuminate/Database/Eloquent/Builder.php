@@ -962,7 +962,7 @@ class Builder implements BuilderContract
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
-        $relation = Relation::noConstraints(function () use ($name) {
+        $relation = Relation::noConstraintsForRelation(function () use ($name) {
             try {
                 return $this->getModel()->newInstance()->$name();
             } catch (BadMethodCallException) {
