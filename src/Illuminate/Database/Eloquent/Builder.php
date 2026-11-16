@@ -918,6 +918,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the primary key value from the first result of a query.
+     *
+     * @return mixed
+     */
+    public function keyValue()
+    {
+        return $this->value($this->qualifyColumn($this->model->getKeyName()));
+    }
+
+    /**
+     * Get the primary key value from the first result of the query or throw an exception.
+     *
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     */
+    public function keyValueOrFail()
+    {
+        return $this->valueOrFail($this->qualifyColumn($this->model->getKeyName()));
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns

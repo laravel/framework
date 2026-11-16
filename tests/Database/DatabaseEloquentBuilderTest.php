@@ -363,6 +363,56 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey('bar')->valueOrFail('column');
     }
 
+    public function testKeyValueMethodWithModelFound()
+    {
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
+        $model = $this->getMockModel();
+        $model->expects('qualifyColumn')->with('foo')->returns('foo_table.foo');
+        $builder->setModel($model);
+        $mockModel = new stdClass;
+        $mockModel->foo = 5;
+        $builder->expects('first')->with(['foo_table.foo'])->returns($mockModel);
+
+        $this->assertSame(5, $builder->keyValue());
+    }
+
+    public function testKeyValueMethodWithModelNotFound()
+    {
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
+        $model = $this->getMockModel();
+        $model->expects('qualifyColumn')->with('foo')->returns('foo_table.foo');
+        $builder->setModel($model);
+        $builder->expects('first')->with(['foo_table.foo'])->returns(null);
+
+        $this->assertNull($builder->keyValue());
+    }
+
+    public function testKeyValueOrFailMethodWithModelFound()
+    {
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
+        $model = $this->getMockModel();
+        $model->expects('qualifyColumn')->with('foo')->returns('foo_table.foo');
+        $builder->setModel($model);
+        $mockModel = new stdClass;
+        $mockModel->foo = 5;
+        $builder->expects('first')->with(['foo_table.foo'])->returns($mockModel);
+
+        $this->assertSame(5, $builder->keyValueOrFail());
+    }
+
+    public function testKeyValueOrFailMethodWithModelNotFoundThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
+        $model = $this->getMockModel();
+        $model->expects('qualifyColumn')->with('foo')->returns('foo_table.foo');
+        $builder->setModel($model);
+        $builder->expects('first')->with(['foo_table.foo'])->returns(null);
+
+        $builder->keyValueOrFail();
+    }
+
     public function testChunkWithLastChunkComplete()
     {
         [$connection, $builder] = $this->newPagedBuilder([1, 2, 3, 4]);

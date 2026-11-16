@@ -301,6 +301,68 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertSame('test-name', UserWhereTest::where('name', 'test-name')->soleValue('name'));
     }
 
+    public function testKeyValue()
+    {
+        UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+        ]);
+
+        $second = UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+        ]);
+
+        $this->assertSame($second->id, UserWhereTest::where('name', 'second-name')->keyValue());
+        $this->assertNull(UserWhereTest::where('name', 'missing-name')->keyValue());
+    }
+
+    public function testKeyValueUsesTheQualifiedKeyName()
+    {
+        UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+        ]);
+
+        $second = UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+        ]);
+
+        $this->assertSame($second->id, UserWhereTest::query()
+            ->join('users as other_users', 'other_users.name', '=', 'users.name')
+            ->where('users.name', 'second-name')
+            ->keyValue());
+
+        $this->assertSame($second->id, UserWhereTest::from('users as u')->where('u.name', 'second-name')->keyValue());
+    }
+
+    public function testKeyValueOrFail()
+    {
+        $user = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        $this->assertSame($user->id, UserWhereTest::where('name', 'test-name')->keyValueOrFail());
+    }
+
+    public function testKeyValueOrFailFailsIfNoRecords()
+    {
+        try {
+            UserWhereTest::where('name', 'test-name')->keyValueOrFail();
+        } catch (ModelNotFoundException $exception) {
+            //
+        }
+
+        $this->assertSame(UserWhereTest::class, $exception->getModel());
+    }
+
     public function testChunkMap()
     {
         UserWhereTest::create([
