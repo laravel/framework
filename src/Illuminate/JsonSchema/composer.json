@@ -14,8 +14,11 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "illuminate/contracts": "^10.50.0|^11.47.0|^12.40.2"
+        "php": "^8.2",
+        "illuminate/contracts": "^12.40.2"
+    },
+    "suggest": {
+        "illuminate/validation": "Required to use JsonSchema::rules()"
     },
     "autoload": {
         "psr-4": {
