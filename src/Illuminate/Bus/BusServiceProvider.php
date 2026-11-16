@@ -8,7 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\ServiceProvider;
 
 class BusServiceProvider extends ServiceProvider implements DeferrableProvider
@@ -63,23 +63,9 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton(DynamoBatchRepository::class, function ($app) {
             $config = $app->config->get('queue.batching');
 
-            $dynamoConfig = [
-                'region' => $config['region'],
-                'version' => 'latest',
-                'endpoint' => $config['endpoint'] ?? null,
-            ];
-
-            if (! empty($config['key']) && ! empty($config['secret'])) {
-                $dynamoConfig['credentials'] = Arr::only($config, ['key', 'secret']);
-
-                if (! empty($config['token'])) {
-                    $dynamoConfig['credentials']['token'] = $config['token'];
-                }
-            }
-
             return new DynamoBatchRepository(
                 $app->make(BatchFactory::class),
-                new DynamoDbClient($dynamoConfig),
+                $app->make(ClientFactory::class)->make(DynamoDbClient::class, $config, 'queue.batching'),
                 $app->config->get('app.name'),
                 $app->config->get('queue.batching.table', 'job_batches'),
                 ttl: $app->config->get('queue.batching.ttl', null),

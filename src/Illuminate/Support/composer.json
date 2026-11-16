@@ -35,6 +35,7 @@
         "tightenco/collect": "<5.5.33"
     },
     "suggest": {
+        "aws/aws-sdk-php": "Required to use AWS services (^3.322.9).",
         "illuminate/filesystem": "Required to use the Composer class (^14.0).",
         "laravel/serializable-closure": "Required to use the once function (^2.0.10).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.7).",

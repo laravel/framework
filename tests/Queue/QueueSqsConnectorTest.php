@@ -3,249 +3,135 @@
 namespace Illuminate\Tests\Queue;
 
 use Aws\Credentials\Credentials;
-use Closure;
-use GuzzleHttp\Promise\Create;
+use Aws\Sqs\SqsClient;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Queue\AwsCredentialCache;
+use Illuminate\Container\Container;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\SqsQueue;
+use Illuminate\Support\Aws\ClientFactory;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class QueueSqsConnectorTest extends TestCase
 {
-    public function testCredentialsAreWrappedWithASharedCacheProviderWhenCachingIsEnabled()
+    protected function setUp(): void
     {
-        $config = $this->credentials([
-            'credential_cache' => ['enabled' => true],
-        ]);
+        parent::setUp();
 
-        $this->assertInstanceOf(Closure::class, $config['credentials']);
+        Container::setInstance(new Container);
     }
 
-    public function testCredentialsAreNotWrappedWhenCachingIsNotConfigured()
+    protected function tearDown(): void
     {
-        $config = $this->credentials([]);
+        Container::setInstance(null);
 
-        $this->assertArrayNotHasKey('credentials', $config);
+        parent::tearDown();
     }
 
-    public function testCredentialsAreNotWrappedWhenCachingIsDisabled()
+    public function testConnectionsAreCreatedThroughTheClientFactory()
     {
-        $config = $this->credentials([
+        $queue = $this->connect([
+            'name' => 'reports',
+            'key' => 'foo',
+            'secret' => 'bar',
+            'token' => 'baz',
+            'prefix' => 'https://sqs.us-east-2.amazonaws.com/123456789012',
+            'overflow' => ['enabled' => true],
             'credential_cache' => ['enabled' => false],
-        ]);
+        ], $received, $context);
 
-        $this->assertArrayNotHasKey('credentials', $config);
+        $this->assertInstanceOf(SqsQueue::class, $queue);
+        $this->assertSame('queue.connections.reports', $context);
+        $this->assertSame(['key' => 'foo', 'secret' => 'bar', 'token' => 'baz'], $received['credentials']);
+        $this->assertSame(['timeout' => 60, 'connect_timeout' => 60], $received['http']);
+        $this->assertArrayNotHasKey('version', $received);
+        $this->assertArrayNotHasKey('token', $received);
+        $this->assertArrayNotHasKey('credential_cache', $received);
     }
 
-    public function testExplicitCredentialsAreLeftUntouched()
+    public function testConnectionsWithoutANameUseTheOnDemandContext()
     {
-        $config = $this->credentials([
-            'credentials' => false,
-            'credential_cache' => ['enabled' => true],
-        ]);
+        $this->connect([], $received, $context);
 
-        $this->assertFalse($config['credentials']);
+        $this->assertSame('queue.connections.ondemand', $context);
     }
 
-    public function testStaticKeyAndSecretCredentialsAreLeftUntouched()
+    public function testConnectionHttpOptionsReplaceTheDefaultHttpOptions()
     {
-        $config = $this->credentials([
-            'key' => 'static-key',
-            'secret' => 'static-secret',
-            'credential_cache' => ['enabled' => true],
-        ]);
+        $this->connect(['http' => ['verify' => false]], $received);
 
-        $this->assertSame(['key' => 'static-key', 'secret' => 'static-secret'], $config['credentials']);
+        $this->assertSame(['verify' => false], $received['http']);
     }
 
-    public function testCredentialCacheHitsDoNotInvokeTheUnderlyingProvider()
+    public function testGlobalHttpOptionsOverrideTheDefaultHttpOptions()
     {
-        $repository = new Repository(new ArrayStore);
-        $repository->forever('credentials', new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600));
+        Container::getInstance()->make(ClientFactory::class)->globalOptions(['http' => ['timeout' => 5, 'proxy' => 'http://proxy']]);
 
-        $provider = fn () => (new AwsCredentialCache(fn () => $repository))->resolve(
-            'credentials',
-            fn () => $this->fail('The underlying provider should not be invoked on a cache hit.'),
-        );
+        Container::getInstance()->make(ClientFactory::class)->resolveUsing(SqsClient::class, function ($config) use (&$received) {
+            $received = $config;
 
-        $this->assertSame('cached-key', $provider()->wait()->getAccessKeyId());
+            return new SqsClient($config);
+        });
+
+        (new SqsConnector)->connect($this->config([]));
+
+        $this->assertSame(['timeout' => 5, 'connect_timeout' => 60, 'proxy' => 'http://proxy'], $received['http']);
     }
 
-    public function testCredentialResolutionRefreshesCredentialsBeforeTheyExpire()
-    {
-        $repository = new Repository(new ArrayStore);
-        $repository->forever('credentials', new Credentials('expiring-key', 'expiring-secret', expires: time() + 30));
-        $calls = 0;
-
-        $credentials = (new AwsCredentialCache(fn () => $repository))->resolve(
-            'credentials',
-            function () use (&$calls) {
-                $calls++;
-
-                return Create::promiseFor(new Credentials('fresh-key', 'fresh-secret', expires: time() + 3600));
-            },
-        )->wait();
-
-        $this->assertSame(1, $calls);
-        $this->assertSame('fresh-key', $credentials->getAccessKeyId());
-        $this->assertSame('fresh-key', $repository->get('credentials')->getAccessKeyId());
-    }
-
-    public function testCredentialResolutionReusesCredentialsRefreshedByAnotherProcess()
+    public function testCredentialsAreServedFromTheSharedCache()
     {
         $repository = new Repository(new ArrayStore);
-        $cache = new AwsCredentialCache(fn () => $repository);
-        $calls = 0;
-        $provider = function () use (&$calls) {
-            $calls++;
+        Container::getInstance()->instance('cache', new class($repository)
+        {
+            public function __construct(public $repository)
+            {
+            }
 
-            return Create::promiseFor(new Credentials('shared-key', 'shared-secret', expires: time() + 3600));
-        };
+            public function store($name = null)
+            {
+                return $this->repository;
+            }
+        });
 
-        $first = $cache->resolve('credentials', $provider)->wait();
-        $second = $cache->resolve('credentials', $provider)->wait();
+        $config = ['credentials' => 'ecs', 'credential_cache' => ['enabled' => true]];
 
-        $this->assertSame(1, $calls);
-        $this->assertSame('shared-key', $first->getAccessKeyId());
-        $this->assertSame('shared-key', $second->getAccessKeyId());
-    }
-
-    public function testCredentialResolutionCachesCredentialsWithoutAnExpiration()
-    {
-        $repository = new Repository(new ArrayStore);
-        $cache = new AwsCredentialCache(fn () => $repository);
-        $calls = 0;
-        $provider = function () use (&$calls) {
-            $calls++;
-
-            return Create::promiseFor(new Credentials('constant-key', 'constant-secret'));
-        };
-
-        $cache->resolve('credentials', $provider)->wait();
-        $credentials = $cache->resolve('credentials', $provider)->wait();
-
-        $this->assertSame(1, $calls);
-        $this->assertSame('constant-key', $credentials->getAccessKeyId());
-    }
-
-    public function testCredentialResolutionFallsBackToADirectFetchWhenTheCacheStoreIsUnavailable()
-    {
-        // A broken cache backend (e.g. Redis down) must behave exactly like a
-        // cache miss rather than breaking credential resolution.
-        $provider = fn () => (new AwsCredentialCache(
-            fn () => throw new RuntimeException('Cache store is down.'),
-        ))->resolve(
-            'credentials',
-            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
+        $repository->forever(
+            Container::getInstance()->make(ClientFactory::class)->credentialsCacheKey(
+                SqsClient::class, $this->config($config), 'queue.connections.ondemand'
+            ),
+            new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600),
         );
 
-        $this->assertSame('direct-key', $provider()->wait()->getAccessKeyId());
-    }
+        $credentials = (new SqsConnector)->connect($this->config($config))->getSqs()->getCredentials()->wait();
 
-    public function testCredentialsAreServedFromTheFallbackStoreWhenThePrimaryStoreIsUnavailable()
-    {
-        $fallback = new Repository(new ArrayStore);
-        $fallback->forever('credentials', new Credentials('fallback-key', 'fallback-secret', 'fallback-token', time() + 3600));
-
-        // With the primary store down, the fallback keeps credential fetches
-        // deduplicated rather than degrading straight to one fetch per process.
-        $provider = fn () => (new AwsCredentialCache(
-            fn () => throw new RuntimeException('Cache store is down.'),
-            fn () => $fallback,
-        ))->resolve(
-            'credentials',
-            fn () => $this->fail('The underlying provider should not be invoked on a fallback cache hit.'),
-        );
-
-        $this->assertSame('fallback-key', $provider()->wait()->getAccessKeyId());
-    }
-
-    public function testCredentialsAreWrittenThroughToTheFallbackStore()
-    {
-        $primary = new Repository(new ArrayStore);
-        $fallback = new Repository(new ArrayStore);
-
-        $cache = new AwsCredentialCache(fn () => $primary, fn () => $fallback);
-
-        // The fallback is written through on every set so it is already warm
-        // when the primary store becomes unavailable.
-        $cache->resolve(
-            'credentials',
-            fn () => Create::promiseFor(new Credentials('shared-key', 'shared-secret', expires: time() + 3600)),
-        )->wait();
-
-        $this->assertSame('shared-key', $primary->get('credentials')->getAccessKeyId());
-        $this->assertSame('shared-key', $fallback->get('credentials')->getAccessKeyId());
-    }
-
-    public function testThePrimaryStoreIsPreferredOverTheFallbackStore()
-    {
-        $primary = new Repository(new ArrayStore);
-        $primary->forever('credentials', new Credentials('primary-key', 'primary-secret', expires: time() + 3600));
-
-        $fallback = new Repository(new ArrayStore);
-        $fallback->forever('credentials', new Credentials('fallback-key', 'fallback-secret', expires: time() + 3600));
-
-        $cache = new AwsCredentialCache(fn () => $primary, fn () => $fallback);
-
-        $credentials = $cache->resolve(
-            'credentials',
-            fn () => $this->fail('The underlying provider should not be invoked on a cache hit.'),
-        )->wait();
-
-        $this->assertSame('primary-key', $credentials->getAccessKeyId());
-    }
-
-    public function testCredentialResolutionFallsBackToADirectFetchWhenEveryCacheStoreIsUnavailable()
-    {
-        $provider = fn () => (new AwsCredentialCache(
-            fn () => throw new RuntimeException('Cache store is down.'),
-            fn () => throw new RuntimeException('Fallback store is down too.'),
-        ))->resolve(
-            'credentials',
-            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
-        );
-
-        $this->assertSame('direct-key', $provider()->wait()->getAccessKeyId());
-    }
-
-    public function testCredentialsCacheKeyIsScopedToThePodIdentityAndConnection()
-    {
-        $_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI'] = 'http://169.254.170.23/v1/credentials';
-
-        try {
-            $key = SqsConnector::credentialsCacheKey(['region' => 'us-east-2', 'prefix' => 'prefix']);
-
-            $this->assertNotSame($key, SqsConnector::credentialsCacheKey(['region' => 'us-west-2', 'prefix' => 'prefix']));
-            $this->assertNotSame($key, SqsConnector::credentialsCacheKey(['region' => 'us-east-2', 'prefix' => 'other-prefix']));
-
-            $_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI'] = 'http://169.254.170.23/v1/other-credentials';
-
-            $this->assertNotSame($key, SqsConnector::credentialsCacheKey(['region' => 'us-east-2', 'prefix' => 'prefix']));
-        } finally {
-            unset($_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI']);
-        }
+        $this->assertSame('cached-key', $credentials->getAccessKeyId());
     }
 
     /**
-     * Run the given connection config through the connector's credential resolution.
+     * Connect with the given config, capturing the configuration and context the SQS client is created with.
      */
-    protected function credentials(array $config): array
+    protected function connect(array $config, &$received = null, &$context = null): SqsQueue
     {
-        $connector = new class extends SqsConnector
-        {
-            public function credentials(array $config)
-            {
-                return $this->withCredentials($this->getDefaultConfiguration($config));
-            }
-        };
+        Container::getInstance()->make(ClientFactory::class)->resolveUsing(SqsClient::class, function ($config) use (&$received) {
+            $received = $config;
 
-        return $connector->credentials(array_merge([
-            'driver' => 'sqs',
-            'region' => 'us-east-2',
-            'queue' => 'default',
-        ], $config));
+            return new SqsClient($config);
+        });
+
+        Container::getInstance()->make(ClientFactory::class)->globalOptions(function ($client, $config, $given) use (&$context) {
+            $context = $given;
+
+            return [];
+        });
+
+        return (new SqsConnector)->connect($this->config($config));
+    }
+
+    /**
+     * Get a connection config with the given options.
+     */
+    protected function config(array $config): array
+    {
+        return array_merge(['driver' => 'sqs', 'region' => 'us-east-2', 'queue' => 'default'], $config);
     }
 }

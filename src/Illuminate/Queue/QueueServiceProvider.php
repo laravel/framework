@@ -20,7 +20,7 @@ use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -372,22 +372,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function dynamoFailedJobProvider($config)
     {
-        $dynamoConfig = [
-            'region' => $config['region'],
-            'version' => 'latest',
-            'endpoint' => $config['endpoint'] ?? null,
-        ];
-
-        if (! empty($config['key']) && ! empty($config['secret'])) {
-            $dynamoConfig['credentials'] = Arr::only($config, ['key', 'secret']);
-
-            if (! empty($config['token'])) {
-                $dynamoConfig['credentials']['token'] = $config['token'];
-            }
-        }
-
         return new DynamoDbFailedJobProvider(
-            new DynamoDbClient($dynamoConfig),
+            $this->app->make(ClientFactory::class)->make(DynamoDbClient::class, $config, 'queue.failed'),
             $this->app['config']['app.name'],
             $config['table']
         );

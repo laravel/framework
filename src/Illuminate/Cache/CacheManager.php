@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use Mockery;
@@ -248,23 +249,9 @@ class CacheManager implements FactoryContract
      */
     protected function newDynamodbClient(array $config)
     {
-        $dynamoConfig = [
-            'region' => $config['region'],
-            'version' => 'latest',
-            'endpoint' => $config['endpoint'] ?? null,
-        ];
-
-        if (! empty($config['key']) && ! empty($config['secret'])) {
-            $dynamoConfig['credentials'] = Arr::only(
-                $config, ['key', 'secret']
-            );
-
-            if (! empty($config['token'])) {
-                $dynamoConfig['credentials']['token'] = $config['token'];
-            }
-        }
-
-        return new DynamoDbClient($dynamoConfig);
+        return $this->app->make(ClientFactory::class)->make(
+            DynamoDbClient::class, $config, 'cache.stores.'.($config['store'] ?? 'ondemand')
+        );
     }
 
     /**

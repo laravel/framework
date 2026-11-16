@@ -229,7 +229,7 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         $queue = $this->getConnector($config['driver'])
-            ->connect($config)
+            ->connect(['name' => $name, ...$config])
             ->setConnectionName($name);
 
         if (method_exists($queue, 'setConfig')) {

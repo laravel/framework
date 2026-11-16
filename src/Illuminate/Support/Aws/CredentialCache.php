@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Queue;
+namespace Illuminate\Support\Aws;
 
 use Aws\Credentials\CredentialsInterface;
 use Closure;
@@ -10,7 +10,7 @@ use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Throwable;
 
-class AwsCredentialCache
+class CredentialCache
 {
     /**
      * The number of seconds before expiration that credentials should be refreshed.

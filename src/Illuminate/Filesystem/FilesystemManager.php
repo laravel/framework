@@ -2,11 +2,11 @@
 
 namespace Illuminate\Filesystem;
 
-use Aws\Credentials\CredentialProvider;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -254,26 +254,27 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the Amazon S3 driver.
      *
      * @param  array  $config
+     * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Cloud
      */
-    public function createS3Driver(array $config)
+    public function createS3Driver(array $config, string $name = 'ondemand')
     {
-        $s3Config = $this->formatS3Config($config);
-
-        $root = (string) ($s3Config['root'] ?? '');
+        $root = (string) ($config['root'] ?? '');
 
         $visibility = new AwsS3PortableVisibilityConverter(
             $config['visibility'] ?? Visibility::PUBLIC
         );
 
-        $streamReads = $s3Config['stream_reads'] ?? true;
+        $streamReads = $config['stream_reads'] ?? true;
 
-        $client = new S3Client($s3Config);
+        $client = $this->app->make(ClientFactory::class)->make(
+            S3Client::class, $config, "filesystems.disks.{$name}"
+        );
 
-        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
+        $adapter = new S3Adapter($client, $config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 
         return new AwsS3V3Adapter(
-            $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
+            $this->createFlysystem($adapter, $config), $adapter, Arr::except($config, ['token']), $client
         );
     }
 
@@ -318,47 +319,6 @@ class FilesystemManager implements FactoryContract
             $primary,
             $fallback,
         );
-    }
-
-    /**
-     * Format the given S3 configuration with the default options.
-     *
-     * @param  array  $config
-     * @return array
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function formatS3Config(array $config)
-    {
-        $config += ['version' => 'latest'];
-
-        $credentials = $config['credentials'] ?? null;
-
-        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
-
-        if (is_string($provider)) {
-            $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
-
-            $provider = CredentialProvider::memoize(match ($provider) {
-                'ecs' => CredentialProvider::ecsCredentials($options),
-                'instance' => CredentialProvider::instanceProfile($options),
-                default => throw new InvalidArgumentException(
-                    "Invalid credential provider [{$provider}]."
-                ),
-            });
-        }
-
-        if ($provider) {
-            $config['credentials'] = $provider;
-        } elseif (! empty($config['key']) && ! empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
-
-            if (! empty($config['token'])) {
-                $config['credentials']['token'] = $config['token'];
-            }
-        }
-
-        return Arr::except($config, ['token']);
     }
 
     /**

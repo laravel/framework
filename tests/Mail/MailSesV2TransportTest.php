@@ -11,6 +11,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesV2Transport;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -45,6 +46,31 @@ class MailSesV2TransportTest extends TestCase
         $this->assertSame('us-east-1', $ses->getRegion());
 
         $this->assertSame('ses-v2', (string) $transport);
+    }
+
+    public function testGetTransportWithANamedCredentialProvider(): void
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'services.ses' => [
+                    'credentials' => 'ecs',
+                    'region' => 'us-east-1',
+                ],
+            ]);
+        });
+
+        $container->make(ClientFactory::class)->resolveUsing('mail.mailers.marketing', function ($config) use (&$received) {
+            $received = $config;
+
+            return new SesV2Client($config);
+        });
+
+        $transport = (new MailManager($container))->createSymfonyTransport(['transport' => 'ses-v2', 'name' => 'marketing']);
+
+        $this->assertInstanceOf(SesV2Client::class, $transport->ses());
+        $this->assertIsCallable($received['credentials']);
     }
 
     public function testSend(): void

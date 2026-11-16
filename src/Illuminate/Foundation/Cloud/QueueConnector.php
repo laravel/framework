@@ -37,7 +37,7 @@ class QueueConnector implements ConnectorInterface
      */
     public function connect(array $config): Queue
     {
-        $underlying = $this->connector->connect($config['connection']);
+        $underlying = $this->connector->connect(['name' => $config['name'] ?? 'cloud', ...$config['connection']]);
 
         $queue = new Queue(
             $this->app,

@@ -3,12 +3,14 @@
 namespace Illuminate\Tests\Filesystem;
 
 use Aws\Exception\CredentialsException;
+use Aws\S3\S3Client;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use League\Flysystem\UnableToReadFile;
@@ -169,7 +171,8 @@ class FilesystemManagerTest extends TestCase
             $this->assertSame($credentials, $this->s3Config(['credentials' => $credentials])['credentials']);
         }
 
-        $this->assertArrayNotHasKey('credentials', $this->s3Config([]));
+        // Without credentials, the SDK's default chain is resolved once and shared with other clients...
+        $this->assertIsCallable($this->s3Config([])['credentials']);
         $this->assertSame(['key' => 'key', 'secret' => 'secret', 'token' => 'token'], $this->s3Config([
             'key' => 'key', 'secret' => 'secret', 'token' => 'token',
         ])['credentials']);
@@ -177,13 +180,17 @@ class FilesystemManagerTest extends TestCase
 
     protected function s3Config(array $config): array
     {
-        return (new class(new Application) extends FilesystemManager
-        {
-            public function config(array $config): array
-            {
-                return $this->formatS3Config($config);
-            }
-        })->config($config);
+        $app = new Application;
+
+        $app->make(ClientFactory::class)->resolveUsing(S3Client::class, function ($config) use (&$received) {
+            $received = $config;
+
+            return new S3Client($config);
+        });
+
+        (new FilesystemManager($app))->build(['driver' => 's3', 'region' => 'us-east-1', 'bucket' => 'bucket', ...$config]);
+
+        return $received;
     }
 
     public function testExceptionThrownOnUnsupportedDriver()

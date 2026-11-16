@@ -33,6 +33,7 @@ use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
@@ -341,7 +342,9 @@ class QueueTest extends TestCase
             CloudBootstrapper::bootManagedQueues($this->app);
 
             Cache::store('array')->forever(
-                SqsConnector::credentialsCacheKey(config('queue.connections.cloud.connection')),
+                $this->app->make(ClientFactory::class)->credentialsCacheKey(
+                    SqsClient::class, config('queue.connections.cloud.connection'), 'queue.connections.cloud'
+                ),
                 new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600),
             );
 

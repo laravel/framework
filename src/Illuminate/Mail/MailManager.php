@@ -14,6 +14,7 @@ use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Aws\ClientFactory;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -256,16 +257,12 @@ class MailManager implements FactoryContract
      */
     protected function createSesTransport(array $config)
     {
-        $config = array_merge(
-            $this->app['config']->get('services.ses', []),
-            ['version' => 'latest', 'service' => 'email'],
-            $config
-        );
-
-        $config = Arr::except($config, ['transport']);
+        $config = array_merge($this->app['config']->get('services.ses', []), $config);
 
         return new SesTransport(
-            new SesClient($this->addSesCredentials($config)),
+            $this->app->make(ClientFactory::class)->make(
+                SesClient::class, $config, 'mail.mailers.'.($config['name'] ?? 'ondemand'), ['service' => 'email']
+            ),
             $config['options'] ?? []
         );
     }
@@ -278,37 +275,14 @@ class MailManager implements FactoryContract
      */
     protected function createSesV2Transport(array $config)
     {
-        $config = array_merge(
-            $this->app['config']->get('services.ses', []),
-            ['version' => 'latest'],
-            $config
-        );
-
-        $config = Arr::except($config, ['transport']);
+        $config = array_merge($this->app['config']->get('services.ses', []), $config);
 
         return new SesV2Transport(
-            new SesV2Client($this->addSesCredentials($config)),
+            $this->app->make(ClientFactory::class)->make(
+                SesV2Client::class, $config, 'mail.mailers.'.($config['name'] ?? 'ondemand')
+            ),
             $config['options'] ?? []
         );
-    }
-
-    /**
-     * Add the SES credentials to the configuration array.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function addSesCredentials(array $config)
-    {
-        if (! empty($config['key']) && ! empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
-
-            if (! empty($config['token'])) {
-                $config['credentials']['token'] = $config['token'];
-            }
-        }
-
-        return Arr::except($config, ['token']);
     }
 
     /**
@@ -445,6 +419,8 @@ class MailManager implements FactoryContract
             if (is_null($mailerConfig)) {
                 throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
             }
+
+            $mailerConfig = ['name' => $name, ...$mailerConfig];
 
             // Now, we will check if the "driver" key exists and if it does we will set
             // the transport configuration parameter in order to offer compatibility
