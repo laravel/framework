@@ -974,6 +974,81 @@ class HttpRequestTest extends TestCase
         $this->assertEquals([1 => 'A', 2 => 'B', 3 => 'C'], $request2->all());
     }
 
+    public function testAllInputAllowsEmptyInputValueToBeReplacedByFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $request = Request::create('/', 'POST', ['avatar' => ''], [], ['avatar' => $file]);
+
+        $result = $request->all();
+
+        $this->assertInstanceOf(UploadedFile::class, $result['avatar']);
+        $this->assertSame('avatar.jpg', $result['avatar']->getClientOriginalName());
+    }
+
+    public function testAllInputAllowsNullInputValueToBeReplacedByFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $request = Request::create('/', 'POST', ['avatar' => null], [], ['avatar' => $file]);
+
+        $result = $request->all();
+
+        $this->assertInstanceOf(UploadedFile::class, $result['avatar']);
+    }
+
+    public function testAllInputAllowsEmptyArrayToBeReplacedByFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $request = Request::create('/', 'POST', ['avatar' => []], [], ['avatar' => $file]);
+
+        $result = $request->all();
+
+        $this->assertInstanceOf(UploadedFile::class, $result['avatar']);
+    }
+
+    public function testAllInputPreservesNonEmptyInputValueOverFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $request = Request::create('/', 'POST', ['avatar' => 'kept-value'], [], ['avatar' => $file]);
+
+        $result = $request->all();
+
+        $this->assertSame('kept-value', $result['avatar']);
+        $this->assertInstanceOf(UploadedFile::class, $request->file('avatar'));
+    }
+
+    public function testAllInputAllowsEmptyNestedInputToBeReplacedByFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'photo.jpg');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['avatar' => ''],
+        ], [], [
+            'profile' => ['avatar' => $file],
+        ]);
+
+        $result = $request->all();
+
+        $this->assertInstanceOf(UploadedFile::class, $result['profile']['avatar']);
+        $this->assertSame('photo.jpg', $result['profile']['avatar']->getClientOriginalName());
+    }
+
+    public function testAllInputPreservesNonEmptyNestedInputOverFile()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'photo.jpg');
+        $file2 = new SymfonyUploadedFile(__FILE__, 'bio.txt');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['name' => 'Taylor', 'avatar' => ''],
+        ], [], [
+            'profile' => ['avatar' => $file, 'bio' => $file2],
+        ]);
+
+        $result = $request->all();
+
+        $this->assertSame('Taylor', $result['profile']['name']);
+        $this->assertInstanceOf(UploadedFile::class, $result['profile']['avatar']);
+        // The 'bio' key doesn't have a collision, so it should be from files
+        $this->assertInstanceOf(UploadedFile::class, $result['profile']['bio']);
+    }
+
     public function testInputWithEmptyFilename()
     {
         $invalidFiles = [
