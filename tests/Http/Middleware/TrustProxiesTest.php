@@ -6,7 +6,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
@@ -88,6 +87,7 @@ class TrustProxiesTest extends TestCase
             Container::setInstance($container);
         }
     }
+
     #[TestWith(['example.on-forge.com', true, false, true])]
     #[TestWith(['example.on-vapor.com', false, true, true])]
     #[TestWith(['example.on-forge.com', false, false, false])]
