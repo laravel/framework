@@ -18,6 +18,24 @@ class TrustProxiesTest extends TestCase
      */
     protected $headerAll = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_X_FORWARDED_AWS_ELB;
 
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function setUp(): void
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+
+        parent::setUp();
+    }
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
+
+        parent::tearDown();
+    }
+
     #[TestWith(['example.on-forge.com', false, false, false])]
     #[TestWith(['example.on-vapor.com', false, false, false])]
     #[TestWith(['example.on-forge.com', true, false, true])]
@@ -30,8 +48,6 @@ class TrustProxiesTest extends TestCase
     #[TestWith(['example.on-vapor.com.attacker.com', false, true, false])]
     public function test_platform_proxy_detection_requires_matching_environment_and_host($host, $forge, $vapor, $trusted)
     {
-        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
-
         if ($vapor) {
             $_ENV['VAPOR_SSM_PATH'] = '/vapor/environment';
         }
@@ -65,8 +81,6 @@ class TrustProxiesTest extends TestCase
     #[TestWith(['example.on-vapor.com'])]
     public function test_client_supplied_platform_headers_do_not_enable_proxy_trust($host)
     {
-        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
-
         $container = Container::getInstance();
         Container::setInstance(new Container)->instance('config', new Repository);
 
@@ -94,8 +108,6 @@ class TrustProxiesTest extends TestCase
     #[TestWith(['example.on-vapor.com', false, false, false])]
     public function test_explicit_proxy_configuration_takes_precedence_over_platform_detection($host, $forge, $vapor, $platform)
     {
-        unset($_ENV['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
-
         if ($vapor) {
             $_ENV['VAPOR_SSM_PATH'] = '/vapor/environment';
         }
@@ -126,7 +138,6 @@ class TrustProxiesTest extends TestCase
 
     public function test_laravel_cloud_still_trusts_the_calling_proxy_by_default()
     {
-        unset($_ENV['LARAVEL_CLOUD'], $_ENV['VAPOR_SSM_PATH']);
         $_SERVER['LARAVEL_CLOUD'] = '1';
 
         $container = Container::getInstance();
