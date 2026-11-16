@@ -620,6 +620,21 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Apply query-time casts to the relationship.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function withCasts($casts)
+    {
+        $this->query->withCasts($casts);
+
+        $this->related = $this->query->getModel();
+
+        return $this;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method

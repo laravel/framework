@@ -39,6 +39,18 @@ class DatabaseEloquentWithCastsTest extends TestCase
             $table->time('time')->unique();
             $table->timestamps();
         });
+
+        $this->schema()->create('with_casts_users', function ($table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('with_casts_transactions', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('with_casts_user_id');
+            $table->text('data');
+            $table->timestamps();
+        });
     }
 
     public function testWithFirstOrNew()
@@ -85,6 +97,27 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
         $this->assertIsString($query->clone()->withCasts(['time' => 'string'])->first()->time);
         $this->assertInstanceOf(Carbon::class, $query->first()->time);
+    }
+
+    public function testWithCastsOnRelationIsAppliedWhenCreatingRelatedModels()
+    {
+        $user = WithCastsUser::create();
+
+        $transaction = $user->transactions()
+            ->withCasts(['data' => 'array'])
+            ->create(['data' => ['ip' => '127.0.0.1']]);
+
+        $this->assertSame(['ip' => '127.0.0.1'], $transaction->data);
+        $this->assertSame('{"ip":"127.0.0.1"}', $transaction->fresh()->getRawOriginal('data'));
+    }
+
+    public function testWithCastsOnRelationIsAppliedWhenQueryingRelatedModels()
+    {
+        $user = WithCastsUser::create();
+        $user->transactions()->create(['data' => '{"ip":"127.0.0.1"}']);
+
+        $this->assertSame(['ip' => '127.0.0.1'], $user->transactions()->withCasts(['data' => 'array'])->first()->data);
+        $this->assertIsString($user->transactions()->first()->data);
     }
 
     public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()
@@ -139,4 +172,19 @@ class UniqueTime extends Eloquent
     protected $casts = [
         'time' => 'datetime',
     ];
+}
+
+class WithCastsUser extends Eloquent
+{
+    protected $guarded = [];
+
+    public function transactions()
+    {
+        return $this->hasMany(WithCastsTransaction::class);
+    }
+}
+
+class WithCastsTransaction extends Eloquent
+{
+    protected $guarded = [];
 }
