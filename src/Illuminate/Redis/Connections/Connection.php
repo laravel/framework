@@ -29,6 +29,7 @@ abstract class Connection
         'bitcount',
         'bitpos',
         'dbsize',
+        'del',
         'dump',
         'exists',
         'geodist',
