@@ -133,7 +133,7 @@ class ValidationRules
         $rules = isset($schema['items']) ? $this->rules($schema['items'], "{$attribute}.*", false) : [];
 
         if ($schema['uniqueItems'] ?? false) {
-            $rules["{$attribute}.*"][] = 'distinct';
+            $rules["{$attribute}.*"][] = 'distinct:strict';
         }
 
         return $rules;
