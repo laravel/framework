@@ -204,6 +204,14 @@ class ValidationRules
     {
         $rules = $this->bounds($schema, 'minimum', 'maximum');
 
+        if (isset($schema['exclusiveMinimum']) && is_numeric($schema['exclusiveMinimum'])) {
+            $rules[] = "gt:{$schema['exclusiveMinimum']}";
+        }
+
+        if (isset($schema['exclusiveMaximum']) && is_numeric($schema['exclusiveMaximum'])) {
+            $rules[] = "lt:{$schema['exclusiveMaximum']}";
+        }
+
         if (isset($schema['multipleOf'])) {
             $rules[] = "multiple_of:{$schema['multipleOf']}";
         }

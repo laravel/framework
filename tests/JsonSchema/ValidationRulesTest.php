@@ -274,6 +274,19 @@ class ValidationRulesTest extends TestCase
         $this->assertFalse($this->passes($schema, ['codes' => ['01', '01']]));
     }
 
+    public function test_exclusive_numeric_bounds()
+    {
+        $schema = ['type' => 'object', 'properties' => [
+            'price' => ['type' => 'number', 'exclusiveMinimum' => 0, 'exclusiveMaximum' => 100],
+        ], 'required' => ['price']];
+
+        $this->assertTrue($this->passes($schema, ['price' => 0.01]));
+        $this->assertTrue($this->passes($schema, ['price' => 99]));
+        $this->assertFalse($this->passes($schema, ['price' => 0]));
+        $this->assertFalse($this->passes($schema, ['price' => 100]));
+        $this->assertFalse($this->passes($schema, ['price' => -5]));
+    }
+
     public function test_integer_enum()
     {
         $schema = $this->schema(fn ($s) => ['size' => $s->integer()->enum([1, 2, 3])->required()]);
