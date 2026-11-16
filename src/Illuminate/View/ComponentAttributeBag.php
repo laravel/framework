@@ -270,6 +270,12 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
 
+        foreach ($attributeDefaults as $key => $value) {
+            if ($value instanceof AppendableAttributeValue) {
+                $attributeDefaults[$key] = $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape);
+            }
+        }
+
         return new static(array_merge($attributeDefaults, $attributes));
     }
 

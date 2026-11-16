@@ -470,6 +470,18 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertStringContainsString('x&quot; onmouseover=alert(1) data-x=&quot;', (string) $bag);
     }
 
+    public function testPrependsAreEscapedWhenAttributeIsNotPresent()
+    {
+        $xssPayload = 'x" onmouseover=alert(1) data-x="';
+
+        $bag = new ComponentAttributeBag();
+        $this->assertSame('class="x&quot; onmouseover=alert(1) data-x=&quot;"', (string) $bag->merge(['class' => $bag->prepends($xssPayload)]));
+        $this->assertSame('data-foo="x&quot; onmouseover=alert(1) data-x=&quot;"', (string) $bag->merge(['data-foo' => $bag->prepends($xssPayload)]));
+        $this->assertSame('data-foo="x&quot; onmouseover=alert(1) data-x=&quot;"', (string) $bag->merge(['data-foo' => $bag->prepends(new Stringable($xssPayload))]));
+        $this->assertSame('data-foo="<em>safe</em>"', (string) $bag->merge(['data-foo' => $bag->prepends(new HtmlString('<em>safe</em>'))]));
+        $this->assertSame('data-foo="<em>raw</em>"', (string) $bag->merge(['data-foo' => $bag->prepends('<em>raw</em>')], false));
+    }
+
     public function testHtmlableAttributesInPrependsAreNotEscaped()
     {
         $bag = new ComponentAttributeBag(['class' => 'bar']);
