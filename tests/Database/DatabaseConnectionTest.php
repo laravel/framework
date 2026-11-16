@@ -27,6 +27,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -572,9 +573,67 @@ class DatabaseConnectionTest extends TestCase
             $called = true;
         });
 
-        $this->assertTrue($connection->statement('foo'));
+        $this->assertTrue($connection->statement('select foo'));
 
         $this->assertTrue($called);
+    }
+
+    #[DataProvider('writesProvider')]
+    public function testOnLostConnectionWriteIsNotRunAgainOutsideTransaction($query)
+    {
+        $statement = Double::for(PDOStatement::class);
+        $executions = 0;
+        $statement->allows('execute')->resolves(function () use (&$executions) {
+            $executions++;
+
+            throw new PDOException('server has gone away');
+        });
+
+        $pdo = Double::for(PDO::class);
+        $pdo->allows('prepare')->returns($statement);
+
+        $newStatement = Double::for(PDOStatement::class);
+        $newStatement->expects('execute')->returns(true);
+
+        $newPdo = Double::for(PDO::class);
+        $newPdo->expects('prepare')->returns($newStatement);
+
+        $connection = new Connection($pdo);
+
+        $reconnected = false;
+
+        $connection->setReconnector(function ($connection) use (&$reconnected, $newPdo) {
+            $reconnected = true;
+
+            $connection->setPdo($newPdo);
+        });
+
+        try {
+            $connection->statement($query);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertSame('server has gone away', $e->getPrevious()->getMessage());
+        }
+
+        $this->assertSame(1, $executions);
+        $this->assertFalse($reconnected);
+
+        // The lost connection is not used again: the next statement connects first.
+        $this->assertTrue($connection->statement($query));
+        $this->assertTrue($reconnected);
+        $this->assertSame(1, $executions);
+    }
+
+    public static function writesProvider(): array
+    {
+        return [
+            ['insert into users (email) values (1)'],
+            ['update users set email = 1'],
+            ['delete from users'],
+            ['with deleted as (delete from users returning *) select * from deleted'],
+            ['explain analyze delete from users'],
+        ];
     }
 
     public function testQueriesRunWhileReconnectingDoNotReconnectAgain()
@@ -596,11 +655,11 @@ class DatabaseConnectionTest extends TestCase
                 $this->fail('The connection reconnected while it was already reconnecting.');
             }
 
-            $connection->statement('bar');
+            $connection->statement('select bar');
         });
 
         try {
-            $connection->statement('foo');
+            $connection->statement('select foo');
 
             $this->fail('A QueryException was not thrown.');
         } catch (QueryException $e) {
@@ -616,7 +675,7 @@ class DatabaseConnectionTest extends TestCase
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
-        $method->invokeArgs($mock, ['', [], function () {
+        $method->invokeArgs($mock, ['select 1', [], function () {
             throw new QueryException('', '', [], new Exception);
         }]);
     }
@@ -1162,7 +1221,7 @@ class DatabaseConnectionTest extends TestCase
             $connection->setPdo(fn () => $pdo);
         });
 
-        $this->assertTrue($this->convertingWarningsToExceptions(fn () => $connection->statement('foo')));
+        $this->assertTrue($this->convertingWarningsToExceptions(fn () => $connection->statement('select foo')));
         $this->assertNull($connection->getRawReadPdo());
     }
 

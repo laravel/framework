@@ -1033,6 +1033,17 @@ class Connection implements ConnectionInterface
             throw $e;
         }
 
+        // A statement that can change data may have run before the connection was lost, so it is
+        // not run again: only a read is safe to repeat. The lost connection is dropped so that the
+        // next statement connects again.
+        if (! preg_match('/^\s*(select|show)\b/i', $query)) {
+            if ($this->causedByLostConnection($e->getPrevious())) {
+                $this->pdo = null;
+            }
+
+            throw $e;
+        }
+
         return $this->tryAgainIfCausedByLostConnection(
             $e, $query, $bindings, $callback
         );
