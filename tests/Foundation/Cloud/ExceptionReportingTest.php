@@ -66,6 +66,8 @@ class ExceptionReportingTest extends TestCase
 
     protected $iniSettingsToRestore = [];
 
+    protected $errorLog = null;
+
     protected $reportedScheduledTaskStreams = null;
 
     protected $reportedScheduledTasks = 0;
@@ -91,6 +93,10 @@ class ExceptionReportingTest extends TestCase
     {
         foreach ($this->iniSettingsToRestore as $key => $value) {
             ini_set($key, $value);
+        }
+
+        if ($this->errorLog !== null) {
+            @unlink($this->errorLog);
         }
 
         foreach ($this->serverSettingsToRestore as $key => $value) {
@@ -3984,6 +3990,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $this->fakeEventsStreams();
         Events::$socketFactory = fn () => false;
+        $this->captureErrorLog();
 
         $reporter = new ExceptionReporter(
             $this->app[Events::class],
@@ -4007,6 +4014,7 @@ class ExceptionReportingTest extends TestCase
         Events::$socketFactory = function () {
             return false;
         };
+        $this->captureErrorLog();
         $reportableCalled = false;
         Exceptions::reportable(function (Throwable $e) use (&$reportableCalled) {
             $reportableCalled = true;
@@ -4016,6 +4024,23 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(0, $streams);
         $this->assertTrue($reportableCalled);
+    }
+
+    public function testItLogsEventsThatCannotBeEmitted(): void
+    {
+        $log = $this->captureErrorLog();
+        Events::$socketFactory = fn (...$arguments) => fopen('php://memory', 'r+');
+
+        $this->assertFalse((new Events('unix:///cloud.sock'))->emitMany([['a' => 1], ['b' => 2]]));
+
+        $lines = file($log, FILE_IGNORE_NEW_LINES);
+        $this->assertCount(1, $lines);
+        $this->assertStringContainsString('Laravel Cloud: EVENTS_DROPPED {', $lines[0]);
+        $this->assertSame([
+            'events' => 2,
+            'exception' => RuntimeException::class,
+            'message' => "Failed configuring socket timeout\n---\nclosed: true",
+        ], json_decode(explode('Laravel Cloud: EVENTS_DROPPED ', $lines[0], 2)[1], associative: true));
     }
 
     public function testItDoesNotCaptureSyncJobContext(): void
@@ -4247,6 +4272,18 @@ class ExceptionReportingTest extends TestCase
         Cloud::configureExceptions($this->app);
         Cloud::registerEvents($this->app);
         Cloud::registerExceptionReporting($this->app);
+    }
+
+    /**
+     * Write the "error_log" output to a temporary file and return its path.
+     */
+    protected function captureErrorLog(): string
+    {
+        $this->iniSettingsToRestore['error_log'] ??= ini_get('error_log');
+
+        ini_set('error_log', $this->errorLog = tempnam(sys_get_temp_dir(), 'cloud-error-log'));
+
+        return $this->errorLog;
     }
 
     /**
