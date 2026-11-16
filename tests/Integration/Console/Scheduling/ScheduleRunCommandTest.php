@@ -11,6 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
 
+use function Orchestra\Testbench\artisan;
+
 class ScheduleRunCommandTest extends TestCase
 {
     protected function setUp(): void
@@ -48,7 +50,7 @@ class ScheduleRunCommandTest extends TestCase
         });
 
         // Execute the scheduler
-        $this->artisan('schedule:run');
+        artisan($this, 'schedule:run');
 
         // Verify the event sequence
         Event::assertDispatched(ScheduledTaskStarting::class);
