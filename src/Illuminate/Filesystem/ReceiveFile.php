@@ -5,6 +5,7 @@ namespace Illuminate\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use League\Flysystem\PathTraversalDetected;
 
 class ReceiveFile
@@ -41,9 +42,13 @@ class ReceiveFile
 
     /**
      * Determine if the request has a valid signature if applicable.
+     *
+     * The request body is the file contents, so it is not compared against the signed parameters.
      */
     protected function hasValidSignature(Request $request): bool
     {
-        return filter_var($request->query('upload', false), FILTER_VALIDATE_BOOLEAN) && $request->hasValidRelativeSignature();
+        return filter_var($request->query('upload', false), FILTER_VALIDATE_BOOLEAN)
+            && URL::hasCorrectSignature($request, absolute: false)
+            && URL::signatureHasNotExpired($request);
     }
 }
