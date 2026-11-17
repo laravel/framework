@@ -8,6 +8,9 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\JsonFormatter;
 use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\CloudBootstrapper;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use PDO;
@@ -552,6 +555,54 @@ class CloudBootstrapperTest extends TestCase
         CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+        $this->assertSame([
+            'includeStacktraces' => true,
+        ], $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter_with'));
+    }
+
+    public function test_it_keeps_the_json_formatter_unless_the_log_format_is_line()
+    {
+        $_ENV['LARAVEL_CLOUD_LOG_FORMAT'] = 'json';
+        $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] = 'json';
+
+        try {
+            CloudBootstrapper::configureCloudLogging($this->app);
+
+            $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+        } finally {
+            unset($_ENV['LARAVEL_CLOUD_LOG_FORMAT'], $_SERVER['LARAVEL_CLOUD_LOG_FORMAT']);
+        }
+    }
+
+    public function test_it_formats_build_logs_as_plain_text_and_keeps_escape_sequences()
+    {
+        $_ENV['LARAVEL_CLOUD_LOG_FORMAT'] = 'line';
+        $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] = 'line';
+
+        try {
+            CloudBootstrapper::configureCloudLogging($this->app);
+
+            $this->assertSame(LineFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+            $this->assertSame(LineFormatter::class, $this->app['config']->get('logging.channels.cloud.formatter'));
+
+            $formatter = $this->app->make(
+                $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'),
+                $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter_with'),
+            );
+
+            $formatted = $formatter->format(new LogRecord(
+                datetime: new \DateTimeImmutable('2026-11-16 18:04:39'),
+                channel: 'production',
+                level: Level::Error,
+                message: "\033[31mred\033[0m",
+            ));
+
+            $this->assertStringContainsString("\033[31mred\033[0m", $formatted);
+            $this->assertStringNotContainsString('\\u001b', $formatted);
+            $this->assertSame(1, substr_count($formatted, "\n"));
+        } finally {
+            unset($_ENV['LARAVEL_CLOUD_LOG_FORMAT'], $_SERVER['LARAVEL_CLOUD_LOG_FORMAT']);
+        }
     }
 
     public function test_it_configures_the_cloud_logging_handler()
