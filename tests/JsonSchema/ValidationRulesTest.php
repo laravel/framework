@@ -97,11 +97,9 @@ class ValidationRulesTest extends TestCase
 
     public function test_an_any_of_value_passes_when_any_branch_matches()
     {
-        $schema = [
-            'type' => 'object',
-            'properties' => ['plan' => ['anyOf' => [['type' => 'string', 'enum' => ['Basic', 'Pro']], ['type' => 'integer']]]],
-            'required' => ['plan'],
-        ];
+        $schema = $this->schema(fn ($s) => [
+            'plan' => $s->anyOf([$s->string()->enum(['Basic', 'Pro']), $s->integer()])->required(),
+        ]);
 
         $this->assertTrue($this->passes($schema, ['plan' => 'Pro']));
         $this->assertTrue($this->passes($schema, ['plan' => 3]));
@@ -111,7 +109,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_a_multi_type_union_passes_any_of_its_types()
     {
-        $schema = ['type' => 'object', 'properties' => ['id' => ['type' => ['string', 'integer']]], 'required' => ['id']];
+        $schema = $this->schema(fn ($s) => ['id' => $s->union(['string', 'integer'])->required()]);
 
         $this->assertTrue($this->passes($schema, ['id' => 'abc']));
         $this->assertTrue($this->passes($schema, ['id' => 7]));
@@ -120,7 +118,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_property_names_with_a_dot_are_not_treated_as_nested_paths()
     {
-        $schema = ['type' => 'object', 'properties' => ['v1.0' => ['type' => 'integer']], 'required' => ['v1.0']];
+        $schema = $this->schema(fn ($s) => ['v1.0' => $s->integer()->required()]);
 
         $this->assertTrue($this->passes($schema, ['v1.0' => 1]));
         $this->assertFalse($this->passes($schema, ['v1.0' => 'x']));
@@ -136,7 +134,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_an_enum_of_objects_compares_values_structurally()
     {
-        $schema = ['type' => 'object', 'properties' => ['point' => ['type' => 'object', 'enum' => [['x' => 1, 'y' => 2]]]], 'required' => ['point']];
+        $schema = $this->schema(fn ($s) => ['point' => $s->object()->enum([['x' => 1, 'y' => 2]])->required()]);
 
         $this->assertTrue($this->passes($schema, ['point' => ['y' => 2, 'x' => 1]]));
         $this->assertFalse($this->passes($schema, ['point' => ['x' => 1, 'y' => 3]]));
@@ -144,7 +142,9 @@ class ValidationRulesTest extends TestCase
 
     public function test_an_any_of_value_must_also_pass_a_sibling_enum()
     {
-        $schema = $this->schema(fn ($s) => ['v' => $s->anyOf([$s->string(), $s->integer()])->enum(['allowed', 7])->required()]);
+        $schema = $this->schema(fn ($s) => [
+            'v' => $s->anyOf([$s->string(), $s->integer()])->enum(['allowed', 7])->required(),
+        ]);
 
         $this->assertTrue($this->passes($schema, ['v' => 'allowed']));
         $this->assertTrue($this->passes($schema, ['v' => 7]));
@@ -153,7 +153,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_an_any_of_failure_uses_the_any_of_translation()
     {
-        $schema = ['type' => 'object', 'properties' => ['v' => ['anyOf' => [['type' => 'string'], ['type' => 'integer']]]], 'required' => ['v']];
+        $schema = $this->schema(fn ($s) => ['v' => $s->anyOf([$s->string(), $s->integer()])->required()]);
 
         $validator = Validator::make(['v' => ['a']], JsonSchema::rules($schema));
 
@@ -162,7 +162,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_numeric_property_names_keep_their_own_rules()
     {
-        $schema = ['type' => 'object', 'properties' => ['1' => ['type' => 'string'], '2' => ['type' => 'integer']], 'required' => ['2']];
+        $schema = $this->schema(fn ($s) => ['1' => $s->string(), '2' => $s->integer()->required()]);
 
         $this->assertFalse($this->passes($schema, [2 => 'x']));
         $this->assertTrue($this->passes($schema, [2 => 7]));
@@ -276,9 +276,9 @@ class ValidationRulesTest extends TestCase
 
     public function test_exclusive_numeric_bounds()
     {
-        $schema = ['type' => 'object', 'properties' => [
-            'price' => ['type' => 'number', 'exclusiveMinimum' => 0, 'exclusiveMaximum' => 100],
-        ], 'required' => ['price']];
+        $schema = $this->schema(fn ($s) => ['price' => $s->number()->required()]);
+        $schema['properties']['price']['exclusiveMinimum'] = 0;
+        $schema['properties']['price']['exclusiveMaximum'] = 100;
 
         $this->assertTrue($this->passes($schema, ['price' => 0.01]));
         $this->assertTrue($this->passes($schema, ['price' => 99]));
@@ -339,10 +339,10 @@ class ValidationRulesTest extends TestCase
 
     public function test_annotations_add_no_rules()
     {
-        $schema = [
-            'type' => 'object',
-            'properties' => ['name' => ['type' => 'string', 'title' => 'Name', 'description' => 'The name.', 'default' => 'Taylor', 'examples' => ['Taylor']]],
-        ];
+        $schema = $this->schema(fn ($s) => [
+            'name' => $s->string()->title('Name')->description('The name.')->default('Taylor'),
+        ]);
+        $schema['properties']['name']['examples'] = ['Taylor'];
 
         $this->assertTrue($this->passes($schema, []));
         $this->assertTrue($this->passes($schema, ['name' => 'Abigail']));
@@ -375,7 +375,9 @@ class ValidationRulesTest extends TestCase
 
     public function test_nullable_any_of_accepts_null()
     {
-        $schema = $this->schema(fn ($s) => ['plan' => $s->anyOf([$s->string(), $s->integer()])->nullable()->required()]);
+        $schema = $this->schema(fn ($s) => [
+            'plan' => $s->anyOf([$s->string(), $s->integer()])->nullable()->required(),
+        ]);
 
         $this->assertTrue($this->passes($schema, ['plan' => null]));
         $this->assertTrue($this->passes($schema, ['plan' => 'Pro']));
@@ -385,10 +387,12 @@ class ValidationRulesTest extends TestCase
 
     public function test_any_of_branch_checks_nested_objects()
     {
-        $schema = $this->schema(fn ($s) => ['target' => $s->anyOf([
-            $s->object(['url' => $s->string()->format('url')->required()]),
-            $s->object(['email' => $s->string()->format('email')->required()]),
-        ])->required()]);
+        $schema = $this->schema(fn ($s) => [
+            'target' => $s->anyOf([
+                $s->object(['url' => $s->string()->format('url')->required()]),
+                $s->object(['email' => $s->string()->format('email')->required()]),
+            ])->required(),
+        ]);
 
         $this->assertTrue($this->passes($schema, ['target' => ['email' => 'taylor@laravel.com']]));
         $this->assertFalse($this->passes($schema, ['target' => ['email' => 'nope']]));
@@ -405,7 +409,7 @@ class ValidationRulesTest extends TestCase
 
     public function test_union_applies_type_keywords_to_each_branch()
     {
-        $schema = ['type' => 'object', 'properties' => ['id' => ['type' => ['string', 'integer'], 'enum' => ['a', 1]]], 'required' => ['id']];
+        $schema = $this->schema(fn ($s) => ['id' => $s->union(['string', 'integer'])->enum(['a', 1])->required()]);
 
         $this->assertTrue($this->passes($schema, ['id' => 'a']));
         $this->assertTrue($this->passes($schema, ['id' => 1]));
@@ -433,14 +437,14 @@ class ValidationRulesTest extends TestCase
 
     public function test_a_schema_within_the_node_limit_builds_rules()
     {
-        $schema = ['type' => 'object', 'properties' => array_fill(0, JsonSchema::MAX_NODES, ['type' => 'string'])];
+        $schema = $this->schema(fn ($s) => array_fill(0, JsonSchema::MAX_NODES, $s->string()));
 
         $this->assertCount(JsonSchema::MAX_NODES, JsonSchema::rules($schema));
     }
 
     public function test_a_schema_beyond_the_node_limit_is_refused()
     {
-        $schema = ['type' => 'object', 'properties' => array_fill(0, JsonSchema::MAX_NODES + 1, ['type' => 'string'])];
+        $schema = $this->schema(fn ($s) => array_fill(0, JsonSchema::MAX_NODES + 1, $s->string()));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('it expands beyond ['.JsonSchema::MAX_NODES.'] fragments');

@@ -726,4 +726,39 @@ class DeserializerTest extends TestCase
 
         JsonSchema::fromArray(['$ref' => '#']);
     }
+
+    public function test_it_throws_for_unbounded_ref_chain(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The JSON Schema nests "$ref" beyond [64] levels.');
+
+        // Create a chain of local $refs deeper than MAX_REF_DEPTH (64)
+        $defs = [];
+        for ($i = 0; $i < 100; $i++) {
+            $defs["d$i"] = ['$ref' => '#/$defs/d'.($i + 1)];
+        }
+        $defs['d100'] = ['type' => 'object'];
+
+        JsonSchema::fromArray([
+            '$defs' => $defs,
+            '$ref' => '#/$defs/d0',
+        ]);
+    }
+
+    public function test_it_allows_deep_but_bounded_ref_chains(): void
+    {
+        // Create a chain of local $refs within MAX_REF_DEPTH (64)
+        $defs = [];
+        for ($i = 0; $i < 60; $i++) {
+            $defs["d$i"] = ['$ref' => '#/$defs/d'.($i + 1)];
+        }
+        $defs['d60'] = ['type' => 'object'];
+
+        $type = JsonSchema::fromArray([
+            '$defs' => $defs,
+            '$ref' => '#/$defs/d0',
+        ]);
+
+        $this->assertInstanceOf(ObjectType::class, $type);
+    }
 }

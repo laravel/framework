@@ -189,23 +189,6 @@ trait InteractsWithTestCaseLifecycle
         }
     }
 
-    protected function disconnectDatabaseConnections(): void
-    {
-        if (! $this->app->resolved('db')) {
-            return;
-        }
-
-        $database = $this->app->make('db');
-
-        if (! $database instanceof DatabaseManager) {
-            return;
-        }
-
-        foreach ($database->getConnections() as $connection) {
-            $connection->disconnect();
-        }
-    }
-
     /**
      * Reset static state between test executions.
      */
@@ -242,6 +225,26 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestForgery::flushState();
         Validator::flushState();
         WorkCommand::flushState();
+    }
+
+    /**
+     * Disconnect every resolved database connection of the application.
+     */
+    protected function disconnectDatabaseConnections(): void
+    {
+        if (! $this->app->resolved('db')) {
+            return;
+        }
+
+        $database = $this->app->make('db');
+
+        if (! $database instanceof DatabaseManager) {
+            return;
+        }
+
+        foreach ($database->getConnections() as $connection) {
+            $connection->disconnect();
+        }
     }
 
     /**
