@@ -610,16 +610,6 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Clone the relationship.
-     *
-     * @return static
-     */
-    public function clone()
-    {
-        return clone $this;
-    }
-
-    /**
      * Apply query-time casts to the relationship.
      *
      * @param  array  $casts
@@ -632,6 +622,16 @@ abstract class Relation implements BuilderContract
         $this->related = $this->query->getModel();
 
         return $this;
+    }
+
+    /**
+     * Clone the relationship.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
     }
 
     /**
