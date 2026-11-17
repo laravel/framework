@@ -255,6 +255,19 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals(['baz'], $response);
     }
 
+    public function testClassListenersAreResolvedWithTheContainerGivenToTheDispatcher()
+    {
+        $original = new Container;
+        $replacement = new Container;
+        $replacement->instance(TestListenerDependency::class, $dependency = new TestListenerDependency);
+
+        $d = new Dispatcher($original);
+        $d->listen('foo', TestListenerWithDependency::class);
+
+        $this->assertSame($d, $d->setContainer($replacement));
+        $this->assertSame([$dependency], $d->dispatch('foo'));
+    }
+
     public function testQueuedEventsAreFired()
     {
         unset($_SERVER['__event.test']);
@@ -872,6 +885,22 @@ class TestListener3
     public function handle()
     {
         $_SERVER['__event.test'][] = 'handle-3';
+    }
+}
+
+class TestListenerDependency
+{
+}
+
+class TestListenerWithDependency
+{
+    public function __construct(public TestListenerDependency $dependency)
+    {
+    }
+
+    public function handle()
+    {
+        return $this->dependency;
     }
 }
 

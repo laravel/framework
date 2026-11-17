@@ -884,6 +884,19 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Set the container instance used to resolve class based listeners.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(ContainerContract $container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback while deferring events, then dispatch all deferred events.
      *
      * @template TResult
