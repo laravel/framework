@@ -446,7 +446,6 @@ class FoundationFormRequestModelTest extends TestCase
 
         $this->assertSame([$post->id], $models->modelKeys());
     }
-
 }
 
 class SlugKeyedBlogPost extends BlogPost
