@@ -29,6 +29,7 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Laravel\Octane\Events\RequestReceived;
+use Monolog\Formatter\LineFormatter;
 use PDO;
 use Throwable;
 
@@ -303,12 +304,18 @@ class CloudBootstrapper
             'includeStacktraces' => true,
         ]);
 
+        // Build logs are plain text. JSON encoding would escape ANSI sequences.
+        $plain = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
+
         $channel = [
             'driver' => 'monolog',
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
+            'formatter' => $plain ? LineFormatter::class : JsonFormatter::class,
+            'formatter_with' => $plain ? [
+                'allowInlineLineBreaks' => false,
+                'ignoreEmptyContextAndExtra' => true,
+            ] : [
                 'includeStacktraces' => true,
             ],
             'with' => [
