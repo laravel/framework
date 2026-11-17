@@ -1,6 +1,35 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.72.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.73.0...12.x)
+
+## [v12.73.0](https://github.com/laravel/framework/compare/v12.72.0...v12.73.0) - 2026-11-17
+
+* [12.x] Fix not_regex passing when the pattern match fails by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62428
+* [12.x] Compare fluent database rule `where()` values literally by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62426
+* [12.x] Use possessive quantifiers in decimal validation rule by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62421
+* [12.x] Fix XSS in debug page's "copy request URL" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62418
+* [12.x] Fix EncodedParameter being encoded again in numeric query parameters by [@ghabriel25](https://github.com/ghabriel25) in https://github.com/laravel/framework/pull/62417
+* [12.x] Prevent array `expires` parameters from bypassing signed URL expiration by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62411
+* [12.x] Fix `Arr::forget()` removing the wrong element by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62410
+* [12.x] Fix wildcard validation rules skipping empty array keys by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62409
+* [12.x] Compare integers and booleans as strings in the database presence verifier by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62448
+* [12.x] Keep every where on the same column in exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62463
+* [12.x] Render bound attributes of dynamic class components like the component tag by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62456
+* [12.x] Ignore extension-owned tables when dropping all tables on PostgreSQL by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62477
+* [12.x] Keep every condition on the same column in string exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62476
+* [12.x] Validate dynamic component, slot, and attribute names by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62454
+* [12.x] Fix deprecation when calling from() with a subquery and no alias by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62482
+* [12.x] Add JsonSchema::rules() to derive validation rules from a schema by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62501
+* [12.x] Fix Eloquent mass-assignment guard bypass via mutator attribute-name normalization mismatch by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62499
+* [12.x] Prevent DoS in `Illuminate\JsonSchema\Deserializer` by bounding `$ref` chain depth by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62498
+* [12.x] Splitter workflow by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/62507
+* [12.x] Disconnect database connections when the test environment is torn down by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62494
+* [12.x] Log dropped Cloud events to stderr by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/62493
+* [12.x] Check Forge and Vapor environment variables instead of just `Host` values by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62484
+* [12.x] Preserve relation constraints when resolving attributes during noConstraints by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62483
+* [12.x] Fix XSS in component attributes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62503
+* [12.x] Updated split/release workflows by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/62513
+* [12.x] Fix file validation bypass with empty input field collisions by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62504
 
 ## [v12.72.0](https://github.com/laravel/framework/compare/v12.70.2...v12.72.0) - 2026-11-10
 
