@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\TestCase;
 
+use function Laravel\Prompts\autocomplete;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multisearch;
 use function Laravel\Prompts\multiselect;
@@ -129,6 +130,28 @@ class PromptsAssertionTest extends TestCase
 
         $this
             ->artisan('test:suggest')
+            ->expectsChoice('What is your name?', 'Joe', ['John', 'Jane'])
+            ->expectsOutput('Joe');
+    }
+
+    public function testAssertionForAutocompletePrompt(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:autocomplete';
+
+                public function handle()
+                {
+                    $name = autocomplete('What is your name?', ['John', 'Jane']);
+
+                    $this->line($name);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:autocomplete')
             ->expectsChoice('What is your name?', 'Joe', ['John', 'Jane'])
             ->expectsOutput('Joe');
     }
