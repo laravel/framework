@@ -1,6 +1,85 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.42.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.43.0...13.x)
+
+## [v13.43.0](https://github.com/laravel/framework/compare/v13.42.0...v13.43.0) - 2026-11-17
+
+* [12.x] Prevent escaping from bypassing protection by [@valorin](https://github.com/valorin) in https://github.com/laravel/framework/pull/62027
+* [12.x] Cloud exceptions by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61934
+* [12.x] Cloud exceptions improvements by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/62186
+* [12.x] Fallback retrieving `expires` query string from `QUERY_STRING` header by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62349
+* [12.x] Return each event's own expression and timezone from `schedule:list --json` by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/62358
+* [12.x] Enforce valid email address comply with RFC 5321 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62347
+* [12.x] Fix temporary signed URL expiration bypass via numeric query-fragment parameter smuggling by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62401
+* [12.x] Fix nested sometimes validation rules are skipped when the value is `__missing__` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62402
+* [12.x] Allows to retrieves `expires` from `$_SERVER['VAPOR_RAW_QUERY_STRING']` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62391
+* [12.x] Fix not_regex passing when the pattern match fails by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62428
+* [13.x] Fix not_regex passing when the pattern match fails by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62427
+* [12.x] Compare fluent database rule `where()` values literally by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62426
+* [13.x] Compare fluent database rule `where()` values literally by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62425
+* [12.x] Use possessive quantifiers in decimal validation rule by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62421
+* [13.x] Use possessive quantifiers in decimal validation rule by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62420
+* [12.x] Fix XSS in debug page's "copy request URL" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62418
+* [12.x] Fix EncodedParameter being encoded again in numeric query parameters by [@ghabriel25](https://github.com/ghabriel25) in https://github.com/laravel/framework/pull/62417
+* [13.x] Add isBlank() and isNotBlank() to Stringable by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/62415
+* [13.x] Fix ambiguous updated_at column when calling touch() on a query with joins by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/62412
+* [12.x] Prevent array `expires` parameters from bypassing signed URL expiration by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62411
+* [13.x] Tweak release.sh by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62407
+* [12.x] Fix `Arr::forget()` removing the wrong element by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62410
+* [13.x] Allow Windows separators for paths inside the running phar by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62413
+* [13.x] Ensure WorkComand shows manually failed jobs as failed by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62377
+* [12.x] Fix wildcard validation rules skipping empty array keys by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/62409
+* Merge tag 'v12.72.0' into 13.x by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62437
+* [12.x] Compare integers and booleans as strings in the database presence verifier by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62448
+* [13.x] Compare integers and booleans as strings in the database presence verifier by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62447
+* [13.x] Speed up slow tests by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/62443
+* [13.x] Keep every where on the same column in exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62442
+* [13.x] Add `releaseUsingBackoff()` to `InteractsWithQueue` by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/62435
+* [13.x] Add `#[RetryFor]` queue attribute by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/62434
+* [13.x] Fix union cursor pagination when ordering by an aliased expression by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/62433
+* [13.x] Cache more Model reflection bits by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62432
+* [13.x] Fix DatabaseTransactionsManager::commit() return type by [@dhrupo](https://github.com/dhrupo) in https://github.com/laravel/framework/pull/62431
+* [13.x] Fix PHP 8.5 deprecation when calling from() with a subquery and no alias by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/62430
+* [13.x] Add RawTemplate for inline Blade components by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/62419
+* [13.x] Add withoutAffectingStickiness to Connection by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62465
+* [13.x] Speed up wildcard attribute lookups during validation by [@Afcyy](https://github.com/Afcyy) in https://github.com/laravel/framework/pull/62464
+* [12.x] Keep every where on the same column in exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62463
+* [13.x] Ignore extension-owned tables when dropping all tables on PostgreSQL by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62460
+* [13.x] Keep every condition on the same column in string exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62459
+* [12.x] Render bound attributes of dynamic class components like the component tag by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62456
+* [13.x] Render bound attributes of dynamic class components like the component tag by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62455
+* [13.x] Mark laravel/horizon <5.47.0 as conflicting by [@agustingomes](https://github.com/agustingomes) in https://github.com/laravel/framework/pull/62449
+* [13.x] Pipeline tagged Redis cache reads by [@0x15f](https://github.com/0x15f) in https://github.com/laravel/framework/pull/62451
+* [12.x] Ignore extension-owned tables when dropping all tables on PostgreSQL by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62477
+* [12.x] Keep every condition on the same column in string exists and unique rules by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62476
+* Disconnect every database connection when the test environment is torn down by [@GromNaN](https://github.com/GromNaN) in https://github.com/laravel/framework/pull/62471
+* [13.x] Validate dynamic component, slot, and attribute names by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62453
+* [12.x] Validate dynamic component, slot, and attribute names by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62454
+* [13.x] Retry idempotent Predis commands after losing the connection by [@besanek](https://github.com/besanek) in https://github.com/laravel/framework/pull/62406
+* [13.x] Add JsonSchema::rules() to derive validation rules from a schema by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62355
+* Run component splits and release tagging in GitHub Actions by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/62468
+* [12.x] Fix deprecation when calling from() with a subquery and no alias by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62482
+* Bump softprops/action-gh-release from 3.0.3 to 3.0.4 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/62497
+* [13.x] Add del to RETRYABLE_COMMANDS by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/62502
+* [12.x] Add JsonSchema::rules() to derive validation rules from a schema by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62501
+* [12.x] Fix Eloquent mass-assignment guard bypass via mutator attribute-name normalization mismatch by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62499
+* [12.x] Prevent DoS in `Illuminate\JsonSchema\Deserializer` by bounding `$ref` chain depth by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62498
+* [13.x] Support exclusiveMinimum and exclusiveMaximum in JsonSchema::rules() by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62496
+* [12.x] Splitter workflow by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/62507
+* [12.x] Disconnect database connections when the test environment is torn down by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62494
+* [12.x] Log dropped Cloud events to stderr by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/62493
+* [12.x] Check Forge and Vapor environment variables instead of just `Host` values by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62484
+* [13.x] Log dropped Cloud events to stderr by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/62438
+* [12.x] Preserve relation constraints when resolving attributes during noConstraints by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62483
+* [13.x] Compare JSON Schema uniqueItems scalars strictly by [@raghavji2050](https://github.com/raghavji2050) in https://github.com/laravel/framework/pull/62495
+* [12.x] Fix XSS in component attributes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62503
+* Compare user IDs as strings in broadcasting routes stub by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/62500
+* [12.x] Updated split/release workflows by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/62513
+* Merge branch '12.x' into 13.x  by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62520
+* [13.x] Add AutoCompletePrompt fallback by [@imsvidskiy](https://github.com/imsvidskiy) in https://github.com/laravel/framework/pull/62522
+* [13.x] Fix trans_choice ignoring conditions after " | " by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/62519
+* [13.x] Fix file validation bypass with empty input field collisions by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/62521
+* [13.x] Fix withCasts() on relations not applying to Relation::create() by [@arielembeya223](https://github.com/arielembeya223) in https://github.com/laravel/framework/pull/62517
 
 ## [v13.42.0](https://github.com/laravel/framework/compare/v13.40.0...v13.42.0) - 2026-11-10
 
