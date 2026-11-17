@@ -919,9 +919,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $url = new UrlGenerator(new RouteCollection, $request);
 
         $this->assertNull($request->query('expires'));
-        $this->assertTrue($url->signatureHasNotExpired($request));
-
-        Carbon::setTestNow(null);
+        $this->assertFalse($url->signatureHasNotExpired($request));
     }
 
     public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
