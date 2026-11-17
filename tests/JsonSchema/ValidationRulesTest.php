@@ -274,6 +274,29 @@ class ValidationRulesTest extends TestCase
         $this->assertFalse($this->passes($schema, ['codes' => ['01', '01']]));
     }
 
+    public function test_unique_items_compares_array_items_strictly()
+    {
+        $schema = ['type' => 'object', 'properties' => [
+            'rows' => ['type' => 'array', 'items' => ['type' => 'object'], 'uniqueItems' => true],
+        ], 'required' => ['rows']];
+
+        $this->assertTrue($this->passes($schema, ['rows' => [['code' => '1'], ['code' => '01']]]));
+        $this->assertTrue($this->passes($schema, ['rows' => [['code' => '7'], ['code' => 7]]]));
+        $this->assertFalse($this->passes($schema, ['rows' => [['a' => 1, 'b' => 2], ['b' => 2, 'a' => 1]]]));
+    }
+
+    public function test_an_enum_of_arrays_compares_values_strictly()
+    {
+        $schema = ['type' => 'object', 'properties' => [
+            'size' => ['enum' => [[10, 20], ['w' => '1', 'h' => '2']]],
+        ], 'required' => ['size']];
+
+        $this->assertTrue($this->passes($schema, ['size' => [10, 20]]));
+        $this->assertTrue($this->passes($schema, ['size' => ['h' => '2', 'w' => '1']]));
+        $this->assertFalse($this->passes($schema, ['size' => true]));
+        $this->assertFalse($this->passes($schema, ['size' => ['w' => '01', 'h' => '2.0']]));
+    }
+
     public function test_exclusive_numeric_bounds()
     {
         $schema = $this->schema(fn ($s) => ['price' => $s->number()->required()]);
