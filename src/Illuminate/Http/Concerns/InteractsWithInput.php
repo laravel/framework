@@ -85,7 +85,9 @@ trait InteractsWithInput
      */
     public function all($keys = null)
     {
-        $input = array_replace_recursive($this->input(), $this->allFiles());
+        $input = $this->input();
+
+        $input = $this->mergeFilesWithInput($input, $this->allFiles());
 
         if (! $keys) {
             return $input;
@@ -98,6 +100,35 @@ trait InteractsWithInput
         }
 
         return $results;
+    }
+
+    /**
+     * Recursively merge files into input, keeping non-empty input values
+     * but allowing empty input values to be replaced by files.
+     *
+     * @param  array  $input
+     * @param  array  $files
+     * @return array
+     */
+    protected function mergeFilesWithInput($input, $files)
+    {
+        foreach ($files as $key => $value) {
+            if (isset($input[$key])) {
+                $inputValue = $input[$key];
+                // If input value is blank (empty, null, etc.),
+                // let the file win. Otherwise keep the input value.
+                if (blank($inputValue)) {
+                    $input[$key] = $value;
+                } elseif (is_array($inputValue) && is_array($value)) {
+                    // Recursively merge nested arrays
+                    $input[$key] = $this->mergeFilesWithInput($inputValue, $value);
+                }
+            } else {
+                $input[$key] = $value;
+            }
+        }
+
+        return $input;
     }
 
     /**
