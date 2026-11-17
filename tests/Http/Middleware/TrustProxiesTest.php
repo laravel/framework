@@ -64,7 +64,7 @@ class TrustProxiesTest extends TestCase
             }
 
             (new TrustProxies)->handle($request, function ($request) use ($host, $trusted) {
-                $this->assertSame($trusted ? ['192.168.10.10'] : [], $request->getTrustedProxies());
+                $this->assertSame($trusted ? ['0.0.0.0/0', '::/0'] : [], $request->getTrustedProxies());
                 $this->assertSame($trusted ? '173.174.200.38' : '192.168.10.10', $request->ip());
                 $this->assertSame($trusted, $request->isSecure());
                 $this->assertSame($host, $request->getHost());
@@ -147,7 +147,7 @@ class TrustProxiesTest extends TestCase
             $request = $this->createProxiedRequest();
 
             (new TrustProxies)->handle($request, function ($request) {
-                $this->assertSame(['192.168.10.10'], $request->getTrustedProxies());
+                $this->assertSame(['0.0.0.0/0', '::/0'], $request->getTrustedProxies());
                 $this->assertSame('173.174.200.38', $request->ip());
                 $this->assertTrue($request->isSecure());
                 $this->assertSame('serversforhackers.com', $request->getHost());
