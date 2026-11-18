@@ -29,7 +29,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord('OutputLog command executed'));
 
-        $this->assertSame("\033[44;97m INFO \033[0m OutputLog command executed\n", $formatted);
+        $this->assertSame("\033[44;97mINFO\033[0m OutputLog command executed  \n", $formatted);
     }
 
     public function test_formats_warning_and_error_badges()
@@ -37,12 +37,12 @@ class LineFormatterTest extends TestCase
         $formatter = new LineFormatter;
 
         $this->assertSame(
-            "\033[43;30m WARNING \033[0m Careful\n",
+            "\033[43;30mWARNING\033[0m Careful  \n",
             $formatter->format($this->createRecord('Careful', Level::Warning)),
         );
 
         $this->assertSame(
-            "\033[41;97m ERROR \033[0m Broken\n",
+            "\033[41;97mERROR\033[0m Broken  \n",
             $formatter->format($this->createRecord('Broken', Level::Error)),
         );
     }
@@ -59,7 +59,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord("one\ntwo"));
 
-        $this->assertSame("\033[44;97m INFO \033[0m one two\n", $formatted);
+        $this->assertSame("\033[44;97mINFO\033[0m one two  \n", $formatted);
         $this->assertSame(1, substr_count($formatted, "\n"));
     }
 
@@ -71,16 +71,25 @@ class LineFormatterTest extends TestCase
         ));
 
         $this->assertSame(
-            "\033[44;97m INFO \033[0m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n",
+            "\033[44;97mINFO\033[0m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n",
             $formatted,
         );
+    }
+
+    public function test_normalizes_an_exception_in_the_context()
+    {
+        $formatted = (new LineFormatter)->format($this->createRecord(
+            context: ['exception' => new \RuntimeException('boom')],
+        ));
+
+        $this->assertStringContainsString('[object] (RuntimeException(code: 0): boom', $formatted);
     }
 
     public function test_omits_empty_context_and_extra()
     {
         $formatted = (new LineFormatter)->format($this->createRecord());
 
-        $this->assertSame("\033[44;97m INFO \033[0m Test message\n", $formatted);
+        $this->assertSame("\033[44;97mINFO\033[0m Test message  \n", $formatted);
         $this->assertStringNotContainsString('[]', $formatted);
     }
 }

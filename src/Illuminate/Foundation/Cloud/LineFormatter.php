@@ -4,31 +4,30 @@ namespace Illuminate\Foundation\Cloud;
 
 use Monolog\Formatter\LineFormatter as BaseFormatter;
 use Monolog\LogRecord;
-use Monolog\Utils;
 
 class LineFormatter extends BaseFormatter
 {
+    public function __construct()
+    {
+        parent::__construct(
+            "%level_name% %message% %context% %extra%\n",
+            ignoreEmptyContextAndExtra: true,
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
     public function format(LogRecord $record): string
     {
-        $message = str_replace(["\r\n", "\r", "\n"], ' ', $record->message);
+        $formatted = parent::format($record);
 
-        $suffix = '';
+        $level = $record->level->getName();
 
-        if ($record->context !== []) {
-            $suffix .= ' '.Utils::jsonEncode($record->context, ignoreErrors: true);
-        }
-
-        if ($record->extra !== []) {
-            $suffix .= ' '.Utils::jsonEncode($record->extra, ignoreErrors: true);
-        }
-
-        return $this->badge($record->level->getName()).' '.$message.$suffix."\n";
+        return $this->colorize($level).substr($formatted, strlen($level));
     }
 
-    protected function badge(string $level): string
+    protected function colorize(string $level): string
     {
         // Matches Laravel's console Line component: blue info, yellow warn, red error.
         [$background, $foreground] = match ($level) {
@@ -38,6 +37,6 @@ class LineFormatter extends BaseFormatter
             default => ['100', '97'],
         };
 
-        return "\033[{$background};{$foreground}m {$level} \033[0m";
+        return "\033[{$background};{$foreground}m{$level}\033[0m";
     }
 }
