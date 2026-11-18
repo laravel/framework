@@ -16,6 +16,7 @@ use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\JsonFormatter;
+use Illuminate\Foundation\Cloud\LineFormatter;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
@@ -29,7 +30,6 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Laravel\Octane\Events\RequestReceived;
-use Monolog\Formatter\LineFormatter;
 use PDO;
 use Throwable;
 
@@ -311,10 +311,7 @@ class CloudBootstrapper
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
             'formatter' => $useLineFormatter ? LineFormatter::class : JsonFormatter::class,
-            'formatter_with' => $useLineFormatter ? [
-                'allowInlineLineBreaks' => false,
-                'ignoreEmptyContextAndExtra' => true,
-            ] : [
+            'formatter_with' => $useLineFormatter ? [] : [
                 'includeStacktraces' => true,
             ],
             'with' => [
