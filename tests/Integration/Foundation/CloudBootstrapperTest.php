@@ -598,7 +598,7 @@ class CloudBootstrapperTest extends TestCase
                 message: "\033[31mred\033[0m",
             ));
 
-            $this->assertSame("\033[41;97m ERROR \033[0m \033[31mred\033[0m\n", $formatted);
+            $this->assertSame("\033[41;97mERROR\033[0m \033[31mred\033[0m  \n", $formatted);
             $this->assertStringNotContainsString('\\u001b', $formatted);
         } finally {
             unset($_ENV['LARAVEL_CLOUD_LOG_FORMAT'], $_SERVER['LARAVEL_CLOUD_LOG_FORMAT']);
