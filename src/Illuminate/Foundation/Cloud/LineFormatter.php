@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Cloud;
 
 use Monolog\Formatter\LineFormatter as BaseFormatter;
+use Monolog\Level;
 use Monolog\LogRecord;
 
 class LineFormatter extends BaseFormatter
@@ -10,7 +11,7 @@ class LineFormatter extends BaseFormatter
     public function __construct()
     {
         parent::__construct(
-            "%level_name% %message% %context% %extra%\n",
+            "%message% %context% %extra%\n",
             ignoreEmptyContextAndExtra: true,
         );
     }
@@ -22,18 +23,15 @@ class LineFormatter extends BaseFormatter
     {
         $formatted = parent::format($record);
 
-        $level = $record->level->getName();
-
-        return $this->colorize($level).substr($formatted, strlen($level));
+        return $this->colorize($record->level).' '.$formatted;
     }
 
-    protected function colorize(string $level): string
+    protected function colorize(Level $level): string
     {
-        // Matches Laravel's console Line component: blue info, yellow warn, red error.
         [$background, $foreground] = match ($level) {
-            'INFO', 'NOTICE' => ['44', '97'],
-            'WARNING' => ['43', '30'],
-            'ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY' => ['41', '97'],
+            Level::Info, Level::Notice => ['44', '97'],
+            Level::Warning => ['43', '30'],
+            Level::Error, Level::Critical, Level::Alert, Level::Emergency => ['41', '97'],
             default => ['100', '97'],
         };
 
