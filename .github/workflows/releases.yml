@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Remove optional "v" prefix
         id: version
@@ -38,9 +38,8 @@ jobs:
         id: guard
         run: |
           MAJOR_VERSION="${NUMERIC_VERSION%%.*}"
-          BRANCH_MAJOR_VERSION="${BRANCH%%.*}"
 
-          if [ "$MAJOR_VERSION" != "$BRANCH_MAJOR_VERSION" ]; then
+          if [ "$BRANCH" != "$MAJOR_VERSION.x" ]; then
             echo "Mismatched versions! Aborting."
             VERSION_MISMATCH='true';
           else
@@ -55,13 +54,13 @@ jobs:
 
       - name: Fail if branch and release tag do not match
         if: ${{ steps.guard.outputs.VERSION_MISMATCH == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
               core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
 
       # Component tags point at each illuminate/* branch head, so this branch's in-flight split must land first.
-      # Matched by job name because scheduled runs split every branch from master.
+      # Matched by job name because scheduled runs split every branch from the default branch.
       - name: Wait for component split
         run: |
           for RUN_ID in $(gh run list --workflow split.yml --json databaseId,status --jq '.[] | select(.status != "completed") | .databaseId'); do
@@ -79,7 +78,7 @@ jobs:
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
       - name: Commit version change
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7
         with:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
@@ -98,7 +97,7 @@ jobs:
 
       - name: Generate release notes
         id: generated-notes
-        uses: RedCrafter07/release-notes-action@main
+        uses: RedCrafter07/release-notes-action@304edb57ff4d0cb822b39a00556c015790dee977 # main
         with:
           tag-name: v${{ steps.version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -135,7 +134,7 @@ jobs:
           RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -150,7 +149,7 @@ jobs:
 
     name: Update changelog
 
-    uses: laravel/.github/.github/workflows/update-changelog.yml@main
+    uses: laravel/.github/.github/workflows/update-changelog.yml@dd86ce0a18475504e42fa809d7454c1cb1a88028 # main
     with:
       branch: ${{ github.ref_name }}
       version: "v${{ needs.release.outputs.version }}"
