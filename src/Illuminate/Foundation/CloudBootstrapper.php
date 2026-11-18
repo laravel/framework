@@ -304,7 +304,6 @@ class CloudBootstrapper
             'includeStacktraces' => true,
         ]);
 
-        // Build logs are plain text. JSON encoding would escape ANSI sequences.
         $plain = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
 
         $channel = [
