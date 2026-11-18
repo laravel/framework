@@ -178,6 +178,28 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('secret');
     }
 
+    public function testAssertionForPasswordPromptWithNullAnswer(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:password-empty';
+
+                public function handle()
+                {
+                    $password = password('What is your password?');
+
+                    $this->line($password === '' ? 'No password' : $password);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:password-empty')
+            ->expectsQuestion('What is your password?', null)
+            ->expectsOutput('No password');
+    }
+
     public function testAssertionForConfirmPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
