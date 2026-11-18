@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Cloud;
 
-use Monolog\Formatter\FormatterInterface;
+use Monolog\Formatter\LineFormatter as BaseFormatter;
 use Monolog\LogRecord;
 use Monolog\Utils;
 
-class LineFormatter implements FormatterInterface
+class LineFormatter extends BaseFormatter
 {
     /**
      * {@inheritdoc}
@@ -26,14 +26,6 @@ class LineFormatter implements FormatterInterface
         }
 
         return $this->badge($record->level->getName()).' '.$message.$suffix."\n";
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function formatBatch(array $records): string
-    {
-        return implode('', array_map($this->format(...), $records));
     }
 
     protected function badge(string $level): string
