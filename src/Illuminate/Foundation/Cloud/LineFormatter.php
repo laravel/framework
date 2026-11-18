@@ -11,7 +11,7 @@ class LineFormatter extends BaseFormatter
     public function __construct()
     {
         parent::__construct(
-            "%message% %context% %extra%\n",
+            format: "%message% %context% %extra%\n",
             ignoreEmptyContextAndExtra: true,
         );
     }
