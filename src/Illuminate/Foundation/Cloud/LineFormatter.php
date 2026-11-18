@@ -35,6 +35,6 @@ class LineFormatter extends BaseFormatter
             default => ['100', '97'],
         };
 
-        return "\033[{$background};{$foreground}m{$level}\033[0m";
+        return "\033[{$background};{$foreground}m{$level->getName()}\033[0m";
     }
 }
