@@ -153,6 +153,25 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--step' => true]);
     }
 
+    public function testSchemaOnlySkipsMigrations()
+    {
+        $migrator = Double::for(Migrator::class);
+        $dispatcher = new EventsDispatcher;
+        $command = new MigrateCommand($migrator, $dispatcher);
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->expects('hasRunAnyMigrations')->returns(true);
+        $migrator->expects('usingConnection')->resolves(function ($name, $callback) {
+            return $callback();
+        });
+        $migrator->expects('repositoryExists')->returns(true);
+
+        $this->runCommand($command, ['--schema-only' => true]);
+
+        $migrator->received('run')->never();
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
