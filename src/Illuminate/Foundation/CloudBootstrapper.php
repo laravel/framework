@@ -304,14 +304,14 @@ class CloudBootstrapper
             'includeStacktraces' => true,
         ]);
 
-        $plain = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
+        $useLineFormatter = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
 
         $channel = [
             'driver' => 'monolog',
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
-            'formatter' => $plain ? LineFormatter::class : JsonFormatter::class,
-            'formatter_with' => $plain ? [
+            'formatter' => $useLineFormatter ? LineFormatter::class : JsonFormatter::class,
+            'formatter_with' => $useLineFormatter ? [
                 'allowInlineLineBreaks' => false,
                 'ignoreEmptyContextAndExtra' => true,
             ] : [
