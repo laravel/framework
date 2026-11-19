@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Cloud;
 use Monolog\Formatter\LineFormatter as BaseFormatter;
 use Monolog\Level;
 use Monolog\LogRecord;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 class LineFormatter extends BaseFormatter
 {
@@ -23,18 +24,18 @@ class LineFormatter extends BaseFormatter
     {
         $formatted = parent::format($record);
 
-        return '  '.$this->colorize($record->level).' '.$formatted;
+        return "\n  ".$this->colorize($record->level).' '.$formatted."\n";
     }
 
     protected function colorize(Level $level): string
     {
-        [$foreground, $background] = match ($level) {
-            Level::Info, Level::Notice => ['37', '44'],
-            Level::Warning => ['30', '43'],
-            Level::Error, Level::Critical, Level::Alert, Level::Emergency => ['37', '41'],
-            default => ['37', '100'],
+        $style = match ($level) {
+            Level::Info, Level::Notice => 'fg=white;bg=blue',
+            Level::Warning => 'fg=black;bg=yellow',
+            Level::Error, Level::Critical, Level::Alert, Level::Emergency => 'fg=white;bg=red',
+            default => 'fg=white;bg=gray',
         };
 
-        return "\033[{$foreground};{$background}m {$level->getName()} \033[39;49m";
+        return (new OutputFormatter(decorated: true))->format("<".$style."> {".$level->getName()."} </>");
     }
 }

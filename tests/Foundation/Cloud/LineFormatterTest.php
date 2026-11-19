@@ -29,7 +29,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord('OutputLog command executed'));
 
-        $this->assertSame("  \033[37;44m INFO \033[39;49m OutputLog command executed  \n", $formatted);
+        $this->assertSame("\n  \033[37;44m INFO \033[39;49m OutputLog command executed  \n\n", $formatted);
     }
 
     public function test_formats_warning_and_error_badges()
@@ -37,12 +37,12 @@ class LineFormatterTest extends TestCase
         $formatter = new LineFormatter;
 
         $this->assertSame(
-            "  \033[30;43m WARNING \033[39;49m Careful  \n",
+            "\n  \033[30;43m WARNING \033[39;49m Careful  \n\n",
             $formatter->format($this->createRecord('Careful', Level::Warning)),
         );
 
         $this->assertSame(
-            "  \033[37;41m ERROR \033[39;49m Broken  \n",
+            "\n  \033[37;41m ERROR \033[39;49m Broken  \n\n",
             $formatter->format($this->createRecord('Broken', Level::Error)),
         );
     }
@@ -59,8 +59,8 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord("one\ntwo"));
 
-        $this->assertSame("  \033[37;44m INFO \033[39;49m one two  \n", $formatted);
-        $this->assertSame(1, substr_count($formatted, "\n"));
+        $this->assertSame("\n  \033[37;44m INFO \033[39;49m one two  \n\n", $formatted);
+        $this->assertSame(3, substr_count($formatted, "\n"));
     }
 
     public function test_appends_non_empty_context_and_extra()
@@ -71,7 +71,7 @@ class LineFormatterTest extends TestCase
         ));
 
         $this->assertSame(
-            "  \033[37;44m INFO \033[39;49m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n",
+            "\n  \033[37;44m INFO \033[39;49m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n\n",
             $formatted,
         );
     }
@@ -89,7 +89,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord());
 
-        $this->assertSame("  \033[37;44m INFO \033[39;49m Test message  \n", $formatted);
+        $this->assertSame("\n  \033[37;44m INFO \033[39;49m Test message  \n\n", $formatted);
         $this->assertStringNotContainsString('[]', $formatted);
     }
 }
