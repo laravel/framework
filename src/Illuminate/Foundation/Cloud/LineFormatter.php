@@ -24,10 +24,10 @@ class LineFormatter extends BaseFormatter
     {
         $formatted = parent::format($record);
 
-        return "\n  ".$this->colorize($record->level).' '.$formatted."\n";
+        return "\n  ".$this->level($record->level).' '.$formatted."\n";
     }
 
-    protected function colorize(Level $level): string
+    protected function level(Level $level): string
     {
         $style = match ($level) {
             Level::Info, Level::Notice => 'fg=white;bg=blue',
