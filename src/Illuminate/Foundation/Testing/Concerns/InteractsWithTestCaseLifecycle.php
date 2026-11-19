@@ -21,6 +21,7 @@ use Illuminate\Foundation\Testing\Attributes\TearDown;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Foundation\Testing\ModelMatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -111,6 +112,10 @@ trait InteractsWithTestCaseLifecycle
         }
 
         Model::setEventDispatcher($this->app['events']);
+
+        if (class_exists(Mockery::class)) {
+            Mockery::getConfiguration()->setDefaultMatcher(Model::class, ModelMatcher::class);
+        }
 
         $this->setUpHasRun = true;
     }
