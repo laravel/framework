@@ -36,6 +36,6 @@ class LineFormatter extends BaseFormatter
             default => 'fg=white;bg=gray',
         };
 
-        return (new OutputFormatter(decorated: true))->format("<".$style."> {".$level->getName()."} </>");
+        return (new OutputFormatter(decorated: true))->format('<'.$style.'> {'.$level->getName().'} </>');
     }
 }
