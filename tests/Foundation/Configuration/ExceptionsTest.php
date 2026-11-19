@@ -49,4 +49,14 @@ class ExceptionsTest extends TestCase
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertFalse($shouldReturnJson);
     }
+
+    public function testIgnoreErrorBagInput()
+    {
+        $exceptions = new Exceptions(new Handler(new Container));
+
+        $this->assertFalse((fn () => $this->ignoreErrorBagInput)->call($exceptions->handler));
+
+        $this->assertSame($exceptions, $exceptions->ignoreErrorBagInput());
+        $this->assertTrue((fn () => $this->ignoreErrorBagInput)->call($exceptions->handler));
+    }
 }

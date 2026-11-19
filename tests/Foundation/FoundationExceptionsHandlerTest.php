@@ -451,6 +451,42 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('default_bag', $errorBagActual);
     }
 
+    public function testInvalidIgnoresErrorBagInputWhenConfigured()
+    {
+        $errorBagActual = null;
+
+        $this->container->singleton('redirect', function () use (&$errorBagActual) {
+            $redirector = Double::for(Redirector::class);
+
+            $responder = Double::for(RedirectResponse::class);
+            $redirector->expects('to')->returns($responder);
+            $responder->expects('withInput')->returns($responder);
+            $responder->expects('withErrors')->with(
+                Argument::any(),
+                Argument::satisfies(function ($errorBag) use (&$errorBagActual) {
+                    $errorBagActual = $errorBag;
+
+                    return true;
+                })
+            )->returns($responder);
+
+            return $redirector;
+        });
+
+        $validator = Double::for(Validator::class);
+        $validator->expects('errors')->times(2)->returns(new MessageBag(['error' => 'My custom validation exception']));
+
+        $validationException = new ValidationException($validator);
+        $validationException->redirectTo = '/';
+        $validationException->errorBag = 'default_bag';
+
+        $this->assertSame($this->handler, $this->handler->ignoreErrorBagInput());
+
+        $request = Request::create('/', 'POST', ['_error_bag' => 'custom_bag']);
+        $this->handler->render($request, $validationException);
+        $this->assertSame('default_bag', $errorBagActual);
+    }
+
     public function testSuspiciousOperationReturns400WithoutReporting()
     {
         $this->config->expects('get')->with('app.debug', null)->returns(true);

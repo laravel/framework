@@ -201,6 +201,13 @@ class Handler implements ExceptionHandlerContract
     protected $withoutDuplicates = false;
 
     /**
+     * Indicates that the "_error_bag" request input should be ignored for validation exceptions.
+     *
+     * @var bool
+     */
+    protected $ignoreErrorBagInput = false;
+
+    /**
      * The already reported exception map.
      *
      * @var \WeakMap
@@ -396,6 +403,18 @@ class Handler implements ExceptionHandlerContract
         $this->dontFlash = array_values(array_unique(
             array_merge($this->dontFlash, Arr::wrap($attributes))
         ));
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the "_error_bag" request input should be ignored when redirecting with validation errors.
+     *
+     * @return $this
+     */
+    public function ignoreErrorBagInput()
+    {
+        $this->ignoreErrorBagInput = true;
 
         return $this;
     }
@@ -893,7 +912,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        $errorBag = $request->input('_error_bag');
+        $errorBag = $this->ignoreErrorBagInput ? null : $request->input('_error_bag');
 
         return redirect($exception->redirectTo ?? url()->previous())
             ->withInput(Arr::except($request->input(), $this->dontFlash))

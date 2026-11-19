@@ -217,6 +217,18 @@ class Exceptions
     }
 
     /**
+     * Indicate that the "_error_bag" request input should be ignored when redirecting with validation errors.
+     *
+     * @return $this
+     */
+    public function ignoreErrorBagInput()
+    {
+        $this->handler->ignoreErrorBagInput();
+
+        return $this;
+    }
+
+    /**
      * Register the callable that determines if the exception handler response should be JSON.
      *
      * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
