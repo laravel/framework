@@ -2580,6 +2580,82 @@ class HttpClientTest extends TestCase
         $this->assertFalse($called);
     }
 
+    public function testWhenRequestTakesLongerThanForASingleRequest()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $this->factory->fake(['foo.com/*' => $this->factory::response(['ok'])]);
+
+        $called = [];
+
+        $handler = function ($request, $response, $duration) use (&$called) {
+            $called[] = [$request->url(), $response->json(), $duration];
+        };
+
+        $send = fn ($seconds, $threshold, $url) => $this->factory
+            ->withOptions($this->transferTime($seconds))
+            ->whenRequestTakesLongerThan($threshold, $handler)
+            ->get($url);
+
+        $send(1.0, 1000, 'http://foo.com/exact');
+        $send(1.5, 1000, 'http://foo.com/slow');
+        $send(1.5, CarbonInterval::seconds(2), 'http://foo.com/interval-fast');
+        $send(2.5, CarbonInterval::seconds(2), 'http://foo.com/interval-slow');
+        $send(2.5, Carbon::now()->addSeconds(3), 'http://foo.com/date-fast');
+        $send(3.5, Carbon::now()->addSeconds(3), 'http://foo.com/date-slow');
+
+        $this->factory->withOptions($this->transferTime(4.5))->get('http://foo.com/other');
+
+        $this->assertSame([
+            ['http://foo.com/slow', ['ok'], 1500.0],
+            ['http://foo.com/interval-slow', ['ok'], 2500.0],
+            ['http://foo.com/date-slow', ['ok'], 3500.0],
+        ], $called);
+
+        Carbon::setTestNow();
+    }
+
+    public function testWhenRequestTakesLongerThanForASingleRequestIsInvokedForEveryAttempt()
+    {
+        $this->factory->fake(['foo.com/*' => $this->factory::response(['error'], 500)]);
+
+        $called = 0;
+
+        $this->factory->withOptions($this->transferTime(1.5))->retry(3, 0, null, false)->whenRequestTakesLongerThan(1000, function () use (&$called) {
+            $called++;
+        })->get('http://foo.com/get');
+
+        $this->assertSame(3, $called);
+    }
+
+    public function testWhenRequestTakesLongerThanWithPooledRequests()
+    {
+        $factory = new Factory(new Dispatcher);
+        $factory->fake(['foo.com/*' => $factory::response(['ok'])]);
+
+        $called = [];
+
+        $factory->whenRequestTakesLongerThan(1000, function ($request) use (&$called) {
+            $called[] = ['any', $request->url()];
+        });
+
+        $factory->pool(function (Pool $pool) use (&$called) {
+            return [
+                $pool->withOptions($this->transferTime(1.5))->whenRequestTakesLongerThan(1000, function ($request) use (&$called) {
+                    $called[] = ['single', $request->url()];
+                })->get('http://foo.com/slow'),
+                $pool->withOptions($this->transferTime(0.5))->get('http://foo.com/fast'),
+                $pool->withOptions($this->transferTime(2.5))->get('http://foo.com/slower'),
+            ];
+        });
+
+        $this->assertEqualsCanonicalizing([
+            ['any', 'http://foo.com/slow'],
+            ['single', 'http://foo.com/slow'],
+            ['any', 'http://foo.com/slower'],
+        ], $called);
+    }
+
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
     {
         $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Http\Client;
 
+use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -23,6 +25,7 @@ use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
@@ -41,7 +44,7 @@ use Throwable;
  */
 class PendingRequest
 {
-    use Conditionable, Macroable;
+    use Conditionable, InteractsWithTime, Macroable;
 
     /**
      * The factory instance.
@@ -771,6 +774,32 @@ class PendingRequest
         $this->afterResponseCallbacks[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Register a callback to be invoked when the request takes longer than a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  (callable(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response, float): mixed)  $handler
+     * @return $this
+     */
+    public function whenRequestTakesLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        return $this->afterResponse(function ($response, $request) use ($threshold, $handler) {
+            $duration = $response->transferStats?->getTransferTime();
+
+            if (! is_null($duration) && ($duration = round($duration * 1000, 2)) > $threshold) {
+                $handler($request, $response, $duration);
+            }
+        });
     }
 
     /**
