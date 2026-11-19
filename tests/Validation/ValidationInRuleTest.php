@@ -94,6 +94,39 @@ class ValidationInRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[TestWith(['1', true])]
+    #[TestWith([1, true])]
+    #[TestWith(['2', false])]
+    #[TestWith(['01', false])]
+    #[TestWith(['+1', false])]
+    #[TestWith(['1.0', false])]
+    #[TestWith(['1e0', false])]
+    #[TestWith([' 1', false])]
+    public function testNumericArrayRuleParametersMatchOtherInRuleForms(mixed $value, bool $matches)
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        foreach ([
+            [['in', 1]],
+            'in:1',
+            Rule::in([1]),
+        ] as $rule) {
+            $v = new Validator($trans, ['x' => $value], ['x' => [$rule]]);
+
+            $this->assertSame($matches, $v->passes());
+        }
+
+        foreach ([
+            [['not_in', 1]],
+            'not_in:1',
+            Rule::notIn([1]),
+        ] as $rule) {
+            $v = new Validator($trans, ['x' => $value], ['x' => [$rule]]);
+
+            $this->assertSame(! $matches, $v->passes());
+        }
+    }
+
     #[TestWith([' 1', false])]
     #[TestWith(['1 ', false])]
     #[TestWith(["\t1", false])]
