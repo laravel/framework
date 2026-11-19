@@ -56,12 +56,12 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+            if ($limit->afterCallback) {
+                if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+                    throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+                }
+            } elseif (! $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
-            }
-
-            if (! $limit->afterCallback) {
-                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
             }
         }
 
@@ -109,7 +109,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
-     * @return void
+     * @return bool
      */
     protected function hit($key, $maxAttempts, $decaySeconds)
     {
@@ -117,11 +117,13 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
         );
 
-        $limiter->acquire();
+        $acquired = $limiter->acquire();
 
         [$this->decaysAt[$key], $this->remaining[$key]] = [
             $limiter->decaysAt, $limiter->remaining,
         ];
+
+        return $acquired;
     }
 
     /**
