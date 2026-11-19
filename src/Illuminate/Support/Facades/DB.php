@@ -59,6 +59,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void allowQueryDurationHandlersToRunAgain()
  * @method static float totalQueryDuration()
  * @method static void resetTotalQueryDuration()
+ * @method static void whenTransactionRunsLongerThan(\DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold, callable $handler)
  * @method static void reconnectIfMissingConnection()
  * @method static \Illuminate\Database\Connection beforeStartingTransaction(\Closure $callback)
  * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
