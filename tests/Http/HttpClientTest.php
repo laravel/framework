@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use Carbon\CarbonInterval;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
@@ -2501,6 +2502,82 @@ class HttpClientTest extends TestCase
         $factory->assertSentCount(2);
         $events->assertDispatchedTimes(RequestSending::class, 2);
         $events->assertDispatchedTimes(ResponseReceived::class, 2);
+    }
+
+    public function testWhenRequestTakesLongerThan()
+    {
+        $factory = new Factory(new Dispatcher);
+        $factory->fake(['foo.com/*' => $factory::response(['ok'])]);
+
+        $called = [];
+
+        $factory->whenRequestTakesLongerThan(1000, function ($request, $response, $duration) use (&$called) {
+            $called[] = [$request->url(), $response->json(), $duration];
+        });
+
+        $factory->withOptions($this->transferTime(1.0))->get('http://foo.com/exact');
+        $factory->withOptions($this->transferTime(1.5))->get('http://foo.com/slow');
+
+        $this->assertSame([['http://foo.com/slow', ['ok'], 1500.0]], $called);
+    }
+
+    public function testWhenRequestTakesLongerThanAcceptsIntervalsAndDates()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $factory = new Factory(new Dispatcher);
+        $factory->fake(['foo.com/*' => $factory::response(['ok'])]);
+
+        $called = [];
+
+        $factory->whenRequestTakesLongerThan(CarbonInterval::seconds(2), function ($request, $response, $duration) use (&$called) {
+            $called[] = ['interval', $duration];
+        });
+
+        $factory->whenRequestTakesLongerThan(Carbon::now()->addSeconds(3), function ($request, $response, $duration) use (&$called) {
+            $called[] = ['date', $duration];
+        });
+
+        $factory->withOptions($this->transferTime(1.5))->get('http://foo.com/fast');
+        $factory->withOptions($this->transferTime(2.5))->get('http://foo.com/slow');
+        $factory->withOptions($this->transferTime(3.5))->get('http://foo.com/slower');
+
+        $this->assertSame([['interval', 2500.0], ['interval', 3500.0], ['date', 3500.0]], $called);
+
+        Carbon::setTestNow();
+    }
+
+    public function testWhenRequestTakesLongerThanIsInvokedForEveryAttempt()
+    {
+        $factory = new Factory(new Dispatcher);
+        $factory->fake(['foo.com/*' => $factory::response(['error'], 500)]);
+
+        $called = 0;
+
+        $factory->whenRequestTakesLongerThan(1000, function () use (&$called) {
+            $called++;
+        });
+
+        $factory->withOptions($this->transferTime(1.5))->retry(3, 0, null, false)->get('http://foo.com/get');
+
+        $this->assertSame(3, $called);
+    }
+
+    public function testWhenRequestTakesLongerThanIsNotInvokedWithoutATransferTime()
+    {
+        $factory = new Factory(new Dispatcher);
+        $factory->fake(['foo.com/*' => $factory::response(['ok'])]);
+
+        $called = false;
+
+        $factory->whenRequestTakesLongerThan(0, function () use (&$called) {
+            $called = true;
+        });
+
+        $factory->get('http://foo.com/get');
+
+        $factory->assertSentCount(1);
+        $this->assertFalse($called);
     }
 
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
@@ -5088,6 +5165,11 @@ class HttpClientTest extends TestCase
             'array with resource' => [['valid', fopen('php://temp', 'r')]],
             'array with nested array' => [['valid', ['nested']]],
         ];
+    }
+
+    protected function transferTime($seconds)
+    {
+        return ['on_stats' => fn (TransferStats $stats) => new TransferStats($stats->getRequest(), $stats->getResponse(), $seconds)];
     }
 
     public function testAfterResponse()

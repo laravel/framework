@@ -2,7 +2,9 @@
 
 namespace Illuminate\Http\Client;
 
+use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
@@ -10,7 +12,9 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Collection;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
@@ -24,7 +28,7 @@ use Psr\Http\Message\StreamInterface;
  */
 class Factory
 {
-    use Macroable {
+    use InteractsWithTime, Macroable {
         __call as macroCall;
     }
 
@@ -174,6 +178,32 @@ class Factory
         } finally {
             [$this->globalMiddleware, $this->globalOptions] = [$middleware, $options];
         }
+    }
+
+    /**
+     * Register a callback to be invoked when a request takes longer than a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  (callable(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response, float): mixed)  $handler
+     * @return void
+     */
+    public function whenRequestTakesLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $this->dispatcher?->listen(ResponseReceived::class, function ($event) use ($threshold, $handler) {
+            $duration = $event->response->transferStats?->getTransferTime();
+
+            if (! is_null($duration) && ($duration = round($duration * 1000, 2)) > $threshold) {
+                $handler($event->request, $event->response, $duration);
+            }
+        });
     }
 
     /**
