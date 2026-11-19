@@ -29,7 +29,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord('OutputLog command executed'));
 
-        $this->assertSame("\033[44;97mINFO\033[0m OutputLog command executed  \n", $formatted);
+        $this->assertSame("  \033[37;44m INFO \033[39;49m OutputLog command executed  \n", $formatted);
     }
 
     public function test_formats_warning_and_error_badges()
@@ -37,12 +37,12 @@ class LineFormatterTest extends TestCase
         $formatter = new LineFormatter;
 
         $this->assertSame(
-            "\033[43;30mWARNING\033[0m Careful  \n",
+            "  \033[30;43m WARNING \033[39;49m Careful  \n",
             $formatter->format($this->createRecord('Careful', Level::Warning)),
         );
 
         $this->assertSame(
-            "\033[41;97mERROR\033[0m Broken  \n",
+            "  \033[37;41m ERROR \033[39;49m Broken  \n",
             $formatter->format($this->createRecord('Broken', Level::Error)),
         );
     }
@@ -59,7 +59,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord("one\ntwo"));
 
-        $this->assertSame("\033[44;97mINFO\033[0m one two  \n", $formatted);
+        $this->assertSame("  \033[37;44m INFO \033[39;49m one two  \n", $formatted);
         $this->assertSame(1, substr_count($formatted, "\n"));
     }
 
@@ -71,7 +71,7 @@ class LineFormatterTest extends TestCase
         ));
 
         $this->assertSame(
-            "\033[44;97mINFO\033[0m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n",
+            "  \033[37;44m INFO \033[39;49m Test message {\"command\":\"OutputLog\"} {\"user_id\":5}\n",
             $formatted,
         );
     }
@@ -89,7 +89,7 @@ class LineFormatterTest extends TestCase
     {
         $formatted = (new LineFormatter)->format($this->createRecord());
 
-        $this->assertSame("\033[44;97mINFO\033[0m Test message  \n", $formatted);
+        $this->assertSame("  \033[37;44m INFO \033[39;49m Test message  \n", $formatted);
         $this->assertStringNotContainsString('[]', $formatted);
     }
 }

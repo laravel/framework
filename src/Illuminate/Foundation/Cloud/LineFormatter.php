@@ -23,18 +23,19 @@ class LineFormatter extends BaseFormatter
     {
         $formatted = parent::format($record);
 
-        return $this->colorize($record->level).' '.$formatted;
+        return '  '.$this->colorize($record->level).' '.$formatted;
     }
 
     protected function colorize(Level $level): string
     {
-        [$background, $foreground] = match ($level) {
-            Level::Info, Level::Notice => ['44', '97'],
-            Level::Warning => ['43', '30'],
-            Level::Error, Level::Critical, Level::Alert, Level::Emergency => ['41', '97'],
-            default => ['100', '97'],
+        // Same codes as Termwind's console line: white on blue, black on yellow, white on red.
+        [$foreground, $background] = match ($level) {
+            Level::Info, Level::Notice => ['37', '44'],
+            Level::Warning => ['30', '43'],
+            Level::Error, Level::Critical, Level::Alert, Level::Emergency => ['37', '41'],
+            default => ['37', '100'],
         };
 
-        return "\033[{$background};{$foreground}m{$level->getName()}\033[0m";
+        return "\033[{$foreground};{$background}m {$level->getName()} \033[39;49m";
     }
 }
