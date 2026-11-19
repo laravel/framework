@@ -3,14 +3,17 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Auth\Access\Gate;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -112,6 +115,98 @@ class ValidationRuleCanTest extends TestCase
             'You dont have permission (dot notation)',
             'You dont have permission (fqcn)',
         ], $v->messages()->all());
+    }
+
+    #[DataProvider('messageProvider')]
+    public function testValidationMessages(Response $response, ?string $translation, ?string $custom, string $expected)
+    {
+        $this->gate()->define('update-company', fn ($user, $value) => $response);
+
+        $translator = resolve('translator');
+
+        if ($translation) {
+            $translator->addLines(['validation.can' => $translation], 'en');
+        }
+
+        $v = new Validator(
+            $translator,
+            ['company' => '1'],
+            ['company' => new Can('update-company')],
+            $custom ? ['company.can' => $custom] : []
+        );
+
+        $this->assertSame([$expected], $v->messages()->get('company'));
+    }
+
+    public static function messageProvider()
+    {
+        $reason = 'Archived companies cannot be updated.';
+
+        return [
+            'default with reason' => [Response::deny($reason), null, null, "The company field contains an unauthorized value. {$reason}"],
+            'default without reason' => [Response::deny(), null, null, 'The company field contains an unauthorized value.'],
+            'translation with placeholder' => [Response::deny($reason), 'You may not select this :attribute. :reason', null, "You may not select this company. {$reason}"],
+            'translation without placeholder' => [Response::deny($reason), 'You may not select this :attribute.', null, 'You may not select this company.'],
+            'custom with placeholder' => [Response::deny($reason), null, 'Choose a different :attribute. :reason', "Choose a different company. {$reason}"],
+            'custom without placeholder' => [Response::deny($reason), null, 'Choose a different :attribute.', 'Choose a different company.'],
+        ];
+    }
+
+    public function testEachRuleUsesItsOwnReason()
+    {
+        $this->gate()->define('update-company', fn ($user, $value) => Response::deny('Archived companies cannot be updated.'));
+        $this->gate()->define('update-team', fn ($user, $value) => Response::deny('Only team owners may update the team.'));
+
+        $v = new Validator(
+            resolve('translator'),
+            ['company' => '1', 'team' => '1'],
+            ['company' => new Can('update-company'), 'team' => new Can('update-team')],
+            ['company.can' => 'Invalid :attribute. :reason', 'team.can' => 'Invalid :attribute. :reason']
+        );
+
+        $this->assertSame(['Invalid company. Archived companies cannot be updated.'], $v->messages()->get('company'));
+        $this->assertSame(['Invalid team. Only team owners may update the team.'], $v->messages()->get('team'));
+    }
+
+    public function testFalsyValuesArePassedToThePolicy()
+    {
+        $this->gate()->define('update-company', function ($user, $model, $value) {
+            $this->assertInstanceOf(stdClass::class, $model);
+            $this->assertSame(0, $value);
+
+            return true;
+        });
+
+        $v = new Validator(
+            resolve('translator'),
+            ['company' => 0],
+            ['company' => new Can('update-company', [new stdClass])]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testArgumentsCanBeResolvedUsingCallback()
+    {
+        $model = new stdClass;
+
+        $this->gate()->define('update-company', function ($user, ...$arguments) use ($model) {
+            $this->assertSame([null, 'ACTIVE', $model], $arguments);
+
+            return true;
+        });
+
+        $v = new Validator(
+            resolve('translator'),
+            ['company' => 'active'],
+            ['company' => Rule::can('update-company', new stdClass)->using(function ($value, $attribute) use ($model) {
+                $this->assertSame('company', $attribute);
+
+                return [null, strtoupper($value), $model];
+            })]
+        );
+
+        $this->assertTrue($v->passes());
     }
 
     /**
