@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - '*.x'
+      - '[0-9]+.x'
   # Scheduled runs only fire from the default branch, so they fan out to every supported branch as a retry net for failed push runs.
   schedule:
     - cron: '17 * * * *'
@@ -46,6 +46,18 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
+
+      # bin/split.sh merges its hard-coded branch into whatever is checked out and force-pushes the result,
+      # so running it from any other branch (a manual dispatch, or a new major cut before split.sh is updated)
+      # would publish that branch's code as the component release branch.
+      - name: Verify split target
+        run: |
+          if ! grep -qx "CURRENT_BRANCH=\"$BRANCH\"" bin/split.sh; then
+            echo "::error::bin/split.sh does not target $BRANCH, refusing to split."
+            exit 1
+          fi
+        env:
+          BRANCH: ${{ matrix.branch }}
 
       - name: Restore splitsh-lite
         id: splitsh-lite
