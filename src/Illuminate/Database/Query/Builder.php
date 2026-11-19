@@ -3425,6 +3425,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Lock the selected rows in the table for updating without blocking foreign key checks.
+     *
+     * @return $this
+     */
+    public function lockForNoKeyUpdate()
+    {
+        return $this->lock($this->grammar->getNoKeyUpdateLock());
+    }
+
+    /**
      * Share lock the selected rows in the table.
      *
      * @return $this

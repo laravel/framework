@@ -1572,6 +1572,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Get the lock value for updating rows without blocking foreign key checks.
+     *
+     * Grammars without a weaker update lock fall back to the regular update lock.
+     *
+     * @return string|bool
+     */
+    public function getNoKeyUpdateLock()
+    {
+        return true;
+    }
+
+    /**
      * Compile a query to get the number of open connections for a database.
      *
      * @return string|null

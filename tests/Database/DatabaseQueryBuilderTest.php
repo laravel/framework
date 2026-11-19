@@ -6064,6 +6064,11 @@ SQL;
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('lock in share mode');
         $this->assertSame('select * from `foo` where `bar` = ? lock in share mode', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lockForNoKeyUpdate();
+        $this->assertSame('select * from `foo` where `bar` = ? for update', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
     }
 
     public function testPostgresLock()
@@ -6082,6 +6087,11 @@ SQL;
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('for key share');
         $this->assertSame('select * from "foo" where "bar" = ? for key share', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lockForNoKeyUpdate();
+        $this->assertSame('select * from "foo" where "bar" = ? for no key update', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
     }
 
     public function testSqlServerLock()
@@ -6099,6 +6109,11 @@ SQL;
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock('with(holdlock)');
         $this->assertSame('select * from [foo] with(holdlock) where [bar] = ?', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lockForNoKeyUpdate();
+        $this->assertSame('select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?', $builder->toSql());
         $this->assertEquals(['baz'], $builder->getBindings());
     }
 
