@@ -1590,6 +1590,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['bar' => 1], ['foo' => 'present_unless:bar,1']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 3], ['foo' => 'present_unless:bar,1,2']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present unless bar is 1, 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['bar' => 2], ['foo' => 'present_unless:bar,1,2']);
+        $this->assertTrue($v->passes());
+
+        $trans->addLines(['validation.present_unless' => 'The :attribute field must be present unless :other is in :values.'], 'en');
+
+        $v = new Validator($trans, ['bar' => 3], ['foo' => 'present_unless:bar,1,2']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present unless bar is in 1, 2.', $v->errors()->first('foo'));
     }
 
     public function testValidatePresentWith()
@@ -3070,6 +3083,25 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [0 => ['bar' => 0, 'baz' => 'should be missing']]], ['foo.*.baz' => 'missing_unless:foo.*.bar,1']);
         $this->assertTrue($v->fails());
         $this->assertSame('The foo.0.baz field must be missing unless foo.0.bar is 1.', $v->errors()->first('foo.0.baz'));
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '3'], ['foo' => 'missing_unless:bar,1,2']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 1, 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_unless:bar,1,2']);
+        $this->assertTrue($v->passes());
+
+        $trans->addLines(['validation.missing_unless' => 'The :attribute field must be missing unless :other is in :values.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '3'], ['foo' => 'missing_unless:bar,1,2']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is in 1, 2.', $v->errors()->first('foo'));
+
+        $trans->addLines(['validation.missing_unless' => 'The :attribute field must be missing unless :OTHER is in :Values.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '3'], ['foo' => 'missing_unless:bar,a,b']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless BAR is in A, B.', $v->errors()->first('foo'));
     }
 
     public function testValidateMissingWith()
