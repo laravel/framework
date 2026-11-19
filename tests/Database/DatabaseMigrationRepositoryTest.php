@@ -7,7 +7,9 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Support\Collection;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
@@ -103,6 +105,49 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('getSchemaBuilder')->returns($schema);
+        $schema->expects('create')->with('migrations', Argument::type(Closure::class));
+
+        $repo->createRepository();
+    }
+
+    public function testCreateRepositoryCreatesMissingPostgresSchema()
+    {
+        $schema = Double::for(PostgresBuilder::class);
+        $connectionMock = Double::for(Connection::class);
+        $repo = $this->getRepository($connectionMock);
+        $connectionMock->expects('getSchemaBuilder')->returns($schema);
+        $schema->expects('getCurrentSchemaListing')->returns(['myschema']);
+        $connectionMock->expects('scalar')->with('select exists(select 1 from pg_namespace where nspname = ?)', ['myschema'], false)->returns(false);
+        $connectionMock->expects('getQueryGrammar')->returns(new PostgresGrammar($connectionMock));
+        $connectionMock->expects('statement')->with('create schema if not exists "myschema"');
+        $schema->expects('create')->with('migrations', Argument::type(Closure::class));
+
+        $repo->createRepository();
+    }
+
+    public function testCreateRepositoryDoesNotCreateExistingPostgresSchema()
+    {
+        $schema = Double::for(PostgresBuilder::class);
+        $connectionMock = Double::for(Connection::class);
+        $repo = $this->getRepository($connectionMock);
+        $connectionMock->expects('getSchemaBuilder')->returns($schema);
+        $schema->expects('getCurrentSchemaListing')->returns(['myschema']);
+        $connectionMock->expects('scalar')->with('select exists(select 1 from pg_namespace where nspname = ?)', ['myschema'], false)->returns(true);
+        $connectionMock->expects('getQueryGrammar')->never();
+        $connectionMock->expects('statement')->never();
+        $schema->expects('create')->with('migrations', Argument::type(Closure::class));
+
+        $repo->createRepository();
+    }
+
+    public function testCreateRepositoryDoesNotCheckSchemaForOtherDatabases()
+    {
+        $schema = Double::for(SchemaBuilder::class);
+        $connectionMock = Double::for(Connection::class);
+        $repo = $this->getRepository($connectionMock);
+        $connectionMock->expects('getSchemaBuilder')->returns($schema);
+        $connectionMock->expects('scalar')->never();
+        $connectionMock->expects('statement')->never();
         $schema->expects('create')->with('migrations', Argument::type(Closure::class));
 
         $repo->createRepository();

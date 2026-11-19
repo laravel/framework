@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Schema\PostgresBuilder;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -161,7 +163,13 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function createRepository()
     {
-        $schema = $this->getConnection()->getSchemaBuilder();
+        $connection = $this->getConnection();
+
+        $schema = $connection->getSchemaBuilder();
+
+        if ($schema instanceof PostgresBuilder) {
+            $this->ensurePostgresSchemaExists($connection, $schema);
+        }
 
         $schema->create($this->table, function ($table) {
             // The migrations table is responsible for keeping track of which of the
@@ -171,6 +179,41 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $table->string('migration');
             $table->integer('batch');
         });
+    }
+
+    /**
+     * Create the first schema in the Postgres "search_path" if it does not exist.
+     *
+     * When a non-default "search_path" is configured and the schema has not been
+     * created yet, creating the migration repository fails because Postgres has
+     * no schema to create the table in. The schema is only created when it is
+     * missing, so existing setups are left untouched.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\PostgresBuilder  $schema
+     * @return void
+     */
+    protected function ensurePostgresSchemaExists(Connection $connection, PostgresBuilder $schema)
+    {
+        $schemas = $schema->getCurrentSchemaListing();
+
+        if (empty($schemas)) {
+            return;
+        }
+
+        $name = $schemas[0];
+
+        $exists = $connection->scalar(
+            'select exists(select 1 from pg_namespace where nspname = ?)', [$name], false
+        );
+
+        if ($exists) {
+            return;
+        }
+
+        $connection->statement(
+            'create schema if not exists '.$connection->getQueryGrammar()->wrap($name)
+        );
     }
 
     /**
