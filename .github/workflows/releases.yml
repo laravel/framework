@@ -38,9 +38,8 @@ jobs:
         id: guard
         run: |
           MAJOR_VERSION="${NUMERIC_VERSION%%.*}"
-          BRANCH_MAJOR_VERSION="${BRANCH%%.*}"
 
-          if [ "$MAJOR_VERSION" != "$BRANCH_MAJOR_VERSION" ]; then
+          if [ "$BRANCH" != "$MAJOR_VERSION.x" ]; then
             echo "Mismatched versions! Aborting."
             VERSION_MISMATCH='true';
           else
@@ -61,7 +60,7 @@ jobs:
               core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
 
       # Component tags point at each illuminate/* branch head, so this branch's in-flight split must land first.
-      # Matched by job name because scheduled runs split every branch from master.
+      # Matched by job name because scheduled runs split every branch from the default branch.
       - name: Wait for component split
         run: |
           for RUN_ID in $(gh run list --workflow split.yml --json databaseId,status --jq '.[] | select(.status != "completed") | .databaseId'); do
