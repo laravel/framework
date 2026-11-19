@@ -18,6 +18,36 @@ use function Illuminate\Support\enum_value;
 trait InteractsWithData
 {
     /**
+     * Indicates if the typed data helpers should be strict by default.
+     *
+     * @var bool
+     */
+    protected static $strictByDefault = false;
+
+    /**
+     * Indicate that the typed data helpers should be strict by default.
+     *
+     * An explicit $strict argument passed to a helper always takes precedence.
+     *
+     * @param  bool  $strict
+     * @return void
+     */
+    public static function shouldBeStrict($strict = true)
+    {
+        static::$strictByDefault = $strict;
+    }
+
+    /**
+     * Determine if the typed data helpers are strict by default.
+     *
+     * @return bool
+     */
+    public static function isStrict()
+    {
+        return static::$strictByDefault;
+    }
+
+    /**
      * Retrieve all data from the instance.
      *
      * @param  mixed  $keys
@@ -247,10 +277,10 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @param  bool  $strict
+     * @param  bool|null  $strict
      * @return \Illuminate\Support\Stringable
      */
-    public function str($key, $default = null, $strict = false)
+    public function str($key, $default = null, $strict = null)
     {
         return $this->string($key, $default, $strict);
     }
@@ -262,11 +292,13 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @param  bool  $strict
+     * @param  bool|null  $strict
      * @return \Illuminate\Support\Stringable
      */
-    public function string($key, $default = null, $strict = false)
+    public function string($key, $default = null, $strict = null)
     {
+        $strict ??= static::isStrict();
+
         $value = $this->data($key, $default);
 
         if ($strict && ! is_string($value) && ! is_int($value) && ! is_float($value) && ! $value instanceof \Stringable) {
@@ -284,11 +316,13 @@ trait InteractsWithData
      *
      * @param  string|null  $key
      * @param  bool  $default
-     * @param  bool  $strict
+     * @param  bool|null  $strict
      * @return bool
      */
-    public function boolean($key = null, $default = false, $strict = false)
+    public function boolean($key = null, $default = false, $strict = null)
     {
+        $strict ??= static::isStrict();
+
         if ($strict) {
             return $this->isNotFilled($key)
                 ? value($default)
@@ -305,11 +339,13 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  int  $default
-     * @param  bool  $strict
+     * @param  bool|null  $strict
      * @return int
      */
-    public function integer($key, $default = 0, $strict = false)
+    public function integer($key, $default = 0, $strict = null)
     {
+        $strict ??= static::isStrict();
+
         $value = $this->data($key, $default);
 
         // FILTER_VALIDATE_INT returns 1 for true, but false for false, so we need to check for a bool first
@@ -327,11 +363,13 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  float  $default
-     * @param  bool  $strict
+     * @param  bool|null  $strict
      * @return float
      */
-    public function float($key, $default = 0.0, $strict = false)
+    public function float($key, $default = 0.0, $strict = null)
     {
+        $strict ??= static::isStrict();
+
         $value = $this->data($key, $default);
 
         if ($strict && (is_bool($value) || filter_var($value, FILTER_VALIDATE_FLOAT) === false)) {
