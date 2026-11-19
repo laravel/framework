@@ -1636,6 +1636,26 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Create an array of new instances of the related models with mass assignment and attach them to the parent model.
+     *
+     * @param  iterable  $records
+     * @param  array  $joinings
+     * @return array<int, TRelatedModel&object{TAccessor: TPivotModel}>
+     */
+    public function forceCreateMany(iterable $records, array $joinings = [])
+    {
+        $instances = [];
+
+        foreach ($records as $key => $record) {
+            $instances[] = $this->forceCreate($record, (array) ($joinings[$key] ?? []), false);
+        }
+
+        $this->touchIfTouching();
+
+        return $instances;
+    }
+
+    /**
      * Create a new instance of the related model with mass assignment without raising any events and attach it to the parent model.
      *
      * @param  array  $attributes
@@ -1646,6 +1666,18 @@ class BelongsToMany extends Relation
     public function forceCreateQuietly(array $attributes = [], array $joining = [], $touch = true)
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes, $joining, $touch));
+    }
+
+    /**
+     * Create an array of new instances of the related models with mass assignment without raising any events and attach them to the parent model.
+     *
+     * @param  iterable  $records
+     * @param  array  $joinings
+     * @return array<int, TRelatedModel&object{TAccessor: TPivotModel}>
+     */
+    public function forceCreateManyQuietly(iterable $records, array $joinings = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreateMany($records, $joinings));
     }
 
     /** @inheritDoc */

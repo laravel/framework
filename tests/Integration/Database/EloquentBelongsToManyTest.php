@@ -671,6 +671,60 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertTrue($tag->is($post->tags()->first()));
     }
 
+    public function testForceCreateManyMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tags = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreateMany([
+                ['name' => 'wavez', 'type' => 'featured'],
+                ['name' => 'laravel', 'type' => 'pinned'],
+            ], [
+                ['flag' => 'taylor'],
+                ['flag' => 'otwell'],
+            ]);
+
+        $this->assertCount(2, $tags);
+        $this->assertSame('featured', $tags[0]->type);
+        $this->assertSame('pinned', $tags[1]->type);
+
+        $attached = $post->tags()->orderBy('tags.id')->get();
+        $this->assertCount(2, $attached);
+        $this->assertTrue($tags[0]->is($attached[0]));
+        $this->assertTrue($tags[1]->is($attached[1]));
+        $this->assertSame('featured', $attached[0]->type);
+        $this->assertSame('pinned', $attached[1]->type);
+        $this->assertSame('taylor', $attached[0]->pivot->flag);
+        $this->assertSame('otwell', $attached[1]->pivot->flag);
+    }
+
+    public function testForceCreateManyQuietlyMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        GuardedTag::creating(fn () => false);
+
+        $tags = $post->belongsToMany(GuardedTag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->forceCreateManyQuietly([
+                ['name' => 'wavez', 'type' => 'featured'],
+                ['name' => 'laravel', 'type' => 'pinned'],
+            ], [
+                ['flag' => 'taylor'],
+                ['flag' => 'otwell'],
+            ]);
+
+        $this->assertCount(2, $tags);
+        $this->assertSame('featured', $tags[0]->type);
+        $this->assertSame('pinned', $tags[1]->type);
+
+        $attached = $post->tags()->orderBy('tags.id')->get();
+        $this->assertCount(2, $attached);
+        $this->assertTrue($tags[0]->is($attached[0]));
+        $this->assertTrue($tags[1]->is($attached[1]));
+        $this->assertSame('taylor', $attached[0]->pivot->flag);
+        $this->assertSame('otwell', $attached[1]->pivot->flag);
+    }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
