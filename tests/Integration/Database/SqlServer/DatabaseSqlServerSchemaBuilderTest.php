@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\SqlServer;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -99,5 +100,30 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 
         $this->assertContains('table_title_unique', $indexNames);
         $this->assertContains('table_created_at_index', $indexNames);
+    }
+
+    public function testUniqueIndexWithNullsDistinctAllowsMultipleNulls()
+    {
+        Schema::create('table', function (Blueprint $table) {
+            $table->string('code')->nullable();
+            $table->string('scope')->nullable();
+
+            $table->unique('code')->nullsNotDistinct(false);
+            $table->unique(['scope', 'code'])->nullsNotDistinct(false);
+        });
+
+        DB::table('table')->insert([
+            ['code' => null, 'scope' => 'a'],
+            ['code' => null, 'scope' => 'a'],
+            ['code' => 'x', 'scope' => null],
+            ['code' => 'y', 'scope' => null],
+        ]);
+
+        $this->assertSame(4, DB::table('table')->count());
+        $this->assertTrue(Schema::hasIndex('table', ['code'], 'unique'));
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        DB::table('table')->insert(['code' => 'x', 'scope' => 'b']);
     }
 }

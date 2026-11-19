@@ -272,12 +272,24 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create unique index %s on %s (%s)%s',
+        return sprintf('create unique index %s on %s (%s)%s%s',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $this->columnize($command->columns),
+            $command->nullsNotDistinct === false ? ' where '.$this->compileNotNullFilter($command->columns) : '',
             $command->online ? ' with (online = on)' : ''
         );
+    }
+
+    /**
+     * Compile a filter that excludes rows with a null value in any of the given columns.
+     *
+     * @param  array  $columns
+     * @return string
+     */
+    protected function compileNotNullFilter(array $columns)
+    {
+        return implode(' and ', array_map(fn ($column) => $this->wrap($column).' is not null', $columns));
     }
 
     /**

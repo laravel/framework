@@ -290,6 +290,36 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo") with (online = on)', $statements[0]);
     }
 
+    public function testAddingUniqueKeyWithNullsDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct(false);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo") where "foo" is not null', $statements[0]);
+    }
+
+    public function testAddingCompositeUniqueKeyWithNullsDistinctOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique(['foo', 'baz'], 'bar')->nullsNotDistinct(false)->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo", "baz") where "foo" is not null and "baz" is not null with (online = on)', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithNullsNotDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

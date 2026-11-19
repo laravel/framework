@@ -11,7 +11,7 @@ use Illuminate\Support\Fluent;
  * @method $this inplace(bool $value = true) Specify that algorithm=inplace should be used for the index operation (MySQL)
  * @method $this language(string $language) Specify a language for the full text index (PostgreSQL)
  * @method $this lock(('none'|'shared'|'default'|'exclusive') $value) Specify the DDL lock mode for the index operation (MySQL)
- * @method $this nullsNotDistinct(bool $value = true) Specify that the null values should not be treated as distinct (PostgreSQL)
+ * @method $this nullsNotDistinct(bool $value = true) Specify that the null values should not be treated as distinct (PostgreSQL/SqlServer)
  * @method $this online(bool $value = true) Specify that index creation should not lock the table (PostgreSQL/SqlServer)
  */
 class IndexDefinition extends Fluent
