@@ -24,6 +24,10 @@ class RouteGroup
             unset($old['controller']);
         }
 
+        if (isset($new['with_trashed'])) {
+            unset($old['with_trashed']);
+        }
+
         $metadata = static::formatMetadata($new, $old);
 
         unset($new['metadata']);

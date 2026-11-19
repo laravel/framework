@@ -11,6 +11,7 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
+use Illuminate\Support\Collection;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
@@ -178,6 +179,122 @@ class RouteRegistrarTest extends TestCase
         foreach ($this->router->getRoutes() as $route) {
             $this->assertTrue($route->allowsTrashedBindings());
         }
+    }
+
+    public function testCanSetWithTrashedOnRegisteredRoute()
+    {
+        $route = $this->router->withTrashed()->get('users/{user}', function () {
+            return 'user';
+        });
+
+        $this->assertTrue($route->allowsTrashedBindings());
+    }
+
+    public function testCanSetWithTrashedOnGroup()
+    {
+        $this->router->withTrashed()->group(function ($router) {
+            $router->get('users/{user}', function () {
+                return 'user';
+            });
+        });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertTrue($route->allowsTrashedBindings());
+    }
+
+    public function testRoutesOutsideWithTrashedGroupDoNotAllowTrashedBindings()
+    {
+        $this->router->withTrashed()->group(function ($router) {
+            $router->get('trashed/{user}', function () {
+                return 'user';
+            });
+        });
+
+        $route = $this->router->get('users/{user}', function () {
+            return 'user';
+        });
+
+        $this->assertFalse($route->allowsTrashedBindings());
+    }
+
+    public function testRouteCanOptOutOfWithTrashedGroup()
+    {
+        $this->router->withTrashed()->group(function ($router) {
+            $router->get('users/{user}', function () {
+                return 'user';
+            })->withTrashed(false);
+        });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertFalse($route->allowsTrashedBindings());
+    }
+
+    public function testNestedGroupCanOverrideWithTrashed()
+    {
+        $this->router->withTrashed()->group(function ($router) {
+            $router->withTrashed(false)->group(function ($router) {
+                $router->get('without/{user}', function () {
+                    return 'user';
+                });
+            });
+
+            $router->group([], function ($router) {
+                $router->get('with/{user}', function () {
+                    return 'user';
+                });
+            });
+        });
+
+        $this->assertFalse($this->getRouteByUri('without/{user}')->allowsTrashedBindings());
+        $this->assertTrue($this->getRouteByUri('with/{user}')->allowsTrashedBindings());
+    }
+
+    public function testCanSetWithTrashedOnGroupUsingArrayAttributes()
+    {
+        $this->router->group(['with_trashed' => true], function ($router) {
+            $router->get('users/{user}', function () {
+                return 'user';
+            });
+        });
+
+        $this->assertTrue($this->getRouteByUri('users/{user}')->allowsTrashedBindings());
+    }
+
+    public function testResourcesInWithTrashedGroupAllowTrashedBindings()
+    {
+        $this->router->withTrashed()->group(function ($router) {
+            $router->resource('users', RouteRegistrarControllerStub::class);
+        });
+
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertTrue($route->allowsTrashedBindings());
+        }
+    }
+
+    public function testCanRegisterResourceWithTrashedThroughRegistrar()
+    {
+        $this->router->withTrashed()->resource('users', RouteRegistrarControllerStub::class);
+
+        $this->assertSame(
+            ['users.edit', 'users.show', 'users.update'],
+            $this->trashedRouteNames()
+        );
+    }
+
+    public function testCanRegisterApiResourceWithTrashedThroughRegistrar()
+    {
+        $this->router->withTrashed()->apiResource('users', RouteRegistrarControllerStub::class);
+
+        $this->assertSame(['users.show', 'users.update'], $this->trashedRouteNames());
+    }
+
+    public function testExplicitResourceTrashedMethodsTakePrecedenceOverRegistrar()
+    {
+        $this->router->withTrashed()->resource('users', RouteRegistrarControllerStub::class)->withTrashed(['destroy']);
+
+        $this->assertSame(['users.destroy'], $this->trashedRouteNames());
     }
 
     public function testFallbackRoute()
@@ -1790,6 +1907,33 @@ class RouteRegistrarTest extends TestCase
     protected function getRoute()
     {
         return last($this->router->getRoutes()->get());
+    }
+
+    /**
+     * Get the registered route with the given URI.
+     *
+     * @param  string  $uri
+     * @return \Illuminate\Routing\Route
+     */
+    protected function getRouteByUri($uri)
+    {
+        return (new Collection($this->router->getRoutes()->getRoutes()))
+            ->first(fn ($route) => $route->uri() === $uri);
+    }
+
+    /**
+     * Get the sorted names of the registered routes that allow trashed bindings.
+     *
+     * @return array
+     */
+    protected function trashedRouteNames()
+    {
+        return (new Collection($this->router->getRoutes()->getRoutes()))
+            ->filter->allowsTrashedBindings()
+            ->map->getName()
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**

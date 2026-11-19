@@ -140,6 +140,34 @@ PHP);
         $this->assertTrue($user->is($response->baseRequest->route('user')));
     }
 
+    public function testSoftDeletedModelsCanBeRetrievedUsingWithTrashedGroup()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::withTrashed()->middleware(['web'])->group(function () {
+            Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+                return $user;
+            });
+        });
+
+        Route::post('/other-user/{user}', function (ImplicitBindingUser $user) {
+            return $user;
+        })->middleware(['web']);
+
+        $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $this->postJson("/other-user/{$user->id}")->assertNotFound();
+    }
+
     public function testEnforceScopingImplicitRouteBindings()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);

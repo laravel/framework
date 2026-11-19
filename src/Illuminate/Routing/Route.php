@@ -109,9 +109,11 @@ class Route
     /**
      * Indicates "trashed" models can be retrieved when resolving implicit model bindings for this route.
      *
-     * @var bool
+     * When null, the "with_trashed" route action attribute (e.g. set by a route group) is used.
+     *
+     * @var bool|null
      */
-    protected $withTrashedBindings = false;
+    protected $withTrashedBindings = null;
 
     /**
      * Indicates the maximum number of seconds the route should acquire a session lock for.
@@ -625,7 +627,7 @@ class Route
      */
     public function allowsTrashedBindings()
     {
-        return $this->withTrashedBindings;
+        return $this->withTrashedBindings ?? (bool) ($this->action['with_trashed'] ?? false);
     }
 
     /**

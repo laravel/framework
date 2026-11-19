@@ -31,6 +31,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method \Illuminate\Routing\RouteRegistrar where(array $where)
+ * @method \Illuminate\Routing\RouteRegistrar withTrashed(bool $withTrashed = true)
  * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
  * @method \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
  */
@@ -84,6 +85,7 @@ class RouteRegistrar
         'where',
         'withoutMiddleware',
         'withoutScopedBindings',
+        'withTrashed',
     ];
 
     /**
@@ -96,6 +98,7 @@ class RouteRegistrar
         'scopeBindings' => 'scope_bindings',
         'withoutScopedBindings' => 'scope_bindings',
         'withoutMiddleware' => 'excluded_middleware',
+        'withTrashed' => 'with_trashed',
     ];
 
     /**
@@ -153,6 +156,10 @@ class RouteRegistrar
             $value = false;
         }
 
+        if ($key === 'withTrashed') {
+            $value = (bool) $value;
+        }
+
         if ($value instanceof BackedEnum && ! is_string($value = $value->value)) {
             throw new InvalidArgumentException("Attribute [{$key}] expects a string backed enum.");
         }
@@ -172,7 +179,7 @@ class RouteRegistrar
      */
     public function resource($name, $controller, array $options = [])
     {
-        return $this->router->resource($name, $controller, $this->attributes + $options);
+        return $this->router->resource($name, $controller, $this->resourceOptions($options));
     }
 
     /**
@@ -185,7 +192,26 @@ class RouteRegistrar
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        return $this->router->apiResource($name, $controller, $this->attributes + $options);
+        return $this->router->apiResource($name, $controller, $this->resourceOptions($options));
+    }
+
+    /**
+     * Merge the registrar attributes into the given resource options.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    protected function resourceOptions(array $options)
+    {
+        $options = $this->attributes + $options;
+
+        if (($options['with_trashed'] ?? false) === true && ! array_key_exists('trashed', $options)) {
+            $options['trashed'] = [];
+        }
+
+        unset($options['with_trashed']);
+
+        return $options;
     }
 
     /**

@@ -104,6 +104,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
  * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
  * @method static \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
+ * @method static \Illuminate\Routing\RouteRegistrar withTrashed(bool $withTrashed = true)
  *
  * @see \Illuminate\Routing\Router
  */
