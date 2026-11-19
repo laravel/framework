@@ -28,7 +28,6 @@ class LineFormatter extends BaseFormatter
 
     protected function colorize(Level $level): string
     {
-        // Same codes as Termwind's console line: white on blue, black on yellow, white on red.
         [$foreground, $background] = match ($level) {
             Level::Info, Level::Notice => ['37', '44'],
             Level::Warning => ['30', '43'],
