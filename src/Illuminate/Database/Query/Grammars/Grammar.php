@@ -1578,7 +1578,7 @@ class Grammar extends BaseGrammar
      *
      * @return string|bool
      */
-    public function noKeyUpdateLock()
+    public function getNoKeyUpdateLock()
     {
         return true;
     }

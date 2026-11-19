@@ -3431,7 +3431,7 @@ class Builder implements BuilderContract
      */
     public function lockForNoKeyUpdate()
     {
-        return $this->lock($this->grammar->noKeyUpdateLock());
+        return $this->lock($this->grammar->getNoKeyUpdateLock());
     }
 
     /**

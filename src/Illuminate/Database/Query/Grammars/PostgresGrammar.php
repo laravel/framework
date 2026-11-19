@@ -394,7 +394,7 @@ class PostgresGrammar extends Grammar
      *
      * @return string
      */
-    public function noKeyUpdateLock()
+    public function getNoKeyUpdateLock()
     {
         return 'for no key update';
     }
