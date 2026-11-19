@@ -25,6 +25,21 @@ class ServeCommandTest extends TestCase
         $this->assertSame([$expectedHost, $expectedPort], $command->getHostAndPortForTesting());
     }
 
+    public function testPhpConfigurationEnvironmentVariablesCanPassThroughToTheServer()
+    {
+        $command = new class extends ServeCommand
+        {
+            public function shouldPassThroughEnvironmentVariable($key)
+            {
+                return parent::shouldPassThroughEnvironmentVariable($key);
+            }
+        };
+
+        $this->assertTrue($command->shouldPassThroughEnvironmentVariable('PHPRC'));
+        $this->assertTrue($command->shouldPassThroughEnvironmentVariable('PHP_INI_SCAN_DIR'));
+        $this->assertFalse($command->shouldPassThroughEnvironmentVariable('APP_KEY'));
+    }
+
     public static function hostAndPortProvider()
     {
         return [
