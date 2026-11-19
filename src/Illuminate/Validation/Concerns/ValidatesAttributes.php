@@ -1582,7 +1582,8 @@ trait ValidatesAttributes
             return array_diff($value, $parameters) === [];
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters, true);
+        // Array rules can contain integer parameters, unlike string-based rules.
+        return ! is_array($value) && in_array((string) $value, array_map(strval(...), $parameters), true);
     }
 
     /**
