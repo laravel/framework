@@ -9,6 +9,9 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 
 class LineFormatter extends BaseFormatter
 {
+    /**
+     * Create a new line formatter instance.
+     */
     public function __construct()
     {
         parent::__construct(
@@ -27,6 +30,12 @@ class LineFormatter extends BaseFormatter
         return "\n  ".$this->level($record->level).' '.$formatted."\n";
     }
 
+    /**
+     * Get the styled console label for the given log level.
+     *
+     * @param  \Monolog\Level  $level
+     * @return string
+     */
     protected function level(Level $level): string
     {
         $style = match ($level) {
