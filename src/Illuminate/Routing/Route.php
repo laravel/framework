@@ -629,6 +629,29 @@ class Route
     }
 
     /**
+     * Only allow "trashed" models to be retrieved when resolving implicit model bindings for this route.
+     *
+     * @param  bool  $onlyTrashed
+     * @return $this
+     */
+    public function onlyTrashed($onlyTrashed = true)
+    {
+        $this->action['only_trashed'] = $onlyTrashed;
+
+        return $this;
+    }
+
+    /**
+     * Determines if the route only allows "trashed" models to be retrieved when resolving implicit model bindings.
+     *
+     * @return bool
+     */
+    public function onlyAllowsTrashedBindings()
+    {
+        return (bool) ($this->action['only_trashed'] ?? false);
+    }
+
+    /**
      * Set a default value for the route.
      *
      * @param  string  $key

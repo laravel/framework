@@ -100,6 +100,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar name(\BackedEnum|string $value)
  * @method static \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
+ * @method static \Illuminate\Routing\RouteRegistrar onlyTrashed(bool $onlyTrashed = true)
  * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
  * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
