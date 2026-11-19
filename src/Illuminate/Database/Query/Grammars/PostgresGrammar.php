@@ -390,6 +390,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Get the lock value for updating rows without blocking foreign key checks.
+     *
+     * @return string
+     */
+    public function noKeyUpdateLock()
+    {
+        return 'for no key update';
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
