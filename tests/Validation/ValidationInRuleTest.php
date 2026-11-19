@@ -108,20 +108,20 @@ class ValidationInRuleTest extends TestCase
 
         foreach ([
             [['in', 1]],
-            'in:1',
-            Rule::in([1]),
-        ] as $rule) {
-            $v = new Validator($trans, ['x' => $value], ['x' => [$rule]]);
+            ['in:1'],
+            [Rule::in([1])],
+        ] as $rules) {
+            $v = new Validator($trans, ['x' => $value], ['x' => $rules]);
 
             $this->assertSame($matches, $v->passes());
         }
 
         foreach ([
             [['not_in', 1]],
-            'not_in:1',
-            Rule::notIn([1]),
-        ] as $rule) {
-            $v = new Validator($trans, ['x' => $value], ['x' => [$rule]]);
+            ['not_in:1'],
+            [Rule::notIn([1])],
+        ] as $rules) {
+            $v = new Validator($trans, ['x' => $value], ['x' => $rules]);
 
             $this->assertSame(! $matches, $v->passes());
         }
