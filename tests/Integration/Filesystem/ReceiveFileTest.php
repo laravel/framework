@@ -34,6 +34,18 @@ class ReceiveFileTest extends TestCase
         Storage::assertExists('receive-file-test.txt', 'Hello World');
     }
 
+    public function testItCanReceiveAJsonFileContainingSignedParameterNames()
+    {
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());
+
+        $contents = '{"upload":false,"path":"other.txt","expires":1}';
+
+        $response = $this->call('PUT', $result['url'], [], [], [], ['CONTENT_TYPE' => 'application/json'], $contents);
+
+        $response->assertNoContent();
+        Storage::assertExists('receive-file-test.txt', $contents);
+    }
+
     public function testItWill403OnWrongSignature()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());

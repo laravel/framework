@@ -9,6 +9,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -90,6 +91,11 @@ class UrlGenerator implements UrlGeneratorContract
      * @var callable
      */
     protected $keyResolver;
+
+    /**
+     * Indicates if request input may override signed query parameters.
+     */
+    protected bool $allowSignedParameterOverrides = false;
 
     /**
      * The missing named route resolver callable.
@@ -435,7 +441,8 @@ class UrlGenerator implements UrlGeneratorContract
     public function hasValidSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
     {
         return $this->hasCorrectSignature($request, $absolute, $ignoreQuery)
-            && $this->signatureHasNotExpired($request);
+            && $this->signatureHasNotExpired($request)
+            && $this->signedParametersAreNotOverridden($request, $ignoreQuery);
     }
 
     /**
@@ -471,19 +478,7 @@ class UrlGenerator implements UrlGeneratorContract
             : '/'.$request->path();
 
         $queryString = (new Stringable((string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'))))->explode('&')
-            ->reject(function ($parameter) use ($ignoreQuery) {
-                $parameter = Str::before($parameter, '=');
-
-                if ($parameter === 'signature') {
-                    return true;
-                }
-
-                if ($ignoreQuery instanceof Closure) {
-                    return $ignoreQuery($parameter);
-                }
-
-                return in_array($parameter, $ignoreQuery);
-            })
+            ->reject(fn ($parameter) => $this->isUnsignedParameter(Str::before($parameter, '='), $ignoreQuery))
             ->join('&');
 
         $original = rtrim($url.'?'.$queryString, '?');
@@ -524,6 +519,38 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         return ! ($expires && Carbon::now()->getTimestamp() > $expires);
+    }
+
+    /**
+     * Determine if the request input does not override any of the signed query parameters.
+     */
+    public function signedParametersAreNotOverridden(Request $request, Closure|array $ignoreQuery = []): bool
+    {
+        if ($this->allowSignedParameterOverrides) {
+            return true;
+        }
+
+        $input = $request->all();
+
+        return (new Collection($request->query()))
+            ->reject(fn ($value, $parameter) => $this->isUnsignedParameter($parameter, $ignoreQuery))
+            ->every(fn ($value, $parameter) => ($input[$parameter] ?? null) === $value);
+    }
+
+    /**
+     * Determine if the given query parameter is excluded from the signature.
+     */
+    protected function isUnsignedParameter(string $parameter, Closure|array $ignoreQuery): bool
+    {
+        if ($parameter === 'signature') {
+            return true;
+        }
+
+        if ($ignoreQuery instanceof Closure) {
+            return $ignoreQuery($parameter);
+        }
+
+        return in_array($parameter, $ignoreQuery);
     }
 
     /**
@@ -908,6 +935,18 @@ class UrlGenerator implements UrlGeneratorContract
     public function setSessionResolver(callable $sessionResolver)
     {
         $this->sessionResolver = $sessionResolver;
+
+        return $this;
+    }
+
+    /**
+     * Allow request input to override signed query parameters.
+     *
+     * @return $this
+     */
+    public function allowSignedParameterOverrides(bool $allow = true): static
+    {
+        $this->allowSignedParameterOverrides = $allow;
 
         return $this;
     }

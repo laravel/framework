@@ -284,6 +284,30 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url)->original);
     }
 
+    public function testSignedMiddlewareRejectsInputOverridingSignedParameters()
+    {
+        Route::post('/foo', fn (Request $request) => $request->input('student_id'))
+            ->name('foo')
+            ->middleware(ValidateSignature::class);
+
+        $url = URL::signedRoute('foo', ['student_id' => 123]);
+
+        $this->postJson($url)->assertOk()->assertContent('123');
+        $this->postJson($url, ['student_id' => 1])->assertForbidden();
+        $this->post($url, ['student_id' => 1])->assertForbidden();
+    }
+
+    public function testSignedMiddlewareAllowsInputWhenRequestHasBeenTransformed()
+    {
+        Route::post('/foo', fn (Request $request) => $request->input('name'))
+            ->name('foo')
+            ->middleware(ValidateSignature::class);
+
+        $url = URL::signedRoute('foo', ['ref' => '', 'note' => ' padded ']);
+
+        $this->postJson($url, ['name' => 'Taylor'])->assertOk()->assertContent('Taylor');
+    }
+
     public function testSignedMiddlewareWithInvalidUrl()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {

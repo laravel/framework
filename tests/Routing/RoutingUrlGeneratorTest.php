@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Routing;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\EncodedParameter;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
@@ -850,6 +851,83 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: ['tampered']));
 
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
+    }
+
+    public function testSignedUrlParametersCannotBeOverriddenByRequestInput()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET', 'POST'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $signedUrl = $url->signedRoute('foo', ['student_id' => 123]);
+        $json = ['CONTENT_TYPE' => 'application/json'];
+
+        $this->assertTrue($url->hasValidSignature(Request::create($signedUrl)));
+
+        $this->assertFalse($url->hasValidSignature(Request::create($signedUrl, 'POST', server: $json, content: '{"student_id":1}')));
+
+        $this->assertFalse($url->hasValidSignature(Request::create($signedUrl, 'GET', server: $json, content: '{"student_id":1}')));
+
+        $this->assertFalse($url->hasValidSignature(Request::create($signedUrl, 'POST', ['student_id' => 1])));
+
+        $this->assertTrue($url->hasValidSignature(Request::create($signedUrl, 'POST', server: $json, content: '{"student_id":"123"}')));
+        $this->assertTrue($url->hasValidSignature(Request::create($signedUrl, 'POST', ['name' => 'Taylor'])));
+    }
+
+    public function testSignedUrlParametersCannotBeExtendedByUploadedFiles()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['POST'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $signedUrl = $url->signedRoute('foo', ['ids' => [5]]);
+
+        $this->assertFalse($url->hasValidSignature(Request::create($signedUrl, 'POST', files: ['ids' => [1 => UploadedFile::fake()->create('file.txt')]])));
+        $this->assertTrue($url->hasValidSignature(Request::create($signedUrl, 'POST', files: ['avatar' => UploadedFile::fake()->create('file.txt')])));
+    }
+
+    public function testIgnoredSignedUrlParametersCanBeOverriddenByRequestInput()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['POST'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $request = Request::create($url->signedRoute('foo').'&page=2', 'POST', ['page' => 3]);
+
+        $this->assertTrue($url->hasValidSignature($request, ignoreQuery: ['page']));
+        $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'page'));
+    }
+
+    public function testSignedUrlParameterOverridesCanBeAllowed()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['POST'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $request = Request::create($url->signedRoute('foo', ['student_id' => 123]), 'POST', ['student_id' => 1]);
+
+        $this->assertFalse($url->hasValidSignature($request));
+
+        $url->allowSignedParameterOverrides();
+
+        $this->assertTrue($url->hasValidSignature($request));
+        $this->assertTrue($url->hasCorrectSignature($request));
     }
 
     public function testNumericQueryParametersAreUrlEncoded()
