@@ -15,6 +15,7 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
+use Illuminate\Foundation\Cloud\LineFormatter;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Log\Context\Events\ContextDehydrating;
@@ -194,12 +195,14 @@ class CloudBootstrapper
             'includeStacktraces' => true,
         ]);
 
+        $useLineFormatter = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
+
         $app['config']->set('logging.channels.laravel-cloud-socket', [
             'driver' => 'monolog',
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
-            'formatter' => LaravelCloudJsonFormatter::class,
-            'formatter_with' => [
+            'formatter' => $useLineFormatter ? LineFormatter::class : LaravelCloudJsonFormatter::class,
+            'formatter_with' => $useLineFormatter ? [] : [
                 'includeStacktraces' => true,
             ],
             'with' => [
