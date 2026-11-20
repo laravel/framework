@@ -6,9 +6,11 @@ use Ably\PubSub\PubSubHttpClient;
 use Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster;
 use Illuminate\Http\Request;
 use Mockery;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+#[IgnoreDeprecations]
 class Ably2BroadcasterTest extends TestCase
 {
     /**
