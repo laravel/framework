@@ -20,6 +20,7 @@ use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Events\JobQueued;
@@ -277,7 +278,9 @@ abstract class Queue
     public function getJobExpiration($job)
     {
         if (! method_exists($job, 'retryUntil') && ! isset($job->retryUntil)) {
-            return;
+            $retryFor = $this->getAttributeValue($job, RetryFor::class);
+
+            return is_null($retryFor) ? null : $this->availableAt($retryFor);
         }
 
         $expiration = $job->retryUntil ?? $job->retryUntil();

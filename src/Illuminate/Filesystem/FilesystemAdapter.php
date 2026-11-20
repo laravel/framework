@@ -676,10 +676,15 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  \UnitEnum|string|\Illuminate\Contracts\Filesystem\Filesystem  $disk
      * @param  string  $from
      * @param  string|null  $to
+     * @param  mixed  $options
      * @return bool
      */
-    public function copyToDisk($disk, $from, $to = null)
+    public function copyToDisk($disk, $from, $to = null, $options = [])
     {
+        $options = is_string($options)
+            ? ['visibility' => $options]
+            : (array) $options;
+
         $destination = $disk instanceof FilesystemContract
             ? $disk
             : Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
@@ -695,7 +700,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         try {
-            return $destination->writeStream($to ?? $from, $stream);
+            return $destination->writeStream($to ?? $from, $stream, $options);
         } finally {
             if (is_resource($stream)) {
                 fclose($stream);
@@ -709,11 +714,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  \UnitEnum|string|\Illuminate\Contracts\Filesystem\Filesystem  $disk
      * @param  string  $from
      * @param  string|null  $to
+     * @param  mixed  $options
      * @return bool
      */
-    public function moveToDisk($disk, $from, $to = null)
+    public function moveToDisk($disk, $from, $to = null, $options = [])
     {
-        return $this->copyToDisk($disk, $from, $to) && $this->delete($from);
+        return $this->copyToDisk($disk, $from, $to, $options) && $this->delete($from);
     }
 
     /**

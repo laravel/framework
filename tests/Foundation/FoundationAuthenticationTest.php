@@ -4,21 +4,24 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class FoundationAuthenticationTest extends TestCase
 {
     use InteractsWithAuthentication;
+    use VerifiesDoubles;
 
     /**
-     * @var \Mockery
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -31,20 +34,18 @@ class FoundationAuthenticationTest extends TestCase
     ];
 
     /**
-     * @return \Illuminate\Contracts\Auth\Guard|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+     * @return \Illuminate\Contracts\Auth\Guard|\JMac\Testing\DoubleInterface
      */
     protected function mockGuard()
     {
-        $guard = Mockery::mock(Guard::class);
+        $guard = Double::for(SessionGuard::class);
 
-        $auth = Mockery::mock(AuthManager::class);
-        $auth->expects('guard')
-            ->andReturn($guard);
+        $auth = Double::for(AuthManager::class);
+        $auth->expects('guard')->returns($guard);
 
-        $this->app = Mockery::mock(Application::class);
-        $this->app->expects('make')
-            ->withArgs(['auth'])
-            ->andReturn($auth);
+        $app = Double::for(Application::class, override: true);
+        $app->expects('make')->with('auth')->returns($auth);
+        $this->app = $app->instance();
 
         return $guard;
     }
@@ -140,19 +141,13 @@ class FoundationAuthenticationTest extends TestCase
     {
         $user = new GenericUser([]);
 
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = Double::for(UserProvider::class);
 
-        $provider->expects('retrieveByCredentials')
-            ->with($credentials)
-            ->andReturn($user);
+        $provider->expects('retrieveByCredentials')->with($credentials)->returns($user);
 
-        $provider->expects('validateCredentials')
-            ->with($user, $credentials)
-            ->andReturn($this->credentials === $credentials);
+        $provider->expects('validateCredentials')->with($user, $credentials)->returns($this->credentials === $credentials);
 
-        $this->mockGuard()
-            ->expects('getProvider')
-            ->andReturn($provider);
+        $this->mockGuard()->expects('getProvider')->returns($provider);
     }
 
     public function testAssertCredentials()

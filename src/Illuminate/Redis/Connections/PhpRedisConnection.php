@@ -19,70 +19,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     use PacksPhpRedisValues;
 
     /**
-     * The commands that may be safely retried after reconnecting.
-     *
-     * @var list<string>
-     */
-    protected const RETRYABLE_COMMANDS = [
-        'bitcount',
-        'bitpos',
-        'dbsize',
-        'dump',
-        'exists',
-        'geodist',
-        'geohash',
-        'geopos',
-        'geosearch',
-        'get',
-        'getbit',
-        'getrange',
-        'hexists',
-        'hget',
-        'hgetall',
-        'hkeys',
-        'hlen',
-        'hmget',
-        'hmset',
-        'hstrlen',
-        'hvals',
-        'keys',
-        'lindex',
-        'llen',
-        'lpos',
-        'lrange',
-        'mget',
-        'mset',
-        'ping',
-        'pttl',
-        'randomkey',
-        'scard',
-        'sdiff',
-        'sinter',
-        'sismember',
-        'smembers',
-        'smismember',
-        'srandmember',
-        'strlen',
-        'sunion',
-        'time',
-        'ttl',
-        'type',
-        'xinfo',
-        'xlen',
-        'xpending',
-        'xrange',
-        'xrevrange',
-        'zcard',
-        'zcount',
-        'zlexcount',
-        'zmscore',
-        'zrange',
-        'zrank',
-        'zrevrank',
-        'zscore',
-    ];
-
-    /**
      * The connection creation callback.
      *
      * @var callable
@@ -484,11 +420,46 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         try {
+            return $this->executePipeline($pipeline, $callback);
+        } catch (Throwable $e) {
+            $this->rebuildClientOnLostConnection($e);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Get multiple values using a pipeline that can safely be retried after a disconnect.
+     *
+     * @param  array  $keys
+     * @return array|false
+     *
+     * @internal
+     */
+    public function getManyViaPipeline(array $keys)
+    {
+        return $this->retryOnceOnLostConnection(function () use ($keys) {
+            return $this->executePipeline($this->client()->pipeline(), function ($pipeline) use ($keys) {
+                foreach ($keys as $key) {
+                    $pipeline->get($key);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a pipeline and discard it if queuing or execution fails.
+     *
+     * @param  \Redis  $pipeline
+     * @param  callable  $callback
+     * @return array|false
+     */
+    protected function executePipeline($pipeline, callable $callback)
+    {
+        try {
             return tap($pipeline, $callback)->exec();
         } catch (Throwable $e) {
             rescue(fn () => $this->client()->discard(), null, false);
-
-            $this->rebuildClientOnLostConnection($e);
 
             throw $e;
         }
@@ -650,24 +621,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Determine whether the command may be safely retried.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function isRetryable($method, array $parameters)
-    {
-        $method = strtolower($method);
-
-        if ($method === 'set') {
-            return ! isset($parameters[2]);
-        }
-
-        return in_array($method, static::RETRYABLE_COMMANDS, true);
-    }
-
-    /**
      * Run the given callback, retrying it once on a rebuilt client if the connection was lost.
      *
      * For operations that have not yet sent a command that could have taken effect, such as opening a pipeline or a transaction.
@@ -728,6 +681,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             'read error on connection',
             'READONLY',
             'Connection lost',
+            'Connection closed',
             'Error processing response from Redis node',
             'Connection reset by peer',
             "Can't communicate with any node in the cluster",

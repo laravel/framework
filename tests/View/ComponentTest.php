@@ -13,23 +13,27 @@ use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
+use Illuminate\View\RawTemplate;
 use Illuminate\View\View;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class ComponentTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $viewFactory;
 
     protected $config;
 
     protected function setUp(): void
     {
-        $this->config = Mockery::mock(Config::class);
+        $this->config = Double::for(Config::class);
 
         $container = new Container;
 
-        $this->viewFactory = Mockery::mock(Factory::class);
+        $this->viewFactory = Double::for(Factory::class);
 
         $container->instance('view', $this->viewFactory);
         $container->alias('view', FactoryContract::class);
@@ -51,18 +55,115 @@ class ComponentTest extends TestCase
 
     public function testInlineViewsGetCreated()
     {
-        $this->config->expects('get')->with('view.compiled')->andReturn('/tmp');
-        $this->viewFactory->expects('exists')->andReturn(false);
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('exists')->returns(false);
         $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
 
         $component = new TestInlineViewComponent;
         $this->assertSame('__components::57b7a54afa0eb51fd9b88eec031c9e9e', $component->resolveView());
     }
 
+    public function testRawTemplatesGetCreated()
+    {
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('exists')->never();
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+
+        $component = new TestRawTemplateComponent;
+
+        $this->assertSame('__components::'.hash('xxh128', 'Hello {{ $title }}'), $component->resolveView());
+    }
+
+    public function testRawTemplatesAreNeverResolvedAsViewNames()
+    {
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('exists')->never();
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+
+        $component = new class extends Component
+        {
+            public function render()
+            {
+                return new RawTemplate('alert');
+            }
+        };
+
+        $viewPath = $component->resolveView();
+
+        $this->assertSame('__components::'.hash('xxh128', 'alert'), $viewPath);
+        $this->assertSame('alert', file_get_contents('/tmp/'.hash('xxh128', 'alert').'.blade.php'));
+    }
+
+    public function testRenderingRawTemplateClosureFromComponent()
+    {
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('exists')->never();
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+
+        $component = new class extends Component
+        {
+            public function render()
+            {
+                return function (array $data) {
+                    return new RawTemplate('<p>Hello {{ $title }}</p>');
+                };
+            }
+        };
+
+        $closure = $component->resolveView();
+
+        $this->assertInstanceOf(Closure::class, $closure);
+
+        $viewPath = $closure([]);
+
+        $hash = hash('xxh128', '<p>Hello {{ $title }}</p>');
+        $this->assertSame("__components::{$hash}", $viewPath);
+        $this->assertSame('<p>Hello {{ $title }}</p>', file_get_contents("/tmp/{$hash}.blade.php"));
+    }
+
+    public function testBladeViewCacheWithRawTemplateComponent()
+    {
+        $component = new TestRawTemplateComponent;
+
+        $this->viewFactory->expects('exists')->never();
+        $this->config->expects('get')->times(2)->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp')->times(2);
+
+        $compiledViewName = '__components::'.hash('xxh128', 'Hello {{ $title }}');
+
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+
+        $cache = (fn () => $component::$rawTemplateViewCache)->call($component);
+        $this->assertSame([$component::class.'::Hello {{ $title }}' => $compiledViewName], $cache);
+
+        $component::flushCache();
+
+        $cache = (fn () => $component::$rawTemplateViewCache)->call($component);
+        $this->assertSame([], $cache);
+
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+    }
+
+    public function testRawTemplatesDoNotShareCacheWithViewNames()
+    {
+        $this->viewFactory->expects('exists')->times(1)->with('alert')->returns(true);
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
+
+        $this->assertSame('alert', (new TestViewNameOrRawTemplateComponent('alert'))->resolveView());
+
+        $this->assertSame(
+            '__components::'.hash('xxh128', 'alert'),
+            (new TestViewNameOrRawTemplateComponent(new RawTemplate('alert')))->resolveView()
+        );
+    }
+
     public function testRegularViewsGetReturnedUsingViewHelper()
     {
-        $view = Mockery::mock(View::class);
-        $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
+        $view = Double::for(View::class);
+        $this->viewFactory->expects('make')->with('alert', [], [])->returns($view);
 
         $component = new TestRegularViewComponentUsingViewHelper;
 
@@ -71,8 +172,8 @@ class ComponentTest extends TestCase
 
     public function testRenderingStringClosureFromComponent()
     {
-        $this->config->expects('get')->with('view.compiled')->andReturn('/tmp');
-        $this->viewFactory->expects('exists')->andReturn(false);
+        $this->config->expects('get')->with('view.compiled')->returns('/tmp');
+        $this->viewFactory->expects('exists')->returns(false);
         $this->viewFactory->expects('addNamespace')->with('__components', '/tmp');
 
         $component = new class() extends Component
@@ -105,8 +206,8 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturnedUsingViewMethod()
     {
-        $view = Mockery::mock(View::class);
-        $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
+        $view = Double::for(View::class);
+        $this->viewFactory->expects('make')->with('alert', [], [])->returns($view);
 
         $component = new TestRegularViewComponentUsingViewMethod;
 
@@ -115,8 +216,8 @@ class ComponentTest extends TestCase
 
     public function testRegularViewNamesGetReturned()
     {
-        $this->viewFactory->expects('exists')->andReturn(true);
-        $this->viewFactory->shouldReceive('addNamespace')->never();
+        $this->viewFactory->expects('exists')->returns(true);
+        $this->viewFactory->expects('addNamespace')->never();
 
         $component = new TestRegularViewNameViewComponent;
 
@@ -193,7 +294,7 @@ class ComponentTest extends TestCase
     {
         $component = new TestRegularViewNameViewComponent;
 
-        $this->viewFactory->expects('exists')->times(2)->andReturn(true);
+        $this->viewFactory->expects('exists')->times(2)->returns(true);
 
         $this->assertSame('alert', $component->resolveView());
         $this->assertSame('alert', $component->resolveView());
@@ -218,9 +319,9 @@ class ComponentTest extends TestCase
     {
         $component = new TestInlineViewComponent;
 
-        $this->viewFactory->expects('exists')->times(2)->andReturn(false);
+        $this->viewFactory->expects('exists')->times(2)->returns(false);
 
-        $this->config->expects('get')->times(2)->with('view.compiled')->andReturn('/tmp');
+        $this->config->expects('get')->times(2)->with('view.compiled')->returns('/tmp');
 
         $this->viewFactory->expects('addNamespace')
             ->with('__components', '/tmp')
@@ -254,9 +355,9 @@ class ComponentTest extends TestCase
         $componentA = new TestInlineViewComponentWhereRenderDependsOnProps('A');
         $componentB = new TestInlineViewComponentWhereRenderDependsOnProps('B');
 
-        $this->viewFactory->expects('exists')->times(2)->andReturn(false);
+        $this->viewFactory->expects('exists')->times(2)->returns(false);
 
-        $this->config->expects('get')->times(2)->with('view.compiled')->andReturn('/tmp');
+        $this->config->expects('get')->times(2)->with('view.compiled')->returns('/tmp');
 
         $this->viewFactory->expects('addNamespace')
             ->with('__components', '/tmp')
@@ -399,6 +500,33 @@ class TestInlineViewComponent extends Component
     public function render()
     {
         return 'Hello {{ $title }}';
+    }
+}
+
+class TestRawTemplateComponent extends Component
+{
+    public $title;
+
+    public function __construct($title = 'foo')
+    {
+        $this->title = $title;
+    }
+
+    public function render()
+    {
+        return new RawTemplate('Hello {{ $title }}');
+    }
+}
+
+class TestViewNameOrRawTemplateComponent extends Component
+{
+    public function __construct(protected $view)
+    {
+    }
+
+    public function render()
+    {
+        return $this->view;
     }
 }
 

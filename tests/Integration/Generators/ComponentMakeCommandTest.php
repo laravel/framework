@@ -38,8 +38,15 @@ class ComponentMakeCommandTest extends TestCase
         $this->assertFileContains([
             'namespace App\View\Components;',
             'use Illuminate\View\Component;',
+            'use Illuminate\View\RawTemplate;',
             'class Foo extends Component',
-            "return <<<'blade'",
+            'public function render(): RawTemplate',
+            "return new RawTemplate(<<<'blade'",
+            '{{--',
+        ], 'app/View/Components/Foo.php');
+
+        $this->assertFileNotContains([
+            '<!--',
         ], 'app/View/Components/Foo.php');
 
         $this->assertFilenameNotExists('resources/views/components/foo.blade.php');

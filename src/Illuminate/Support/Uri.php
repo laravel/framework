@@ -167,6 +167,18 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Get the URI's origin.
+     *
+     * Opaque origins, such as those of relative or "mailto:" URIs, are returned as null.
+     */
+    public function origin(): ?string
+    {
+        $uri = $this->uri instanceof LeagueUri ? $this->uri : LeagueUri::new($this->value());
+
+        return $uri->getOrigin();
+    }
+
+    /**
      * Get the URI's path.
      *
      * Empty or missing paths are returned as a single "/".

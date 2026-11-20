@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
@@ -15,7 +16,7 @@ use Symfony\Component\Process\Process;
 
 class PendingProcess
 {
-    use Conditionable;
+    use Conditionable, Macroable;
 
     /**
      * The process factory instance.

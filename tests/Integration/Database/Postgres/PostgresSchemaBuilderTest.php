@@ -262,4 +262,43 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertContains('public_table_body_fulltext', $indexNames);
         $this->assertContains('table_raw_index', $indexNames);
     }
+
+    public function testDropAllViewsIgnoresViewsOwnedByExtensions()
+    {
+        DB::statement('create extension if not exists pg_stat_statements schema public');
+        DB::statement('create view public.foo (id) as select 1');
+
+        try {
+            $this->assertFalse(Schema::hasView('public.pg_stat_statements'));
+
+            Schema::dropAllViews();
+
+            $this->assertFalse(Schema::hasView('public.foo'));
+            $this->assertTrue((bool) DB::scalar("select exists (select 1 from pg_views where viewname = 'pg_stat_statements')"));
+        } finally {
+            DB::statement('drop extension if exists pg_stat_statements');
+        }
+    }
+
+    public function testDropAllTablesIgnoresTablesOwnedByExtensions()
+    {
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
+        DB::statement('create table public.extension_table (id integer)');
+        DB::statement('alter extension plpgsql add table public.extension_table');
+
+        try {
+            Schema::dropAllTables();
+
+            $this->artisan('migrate:install');
+
+            $this->assertFalse(Schema::hasTable('public.table'));
+            $this->assertTrue(Schema::hasTable('public.extension_table'));
+        } finally {
+            DB::statement('alter extension plpgsql drop table public.extension_table');
+            DB::statement('drop table public.extension_table');
+        }
+    }
 }

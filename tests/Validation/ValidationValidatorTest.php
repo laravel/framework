@@ -31,7 +31,8 @@ use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -43,6 +44,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         Validator::flushState();
@@ -135,6 +138,57 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => ['bar' => ['baz' => 'nonEmpty']]], ['foo.bar.baz' => 'sometimes|required']);
         $this->assertTrue($v->passes());
+    }
+
+    #[DataProvider('nestedSometimesMissingStringProvider')]
+    public function testSometimesValidatesNestedMissingString($data, $attribute, $failedAttribute, $rule, $failedRule)
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [$attribute => 'sometimes|'.$rule]);
+
+        $this->assertFalse($v->passes());
+        $this->assertArrayHasKey($failedRule, $v->failed()[$failedAttribute]);
+    }
+
+    public static function nestedSometimesMissingStringProvider()
+    {
+        return [
+            'nested integer' => [['profile' => ['age' => '__missing__']], 'profile.age', 'profile.age', 'integer', 'Integer'],
+            'nested in' => [['profile' => ['status' => '__missing__']], 'profile.status', 'profile.status', 'in:active,inactive', 'In'],
+            'wildcard' => [['items' => [['quantity' => '__missing__']]], 'items.*.quantity', 'items.0.quantity', 'integer', 'Integer'],
+            'terminal wildcard' => [['items' => ['__missing__']], 'items.*', 'items.0', 'integer', 'Integer'],
+            'multiple wildcards' => [['groups' => [['items' => [['quantity' => '__missing__']]]]], 'groups.*.items.*.quantity', 'groups.0.items.0.quantity', 'integer', 'Integer'],
+        ];
+    }
+
+    #[DataProvider('nestedSometimesMissingStringProvider')]
+    public function testSometimesRejectsInvalidNestedDataFromValidated($data, $attribute, $failedAttribute, $rule, $failedRule)
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [$attribute => 'sometimes|'.$rule]);
+
+        $this->expectException(ValidationException::class);
+
+        $v->validated();
+    }
+
+    public function testSometimesAllowsMissingAndValidNestedValues()
+    {
+        $data = ['items' => [['quantity' => '__missing__'], [], ['quantity' => null]]];
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, [
+            'items.*.quantity' => 'sometimes|nullable|in:__missing__',
+        ]);
+
+        $this->assertTrue($v->passes());
+        $this->assertSame(['items' => [0 => ['quantity' => '__missing__'], 2 => ['quantity' => null]]], $v->validated());
+    }
+
+    public function testSometimesDistinguishesMissingFromNullNestedValues()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['items' => [[], ['quantity' => null]]], [
+            'items.*.quantity' => 'sometimes|required|integer',
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame(['items.1.quantity' => ['Required' => []]], $v->failed());
     }
 
     public function testAfterCallbacksAreCalledWithValidatorInstance()
@@ -244,7 +298,7 @@ class ValidationValidatorTest extends TestCase
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -253,7 +307,7 @@ class ValidationValidatorTest extends TestCase
     public function testSometimesCanSkipRequiredRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, [], ['name' => 'sometimes|required']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -262,7 +316,7 @@ class ValidationValidatorTest extends TestCase
     public function testInValidatableRulesReturnsValid()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->never();
+        $trans->expects('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
     }
@@ -1311,97 +1365,97 @@ class ValidationValidatorTest extends TestCase
     public function testValidateCurrentPassword()
     {
         // Fails when user is not logged in.
-        $guard = Mockery::mock(Guard::class);
-        $guard->expects('guest')->andReturn(true);
-        $auth = Mockery::mock(AuthFactory::class);
-        $auth->expects('guard')->andReturn($guard);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(true);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = Double::for(Hasher::class);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
         // Fails when password is incorrect.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $guard = Mockery::mock(Guard::class);
-        $guard->expects('guest')->andReturn(false);
-        $guard->expects('user')->andReturn($user);
-        $auth = Mockery::mock(AuthFactory::class);
-        $auth->expects('guard')->andReturn($guard);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(false);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(false);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertFalse($v->passes());
 
         // Succeeds when password is correct.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $guard = Mockery::mock(Guard::class);
-        $guard->expects('guest')->andReturn(false);
-        $guard->expects('user')->andReturn($user);
-        $auth = Mockery::mock(AuthFactory::class);
-        $auth->expects('guard')->andReturn($guard);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(true);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(true);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
 
         // We can use a specific guard.
-        $user = Mockery::mock(Authenticatable::class);
+        $user = Double::for(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $guard = Mockery::mock(Guard::class);
-        $guard->expects('guest')->andReturn(false);
-        $guard->expects('user')->andReturn($user);
-        $auth = Mockery::mock(AuthFactory::class);
-        $auth->expects('guard')->with('custom')->andReturn($guard);
+        $guard = Double::for(Guard::class);
+        $guard->expects('guest')->returns(false);
+        $guard->expects('user')->returns($user);
+        $auth = Double::for(AuthFactory::class);
+        $auth->expects('guard')->with('custom')->returns($guard);
 
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->andReturn(true);
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->returns(true);
 
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with('auth')->andReturn($auth);
-        $container->expects('make')->with('hash')->andReturn($hasher);
+        $container = Double::for(Container::class, override: true);
+        $container->expects('make')->with('auth')->returns($auth);
+        $container->expects('make')->with('hash')->returns($hasher);
 
         $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
+        $trans->allows('get')->resolves(fn (...$args) => $args[0]);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
-        $v->setContainer($container);
+        $v->setContainer($container->instance());
 
         $this->assertTrue($v->passes());
     }
@@ -2302,31 +2356,31 @@ class ValidationValidatorTest extends TestCase
 
         // If file is not successfully uploaded validation should fail with a
         // 'uploaded' error message instead of the original rule.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
-        $file->shouldNotReceive('getSize');
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
+        $file->expects('getSize')->never();
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // Even "required" will not run if the file failed to upload.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'required']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
 
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'string']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
 
         // Validation shouldn't continue if a file failed to upload.
-        $file = Mockery::mock(UploadedFile::class);
-        $file->expects('isValid')->andReturn(false);
+        $file = Double::for(UploadedFile::class);
+        $file->expects('isValid')->returns(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'file|mimes:pdf|min:10']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
@@ -3828,6 +3882,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 1.23], ['foo' => 'Decimal:0,3']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1e5'], ['foo' => 'Decimal:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.5e3'], ['foo' => 'Decimal:0,3']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateInt()
@@ -4601,46 +4661,44 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:connection.users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with('connection');
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id', [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id', [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1,id_col']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id_col', [])->andReturn(2);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', '1', 'id_col', [])->returns(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['users' => [['id' => 1, 'email' => 'foo']]], ['users.*.email' => 'Unique:users,email,[users.*.id]']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', '1', 'id', [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', '1', 'id', [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,NULL,id_col,foo,bar']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->withArgs(function () {
-            return func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
-        })->andReturn(2);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar'])->returns(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
     }
@@ -4651,10 +4709,10 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => 'unique:users', '*.type' => 'exists:user_types',
         ]);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->times(2)->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
-        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
@@ -4666,10 +4724,10 @@ class ValidationValidatorTest extends TestCase
             '*.email' => (new Unique('users'))->where($closure),
             '*.type' => (new Exists('user_types'))->where($closure),
         ]);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->times(2)->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
-        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->returns(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -4678,45 +4736,45 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email,account_id,1,name,taylor']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, ['account_id' => '1', 'name' => 'taylor'])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('users', 'email_addr', 'foo', null, null, [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => ['foo']], ['email' => 'Exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo'], [])->andReturn(0);
+        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo'], [])->returns(0);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:connection.users']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with('connection');
-        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => ['foo', 'foo']], ['email' => 'exists:users,email_addr']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo', 'foo'], [])->andReturn(1);
+        $mock->expects('getMultiCount')->with('users', 'email_addr', ['foo', 'foo'], [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -4725,16 +4783,16 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['id' => 'foo'], ['id' => 'Integer|Exists:users,id']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
-        $mock->shouldReceive('getCount')->never();
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
+        $mock->expects('getCount')->never();
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['id' => '1'], ['id' => 'Integer|Exists:users,id']);
-        $mock = Mockery::mock(DatabasePresenceVerifierInterface::class);
+        $mock = Double::for(DatabasePresenceVerifierInterface::class);
         $mock->expects('setConnection')->with(null);
-        $mock->expects('getCount')->with('users', 'id', '1', null, null, [])->andReturn(1);
+        $mock->expects('getCount')->with('users', 'id', '1', null, null, [])->returns(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -6572,6 +6630,10 @@ class ValidationValidatorTest extends TestCase
         // Ensure commas are not interpreted as parameter separators
         $v = new Validator($trans, ['x' => 'foo bar'], ['x' => 'NotRegex:/x{3,}/i']);
         $this->assertTrue($v->passes());
+
+        // Ensure a failed match is not treated as no match
+        $v = new Validator($trans, ['x' => "foo\xFF"], ['x' => 'NotRegex:/foo/u']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDateAndFormat()
@@ -8412,6 +8474,13 @@ class ValidationValidatorTest extends TestCase
 
         $data = ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]];
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
+
+        $data = ['cat' => ['name' => '__missing__', 'age' => null]];
+        $this->assertSame(['cat' => ['name' => '__missing__']], ValidationData::extractDataFromPath('cat.name', $data));
+        $this->assertSame(['cat' => ['age' => null]], ValidationData::extractDataFromPath('cat.age', $data));
+        $this->assertSame([], ValidationData::extractDataFromPath('cat.absent', $data));
+        $this->assertSame($data, ValidationData::extractDataFromPath(null, $data));
+        $this->assertSame([], ValidationData::extractDataFromPath(null, []));
     }
 
     public function testParsingTablesFromModels()
@@ -10423,7 +10492,7 @@ class ValidationValidatorTest extends TestCase
 
     protected function getTranslator()
     {
-        return Mockery::mock(TranslatorContract::class);
+        return Double::for(TranslatorContract::class);
     }
 
     public function getIlluminateArrayTranslator()

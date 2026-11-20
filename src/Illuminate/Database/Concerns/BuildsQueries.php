@@ -535,7 +535,7 @@ trait BuildsQueries
                         $originalColumn = $this->getOriginalColumnNameForCursorPagination($union, $column);
                         $union->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $union) {
                             $unionBuilder->where(
-                                $originalColumn,
+                                $originalColumn !== $column && Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
                                 $cursor->parameter($column)
                             );

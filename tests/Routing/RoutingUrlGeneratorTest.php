@@ -10,12 +10,14 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Carbon;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -850,6 +852,123 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
     }
 
+    public function testNumericQueryParametersAreUrlEncoded()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $this->assertSame('http://www.foo.com/foo?a=1&expires%3D', $url->route('foo', ['a' => 1, 'expires=']));
+
+        $request = Request::create($url->temporarySignedRoute('foo', Carbon::now()->addSecond(), [0 => 'expires=']));
+
+        $this->assertNotSame('', $request->query('expires'));
+        $this->assertTrue($url->hasValidSignature($request));
+    }
+
+    public function testEncodedNumericQueryParametersAreNotEncodedAgain()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'foo', ['as' => 'foo', fn () => '']));
+
+        $this->assertSame('http://www.foo.com/foo?q=000001', $url->route('foo', new EncodedParameter('q=000001')));
+        $this->assertSame('http://www.foo.com/foo?a=1&q=000001', $url->route('foo', ['a' => 1, new EncodedParameter('q=000001')]));
+        $this->assertSame('http://www.foo.com/foo?foo%20bar', $url->route('foo', [new EncodedParameter('foo%20bar')]));
+
+        $this->assertSame('http://www.foo.com/foo?q%3D000001', $url->route('foo', ['q=000001']));
+    }
+
+    #[TestWith(['QUERY_STRING'])]
+    #[TestWith(['VAPOR_RAW_QUERY_STRING'])]
+    public function testSignatureExpirationIsReadFromTheRawQueryString(string $serverKey)
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        try {
+            $request = Request::create('http://www.foo.com/foo');
+            $request->server->set($serverKey, sprintf('expires=%d', $now->copy()->addMinutes(10)->timestamp));
+
+            $url = new UrlGenerator(new RouteCollection, $request);
+
+            $this->assertNull($request->query('expires'));
+            $this->assertTrue($url->signatureHasNotExpired($request));
+
+            Carbon::setTestNow($now->copy()->addMinutes(11));
+
+            $this->assertFalse($url->signatureHasNotExpired($request));
+        } finally {
+            Carbon::setTestNow(null);
+        }
+    }
+
+    #[TestWith(['QUERY_STRING'])]
+    #[TestWith(['VAPOR_RAW_QUERY_STRING'])]
+    public function testSignatureExpirationRejectsArraysFromTheRawQueryString(string $serverKey)
+    {
+        $request = Request::create('http://www.foo.com/foo');
+        $request->server->set($serverKey, 'expires[]=99999999999');
+
+        $url = new UrlGenerator(new RouteCollection, $request);
+
+        $this->assertNull($request->query('expires'));
+        $this->assertFalse($url->signatureHasNotExpired($request));
+    }
+
+    public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        // ?signature[]=foo&signature[]=bar previously raised an
+        // "Array to string conversion" warning.
+        $request = Request::create('http://www.foo.com/foo?signature[]=foo&signature[]=bar');
+
+        set_error_handler(static function (int $errno, string $errstr) {
+            throw new \ErrorException($errstr, 0, $errno);
+        }, E_WARNING);
+
+        try {
+            $this->assertFalse($url->hasValidSignature($request));
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function testSignedUrlWithArrayExpiresReturnsFalse()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        // ?expires[]=99999999999 is truthy but comparing timestamp > array is always
+        // false in PHP, so without the guard the URL would never appear expired.
+        $request = Request::create('http://www.foo.com/foo?expires[]=99999999999');
+
+        $this->assertFalse($url->signatureHasNotExpired($request));
+    }
+
     public function testSignedUrlDoesNotTrustForwardedPrefixToChangeThePathBeingVerified()
     {
         $url = new UrlGenerator(
@@ -1067,53 +1186,6 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertTrue($url3->hasValidSignature($firstRequest));
         $this->assertTrue($url3->hasValidSignature($secondRequest));
-    }
-
-    public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
-    {
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            Request::create('http://www.foo.com/')
-        );
-        $url->setKeyResolver(function () {
-            return 'secret';
-        });
-
-        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
-            //
-        }]);
-        $routes->add($route);
-
-        // ?signature[]=foo&signature[]=bar previously raised an
-        // "Array to string conversion" warning.
-        $request = Request::create('http://www.foo.com/foo?signature[]=foo&signature[]=bar');
-
-        set_error_handler(static function (int $errno, string $errstr) {
-            throw new \ErrorException($errstr, 0, $errno);
-        }, E_WARNING);
-
-        try {
-            $this->assertFalse($url->hasValidSignature($request));
-        } finally {
-            restore_error_handler();
-        }
-    }
-
-    public function testSignedUrlWithArrayExpiresReturnsFalse()
-    {
-        $url = new UrlGenerator(
-            new RouteCollection,
-            Request::create('http://www.foo.com/')
-        );
-        $url->setKeyResolver(function () {
-            return 'secret';
-        });
-
-        // ?expires[]=99999999999 is truthy but comparing timestamp > array is always
-        // false in PHP, so without the guard the URL would never appear expired.
-        $request = Request::create('http://www.foo.com/foo?expires[]=99999999999');
-
-        $this->assertFalse($url->signatureHasNotExpired($request));
     }
 
     public function testMissingNamedRouteResolution()

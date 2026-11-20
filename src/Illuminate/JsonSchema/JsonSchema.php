@@ -18,6 +18,11 @@ use Illuminate\JsonSchema\Types\Type;
 class JsonSchema
 {
     /**
+     * The maximum number of schema fragments that may be expanded when deserializing or building rules.
+     */
+    public const MAX_NODES = 20000;
+
+    /**
      * Build a type from a raw array of the Laravel-supported JSON Schema subset.
      *
      * @param  array<string, mixed>  $schema
@@ -27,6 +32,19 @@ class JsonSchema
     public static function fromArray(array $schema): Type
     {
         return Deserializer::deserialize($schema);
+    }
+
+    /**
+     * Get the Laravel validation rules for the properties of the given object schema.
+     *
+     * @param  \Illuminate\JsonSchema\Types\Type|array<string, mixed>  $schema
+     * @return array<string, array<int, mixed>>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function rules(Type|array $schema): array
+    {
+        return ValidationRules::for($schema);
     }
 
     /**

@@ -165,6 +165,18 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $model1 = EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading::create();
         $this->assertInstanceOf(Collection::class, $model1->modelTwos);
     }
+
+    public function testStrictModeThrowsAnExceptionOnLazyLoadingWithCursor()
+    {
+        $this->expectException(LazyLoadingViolationException::class);
+        $this->expectExceptionMessage('Attempted to lazy load');
+
+        EloquentStrictLoadingTestModel1::create();
+
+        foreach (EloquentStrictLoadingTestModel1::cursor() as $model) {
+            $model->modelTwos;
+        }
+    }
 }
 
 class EloquentStrictLoadingTestModel1 extends Model

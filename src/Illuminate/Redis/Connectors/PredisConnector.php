@@ -35,7 +35,7 @@ class PredisConnector implements Connector
 
         $config = $this->formatHost($config);
 
-        return new PredisConnection(new Client($config, $formattedOptions));
+        return new PredisConnection(new Client($config, $formattedOptions), $config);
     }
 
     /**
@@ -64,7 +64,9 @@ class PredisConnector implements Connector
             $options['parameters'] = $this->formatRetry($options['parameters']);
         }
 
-        return new PredisClusterConnection(new Client($servers, $options));
+        return new PredisClusterConnection(new Client($servers, $options), [
+            'command_retries' => (int) Arr::get($options, 'command_retries', 0),
+        ]);
     }
 
     /**

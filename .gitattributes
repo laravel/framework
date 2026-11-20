@@ -10,6 +10,7 @@
 *.neon.dist linguist-language=neon
 
 /.github export-ignore
+/.oss-scanner export-ignore
 /bin export-ignore
 /tests export-ignore
 /types export-ignore

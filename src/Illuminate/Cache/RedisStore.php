@@ -121,6 +121,53 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     }
 
     /**
+     * Retrieve multiple items using a pipeline of individual reads.
+     *
+     * @param  array  $keys
+     * @return array
+     *
+     * @internal
+     */
+    public function manyViaPipeline(array $keys)
+    {
+        if (count($keys) < 2) {
+            return $keys === [] ? [] : $this->manyAlias($keys);
+        }
+
+        $connection = $this->connection();
+
+        if ($connection->isCluster() ||
+            ! ($connection instanceof PhpRedisConnection || $connection instanceof PredisConnection)) {
+            return $this->manyAlias($keys);
+        }
+
+        // A single endpoint can enforce cluster slots even when the client is not cluster-aware...
+        $prefixedKeys = array_map(fn ($key) => $this->prefix.$key, $keys);
+
+        $values = $connection instanceof PhpRedisConnection
+            ? $connection->getManyViaPipeline($prefixedKeys)
+            : $connection->pipeline(function ($pipeline) use ($prefixedKeys) {
+                foreach ($prefixedKeys as $key) {
+                    $pipeline->get($key);
+                }
+            });
+
+        if ($values === false) {
+            return $this->manyAlias($keys);
+        }
+
+        $results = [];
+
+        foreach ($values as $index => $value) {
+            $results[$keys[$index]] = is_null($value) || $value === false
+                ? null
+                : $this->connectionAwareUnserialize($value, $connection);
+        }
+
+        return $results;
+    }
+
+    /**
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key

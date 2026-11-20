@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\UploadedFile;
@@ -17,12 +18,15 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
 class ImageManagerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function test_default_driver_returns_configured_value()
     {
         $app = $this->makeApp(['images.default' => 'imagick']);
@@ -101,9 +105,7 @@ class ImageManagerTest extends TestCase
         $path = $file->getRealPath();
 
         $app = $this->makeApp([]);
-        $app->expects('make')
-            ->with(Filesystem::class)
-            ->andReturn(new Filesystem);
+        $app->instance(Filesystem::class, new Filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromPath($path);
@@ -114,8 +116,8 @@ class ImageManagerTest extends TestCase
 
     public function test_from_path_is_lazy()
     {
-        $filesystem = Mockery::mock(Filesystem::class);
-        $filesystem->shouldNotReceive('get');
+        $filesystem = Double::for(Filesystem::class);
+        $filesystem->expects('get')->never();
 
         $app = $this->makeApp([]);
 
@@ -129,20 +131,14 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = Mockery::mock(FilesystemContract::class);
-        $disk->expects('get')
-            ->with('images/avatar.jpg')
-            ->andReturn($contents);
+        $disk = Double::for(FilesystemContract::class);
+        $disk->expects('get')->with('images/avatar.jpg')->returns($contents);
 
-        $filesystem = Mockery::mock(FilesystemFactory::class);
-        $filesystem->expects('disk')
-            ->with('public')
-            ->andReturn($disk);
+        $filesystem = Double::for(FilesystemFactory::class);
+        $filesystem->expects('disk')->with('public')->returns($disk);
 
         $app = $this->makeApp([]);
-        $app->expects('make')
-            ->with(FilesystemFactory::class)
-            ->andReturn($filesystem);
+        $app->instance(FilesystemFactory::class, $filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromStorage('images/avatar.jpg', 'public');
@@ -155,20 +151,14 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = Mockery::mock(FilesystemContract::class);
-        $disk->expects('get')
-            ->with('images/avatar.jpg')
-            ->andReturn($contents);
+        $disk = Double::for(FilesystemContract::class);
+        $disk->expects('get')->with('images/avatar.jpg')->returns($contents);
 
-        $filesystem = Mockery::mock(FilesystemFactory::class);
-        $filesystem->expects('disk')
-            ->with('public')
-            ->andReturn($disk);
+        $filesystem = Double::for(FilesystemFactory::class);
+        $filesystem->expects('disk')->with('public')->returns($disk);
 
         $app = $this->makeApp([]);
-        $app->expects('make')
-            ->with(FilesystemFactory::class)
-            ->andReturn($filesystem);
+        $app->instance(FilesystemFactory::class, $filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromStorage('images/avatar.jpg', ImageDiskStub::Public);
@@ -179,8 +169,8 @@ class ImageManagerTest extends TestCase
 
     public function test_from_storage_is_lazy()
     {
-        $filesystem = Mockery::mock(FilesystemFactory::class);
-        $filesystem->shouldNotReceive('disk');
+        $filesystem = Double::for(FilesystemFactory::class);
+        $filesystem->expects('disk')->never();
 
         $app = $this->makeApp([]);
 
@@ -305,9 +295,7 @@ class ImageManagerTest extends TestCase
         ]);
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
-            ->with(HttpFactory::class)
-            ->andReturn($http);
+        $app->instance(HttpFactory::class, $http);
 
         $manager = new ImageManager($app);
         $image = $manager->fromUrl('https://example.com/photo.jpg');
@@ -360,9 +348,7 @@ class ImageManagerTest extends TestCase
         ]);
 
         $app = $this->makeApp([]);
-        $app->expects('make')
-            ->with(HttpFactory::class)
-            ->andReturn($http);
+        $app->instance(HttpFactory::class, $http);
 
         $manager = new ImageManager($app);
         $image = $manager->fromUrl('https://example.com/photo.jpg');
@@ -379,9 +365,7 @@ class ImageManagerTest extends TestCase
         ]);
 
         $app = $this->makeApp([]);
-        $app->expects('make')
-            ->with(HttpFactory::class)
-            ->andReturn($http);
+        $app->instance(HttpFactory::class, $http);
 
         $manager = new ImageManager($app);
         $image = $manager->fromUrl('https://example.com/missing.jpg');
@@ -399,9 +383,7 @@ class ImageManagerTest extends TestCase
         $http->fake();
 
         $app = $this->makeApp([]);
-        $app->allows('make')
-            ->with(HttpFactory::class)
-            ->andReturn($http);
+        $app->instance(HttpFactory::class, $http);
 
         $manager = new ImageManager($app);
         $image = $manager->fromUrl('https://example.com/photo.jpg');
@@ -557,13 +539,9 @@ class ImageManagerTest extends TestCase
 
     protected function makeApp(array $config): Application
     {
-        $app = Mockery::mock(Application::class, \ArrayAccess::class);
+        $app = new FoundationApplication;
 
-        $configRepo = new Repository($config);
-
-        $app->shouldReceive('make')->with('config')->andReturn($configRepo)->byDefault();
-        $app->shouldReceive('offsetGet')->with('config')->andReturn($configRepo);
-        $app->shouldReceive('offsetExists')->andReturn(true);
+        $app->instance('config', new Repository($config));
 
         return $app;
     }
