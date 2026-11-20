@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
+use Illuminate\Foundation\Cloud\LineFormatter;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
@@ -140,11 +141,13 @@ class CloudBootstrapper
             'includeStacktraces' => true,
         ]);
 
+        $useLineFormatter = ($_ENV['LARAVEL_CLOUD_LOG_FORMAT'] ?? $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] ?? null) === 'line';
+
         $app['config']->set('logging.channels.laravel-cloud-socket', [
             'driver' => 'monolog',
             'handler' => SocketHandler::class,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
+            'formatter' => $useLineFormatter ? LineFormatter::class : JsonFormatter::class,
+            'formatter_with' => $useLineFormatter ? [] : [
                 'includeStacktraces' => true,
             ],
             'with' => [
