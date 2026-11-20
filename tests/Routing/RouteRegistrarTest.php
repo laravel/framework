@@ -180,6 +180,59 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testGetRouteWithOnlyTrashed()
+    {
+        $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->onlyTrashed();
+
+        $this->assertTrue($route->onlyAllowsTrashedBindings());
+    }
+
+    public function testRouteGroupWithOnlyTrashed()
+    {
+        $this->router->onlyTrashed()->group(function ($router) {
+            $router->get('users', [RouteRegistrarControllerStub::class, 'index']);
+        });
+
+        $this->assertTrue($this->getRoute()->onlyAllowsTrashedBindings());
+    }
+
+    public function testRouteCanOptOutOfGroupOnlyTrashed()
+    {
+        $this->router->onlyTrashed()->group(function ($router) {
+            $router->get('users', [RouteRegistrarControllerStub::class, 'index'])->onlyTrashed(false);
+        });
+
+        $this->assertFalse($this->getRoute()->onlyAllowsTrashedBindings());
+    }
+
+    public function testResourceWithOnlyTrashed()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->only(['index', 'show', 'destroy'])
+            ->onlyTrashed(['show', 'destroy']);
+
+        $routes = collect($this->router->getRoutes())->keyBy(fn ($route) => $route->getName());
+
+        $this->assertFalse($routes['users.index']->onlyAllowsTrashedBindings());
+        $this->assertTrue($routes['users.show']->onlyAllowsTrashedBindings());
+        $this->assertTrue($routes['users.destroy']->onlyAllowsTrashedBindings());
+    }
+
+    public function testResourceWithOnlyTrashedUsesDefaultMethods()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)->onlyTrashed();
+
+        $routes = collect($this->router->getRoutes())->keyBy(fn ($route) => $route->getName());
+
+        foreach (['show', 'edit', 'update'] as $method) {
+            $this->assertTrue($routes["users.{$method}"]->onlyAllowsTrashedBindings());
+        }
+
+        foreach (['index', 'create', 'store', 'destroy'] as $method) {
+            $this->assertFalse($routes["users.{$method}"]->onlyAllowsTrashedBindings());
+        }
+    }
+
     public function testFallbackRoute()
     {
         $route = $this->router->fallback(function () {
