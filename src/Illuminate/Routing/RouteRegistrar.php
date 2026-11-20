@@ -28,6 +28,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
  * @method \Illuminate\Routing\RouteRegistrar name(\BackedEnum|string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
+ * @method \Illuminate\Routing\RouteRegistrar onlyTrashed(bool $onlyTrashed = true)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method \Illuminate\Routing\RouteRegistrar where(array $where)
@@ -79,6 +80,7 @@ class RouteRegistrar
         'missing',
         'name',
         'namespace',
+        'onlyTrashed',
         'prefix',
         'scopeBindings',
         'where',
@@ -93,6 +95,7 @@ class RouteRegistrar
      */
     protected $aliases = [
         'name' => 'as',
+        'onlyTrashed' => 'only_trashed',
         'scopeBindings' => 'scope_bindings',
         'withoutScopedBindings' => 'scope_bindings',
         'withoutMiddleware' => 'excluded_middleware',
