@@ -14,11 +14,11 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
+#[RequiresPhpExtension('redis')]
 class RedisEventsTest extends TestCase
 {
     use VerifiesDoubles;
 
-    #[RequiresPhpExtension('redis')]
     public function testCommandFailedEventIsDispatched()
     {
         $exception = new Exception('Test exception');
