@@ -54,7 +54,7 @@ abstract class Manager
     /**
      * Get the default driver name.
      *
-     * @return string|null
+     * @return \UnitEnum|string|null
      */
     abstract public function getDefaultDriver();
 
@@ -68,7 +68,7 @@ abstract class Manager
      */
     public function driver($driver = null)
     {
-        $driver = enum_value($driver) ?: $this->getDefaultDriver();
+        $driver = enum_value($driver) ?: enum_value($this->getDefaultDriver());
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
