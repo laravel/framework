@@ -193,6 +193,10 @@ class WorkCommand extends Command
         });
 
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+            if ($event->job->hasFailed()) {
+                return;
+            }
+
             $this->writeOutput($event->job, 'success');
         });
 

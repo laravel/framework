@@ -60,7 +60,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected $driverPackages = [
         'pusher' => ['pusher/pusher-php-server' => '*'],
-        'ably' => ['ably/ably-php' => '*'],
+        'ably' => ['ably/pubsub-server' => '*'],
         'mercure' => ['symfony/mercure' => '^0.8', 'web-token/jwt-library' => '^4.1'],
     ];
 

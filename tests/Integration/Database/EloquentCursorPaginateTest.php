@@ -254,6 +254,29 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertEquals(2, current($result->items())->rank);
     }
 
+    public function testPaginationWithUnionAndAliasedExpressions()
+    {
+        TestUser::fillAndInsert([['name' => 'alpha'], ['name' => 'bravo']]);
+        TestPost::fillAndInsert([['title' => 'bravo'], ['title' => 'charlie']]);
+
+        $query = fn ($direction) => TestPost::select('test_posts.id')->selectRaw('UPPER(test_posts.title) as label')->toBase()
+            ->unionAll(TestUser::select('test_users.id')->selectRaw('UPPER(test_users.name) as label')->toBase())
+            ->orderBy('label', $direction)
+            ->orderBy('id', $direction);
+
+        $first = $query('asc')->cursorPaginate(2);
+        $second = $query('asc')->cursorPaginate(2, ['*'], 'cursor', $first->nextCursor());
+
+        $this->assertSame(['BRAVO', 'CHARLIE'], collect($second->items())->pluck('label')->all());
+        $this->assertEquals([2, 2], collect($second->items())->pluck('id')->all());
+
+        $first = $query('desc')->cursorPaginate(2);
+        $second = $query('desc')->cursorPaginate(2, ['*'], 'cursor', $first->nextCursor());
+
+        $this->assertSame(['BRAVO', 'ALPHA'], collect($second->items())->pluck('label')->all());
+        $this->assertEquals([1, 1], collect($second->items())->pluck('id')->all());
+    }
+
     public function testPaginationWithAliasedOrderBy()
     {
         TestUser::fillAndInsert([[], [], [], [], [], []]);

@@ -15,7 +15,9 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Testing\Assert;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -23,40 +25,38 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class SeedCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testHandle()
     {
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $seeder = Mockery::mock(Seeder::class);
-        $seeder->expects('setContainer')->andReturnSelf();
-        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder = Double::for(Seeder::class);
+        $seeder->expects('setContainer')->returns($seeder);
+        $seeder->expects('setCommand')->returns($seeder);
         $seeder->expects('__invoke');
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
-        $container->expects('environment')->andReturn('testing');
-        $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
-            $outputStyle
-        );
-        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->expects('environment')->returns('testing');
+        $container->allows('runningUnitTests')->returns('true');
+        $container->expects('make')->with('DatabaseSeeder')->returns($seeder);
+        $container->expects('make')->with(OutputStyle::class, Argument::any())->returns($outputStyle);
+        $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
         $command->handle();
 
         $this->assertSame('sqlite', $resolver->getDefaultConnection());
-        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+        $container->received('call')->with([$command, 'handle']);
     }
 
     public function testFailedSeederRestoresPreviousDefaultConnection()
@@ -65,28 +65,24 @@ class SeedCommandTest extends TestCase
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $seeder = Mockery::mock(Seeder::class);
-        $seeder->expects('setContainer')->andReturnSelf();
-        $seeder->expects('setCommand')->andReturnSelf();
-        $seeder->expects('__invoke')->andThrow(new RuntimeException('Seeding failed.'));
+        $seeder = Double::for(Seeder::class);
+        $seeder->expects('setContainer')->returns($seeder);
+        $seeder->expects('setCommand')->returns($seeder);
+        $seeder->expects('__invoke')->throws(new RuntimeException('Seeding failed.'));
 
         $resolver = new SeedCommandTestConnectionResolver;
         $resolver->default = 'mysql';
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
-        $container->expects('environment')->andReturn('testing');
-        $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
-            $outputStyle
-        );
-        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->expects('environment')->returns('testing');
+        $container->allows('runningUnitTests')->returns('true');
+        $container->expects('make')->with('DatabaseSeeder')->returns($seeder);
+        $container->expects('make')->with(OutputStyle::class, Argument::any())->returns($outputStyle);
+        $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
@@ -113,26 +109,22 @@ class SeedCommandTest extends TestCase
 
         $instance = new UserWithoutModelEventsSeeder();
 
-        $seeder = Mockery::mock($instance);
-        $seeder->expects('setContainer')->andReturnSelf();
-        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder = Double::for($instance);
+        $seeder->expects('setContainer')->returns($seeder);
+        $seeder->expects('setCommand')->returns($seeder);
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
-        $container->expects('environment')->andReturn('testing');
-        $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->expects('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
-        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
-            $outputStyle
-        );
-        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->expects('environment')->returns('testing');
+        $container->allows('runningUnitTests')->returns('true');
+        $container->expects('make')->with(UserWithoutModelEventsSeeder::class)->returns($seeder);
+        $container->expects('make')->with(OutputStyle::class, Argument::any())->returns($outputStyle);
+        $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         $dispatcher = new Dispatcher;
         Model::setEventDispatcher($dispatcher);
@@ -143,7 +135,7 @@ class SeedCommandTest extends TestCase
 
         Assert::assertSame($dispatcher, Model::getEventDispatcher());
         $this->assertSame('sqlite', $resolver->getDefaultConnection());
-        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+        $container->received('call')->with([$command, 'handle']);
     }
 
     public function testProhibitable()
@@ -154,18 +146,14 @@ class SeedCommandTest extends TestCase
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class, override: true);
         $container->expects('call');
-        $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
-            $outputStyle
-        );
-        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->allows('runningUnitTests')->returns('true');
+        $container->expects('make')->with(OutputStyle::class, Argument::any())->returns($outputStyle);
+        $container->expects('make')->with(Factory::class, Argument::any())->returns(new Factory($outputStyle));
 
         $command = new SeedCommand($resolver);
-        $command->setLaravel($container);
+        $command->setLaravel($container->instance());
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);

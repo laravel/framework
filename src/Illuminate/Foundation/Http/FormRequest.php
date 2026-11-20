@@ -13,6 +13,7 @@ use Illuminate\Foundation\Http\Attributes\FailOnUnknownFields;
 use Illuminate\Foundation\Http\Attributes\RedirectTo;
 use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
+use Illuminate\Foundation\Http\Concerns\InteractsWithModels;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
@@ -21,7 +22,7 @@ use ReflectionClass;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
-    use ValidatesWhenResolvedTrait;
+    use InteractsWithModels, ValidatesWhenResolvedTrait;
 
     /**
      * The container instance.

@@ -18,6 +18,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\InteractsWithTime;
@@ -295,6 +296,10 @@ class Schedule
         }
 
         if (! (new UniqueLock(Container::getInstance()->make(Cache::class)))->acquire($job)) {
+            if (Container::getInstance()->bound(EventDispatcher::class)) {
+                Container::getInstance()->make(EventDispatcher::class)->dispatch(new UniqueJobSkipped($job));
+            }
+
             return;
         }
 

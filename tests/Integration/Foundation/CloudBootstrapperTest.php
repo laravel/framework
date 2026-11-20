@@ -6,6 +6,7 @@ use Illuminate\Database\Connectors\ConnectorInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\JsonFormatter;
+use Illuminate\Foundation\Cloud\LineFormatter;
 use Illuminate\Foundation\Cloud\SocketHandler;
 use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithEnv;
@@ -547,11 +548,26 @@ class CloudBootstrapperTest extends TestCase
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
     }
 
-    public function test_it_configures_the_cloud_logging_formatter()
+    public function test_it_configures_the_cloud_json_logging_formatter()
     {
         CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(JsonFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+        $this->assertSame([
+            'includeStacktraces' => true,
+        ], $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter_with'));
+    }
+
+    public function test_it_configures_the_cloud_line_logging_formatter()
+    {
+        $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] = 'line';
+
+        CloudBootstrapper::configureCloudLogging($this->app);
+
+        $this->assertSame(LineFormatter::class, $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter'));
+        $this->assertSame([], $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter_with'));
+
+        unset($_SERVER['LARAVEL_CLOUD_LOG_FORMAT']);
     }
 
     public function test_it_configures_the_cloud_logging_handler()

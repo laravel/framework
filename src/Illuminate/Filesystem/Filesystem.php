@@ -585,9 +585,9 @@ class Filesystem
             return false;
         }
 
-        $running = class_exists(\Phar::class, false) ? \Phar::running() : '';
+        $running = class_exists(\Phar::class, false) ? str_replace('\\', '/', \Phar::running()) : '';
 
-        return $running === '' || ! str_starts_with($path, $running.'/');
+        return $running === '' || ! str_starts_with(str_replace('\\', '/', $path), $running.'/');
     }
 
     /**

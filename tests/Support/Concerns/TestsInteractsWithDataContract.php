@@ -12,6 +12,8 @@ use Illuminate\Tests\Support\Fixtures\TestEnum;
 use Illuminate\Tests\Support\Fixtures\TestIntegerBackedEnum;
 use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use InvalidArgumentException;
+use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Uid\Ulid;
 
 include_once dirname(__DIR__).'/Fixtures/Enums.php';
 
@@ -847,6 +849,63 @@ trait TestsInteractsWithDataContract
         $this->assertInstanceOf(CarbonInterval::class, $data->interval('very_small', Unit::Second));
         $this->assertInstanceOf(CarbonInterval::class, $data->interval('scientific', Unit::Millisecond));
         $this->assertSame(1, $data->interval('normal_float', Unit::Hour)->hours);
+    }
+
+    protected function assertDataUuidContract()
+    {
+        $data = static::arrayToDataFactory([
+            'as_empty' => '',
+            'as_uuid' => 'a0a2a2d2-0b87-4a18-83f2-2529882be2de',
+            'as_uppercase' => 'A0A2A2D2-0B87-4A18-83F2-2529882BE2DE',
+            'invalid' => 'invalid',
+        ]);
+
+        $this->assertNull($data->uuid('as_empty'));
+        $this->assertNull($data->uuid('doesnt_exist'));
+
+        $uuid = $data->uuid('as_uuid');
+        $this->assertInstanceOf(UuidInterface::class, $uuid);
+        $this->assertSame('a0a2a2d2-0b87-4a18-83f2-2529882be2de', $uuid->toString());
+
+        $this->assertTrue($data->uuid('as_uppercase')->equals($uuid));
+
+        try {
+            $data->uuid('invalid');
+
+            $this->fail('An invalid UUID value should throw an exception.');
+        } catch (InvalidArgumentException) {
+            //
+        }
+    }
+
+    protected function assertDataUlidContract()
+    {
+        $data = static::arrayToDataFactory([
+            'as_empty' => '',
+            'as_ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV',
+            'as_lowercase' => '01arz3ndektsv4rrffq69g5fav',
+            'as_uuid' => 'a0a2a2d2-0b87-4a18-83f2-2529882be2de',
+            'invalid' => 'invalid',
+        ]);
+
+        $this->assertNull($data->ulid('as_empty'));
+        $this->assertNull($data->ulid('doesnt_exist'));
+
+        $ulid = $data->ulid('as_ulid');
+        $this->assertInstanceOf(Ulid::class, $ulid);
+        $this->assertSame('01ARZ3NDEKTSV4RRFFQ69G5FAV', (string) $ulid);
+
+        $this->assertTrue($data->ulid('as_lowercase')->equals($ulid));
+
+        foreach (['invalid', 'as_uuid'] as $key) {
+            try {
+                $data->ulid($key);
+
+                $this->fail('An invalid ULID value should throw an exception.');
+            } catch (InvalidArgumentException) {
+                //
+            }
+        }
     }
 
     protected function assertDataEnumContract()

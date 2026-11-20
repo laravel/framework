@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Aws\MockHandler;
+use Aws\Result;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DynamoDbFailedJobProviderTest extends TestCase
@@ -26,9 +27,11 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $exception = new Exception('Something went wrong.');
 
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $handler = new MockHandler;
+        $dynamoDbClient = $this->dynamoDbClient($handler);
 
-        $dynamoDbClient->expects('putItem')->with([
+        $handler->append(new Result([]));
+        $expectedParams = [
             'TableName' => 'table',
             'Item' => [
                 'application' => ['S' => 'application'],
@@ -40,30 +43,25 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'failed_at' => ['N' => (string) $now->getTimestamp()],
                 'expires_at' => ['N' => (string) $now->addWeek()->getTimestamp()],
             ],
-        ]);
+        ];
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
         $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
+
+        $this->assertEquals($expectedParams, $this->lastCommandParameters($handler));
 
         Str::createUuidsNormally();
     }
 
     public function testCanRetrieveAllFailedJobs()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $handler = new MockHandler;
+        $dynamoDbClient = $this->dynamoDbClient($handler);
 
         $time = time();
 
-        $dynamoDbClient->expects('query')->with([
-            'TableName' => 'table',
-            'Select' => 'ALL_ATTRIBUTES',
-            'KeyConditionExpression' => 'application = :application',
-            'ExpressionAttributeValues' => [
-                ':application' => ['S' => 'application'],
-            ],
-            'ScanIndexForward' => false,
-        ])->andReturn([
+        $handler->append(new Result([
             'Items' => [
                 [
                     'application' => ['S' => 'application'],
@@ -76,7 +74,16 @@ class DynamoDbFailedJobProviderTest extends TestCase
                     'expires_at' => ['N' => (string) $time],
                 ],
             ],
-        ]);
+        ]));
+        $expectedParams = [
+            'TableName' => 'table',
+            'Select' => 'ALL_ATTRIBUTES',
+            'KeyConditionExpression' => 'application = :application',
+            'ExpressionAttributeValues' => [
+                ':application' => ['S' => 'application'],
+            ],
+            'ScanIndexForward' => false,
+        ];
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
@@ -92,21 +99,18 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ISO8601),
             ],
         ], $response);
+
+        $this->assertEquals($expectedParams, $this->lastCommandParameters($handler));
     }
 
     public function testASingleJobCanBeFound()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $handler = new MockHandler;
+        $dynamoDbClient = $this->dynamoDbClient($handler);
 
         $time = time();
 
-        $dynamoDbClient->expects('getItem')->with([
-            'TableName' => 'table',
-            'Key' => [
-                'application' => ['S' => 'application'],
-                'uuid' => ['S' => 'id'],
-            ],
-        ])->andReturn([
+        $handler->append(new Result([
             'Item' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'uuid'],
@@ -117,7 +121,14 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'failed_at' => ['N' => (string) $time],
                 'expires_at' => ['N' => (string) $time],
             ],
-        ]);
+        ]));
+        $expectedParams = [
+            'TableName' => 'table',
+            'Key' => [
+                'application' => ['S' => 'application'],
+                'uuid' => ['S' => 'id'],
+            ],
+        ];
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
@@ -133,41 +144,70 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ISO8601),
             ], $response
         );
+
+        $this->assertEquals($expectedParams, $this->lastCommandParameters($handler));
     }
 
     public function testNullIsReturnedIfJobNotFound()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $handler = new MockHandler;
+        $dynamoDbClient = $this->dynamoDbClient($handler);
 
-        $dynamoDbClient->expects('getItem')->with([
+        $handler->append(new Result([]));
+        $expectedParams = [
             'TableName' => 'table',
             'Key' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
             ],
-        ])->andReturn([]);
+        ];
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
         $response = $provider->find('id');
 
         $this->assertNull($response);
+
+        $this->assertEquals($expectedParams, $this->lastCommandParameters($handler));
     }
 
     public function testJobsCanBeDeleted()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $handler = new MockHandler;
+        $dynamoDbClient = $this->dynamoDbClient($handler);
 
-        $dynamoDbClient->expects('deleteItem')->with([
+        $handler->append(new Result([]));
+        $expectedParams = [
             'TableName' => 'table',
             'Key' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
             ],
-        ])->andReturn([]);
+        ];
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
         $provider->forget('id');
+
+        $this->assertEquals($expectedParams, $this->lastCommandParameters($handler));
+    }
+
+    protected function dynamoDbClient(MockHandler $handler): DynamoDbClient
+    {
+        return new DynamoDbClient([
+            'region' => 'us-east-1',
+            'version' => 'latest',
+            'credentials' => ['key' => 'foo', 'secret' => 'bar'],
+            'handler' => $handler,
+        ]);
+    }
+
+    protected function lastCommandParameters(MockHandler $handler): array
+    {
+        return array_filter(
+            $handler->getLastCommand()->toArray(),
+            fn ($key) => ! str_starts_with($key, '@'),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

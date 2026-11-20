@@ -13,12 +13,15 @@ use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 
 class MailMailerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
         unset($_SERVER['__mailer.test']);
@@ -62,7 +65,7 @@ class MailMailerTest extends TestCase
 
     public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings(): void
     {
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -80,7 +83,7 @@ class MailMailerTest extends TestCase
 
     public function testMailerSendSendsMessageWithProperViewContentUsingStringCallbacks(): void
     {
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -109,7 +112,7 @@ class MailMailerTest extends TestCase
 
     public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod(): void
     {
-        $view = Mockery::mock(Factory::class);
+        $view = Double::for(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -314,7 +317,7 @@ class MailMailerTest extends TestCase
             return 'bar';
         });
 
-        $mailer = new Mailer('array', Mockery::mock(Factory::class), new ArrayTransport);
+        $mailer = new Mailer('array', Double::for(Factory::class), new ArrayTransport);
 
         $this->assertSame(
             'bar', $mailer->foo()
@@ -323,13 +326,16 @@ class MailMailerTest extends TestCase
 
     protected function viewFactory(string ...$rendered)
     {
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
+        $views = [];
 
         foreach ($rendered as $contents) {
-            $view = Mockery::mock(View::class);
-            $view->expects('render')->andReturn($contents);
-            $factory->expects('make')->andReturn($view);
+            $view = Double::for(View::class);
+            $view->expects('render')->returns($contents);
+            $views[] = $view;
         }
+
+        $factory->expects('make')->times(count($views))->returns(...$views);
 
         return $factory;
     }

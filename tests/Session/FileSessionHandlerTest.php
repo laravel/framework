@@ -5,13 +5,16 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Support\Carbon;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 use function Illuminate\Filesystem\join_paths;
 
 class FileSessionHandlerTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $files;
 
     protected $sessionHandler;
@@ -19,7 +22,7 @@ class FileSessionHandlerTest extends TestCase
     protected function setUp(): void
     {
         // Create a mock for the Filesystem class
-        $this->files = Mockery::mock(Filesystem::class);
+        $this->files = Double::for(Filesystem::class);
 
         // Initialize the FileSessionHandler with the mocked Filesystem
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);
@@ -48,7 +51,7 @@ class FileSessionHandlerTest extends TestCase
         $sessionId = 'session_id';
         $path = '/path/to/sessions/'.$sessionId;
 
-        $this->files->expects('isFile')->with($path)->andReturn(true);
+        $this->files->expects('isFile')->with($path)->returns(true);
 
         $this->assertTrue($this->sessionHandler->validateId($sessionId));
     }
@@ -59,11 +62,11 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
         Carbon::setTestNow(Carbon::parse('2025-02-02 01:30:00'));
         // Set up expectations
-        $this->files->expects('isFile')->with($path)->andReturn(true);
+        $this->files->expects('isFile')->with($path)->returns(true);
 
         $minutesAgo30 = Carbon::parse('2025-02-02 01:00:00')->getTimestamp();
-        $this->files->expects('lastModified')->with($path)->andReturn($minutesAgo30);
-        $this->files->expects('sharedGet')->with($path)->andReturn('session_data');
+        $this->files->expects('lastModified')->with($path)->returns($minutesAgo30);
+        $this->files->expects('sharedGet')->with($path)->returns('session_data');
 
         $result = $this->sessionHandler->read($sessionId);
 
@@ -76,11 +79,11 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
         Carbon::setTestNow(Carbon::parse('2025-02-02 01:30:01'));
         // Set up expectations
-        $this->files->expects('isFile')->with($path)->andReturn(true);
+        $this->files->expects('isFile')->with($path)->returns(true);
 
         $minutesAgo30 = Carbon::parse('2025-02-02 01:00:00')->getTimestamp();
-        $this->files->expects('lastModified')->with($path)->andReturn($minutesAgo30);
-        $this->files->shouldReceive('sharedGet')->never();
+        $this->files->expects('lastModified')->with($path)->returns($minutesAgo30);
+        $this->files->expects('sharedGet')->never();
 
         $result = $this->sessionHandler->read($sessionId);
 
@@ -93,7 +96,7 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
 
         // Set up expectations
-        $this->files->expects('isFile')->with($path)->andReturn(false);
+        $this->files->expects('isFile')->with($path)->returns(false);
 
         $result = $this->sessionHandler->read($sessionId);
 
@@ -106,7 +109,7 @@ class FileSessionHandlerTest extends TestCase
         $data = 'session_data';
 
         // Set up expectations
-        $this->files->expects('put')->with('/path/to/sessions/'.$sessionId, $data, true)->andReturn(null);
+        $this->files->expects('put')->with('/path/to/sessions/'.$sessionId, $data, true)->returns(null);
 
         $result = $this->sessionHandler->write($sessionId, $data);
 
@@ -118,7 +121,7 @@ class FileSessionHandlerTest extends TestCase
         $sessionId = 'session_id';
 
         // Set up expectations
-        $this->files->expects('delete')->with('/path/to/sessions/'.$sessionId)->andReturn(null);
+        $this->files->expects('delete')->with('/path/to/sessions/'.$sessionId)->returns(null);
 
         $result = $this->sessionHandler->destroy($sessionId);
 
@@ -129,8 +132,8 @@ class FileSessionHandlerTest extends TestCase
     {
         $session = new FileSessionHandler($this->files, join_paths(__DIR__, 'tmp'), 30);
         // Set up expectations for Filesystem
-        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a2'))->andReturn(false);
-        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a3'))->andReturn(true);
+        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a2'))->returns(false);
+        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a3'))->returns(true);
 
         mkdir(__DIR__.'/tmp');
         touch(__DIR__.'/tmp/a1', time() - 3); // last modified: 3 sec ago

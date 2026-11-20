@@ -17,6 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
@@ -28,6 +29,13 @@ use Orchestra\Testbench\TestCase;
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Sleep::fake();
+    }
 
     protected function defineEnvironment($app)
     {

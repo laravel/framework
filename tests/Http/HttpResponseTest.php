@@ -14,8 +14,9 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JsonSerializable;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);
@@ -209,8 +212,8 @@ class HttpResponseTest extends TestCase
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $session = new Store('test', new NullSessionHandler);
         $response->setSession($session);
-        $provider = Mockery::mock(MessageProvider::class);
-        $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
+        $provider = Double::for(MessageProvider::class);
+        $provider->expects('getMessageBag')->returns(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 
         $this->assertContains('errors', $session->get('_flash.new', []));

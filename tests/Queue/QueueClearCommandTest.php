@@ -7,13 +7,16 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ClearCommand;
 use Illuminate\Queue\QueueManager;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueClearCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testClearingDefaultQueue()
     {
         $queue = new FakeClearableQueue(['default' => 2]);
@@ -69,14 +72,14 @@ class QueueClearCommandTest extends TestCase
         $container = new Application;
         $container['env'] = 'testing';
 
-        $config = Mockery::mock(Repository::class, \ArrayAccess::class);
-        $config->expects('offsetGet')->with('queue.default')->andReturn('redis');
-        $config->shouldReceive('get')->with('queue.connections.redis.queue', 'default')->andReturn('default');
+        $config = Double::for(Repository::class, \ArrayAccess::class);
+        $config->expects('offsetGet')->with('queue.default')->returns('redis');
+        $config->allows('get')->with('queue.connections.redis.queue', 'default')->returns('default');
 
         $container['config'] = $config;
 
-        $queueManager = Mockery::mock(QueueManager::class);
-        $queueManager->expects('connection')->with('redis')->andReturn($queue);
+        $queueManager = Double::for(QueueManager::class);
+        $queueManager->expects('connection')->with('redis')->returns($queue);
 
         $container['queue'] = $queueManager;
 

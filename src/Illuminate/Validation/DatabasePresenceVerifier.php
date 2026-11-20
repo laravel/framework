@@ -44,7 +44,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
     {
-        $query = $this->table($collection)->where($column, '=', $value);
+        $query = $this->table($collection)->where($column, '=', $this->prepareValue($value));
 
         if (! is_null($excludeId) && $excludeId !== 'NULL') {
             $query->where($idColumn ?: 'id', '<>', $excludeId);
@@ -64,9 +64,24 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      */
     public function getMultiCount($collection, $column, array $values, array $extra = [])
     {
-        $query = $this->table($collection)->whereIn($column, $values);
+        $query = $this->table($collection)->whereIn($column, array_map($this->prepareValue(...), $values));
 
         return $this->addConditions($query, $extra)->distinct()->count($column);
+    }
+
+    /**
+     * Prepare a value for comparison with a database column.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function prepareValue($value)
+    {
+        return match (true) {
+            is_bool($value) => (string) (int) $value,
+            is_int($value) => (string) $value,
+            default => $value,
+        };
     }
 
     /**

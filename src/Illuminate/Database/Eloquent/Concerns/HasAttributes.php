@@ -1749,7 +1749,7 @@ trait HasAttributes
      */
     protected function mergeDefaultAttributes()
     {
-        if (! in_array(HasDefaultAttributes::class, class_uses_recursive(static::class), true)) {
+        if (! (static::$classAttributes[static::class.'@defaults'] ??= in_array(HasDefaultAttributes::class, class_uses_recursive(static::class), true))) {
             return;
         }
 

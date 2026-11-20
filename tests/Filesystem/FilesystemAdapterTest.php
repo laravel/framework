@@ -16,6 +16,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -23,7 +26,7 @@ use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Mockery;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -32,6 +35,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FilesystemAdapterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     private $tempDir;
     private $filesystem;
     private $adapter;
@@ -73,8 +78,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
-        $files->shouldReceive('mimeType')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('mimeType')->never();
 
         $files->response('file.txt', null, [
             'Content-Type' => 'text/x-custom',
@@ -85,8 +90,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
-        $files->shouldReceive('size')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('size')->never();
 
         $files->response('file.txt', null, [
             'Content-Length' => 11,
@@ -97,10 +102,8 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
-            ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
-        $files->shouldReceive('fallbackName')->never();
+        $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
+        $files->expects('fallbackName')->never();
 
         $files->response('file.txt', null, [
             'Content-Disposition' => 'attachment',
@@ -360,9 +363,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory3 = Double::for(FilesystemFactory::class);
+        $filesystemFactory3->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory3);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->copyToDisk('backup', 'file.txt');
@@ -377,9 +381,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory2 = Double::for(FilesystemFactory::class);
+        $filesystemFactory2->expects('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory2);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
@@ -394,9 +399,10 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => $filesystemAdapter,
-        ]));
+        $filesystemFactory = Double::for(FilesystemFactory::class);
+        $filesystemFactory->expects('disk')->returns($filesystemAdapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -438,6 +444,84 @@ class FilesystemAdapterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt');
+    }
+
+    public function testCopyToDiskWithOptions()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+        $destination = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertTrue($filesystemAdapter->copyToDisk($destination, 'file.txt', 'copy.txt', [
+            'visibility' => 'public',
+            'CacheControl' => 'max-age=31536000',
+        ]));
+        $this->assertTrue($filesystemAdapter->copyToDisk($destination, 'file.txt', options: 'private'));
+
+        $destination->received('writeStream')->with('copy.txt', Argument::any(), [
+            'visibility' => 'public',
+            'CacheControl' => 'max-age=31536000',
+        ]);
+        $destination->received('writeStream')->with('file.txt', Argument::any(), [
+            'visibility' => 'private',
+        ]);
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertStringEqualsFile($this->tempDir.'/backup/copy.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/backup/file.txt', 'Hello World');
+    }
+
+    public function testMoveToDiskWithOptions()
+    {
+        $this->filesystem->write('first.txt', 'First');
+        $this->filesystem->write('second.txt', 'Second');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+        $destination = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertTrue($filesystemAdapter->moveToDisk($destination, 'first.txt', 'moved.txt', [
+            'visibility' => 'public',
+            'CacheControl' => 'max-age=31536000',
+        ]));
+        $this->assertTrue($filesystemAdapter->moveToDisk($destination, 'second.txt', options: 'public'));
+
+        $destination->received('writeStream')->with('moved.txt', Argument::any(), [
+            'visibility' => 'public',
+            'CacheControl' => 'max-age=31536000',
+        ]);
+        $destination->received('writeStream')->with('second.txt', Argument::any(), [
+            'visibility' => 'public',
+        ]);
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/first.txt');
+        Assert::assertFileDoesNotExist($this->tempDir.'/second.txt');
+        $this->assertStringEqualsFile($this->tempDir.'/backup/moved.txt', 'First');
+        $this->assertStringEqualsFile($this->tempDir.'/backup/second.txt', 'Second');
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testCopyToDiskAndMoveToDiskSetVisibility()
+    {
+        $this->filesystem->write('first.txt', 'First', ['visibility' => 'public']);
+        $this->filesystem->write('second.txt', 'Second', ['visibility' => 'public']);
+
+        $backupFilesystem = new Filesystem(
+            $backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'),
+            ['visibility' => 'public']
+        );
+        $destination = new FilesystemAdapter($backupFilesystem, $backupAdapter);
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->copyToDisk($destination, 'first.txt', 'copied.txt', 'private');
+        $filesystemAdapter->moveToDisk($destination, 'second.txt', 'moved.txt', ['visibility' => 'private']);
+
+        $this->assertSame('private', $destination->getVisibility('copied.txt'));
+        $this->assertSame('private', $destination->getVisibility('moved.txt'));
     }
 
     public function testStream()

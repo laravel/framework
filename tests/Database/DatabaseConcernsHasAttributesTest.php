@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseConcernsHasAttributesTest extends TestCase
@@ -27,20 +26,16 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
     public function testRelationsToArray()
     {
-        $mock = Mockery::mock(HasAttributesWithoutConstructor::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods()
-            ->expects('getArrayableRelations')->andReturn([
-                'arrayable_relation' => new Collection(['foo' => 'bar']),
-                'invalid_relation' => 'invalid',
-                'null_relation' => null,
-            ])
-            ->getMock();
+        $model = new class extends Model {
+        };
+        $model->setRelation('arrayable_relation', new Collection(['foo' => 'bar']));
+        $model->setRelation('invalid_relation', 'invalid');
+        $model->setRelation('null_relation', null);
 
         $this->assertEquals([
             'arrayable_relation' => ['foo' => 'bar'],
             'null_relation' => null,
-        ], $mock->relationsToArray());
+        ], $model->relationsToArray());
     }
 
     public function testCastingEmptyStringToArrayDoesNotError()

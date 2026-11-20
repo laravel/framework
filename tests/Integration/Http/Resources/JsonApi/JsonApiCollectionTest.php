@@ -9,6 +9,7 @@ use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserWithLazyTeamAttributeResource;
 
 class JsonApiCollectionTest extends TestCase
 {
@@ -207,6 +208,58 @@ class JsonApiCollectionTest extends TestCase
                     ],
                 ]
             );
+    }
+
+    public function testItIncludesIdenticalBelongsToManyResourcesOnce()
+    {
+        $users = User::factory()->times(2)->create();
+
+        $team = Team::factory()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $users->each(fn ($user) => $user->teams()->attach($team, ['role' => 'Member']));
+
+        $this->getJson('/users?'.http_build_query(['include' => 'teams', 'fields' => ['teams' => 'name']]))
+            ->assertJsonPath('data.0.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('data.1.relationships.teams.data', [['id' => (string) $team->getKey(), 'type' => 'teams']])
+            ->assertJsonPath('included', [
+                [
+                    'id' => (string) $team->getKey(),
+                    'type' => 'teams',
+                    'attributes' => [
+                        'name' => 'Laravel Team',
+                    ],
+                ],
+            ]);
+    }
+
+    public function testItIncludesIdenticalBelongsToManyResourcesWithLazyAttributesOnce()
+    {
+        $users = User::factory()->times(2)->create();
+
+        $team = Team::factory()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $users->each(fn ($user) => $user->teams()->attach($team, ['role' => 'Member']));
+
+        Route::get('users-with-lazy-team-attributes', function () {
+            return UserWithLazyTeamAttributeResource::collection(User::all());
+        });
+
+        $this->getJson('/users-with-lazy-team-attributes?'.http_build_query(['include' => 'teams']))
+            ->assertOk()
+            ->assertJsonPath('included', [
+                [
+                    'id' => (string) $team->getKey(),
+                    'type' => 'teams',
+                    'attributes' => [
+                        'name' => 'Laravel Team',
+                        'tags' => ['php'],
+                    ],
+                ],
+            ]);
     }
 
     public function testItEagerLoadsIncludesForAllResourcesAtOnce()

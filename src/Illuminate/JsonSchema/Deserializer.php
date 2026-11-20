@@ -9,7 +9,12 @@ class Deserializer
     /**
      * The maximum number of schema fragments that may be expanded.
      */
-    protected const MAX_NODES = 20000;
+    protected const MAX_NODES = JsonSchema::MAX_NODES;
+
+    /**
+     * The maximum depth of chained local "$ref" resolution.
+     */
+    protected const MAX_REF_DEPTH = 64;
 
     /**
      * The root schema being deserialized (used to resolve local $refs).
@@ -549,6 +554,12 @@ class Deserializer
 
         if (in_array($ref, $refs, true)) {
             throw new InvalidArgumentException("Circular JSON Schema \$ref [{$ref}] detected.");
+        }
+
+        if (count($refs) >= static::MAX_REF_DEPTH) {
+            throw new InvalidArgumentException(
+                'The JSON Schema nests "$ref" beyond ['.static::MAX_REF_DEPTH.'] levels.'
+            );
         }
 
         $refs[] = $ref;

@@ -4,15 +4,18 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSqlServerQueryGrammarTest extends TestCase
 {
+    use VerifiesDoubles;
+
     public function testToRawSql()
     {
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('escape')->with('foo', false)->andReturn("'foo'");
+        $connection = Double::for(Connection::class);
+        $connection->expects('escape')->with('foo', false)->returns("'foo'");
         $grammar = new SqlServerGrammar($connection);
 
         $query = $grammar->substituteBindingsIntoRawSql(

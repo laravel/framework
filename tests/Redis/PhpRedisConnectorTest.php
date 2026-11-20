@@ -516,6 +516,20 @@ class PhpRedisConnectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesDeleteAfterRebuildingItsClient()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('del')->with('foo')->willThrowException(new RedisException('read error on connection'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('del')->with('foo')->willReturn(1);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame(1, $connection->command('del', ['foo']));
+    }
+
+    #[RequiresPhpExtension('redis')]
     public function testConnectionDoesNotAutomaticallyRetryNonIdempotentWrite()
     {
         $failedClient = $this->createMock(\Redis::class);

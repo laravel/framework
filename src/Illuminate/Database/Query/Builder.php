@@ -551,7 +551,7 @@ class Builder implements BuilderContract
     public function from($table, $as = null)
     {
         if ($this->isQueryable($table)) {
-            return $this->fromSub($table, $as);
+            return $this->fromSub($table, $as ?? '');
         }
 
         $this->from = $as ? "{$table} as {$as}" : $table;
@@ -3422,6 +3422,16 @@ class Builder implements BuilderContract
     public function lockForUpdate()
     {
         return $this->lock(true);
+    }
+
+    /**
+     * Lock the selected rows in the table for updating without blocking foreign key checks.
+     *
+     * @return $this
+     */
+    public function lockForNoKeyUpdate()
+    {
+        return $this->lock($this->grammar->getNoKeyUpdateLock());
     }
 
     /**

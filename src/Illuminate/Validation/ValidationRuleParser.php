@@ -137,8 +137,8 @@ class ValidationRuleParser
         if (! is_object($rule) ||
             $rule instanceof RuleContract ||
             $rule instanceof ParameterizedRule ||
-            ($rule instanceof Exists && $rule->queryCallbacks()) ||
-            ($rule instanceof Unique && $rule->queryCallbacks())) {
+            ($rule instanceof Exists && $rule->queryConditions()) ||
+            ($rule instanceof Unique && $rule->queryConditions())) {
             return $rule;
         }
 

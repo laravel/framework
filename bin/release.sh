@@ -58,7 +58,7 @@ do
     echo ""
     echo "Releasing $REMOTE";
 
-    TMP_DIR="/tmp/laravel-split"
+    TMP_DIR="/tmp/laravel-split-$VERSION"
     REMOTE_URL="git@github.com:illuminate/$REMOTE.git"
 
     rm -rf $TMP_DIR;

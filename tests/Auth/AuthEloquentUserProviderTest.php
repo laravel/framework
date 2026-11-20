@@ -10,12 +10,14 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     public function testRetrieveByIDReturnsUser()
     {
@@ -83,7 +85,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidation()
     {
-        $hasher = new BcryptHasher;
+        $hasher = new BcryptHasher(['rounds' => 4]);
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = new GenericUser(['password' => $hasher->make('plain')]);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
@@ -93,7 +95,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidationFailed()
     {
-        $hasher = new BcryptHasher;
+        $hasher = new BcryptHasher(['rounds' => 4]);
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = new GenericUser(['password' => $hasher->make('plain')]);
         $result = $provider->validateCredentials($user, ['password' => 'wrong']);
@@ -103,11 +105,11 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidationFailsGracefullyWithNullPassword()
     {
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->shouldReceive('check')->never();
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('check')->never();
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn(null);
+        $user = Double::for(Authenticatable::class);
+        $user->expects('getAuthPassword')->returns(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);
@@ -129,9 +131,9 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testDontRehashPasswordIfNotRequired()
     {
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('needsRehash')->with('hash')->andReturn(false);
-        $hasher->shouldNotReceive('make');
+        $hasher = Double::for(Hasher::class);
+        $hasher->expects('needsRehash')->with('hash')->returns(false);
+        $hasher->expects('make')->never();
 
         $provider = $this->newProvider($hasher);
         $user = EloquentProviderUserStub::find(3);

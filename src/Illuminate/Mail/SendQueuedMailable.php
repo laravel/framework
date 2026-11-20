@@ -15,9 +15,11 @@ use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\RetryFor;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 
 class SendQueuedMailable
 {
@@ -138,7 +140,9 @@ class SendQueuedMailable
     public function retryUntil()
     {
         if (! method_exists($this->mailable, 'retryUntil') && ! isset($this->mailable->retryUntil)) {
-            return;
+            $retryFor = $this->getAttributeValue($this->mailable, RetryFor::class);
+
+            return is_null($retryFor) ? null : Carbon::now()->addSeconds($retryFor);
         }
 
         return $this->mailable->retryUntil ?? $this->mailable->retryUntil();

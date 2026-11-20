@@ -6,7 +6,9 @@ use BackedEnum;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
+use InvalidArgumentException;
 
 use function Illuminate\Support\enum_value;
 
@@ -34,6 +36,20 @@ class DynamicComponent extends Component
     protected static $componentClasses = [];
 
     /**
+     * The names of the attributes that were bound on the component tag.
+     *
+     * @var array
+     */
+    protected $boundAttributes = [];
+
+    /**
+     * The methods that should be ignored.
+     *
+     * @var array
+     */
+    protected $except = ['withBoundAttributes'];
+
+    /**
      * Create a new component instance.
      *
      * @param  \BackedEnum|string  $component
@@ -41,6 +57,10 @@ class DynamicComponent extends Component
     public function __construct(BackedEnum|string $component)
     {
         $this->component = (string) enum_value($component);
+
+        if (! preg_match('/^[\w\-:.]+$/', $this->component)) {
+            throw new InvalidArgumentException("Invalid component name [{$this->component}].");
+        }
     }
 
     /**
@@ -62,6 +82,12 @@ EOF;
         return function ($data) use ($template) {
             $bindings = $this->bindings($class = $this->classForComponent());
 
+            foreach ($bindings as $key) {
+                if (! preg_match('/^[\w\-:.]+$/', $key)) {
+                    throw new InvalidArgumentException("Invalid attribute name [{$key}] for component [{$this->component}].");
+                }
+            }
+
             return str_replace(
                 [
                     '{{ component }}',
@@ -82,6 +108,40 @@ EOF;
                 $template
             );
         };
+    }
+
+    /**
+     * Set the names of the attributes that were bound on the component tag.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withBoundAttributes(array $attributes)
+    {
+        $this->boundAttributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Set the extra attributes that the component should make available.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withAttributes(array $attributes)
+    {
+        if ($this->boundAttributes && class_exists($class = $this->classForComponent())) {
+            [$data] = $this->compiler()->partitionDataAndAttributes($class, $attributes);
+
+            foreach ($this->boundAttributes as $key) {
+                if (array_key_exists($key, $attributes) && ! $data->has($key)) {
+                    $attributes[$key] = BladeCompiler::sanitizeComponentAttribute($attributes[$key]);
+                }
+            }
+        }
+
+        return parent::withAttributes($attributes);
     }
 
     /**
@@ -124,6 +184,11 @@ EOF;
     {
         return (new Collection($slots))
             ->reject(fn ($slot, $name) => $name === '__default')
+            ->each(function ($slot, $name) {
+                if (! preg_match('/^[a-zA-Z_]\w*$/', $name)) {
+                    throw new InvalidArgumentException("Invalid slot name [{$name}] for component [{$this->component}].");
+                }
+            })
             ->map(fn ($slot, $name) => '<x-slot name="'.$name.'" :attributes="$'.$name.'->attributes">{{ $'.$name.' }}</x-slot>')
             ->implode(PHP_EOL);
     }

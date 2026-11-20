@@ -13,7 +13,9 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use InvalidArgumentException;
-use Mockery;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -21,6 +23,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class PruneCommandTest extends TestCase
 {
     use RestoresConnectionResolver;
+    use VerifiesDoubles;
 
     protected function setUp(): void
     {
@@ -249,23 +252,26 @@ class PruneCommandTest extends TestCase
 
     public function testTheCommandDispatchesEvents()
     {
-        $dispatcher = Mockery::mock(DispatcherContract::class);
+        $dispatcher = Double::for(DispatcherContract::class);
 
-        $dispatcher->expects('dispatch')->withArgs(function ($event) {
-            return get_class($event) === ModelPruningStarting::class &&
-                $event->models === [Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class];
+        $events = [];
+        $dispatcher->expects('dispatch')->times(4)->resolves(function ($event) use (&$events) {
+            $events[] = $event;
         });
-        $dispatcher->expects('listen')->with(ModelsPruned::class, Mockery::type(Closure::class));
-        $dispatcher->expects('dispatch')->times(2)->with(Mockery::type(ModelsPruned::class));
-        $dispatcher->expects('dispatch')->withArgs(function ($event) {
-            return get_class($event) === ModelPruningFinished::class &&
-                $event->models === [Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class];
-        });
+        $dispatcher->expects('listen')->with(ModelsPruned::class, Argument::type(Closure::class));
         $dispatcher->expects('forget')->with(ModelsPruned::class);
 
         Application::getInstance()->instance(DispatcherContract::class, $dispatcher);
 
         $this->artisan(['--model' => Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class]);
+
+        $models = [Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class];
+        $this->assertSame(
+            [ModelPruningStarting::class, ModelsPruned::class, ModelsPruned::class, ModelPruningFinished::class],
+            array_map(get_class(...), $events)
+        );
+        $this->assertSame($models, $events[0]->models);
+        $this->assertSame($models, $events[3]->models);
     }
 
     protected function artisan($arguments)
