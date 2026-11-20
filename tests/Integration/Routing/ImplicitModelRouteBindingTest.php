@@ -140,6 +140,46 @@ PHP);
         $this->assertTrue($user->is($response->baseRequest->route('user')));
     }
 
+    public function testOnlySoftDeletedModelsCanBeRetrievedUsingOnlyTrashedMethod()
+    {
+        $trashed = ImplicitBindingUser::create(['name' => 'Dries']);
+        $trashed->delete();
+
+        $active = ImplicitBindingUser::create(['name' => 'Taylor']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+            return $user;
+        })->middleware(['web'])->onlyTrashed();
+
+        $this->postJson("/user/{$trashed->id}")->assertJson([
+            'id' => $trashed->id,
+            'name' => $trashed->name,
+        ]);
+
+        $this->postJson("/user/{$active->id}")->assertNotFound();
+    }
+
+    public function testOnlySoftDeletedModelsCanBeRetrievedUsingOnlyTrashedOnRouteGroup()
+    {
+        $trashed = ImplicitBindingUser::create(['name' => 'Dries']);
+        $trashed->delete();
+
+        $active = ImplicitBindingUser::create(['name' => 'Taylor']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::onlyTrashed()->group(function () {
+            Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+                return $user;
+            })->middleware(['web']);
+        });
+
+        $this->postJson("/user/{$trashed->id}")->assertJson(['id' => $trashed->id]);
+        $this->postJson("/user/{$active->id}")->assertNotFound();
+    }
+
     public function testEnforceScopingImplicitRouteBindings()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
