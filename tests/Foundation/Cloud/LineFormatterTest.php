@@ -10,7 +10,7 @@ use RuntimeException;
 
 class LineFormatterTest extends TestCase
 {
-    public function testItFormatsLogLevels()
+    public function test_it_formats_log_levels()
     {
         $formatter = new LineFormatter;
 
@@ -30,14 +30,14 @@ class LineFormatterTest extends TestCase
         );
     }
 
-    public function testItCollapsesMessageNewlinesOntoOneLine()
+    public function test_it_collapses_message_newlines_onto_one_line()
     {
         $formatted = (new LineFormatter)->format($this->createLogRecord("one\ntwo"));
 
         $this->assertSame("\n  \033[37;44m INFO \033[39;49m one two  \n\n", $formatted);
     }
 
-    public function testItAppendsContextAndExtra()
+    public function test_it_appends_context_and_extra()
     {
         $formatted = (new LineFormatter)->format($this->createLogRecord(
             context: ['environment' => 'production'],
@@ -50,7 +50,7 @@ class LineFormatterTest extends TestCase
         );
     }
 
-    public function testItNormalizesAnExceptionInTheContext()
+    public function test_it_normalizes_an_exception_in_the_context()
     {
         $formatted = (new LineFormatter)->format($this->createLogRecord(
             context: ['exception' => new RuntimeException('boom')],
@@ -59,7 +59,7 @@ class LineFormatterTest extends TestCase
         $this->assertStringContainsString('[object] (RuntimeException(code: 0): boom', $formatted);
     }
 
-    public function testItOmitsEmptyContextAndExtra()
+    public function test_it_omits_empty_context_and_extra()
     {
         $formatted = (new LineFormatter)->format($this->createLogRecord());
 

@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class CloudBootstrapperTest extends TestCase
 {
-    public function testItConfiguresTheCloudJsonLoggingFormatter()
+    public function test_it_configures_the_cloud_json_logging_formatter()
     {
         CloudBootstrapper::configureCloudLogging($this->app);
 
@@ -19,7 +19,7 @@ class CloudBootstrapperTest extends TestCase
         ], $this->app['config']->get('logging.channels.laravel-cloud-socket.formatter_with'));
     }
 
-    public function testItConfiguresTheCloudLineLoggingFormatter()
+    public function test_it_configures_the_cloud_line_logging_formatter()
     {
         $_SERVER['LARAVEL_CLOUD_LOG_FORMAT'] = 'line';
 
