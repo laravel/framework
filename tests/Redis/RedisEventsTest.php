@@ -9,11 +9,13 @@ use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Events\CommandFailed;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
 class RedisEventsTest extends TestCase
 {
+    #[RequiresPhpExtension]
     public function testCommandFailedEventIsDispatched()
     {
         $exception = new Exception('Test exception');
