@@ -30,6 +30,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
             $table->integer('credits');
         });
     }
+
     #[RequiresDatabase(['sqlite', 'mysql', 'mariadb', 'pgsql'])]
     public function testUpdateOrInsertWithJsonArray()
     {
