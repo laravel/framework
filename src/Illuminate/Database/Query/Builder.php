@@ -4439,6 +4439,7 @@ class Builder implements BuilderContract
         }
 
         if (! $exists) {
+	    $values = $this->grammar->prepareValuesForUpdateOrInsert($values);
             return $this->insert(array_merge($attributes, $values));
         }
 

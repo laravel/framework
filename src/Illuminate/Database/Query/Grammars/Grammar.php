@@ -1469,6 +1469,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Prepare the values for the insert path of an update or insert operation.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareValuesForUpdateOrInsert(array $values)
+    {
+        return $values;
+    }
+
+    /**
      * Prepare the bindings for an update statement.
      *
      * @param  array  $bindings

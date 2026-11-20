@@ -30,6 +30,19 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
             $table->integer('credits');
         });
     }
+    #[RequiresDatabase(['sqlite', 'mysql', 'mariadb', 'pgsql'])]
+    public function testUpdateOrInsertWithJsonArray()
+    {
+        $attributes = ['id' => 1];
+
+        foreach ([['first', 'second'], ['third', 'fourth']] as $payload) {
+            DB::table('example')->updateOrInsert($attributes, ['payload' => $payload]);
+
+            $stored = DB::table('example')->where($attributes)->value('payload');
+
+            $this->assertSame($payload, json_decode($stored, true, flags: JSON_THROW_ON_ERROR));
+        }
+    }
 
     #[DataProvider('jsonValuesDataProvider')]
     #[RequiresDatabase(['sqlite', 'mysql', 'mariadb'])]

@@ -519,6 +519,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Prepare the values for the insert path of an update or insert operation.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareValuesForUpdateOrInsert(array $values)
+    {
+        return array_map(fn ($value) => is_array($value) ? json_encode($value) : $value, $values);
+    }
+
+    /**
      * Prepare the bindings for an update statement.
      *
      * Booleans, integers, and doubles are inserted into JSON updates as raw values.
