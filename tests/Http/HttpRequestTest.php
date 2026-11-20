@@ -1711,6 +1711,6 @@ class HttpRequestTest extends TestCase
 
     protected static function arrayToDataFactory(array $data)
     {
-        return Request::create('/', 'GET', $data);
+        return new Request($data);
     }
 }
