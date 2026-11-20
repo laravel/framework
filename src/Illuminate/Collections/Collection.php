@@ -1652,7 +1652,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $items = $this->items;
 
-        $php86 = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=');
+        $php86 = version_compare(PHP_VERSION, '8.6.0', '>=');
         $sortLocaleString = $php86 === true ? 5 : SORT_LOCALE_STRING;
 
         uasort($items, function ($a, $b) use ($comparisons, $options, $php86, $sortLocaleString) {
