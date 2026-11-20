@@ -29,6 +29,7 @@ class FreshCommand extends Command
                     {--path=* : The path(s) to the migrations files to be executed}
                     {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                     {--schema-path= : The path to a schema dump file}
+                    {--schema-only : Only load the schema dump without running any migrations}
                     {--seed : Indicates if the seed task should be re-run}
                     {--seeder= : The class name of the root seeder}
                     {--step : Force the migrations to be run so they can be rolled back individually}';
@@ -98,6 +99,7 @@ class FreshCommand extends Command
             '--path' => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
             '--schema-path' => $this->input->getOption('schema-path'),
+            '--schema-only' => $this->option('schema-only'),
             '--force' => true,
             '--step' => $this->option('step'),
         ]));
