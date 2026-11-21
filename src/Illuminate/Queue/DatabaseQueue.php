@@ -663,9 +663,40 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function clear($queue = null)
     {
-        return $this->database->table($this->table)
-            ->where('queue', $this->getQueue($queue))
-            ->delete();
+        $query = $this->database->table($this->table)->where('queue', $this->getQueue($queue));
+
+        [$count, $payloads] = $this->database->transaction(function () use ($query) {
+            $count = 0;
+            $payloads = [];
+            $lastId = (clone $query)->max('id');
+
+            if ($lastId === null) {
+                return [$count, $payloads];
+            }
+
+            (clone $query)->where('id', '<=', $lastId)->lockForUpdate()
+                ->chunkById(500, function ($jobs) use ($query, &$count, &$payloads) {
+                    $count += (clone $query)->whereIn('id', $jobs->pluck('id'))->delete();
+
+                    foreach ($jobs as $job) {
+                        if ($job->reserved_at === null && str_contains($job->payload, 'laravel_unique_job_lock_owner')) {
+                            $payloads[] = $job->payload;
+                        }
+                    }
+                }, 'id');
+
+            return [$count, $payloads];
+        });
+
+        if ($payloads !== []) {
+            if ($this->database->transactionLevel() > 0) {
+                $this->database->afterCommit(fn () => $this->releaseClearedUniqueJobLocks($payloads));
+            } else {
+                $this->releaseClearedUniqueJobLocks($payloads);
+            }
+        }
+
+        return $count;
     }
 
     /**

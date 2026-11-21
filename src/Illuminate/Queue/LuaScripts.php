@@ -191,4 +191,39 @@ redis.call('del', KEYS[1], KEYS[2], KEYS[3], KEYS[4])
 return size
 LUA;
     }
+
+    /**
+     * Clear a queue and return pending or delayed payloads with unique lock metadata.
+     *
+     * KEYS[1] - The name of the primary queue
+     * KEYS[2] - The name of the "delayed" queue
+     * KEYS[3] - The name of the "reserved" queue
+     * KEYS[4] - The name of the "notify" queue
+     *
+     * @return string
+     */
+    public static function clearWithUniqueLocks()
+    {
+        return <<<'LUA'
+local ready = redis.call('llen', KEYS[1])
+local delayed = redis.call('zcard', KEYS[2])
+local reserved = redis.call('zcard', KEYS[3])
+local payloads = {}
+
+local function collect(command, key, count)
+    for offset = 0, count - 1, 500 do
+        for _, payload in ipairs(redis.call(command, key, offset, offset + 499)) do
+            if string.find(payload, 'laravel_unique_job_lock_owner', 1, true) then
+                payloads[#payloads + 1] = payload
+            end
+        end
+    end
+end
+
+collect('lrange', KEYS[1], ready)
+collect('zrange', KEYS[2], delayed)
+redis.call('del', KEYS[1], KEYS[2], KEYS[3], KEYS[4])
+return {ready + delayed + reserved, payloads}
+LUA;
+    }
 }

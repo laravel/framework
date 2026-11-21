@@ -8,6 +8,8 @@ use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\Queueable;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -557,6 +559,46 @@ abstract class Queue
         $this->config = $config;
 
         return $this;
+    }
+
+    /**
+     * Release the unique locks owned by jobs that were removed before processing.
+     *
+     * @param  iterable<string>  $payloads
+     * @return void
+     */
+    protected function releaseClearedUniqueJobLocks($payloads)
+    {
+        if (! $this->container?->bound(CacheFactory::class)) {
+            return;
+        }
+
+        foreach ($payloads as $payload) {
+            $context = json_decode($payload, true)['illuminate:log:context']['hidden'] ?? [];
+            $values = [];
+
+            foreach (['cache_store', 'key', 'lock_owner'] as $field) {
+                $value = $context['laravel_unique_job_'.$field] ?? null;
+                // Only decode the serialized scalar metadata. The job may contain models or be encrypted.
+                $values[] = is_string($value) && str_starts_with($value, 's:')
+                    ? @unserialize($value, ['allowed_classes' => false])
+                    : null;
+            }
+
+            [$store, $key, $owner] = $values;
+
+            if (! is_string($store) || $store === '' ||
+                ! is_string($key) || ! str_starts_with($key, 'laravel_unique_job:') ||
+                ! is_string($owner) || $owner === '') {
+                continue;
+            }
+
+            $cache = $this->container->make(CacheFactory::class)->store($store);
+
+            if ($cache->getStore() instanceof LockProvider) {
+                $cache->restoreLock($key, $owner)->release();
+            }
+        }
     }
 
     /**
