@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +24,18 @@ class Can implements Rule, ValidatorAwareRule
     protected $arguments;
 
     /**
+     * The callback used to resolve the authorization arguments from the value.
+     *
+     * @var (\Closure(mixed, string): array<mixed>)|null
+     */
+    protected ?Closure $using = null;
+
+    /**
+     * The denial reason from the last failed check.
+     */
+    protected string $reason = '';
+
+    /**
      * The current validator instance.
      *
      * @var \Illuminate\Validation\Validator
@@ -42,6 +55,21 @@ class Can implements Rule, ValidatorAwareRule
     }
 
     /**
+     * Resolve the authorization arguments from the value using the given callback.
+     *
+     * The returned array is passed to the gate as-is, in place of the constructor arguments.
+     *
+     * @param  \Closure(mixed, string): array<mixed>  $callback
+     * @return $this
+     */
+    public function using(Closure $callback): static
+    {
+        $this->using = $callback;
+
+        return $this;
+    }
+
+    /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
@@ -50,11 +78,14 @@ class Can implements Rule, ValidatorAwareRule
      */
     public function passes($attribute, $value)
     {
-        $arguments = $this->arguments;
+        $response = Gate::inspect($this->ability, $this->using
+            ? call_user_func($this->using, $value, $attribute)
+            : array_values(array_filter([...$this->arguments, $value], fn ($argument) => ! is_null($argument)))
+        );
 
-        $model = array_shift($arguments);
+        $this->reason = $response->denied() ? (string) $response->message() : '';
 
-        return Gate::allows($this->ability, array_filter([$model, ...$arguments, $value]));
+        return $response->allowed();
     }
 
     /**
@@ -67,7 +98,7 @@ class Can implements Rule, ValidatorAwareRule
         $message = $this->validator->getTranslator()->get('validation.can');
 
         return $message === 'validation.can'
-            ? ['The :attribute field contains an unauthorized value.']
+            ? ['The :attribute field contains an unauthorized value. :reason']
             : $message;
     }
 
@@ -80,6 +111,8 @@ class Can implements Rule, ValidatorAwareRule
     public function setValidator($validator)
     {
         $this->validator = $validator;
+
+        $validator->addReplacer(static::class, fn ($message) => trim(str_replace(':reason', $this->reason, $message)));
 
         return $this;
     }
