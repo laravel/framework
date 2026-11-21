@@ -35,17 +35,18 @@ class ClearUniqueJobLocksTest extends QueueTestCase
     #[DataProvider('connections')]
     public function testClearingReleasesOnlyLocksOwnedByRemovedUnreservedJobs(string $connection): void
     {
-        if ($connection === 'redis') {
+        $queue = 'clear-test-'.Str::random();
+        $otherQueue = $queue.'-other';
+        $driver = Queue::connection($connection);
+
+        if ($connection === 'redis' && $this->getQueueDriver() !== 'redis') {
             try {
-                $this->app['redis']->connection()->ping();
+                $driver->size($queue);
             } catch (ConnectionException|StreamInitException) {
                 $this->markTestSkipped('Redis is unavailable.');
             }
         }
 
-        $queue = 'clear-test-'.Str::random();
-        $otherQueue = $queue.'-other';
-        $driver = Queue::connection($connection);
         $store = Cache::store('unique-test');
 
         try {
