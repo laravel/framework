@@ -710,6 +710,63 @@ class ContainerTest extends TestCase
         $this->assertFalse(isset($instance->third));
     }
 
+    public function testResolvingWithArrayOfPositionalParameters()
+    {
+        $container = new Container;
+        $stub = new ContainerConcreteStub;
+        $instance = $container->make(ContainerMixedPrimitiveStub::class, ['first', $stub, 'last']);
+        $this->assertSame('first', $instance->first);
+        $this->assertSame($stub, $instance->stub);
+        $this->assertSame('last', $instance->last);
+    }
+
+    public function testResolvingWithPositionalParametersFollowedByNamedParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerMixedPrimitiveStub::class, ['first', 'last' => 'last']);
+        $this->assertSame('first', $instance->first);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
+        $this->assertSame('last', $instance->last);
+    }
+
+    public function testResolvingVariadicWithArrayOfPositionalParameters()
+    {
+        $container = new Container;
+        $stub = new ContainerConcreteStub;
+        $instance = $container->make(ContainerVariadicPrimitiveStub::class, ['first', $stub, 'second', 'third']);
+        $this->assertSame('first', $instance->first);
+        $this->assertSame($stub, $instance->stub);
+        $this->assertSame(['second', 'third'], $instance->rest);
+
+        $instance = $container->make(ContainerVariadicPrimitiveStub::class, ['first']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
+        $this->assertSame([], $instance->rest);
+    }
+
+    public function testPositionalParametersMustBeSequential()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Positional parameters must be sequential starting from zero while building ['.ContainerMixedPrimitiveStub::class.'].');
+
+        (new Container)->make(ContainerMixedPrimitiveStub::class, [0 => 'first', 2 => 'last']);
+    }
+
+    public function testPositionalParametersCannotFollowNamedParameters()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Cannot use positional parameter after named parameter while building ['.ContainerMixedPrimitiveStub::class.'].');
+
+        (new Container)->make(ContainerMixedPrimitiveStub::class, ['last' => 'last', 'first']);
+    }
+
+    public function testNamedParametersCannotOverwritePositionalParameters()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Named parameter [$first] overwrites previous positional parameter while building ['.ContainerMixedPrimitiveStub::class.'].');
+
+        (new Container)->make(ContainerMixedPrimitiveStub::class, ['first', 'first' => 'named']);
+    }
+
     public function testResolvingWithUsingAnInterface()
     {
         $container = new Container;
@@ -1207,6 +1264,16 @@ class ContainerMixedPrimitiveStub
         $this->stub = $stub;
         $this->last = $last;
         $this->first = $first;
+    }
+}
+
+class ContainerVariadicPrimitiveStub
+{
+    public $rest;
+
+    public function __construct(public $first, public ContainerConcreteStub $stub, ...$rest)
+    {
+        $this->rest = $rest;
     }
 }
 

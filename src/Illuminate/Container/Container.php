@@ -1244,7 +1244,31 @@ class Container implements ArrayAccess, ContainerContract
     {
         $results = [];
 
+        $positionals = $this->getPositionalParameterOverrides();
+        $positionalCount = count($positionals);
+
         foreach ($dependencies as $dependency) {
+            $position = $dependency->getPosition();
+
+            // Positional overrides are matched to the leading parameters in order, just
+            // like PHP's own positional arguments, and may not be overwritten by any
+            // named override that targets a parameter which was already provided.
+            if ($position < $positionalCount) {
+                if ($this->hasParameterOverride($dependency)) {
+                    throw new BindingResolutionException(
+                        "Named parameter [\${$dependency->name}] overwrites previous positional parameter while building [".end($this->buildStack).'].'
+                    );
+                }
+
+                if ($dependency->isVariadic()) {
+                    $results = array_merge($results, array_slice($positionals, $position));
+                } else {
+                    $results[] = $positionals[$position];
+                }
+
+                continue;
+            }
+
             // If the dependency has an override for this particular build we will use
             // that instead as the value. Otherwise, we will continue with this run
             // of resolutions and let reflection attempt to determine the result.
@@ -1301,6 +1325,44 @@ class Container implements ArrayAccess, ContainerContract
     protected function getParameterOverride($dependency)
     {
         return $this->getLastParameterOverride()[$dependency->name];
+    }
+
+    /**
+     * Get the positional parameter overrides for the current build.
+     *
+     * @return list<mixed>
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function getPositionalParameterOverrides(): array
+    {
+        $positionals = [];
+
+        $named = false;
+
+        foreach ($this->getLastParameterOverride() as $key => $value) {
+            if (is_string($key)) {
+                $named = true;
+
+                continue;
+            }
+
+            if ($named) {
+                throw new BindingResolutionException(
+                    'Cannot use positional parameter after named parameter while building ['.end($this->buildStack).'].'
+                );
+            }
+
+            if ($key !== count($positionals)) {
+                throw new BindingResolutionException(
+                    'Positional parameters must be sequential starting from zero while building ['.end($this->buildStack).'].'
+                );
+            }
+
+            $positionals[] = $value;
+        }
+
+        return $positionals;
     }
 
     /**
