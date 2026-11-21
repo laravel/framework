@@ -647,10 +647,14 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $this->getQueueRedisKey($queue);
 
-        return $this->getConnection()->eval(
-            LuaScripts::clear(), 4, $queue, $queue.':delayed',
+        [$count, $payloads] = $this->getConnection()->eval(
+            LuaScripts::clearWithUniqueLocks(), 4, $queue, $queue.':delayed',
             $queue.':reserved', $queue.':notify'
         );
+
+        $this->releaseClearedUniqueJobLocks($payloads);
+
+        return $count;
     }
 
     /**
