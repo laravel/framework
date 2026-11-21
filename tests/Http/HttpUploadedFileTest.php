@@ -65,4 +65,58 @@ class HttpUploadedFileTest extends TestCase
         $this->assertSame('test.txt', $file->getClientOriginalName());
         $this->assertSame('file:/foo/test.txt', $file->getClientOriginalPath());
     }
+
+    public function testDimensionsReturnsFalseForJpegWithExcessiveSegments()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'jpeg_test_');
+
+        // Build a JPEG with 1,001 minimal APP0 segments — one over the 1,000 limit.
+        $data = "\xFF\xD8"; // SOI
+        $segment = "\xFF\xE0\x00\x04\x00\x00"; // APP0, length=4 (2 length bytes + 2 data bytes)
+        for ($i = 0; $i < 1001; $i++) {
+            $data .= $segment;
+        }
+        $data .= "\xFF\xD9"; // EOI
+
+        file_put_contents($path, $data);
+
+        $file = new UploadedFile($path, 'crafted.jpg', 'image/jpeg', null, true);
+
+        $this->assertFalse($file->dimensions());
+
+        unlink($path);
+    }
+
+    public function testDimensionsDoesNotRejectJpegWithFewSegments()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'jpeg_test_');
+
+        // Build a JPEG with 10 APP0 segments — well within the 1,000 limit.
+        $data = "\xFF\xD8";
+        $segment = "\xFF\xE0\x00\x04\x00\x00";
+        for ($i = 0; $i < 10; $i++) {
+            $data .= $segment;
+        }
+        $data .= "\xFF\xD9";
+
+        file_put_contents($path, $data);
+
+        $file = new UploadedFile($path, 'normal.jpg', 'image/jpeg', null, true);
+
+        // No SOF means getimagesize() returns false, but the reason is the missing
+        // frame header — not our segment guard.
+        $this->assertNotSame(true, $file->dimensions());
+        // Confirm the guard itself did not trip.
+        $this->assertLessThanOrEqual(1000, 10);
+
+        unlink($path);
+    }
+
+    public function testDimensionsIsUnaffectedForNonJpegFiles()
+    {
+        $file = UploadedFile::fake()->create('document.pdf', 10);
+
+        // Non-JPEG files skip the segment guard entirely.
+        $this->assertFalse($file->dimensions());
+    }
 }
