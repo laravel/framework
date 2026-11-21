@@ -31,7 +31,11 @@ class ReceiveFile
         );
 
         try {
-            Storage::disk($this->disk)->put($path, $request->getContent(true));
+            abort_unless(
+                Storage::disk($this->disk)->put($path, $request->getContent(true)),
+                500,
+                'Unable to store the uploaded file'
+            );
 
             return response()->noContent();
         } catch (PathTraversalDetected) {
