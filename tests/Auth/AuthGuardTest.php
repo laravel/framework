@@ -10,12 +10,15 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Validated;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Cookie\CookieJar;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Support\Timebox;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -154,6 +157,7 @@ class AuthGuardTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $user->shouldReceive('getAuthPassword')->andReturn(null);
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+        $mock->getSession()->shouldReceive('forget')->with('password_hash_default')->once();
         $session->shouldReceive('regenerate')->once();
         $mock->getProvider()->shouldReceive('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
         $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
@@ -230,6 +234,7 @@ class AuthGuardTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $user->shouldReceive('getAuthPassword')->andReturn(null);
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+        $mock->getSession()->shouldReceive('forget')->with('password_hash_default')->once();
         $session->shouldReceive('regenerate')->once();
         $mock->login($user);
     }
@@ -249,6 +254,21 @@ class AuthGuardTest extends TestCase
         );
 
         $guard->login($user);
+    }
+
+    public function testLoginWithUserWithoutPasswordRemovesPreviousPasswordHash()
+    {
+        [, $provider, $request] = $this->getMocks();
+        $session = new Store('test', new ArraySessionHandler(10));
+        $guard = new SessionGuard('default', $provider, $session, $request);
+
+        $guard->login(new GenericUser(['id' => 'foo', 'password' => 'bar']));
+        $this->assertTrue($session->has('password_hash_default'));
+
+        $guard->login(new GenericUser(['id' => 'baz', 'password' => null]));
+
+        $this->assertSame('baz', $session->get($guard->getName()));
+        $this->assertFalse($session->has('password_hash_default'));
     }
 
     public function testSessionGuardIsMacroable()
@@ -276,6 +296,7 @@ class AuthGuardTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $user->shouldReceive('getAuthPassword')->andReturn(null);
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
+        $mock->getSession()->shouldReceive('forget')->with('password_hash_default')->once();
         $session->shouldReceive('regenerate')->once();
         $mock->login($user);
     }
