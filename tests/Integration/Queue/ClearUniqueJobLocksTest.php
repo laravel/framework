@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Predis\Connection\ConnectionException;
+use Predis\Connection\Resource\Exception\StreamInitException;
 
 #[WithMigration('queue')]
 class ClearUniqueJobLocksTest extends QueueTestCase
@@ -37,7 +38,7 @@ class ClearUniqueJobLocksTest extends QueueTestCase
         if ($connection === 'redis') {
             try {
                 $this->app['redis']->connection()->ping();
-            } catch (ConnectionException) {
+            } catch (ConnectionException|StreamInitException) {
                 $this->markTestSkipped('Redis is unavailable.');
             }
         }
