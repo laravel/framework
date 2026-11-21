@@ -46,6 +46,20 @@ class RouteBindingTest extends TestCase
         $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
         $this->assertInstanceOf(ExplicitRouteBindingSoftDeletableUser::class, $callback(1, $route));
     }
+
+    public function test_it_resolves_only_trashed_models_for_the_given_route_with_only_trashed()
+    {
+        $container = Container::getInstance();
+
+        $route = (new Route('GET', '/users/{user}', function () {
+        }))->onlyTrashed();
+
+        $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
+        $model = $callback(1, $route);
+
+        $this->assertInstanceOf(ExplicitRouteBindingSoftDeletableUser::class, $model);
+        $this->assertTrue($model->resolvedAsOnlyTrashed);
+    }
 }
 
 class ExplicitRouteBindingUser extends Model
@@ -65,8 +79,15 @@ class ExplicitRouteBindingSoftDeletableUser extends Model
         return null;
     }
 
+    public $resolvedAsOnlyTrashed = false;
+
     public function resolveSoftDeletableRouteBinding($value, $field = null)
     {
         return new self();
+    }
+
+    public function resolveOnlyTrashedRouteBinding($value, $field = null)
+    {
+        return tap(new self(), fn ($model) => $model->resolvedAsOnlyTrashed = true);
     }
 }

@@ -129,6 +129,11 @@ class ResourceRegistrar
                 $route->withTrashed();
             }
 
+            if (isset($options['only_trashed']) &&
+                in_array($m, ! empty($options['only_trashed']) ? $options['only_trashed'] : array_intersect($resourceMethods, ['show', 'edit', 'update']))) {
+                $route->onlyTrashed();
+            }
+
             $collection->add($route);
         }
 
