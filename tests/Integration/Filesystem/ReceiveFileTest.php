@@ -34,6 +34,25 @@ class ReceiveFileTest extends TestCase
         Storage::assertExists('receive-file-test.txt', 'Hello World');
     }
 
+    public function testItReturnsServerErrorWhenTheUploadCannotBeStored()
+    {
+        $disk = Storage::disk('local');
+        $path = 'receive-file-test-'.bin2hex(random_bytes(8));
+
+        $this->assertTrue($disk->makeDirectory($path));
+
+        try {
+            $result = $disk->temporaryUploadUrl($path, Carbon::now()->addMinute());
+
+            $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
+
+            $this->assertFalse($disk->fileExists($path));
+            $response->assertStatus(500);
+        } finally {
+            $disk->deleteDirectory($path);
+        }
+    }
+
     public function testItWill403OnWrongSignature()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());
