@@ -66,9 +66,15 @@ class ClearUniqueJobLocksTest extends QueueTestCase
 
             $this->assertEquals(0, $driver->size($queue));
             $this->assertEquals(1, $driver->size($otherQueue));
-            $this->assertTrue($store->lock($this->key('ready'))->get());
-            $this->assertTrue($store->lock($this->key('delayed'))->get());
+            $this->dispatchJob('ready', $connection, $queue);
+            $this->assertEquals(1, $driver->size($queue));
+
+            $this->dispatchJob('delayed', $connection, $queue, 600);
+            $this->assertEquals(2, $driver->size($queue));
+
             $this->assertFalse($store->lock($this->key('reserved'))->get());
+            $this->dispatchJob('reserved', $connection, $queue);
+            $this->assertEquals(2, $driver->size($queue));
             $this->assertFalse($store->lock($this->key('another-queue'))->get());
             $this->assertFalse($store->lock($this->key('stale-owner'))->get());
             $this->assertFalse($store->lock('application-lock')->get());
