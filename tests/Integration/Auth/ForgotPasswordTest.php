@@ -4,13 +4,16 @@ namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
@@ -66,6 +69,46 @@ class ForgotPasswordTest extends TestCase
                     && $message->actionUrl === route('password.reset', ['token' => $notification->token, 'email' => $user->email]);
             }
         );
+    }
+
+    #[WithConfig('app.url', 'https://app.example')]
+    public function testPasswordResetAndVerificationLinksIgnoreForgedHost()
+    {
+        Notification::fake();
+        $user = UserFactory::new()->create();
+
+        $this->app['router']->get('email/verify/{id}/{hash}', fn () => '')->name('verification.verify');
+        $this->app['router']->post('security-links', function () use ($user) {
+            Password::broker()->sendResetLink(['email' => $user->email]);
+
+            $resetUrl = null;
+            Notification::assertSentTo($user, function (ResetPassword $notification) use ($user, &$resetUrl) {
+                $resetUrl = $notification->toMail($user)->actionUrl;
+
+                return true;
+            });
+
+            $notifiable = new class extends AuthenticationTestUser
+            {
+                use \Illuminate\Auth\MustVerifyEmail;
+            };
+            $notifiable->setRawAttributes(['id' => $user->getKey(), 'email' => $user->email]);
+
+            return ['host' => request()->getHost(), 'reset' => $resetUrl, 'verify' => (new VerifyEmail)->toMail($notifiable)->actionUrl];
+        });
+
+        $response = $this->post('http://attacker.example/security-links');
+        $response->assertOk();
+        $response->assertJsonPath('host', 'attacker.example');
+
+        $resetUrl = $response->json('reset');
+        $verifyUrl = $response->json('verify');
+        $this->assertStringStartsWith('https://app.example/password/reset/', $resetUrl);
+        $this->assertTrue(Password::broker()->tokenExists($user, basename(parse_url($resetUrl, PHP_URL_PATH))));
+        $this->assertStringContainsString('email='.rawurlencode($user->email), $resetUrl);
+        $this->assertStringStartsWith('https://app.example/email/verify/'.$user->getKey().'/', $verifyUrl);
+        $this->assertTrue($this->app['url']->hasValidSignature(Request::create($verifyUrl)));
+        $this->assertFalse($this->app['url']->hasValidSignature(Request::create(str_replace('app.example', 'attacker.example', $verifyUrl))));
     }
 
     public function testItCanTriggerPasswordResetSentEvent()

@@ -74,12 +74,12 @@ class RoutingServiceProvider extends ServiceProvider
                 ? parse_url($appUrl)
                 : false;
 
-            if ($components 
-                && in_array($components['scheme'] ?? null, ['http', 'https'], true) 
-                && ! empty($components['host']) 
-                && ! isset($components['query']) 
-                && ! isset($components['fragment']) 
-                && ! str_starts_with(rtrim($appUrl, '/'), 'http://localhost')
+            if (is_array($components)
+                && in_array($components['scheme'] ?? null, ['http', 'https'], true)
+                && ! empty($components['host'])
+                && ! isset($components['query'])
+                && ! isset($components['fragment'])
+                && ! in_array(rtrim($appUrl, '/'), ['http://localhost', 'http://localhost:8000'])
             ) {
                 $url->setApplicationUrl($appUrl);
             }

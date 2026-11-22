@@ -84,13 +84,23 @@ class RoutingServiceProviderTest extends TestCase
 
     #[TestWith(['http://localhost'])]
     #[TestWith(['http://localhost/'])]
-    public function testDefaultApplicationUrlUsesRequestOrigin($appUrl)
+    #[TestWith(['http://localhost:8000'])]
+    public function testLocalhostApplicationUrlUsesRequestOrigin($appUrl)
     {
         $this->app['config']->set('app.url', $appUrl);
         $this->app->forgetInstance('url');
         $this->app->instance('request', Request::create('https://request.example/'));
 
         $this->assertSame('https://request.example/profile', $this->app->make(UrlGeneratorContract::class)->to('profile'));
+    }
+
+    public function testLocalhostPrefixedDomainUsesConfiguredOrigin()
+    {
+        $this->app['config']->set('app.url', 'http://localhost.example');
+        $this->app->forgetInstance('url');
+        $this->app->instance('request', Request::create('https://request.example/'));
+
+        $this->assertSame('http://localhost.example/profile', $this->app->make(UrlGeneratorContract::class)->to('profile'));
     }
 
     #[TestWith([null])]

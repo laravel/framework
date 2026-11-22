@@ -39,6 +39,30 @@ class ServeFileTest extends TestCase
         $this->assertEquals('Hello World', $response->streamedContent());
     }
 
+    #[WithConfig('app.url', 'https://app.example')]
+    public function testTemporaryUrlsIgnoreForgedHost()
+    {
+        $this->app['router']->get('security-file-urls', function () {
+            return [
+                'host' => request()->getHost(),
+                'download' => Storage::temporaryUrl('serve-file-test.txt', now()->addMinutes(1)),
+                'upload' => Storage::temporaryUploadUrl('serve-file-test.txt', now()->addMinutes(1))['url'],
+            ];
+        });
+
+        $response = $this->get('http://attacker.example/security-file-urls');
+        $response->assertOk();
+        $response->assertJsonPath('host', 'attacker.example');
+
+        $downloadUrl = $response->json('download');
+        $uploadUrl = $response->json('upload');
+        $this->assertStringStartsWith('https://app.example/', $downloadUrl);
+        $this->assertStringStartsWith('https://app.example/', $uploadUrl);
+        $this->assertSame('Hello World', $this->get($downloadUrl)->streamedContent());
+        $this->call('PUT', $uploadUrl, content: 'Updated content')->assertNoContent();
+        $this->assertSame('Updated content', Storage::get('serve-file-test.txt'));
+    }
+
     public function testItWill404OnMissingFile()
     {
         $url = Storage::temporaryUrl('serve-missing-test.txt', now()->addMinutes(1));
