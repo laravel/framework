@@ -85,7 +85,7 @@ abstract class InterventionDriver implements Driver
             throw new ImageException("The image format [{$mimeType}] is not supported.");
         }
 
-        $image = $this->manager->decode($contents);
+        $image = $this->manager->decodeBinary($contents);
 
         foreach ($pipeline->transformations as $transformation) {
             if ($handler = $this->transformationHandlerFor($transformation)) {
@@ -152,7 +152,7 @@ abstract class InterventionDriver implements Driver
      */
     public function dimensions(string $contents): array
     {
-        $image = $this->manager->decode($contents);
+        $image = $this->manager->decodeBinary($contents);
 
         try {
             return [$image->width(), $image->height()];
@@ -176,7 +176,7 @@ abstract class InterventionDriver implements Driver
      */
     public function dominantColor(string $contents): string
     {
-        $image = $this->manager->decode($contents);
+        $image = $this->manager->decodeBinary($contents);
 
         try {
             return $this->dominantColorFrom($image);

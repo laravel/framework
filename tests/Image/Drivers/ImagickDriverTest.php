@@ -560,6 +560,17 @@ class ImagickDriverTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_processes_images_whose_last_byte_is_an_equals_sign()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(200, 100).'=';
+
+        $result = $driver->process($contents, $this->pipeline(new Scale(100, 100)));
+
+        $this->assertSame([100, 50], array_slice(getimagesizefromstring($result), 0, 2));
+        $this->assertSame([200, 100], $driver->dimensions($contents));
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
