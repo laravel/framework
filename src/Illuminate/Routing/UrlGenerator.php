@@ -50,13 +50,6 @@ class UrlGenerator implements UrlGeneratorContract
     protected $appUrl;
 
     /**
-     * The application URL used when the root and scheme were last cached.
-     *
-     * @var string|null
-     */
-    protected $cachedApplicationUrl;
-
-    /**
      * The forced URL root.
      *
      * @var string
@@ -169,15 +162,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function getApplicationUrl()
     {
-        $appUrl = Request::getTrustedHosts() ? null : $this->appUrl;
-
-        if ($this->cachedApplicationUrl !== $appUrl) {
-            $this->cachedRoot = null;
-            $this->cachedScheme = null;
-            $this->cachedApplicationUrl = $appUrl;
-        }
-
-        return $appUrl;
+        return $this->appUrl;
     }
 
     /**

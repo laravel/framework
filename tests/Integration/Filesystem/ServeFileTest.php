@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\TestWith;
 
 #[WithConfig('filesystems.disks.local.serve', true)]
 class ServeFileTest extends TestCase
@@ -40,8 +42,12 @@ class ServeFileTest extends TestCase
     }
 
     #[WithConfig('app.url', 'https://app.example')]
-    public function testTemporaryUrlsIgnoreForgedHost()
+    #[TestWith([[]])]
+    #[TestWith([['.*']])]
+    public function testTemporaryUrlsIgnoreForgedHost(array $trustedHosts)
     {
+        Request::setTrustedHosts($trustedHosts);
+        $this->beforeApplicationDestroyed(fn () => Request::setTrustedHosts([]));
         $this->app['router']->get('security-file-urls', function () {
             return [
                 'host' => request()->getHost(),

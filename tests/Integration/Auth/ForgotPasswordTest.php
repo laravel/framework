@@ -17,6 +17,7 @@ use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 #[WithMigration]
 class ForgotPasswordTest extends TestCase
@@ -72,8 +73,12 @@ class ForgotPasswordTest extends TestCase
     }
 
     #[WithConfig('app.url', 'https://app.example')]
-    public function testPasswordResetAndVerificationLinksIgnoreForgedHost()
+    #[TestWith([[]])]
+    #[TestWith([['.*']])]
+    public function testPasswordResetAndVerificationLinksIgnoreForgedHost(array $trustedHosts)
     {
+        Request::setTrustedHosts($trustedHosts);
+        $this->beforeApplicationDestroyed(fn () => Request::setTrustedHosts([]));
         Notification::fake();
         $user = UserFactory::new()->create();
 

@@ -40,7 +40,7 @@ class RoutingServiceProviderTest extends TestCase
         $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
     }
 
-    public function testApplicationUrlIsUsedOnlyWhenTrustedHostsAreNotActive()
+    public function testApplicationUrlIsUsedRegardlessOfTrustedHosts()
     {
         Request::setTrustedHosts([]);
 
@@ -65,18 +65,26 @@ class RoutingServiceProviderTest extends TestCase
             };
             $middleware->handle($request, fn () => null);
 
-            $this->assertSame('http://tenant.example.com:8080/profile', $url->route('profile'));
-            $this->assertSame('http://other.example:8080/domain', $url->route('domain'));
+            $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
+            $this->assertSame('https://other.example:8443/domain', $url->route('domain'));
             $this->assertSame('/profile', $url->route('profile', [], false));
+
+            Request::setTrustedHosts(['.*']);
+            $request = Request::create('http://attacker.example:8080/');
+            $this->app->instance('request', $request);
+
+            $this->assertSame('attacker.example', $request->getHost());
+            $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
+            $this->assertSame('https://example.com:8443/base/profile', $url->to('profile'));
+            $this->assertSame('https://example.com:8443/base/profile', strtok($url->signedRoute('profile'), '?'));
 
             Request::setTrustedHosts([]);
             $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
 
             $middleware->handle($request, fn () => null);
-            $this->app->instance('request', Request::create('http://attacker.example/'));
 
             $this->expectException(SuspiciousOperationException::class);
-            $url->to('profile');
+            $request->getHost();
         } finally {
             Request::setTrustedHosts([]);
         }

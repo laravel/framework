@@ -50,8 +50,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | When set to a valid, non-default value, this URL is used as the root
-    | for generated URLs unless trusted hosts are configured. Otherwise,
-    | the incoming request is used. It is also used within Artisan.
+    | for generated URLs instead of the incoming request. Otherwise, the
+    | incoming request is used. It is also used within Artisan.
     |
     */
 

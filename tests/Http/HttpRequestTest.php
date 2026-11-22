@@ -15,9 +15,12 @@ use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -61,6 +64,31 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('http://example.com/foo/bar/script.php?test');
         $this->assertSame('http://example.com', $request->root());
+    }
+
+    #[RunInSeparateProcess]
+    #[TestWith(['example.com/path'])]
+    #[TestWith(['attacker.example@example.com'])]
+    #[TestWith(['example.com,attacker.example'])]
+    public function testRootRejectsMalformedHostsWithoutTrustedHosts(string $host)
+    {
+        Request::setTrustedHosts([]);
+        $request = Request::create('http://example.com/');
+        $request->headers->set('Host', $host);
+
+        $this->expectException(SuspiciousOperationException::class);
+        $this->expectExceptionMessage('Invalid Host');
+        $request->root();
+    }
+
+    #[RunInSeparateProcess]
+    public function testRootAcceptsValidForgedHostWithoutTrustedHosts()
+    {
+        Request::setTrustedHosts([]);
+        $request = Request::create('http://example.com/');
+        $request->headers->set('Host', 'attacker.example');
+
+        $this->assertSame('http://attacker.example', $request->root());
     }
 
     public function testPathMethod()
