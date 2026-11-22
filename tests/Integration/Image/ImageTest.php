@@ -3,7 +3,10 @@
 namespace Illuminate\Tests\Integration\Image;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Image;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Image as ImageFacade;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -787,6 +790,18 @@ class ImageTest extends TestCase
         $image->storePubliclyAs('avatars', 'photo.jpg');
 
         Storage::assertExists('avatars/photo.jpg');
+    }
+
+    public function test_custom_drivers_survive_scoped_instance_resets()
+    {
+        $driver = new GdDriver;
+
+        ImageFacade::extend('custom', fn () => $driver);
+
+        $this->app->forgetScopedInstances();
+        Facade::clearResolvedInstances();
+
+        $this->assertSame($driver, ImageFacade::driver('custom'));
     }
 
     protected function fakeImageContents(int $width = 100, int $height = 100): string
