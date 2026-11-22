@@ -91,6 +91,8 @@ assertType('10', with(new User(), function ($user) {
     return 10;
 }));
 
+assertType("'result'", withLazyLoading(fn () => 'result'));
+
 assertType('SupportLazyClass', lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
     return [];
 }));

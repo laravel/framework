@@ -526,3 +526,26 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('withLazyLoading')) {
+    /**
+     * Run the given callback with lazy loading enabled.
+     *
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
+     */
+    function withLazyLoading(callable $callback)
+    {
+        $preventsLazyLoading = Model::preventsLazyLoading();
+
+        Model::preventLazyLoading(false);
+
+        try {
+            return $callback();
+        } finally {
+            Model::preventLazyLoading($preventsLazyLoading);
+        }
+    }
+}

@@ -101,6 +101,40 @@ class DatabaseEloquentModelTest extends TestCase
         Model::reguard();
     }
 
+    public function testWithLazyLoadingTemporarilyAllowsLazyLoadingAndRestoresThePreviousSetting()
+    {
+        $preventsLazyLoading = Model::preventsLazyLoading();
+
+        try {
+            Model::preventLazyLoading(true);
+
+            $result = withLazyLoading(function () {
+                $this->assertFalse(Model::preventsLazyLoading());
+
+                return 'result';
+            });
+
+            $this->assertSame('result', $result);
+            $this->assertTrue(Model::preventsLazyLoading());
+
+            try {
+                withLazyLoading(function () {
+                    $this->assertFalse(Model::preventsLazyLoading());
+
+                    throw new LogicException('Callback failed.');
+                });
+
+                $this->fail('The exception thrown by the callback was not rethrown.');
+            } catch (LogicException $exception) {
+                $this->assertSame('Callback failed.', $exception->getMessage());
+            }
+
+            $this->assertTrue(Model::preventsLazyLoading());
+        } finally {
+            Model::preventLazyLoading($preventsLazyLoading);
+        }
+    }
+
     public function testAttributeManipulation()
     {
         $model = new EloquentModelStub;
