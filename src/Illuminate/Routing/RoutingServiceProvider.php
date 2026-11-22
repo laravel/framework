@@ -68,6 +68,22 @@ class RoutingServiceProvider extends ServiceProvider
         });
 
         $this->app->extend('url', function (UrlGeneratorContract $url, $app) {
+            $appUrl = $app['config']['app.url'];
+
+            $components = is_string($appUrl) && filter_var($appUrl, FILTER_VALIDATE_URL)
+                ? parse_url($appUrl)
+                : false;
+
+            if ($components 
+                && in_array($components['scheme'] ?? null, ['http', 'https'], true) 
+                && ! empty($components['host']) 
+                && ! isset($components['query']) 
+                && ! isset($components['fragment']) 
+                && ! str_starts_with(rtrim($appUrl, '/'), 'http://localhost')
+            ) {
+                $url->setApplicationUrl($appUrl);
+            }
+
             // Next we will set a few service resolvers on the URL generator so it can
             // get the information it needs to function. This just provides some of
             // the convenience features to this URL generator like "signed" URLs.

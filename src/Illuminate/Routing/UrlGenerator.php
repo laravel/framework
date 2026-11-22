@@ -43,6 +43,20 @@ class UrlGenerator implements UrlGeneratorContract
     protected $assetRoot;
 
     /**
+     * The configured application URL.
+     *
+     * @var string|null
+     */
+    protected $appUrl;
+
+    /**
+     * The application URL used when the root and scheme were last cached.
+     *
+     * @var string|null
+     */
+    protected $cachedApplicationUrl;
+
+    /**
      * The forced URL root.
      *
      * @var string
@@ -132,6 +146,38 @@ class UrlGenerator implements UrlGeneratorContract
         $this->assetRoot = $assetRoot;
 
         $this->setRequest($request);
+    }
+
+    /**
+     * Set the application URL used instead of the request origin.
+     *
+     * @param  string|null  $url
+     * @return void
+     */
+    public function setApplicationUrl(?string $url)
+    {
+        $this->appUrl = $url === null ? null : rtrim($url, '/');
+
+        $this->cachedRoot = null;
+        $this->cachedScheme = null;
+    }
+
+    /**
+     * Get the configured application URL, if it overrides the request.
+     *
+     * @return string|null
+     */
+    public function getApplicationUrl()
+    {
+        $appUrl = Request::getTrustedHosts() ? null : $this->appUrl;
+
+        if ($this->cachedApplicationUrl !== $appUrl) {
+            $this->cachedRoot = null;
+            $this->cachedScheme = null;
+            $this->cachedApplicationUrl = $appUrl;
+        }
+
+        return $appUrl;
     }
 
     /**
@@ -334,12 +380,16 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatScheme($secure = null)
     {
+        $appUrl = $this->getApplicationUrl();
+
         if (! is_null($secure)) {
             return $secure ? 'https://' : 'http://';
         }
 
         if (is_null($this->cachedScheme)) {
-            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
+            $this->cachedScheme = $this->forceScheme ?: ($appUrl
+                ? parse_url($appUrl, PHP_URL_SCHEME).'://'
+                : $this->request->getScheme().'://');
         }
 
         return $this->cachedScheme;
@@ -653,9 +703,11 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatRoot($scheme, $root = null)
     {
+        $appUrl = $this->getApplicationUrl();
+
         if (is_null($root)) {
             if (is_null($this->cachedRoot)) {
-                $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
+                $this->cachedRoot = $this->forcedRoot ?: $appUrl ?: $this->request->root();
             }
 
             $root = $this->cachedRoot;

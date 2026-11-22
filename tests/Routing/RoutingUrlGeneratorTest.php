@@ -43,6 +43,46 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
     }
 
+    public function testConfiguredApplicationUrlRespectsExplicitOriginsAndSchemes()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://attacker.example/'),
+            'https://cdn.example'
+        );
+
+        $this->assertSame('http://attacker.example/path', $url->to('path'));
+        $url->setApplicationUrl('https://example.com/base/');
+        $this->assertSame('https://example.com/base/path', $url->to('path'));
+        $this->assertSame('https://cdn.example/image.png', $url->asset('image.png'));
+
+        $url->useOrigin('http://other.example');
+        $url->forceScheme('http');
+        $this->assertSame('http://other.example/path', $url->to('path'));
+
+        $url->useOrigin(null);
+        $url->forceScheme(null);
+        $this->assertSame('https://example.com/base/path', $url->to('path'));
+
+        $url->setApplicationUrl(null);
+        $this->assertSame('http://attacker.example/path', $url->to('path'));
+    }
+
+    public function testConfiguredBasePathIsRemovedFromRelativeUrls()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://attacker.example/')
+        );
+
+        $url->setApplicationUrl('https://example.com/base.1');
+        $routes->add(new Route(['GET'], '/', ['as' => 'home']));
+        $routes->add(new Route(['GET'], '/baseX1', ['as' => 'domain', 'domain' => 'other.example']));
+
+        $this->assertSame('/?query=value', $url->route('home', ['query' => 'value'], false));
+        $this->assertSame('/baseX1', $url->route('domain', [], false));
+    }
+
     public function testQueryGeneration()
     {
         $url = new UrlGenerator(
