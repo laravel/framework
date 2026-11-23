@@ -745,9 +745,12 @@ class Arr
     /**
      * Get a subset of the items from the given array.
      *
-     * @param  array  $array
-     * @param  array|string  $keys
-     * @return array
+     * @template  TKey of array-key
+     * @template  TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  array<array-key, array-key>|string  $keys
+     * @return array<TKey, TValue>
      */
     public static function only($array, $keys)
     {
