@@ -3,10 +3,7 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
-use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Illuminate\Http\UrlGenerator;
-use Illuminate\Support\Uri;
 
 class TrustProxies
 {
