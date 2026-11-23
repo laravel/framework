@@ -55,6 +55,22 @@ class RoutingServiceProviderTest extends TestCase
         });
     }
 
+    public function testReboundConfigurationIsUsedAfterGeneratorResolution()
+    {
+        $this->app['config']->set('app.url', 'https://old.example');
+        $this->app->forgetInstance('url');
+        $request = Request::create('http://request.example/');
+        $this->app->instance('request', $request);
+        $url = $this->app->make(UrlGeneratorContract::class);
+        $config = clone $this->app['config'];
+        $config->set('app.url', 'https://new.example');
+        $this->app->instance('config', $config);
+
+        $this->app->make(TrustProxies::class)->handle($request, function () use ($url) {
+            $this->assertSame('https://new.example/profile', $url->to('profile'));
+        });
+    }
+
     #[TestWith([[], 'https://example.com:8443/base/profile'])]
     #[TestWith([['.*'], 'https://example.com:8443/base/profile'])]
     #[TestWith([['^.*$'], 'https://example.com:8443/base/profile'])]
