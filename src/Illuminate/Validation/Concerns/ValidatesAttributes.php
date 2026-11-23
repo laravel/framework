@@ -1306,7 +1306,7 @@ trait ValidatesAttributes
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             try {
-                return BigNumber::of($this->trim($value))->isGreaterThan($this->trim($comparedToValue));
+                return BigNumber::of($this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)))->isGreaterThan($this->ensureExponentWithinAllowedRange($attribute, $this->trim($comparedToValue)));
             } catch (MathException) {
                 return false;
             }
@@ -1352,7 +1352,11 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
+            try {
+                return BigNumber::of($this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)))->isLessThan($this->ensureExponentWithinAllowedRange($attribute, $this->trim($comparedToValue)));
+            } catch (MathException) {
+                return false;
+            }
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1396,7 +1400,7 @@ trait ValidatesAttributes
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             try {
-                return BigNumber::of($this->trim($value))->isGreaterThanOrEqualTo($this->trim($comparedToValue));
+                return BigNumber::of($this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)))->isGreaterThanOrEqualTo($this->ensureExponentWithinAllowedRange($attribute, $this->trim($comparedToValue)));
             } catch (MathException) {
                 return false;
             }
@@ -1442,7 +1446,11 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
+            try {
+                return BigNumber::of($this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)))->isLessThanOrEqualTo($this->ensureExponentWithinAllowedRange($attribute, $this->trim($comparedToValue)));
+            } catch (MathException) {
+                return false;
+            }
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1927,7 +1935,7 @@ trait ValidatesAttributes
         }
 
         try {
-            $numerator = BigDecimal::of($this->trim($value));
+            $numerator = BigDecimal::of($this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)));
             $denominator = BigDecimal::of($this->trim($parameters[0]));
 
             if ($numerator->isZero() && $denominator->isZero()) {
@@ -1943,6 +1951,8 @@ trait ValidatesAttributes
             }
 
             return $numerator->remainder($denominator)->isZero();
+        } catch (MathException) {
+            return false;
         } catch (BrickMathException $e) {
             throw new MathException('An error occurred while handling the multiple_of input values.', previous: $e);
         }
