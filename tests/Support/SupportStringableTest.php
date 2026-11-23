@@ -1176,6 +1176,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', collect(['x' => 'foo', 'y' => 'bar'])));
     }
 
+    public function testReplaceArrayWithRepeatedIteratorKeys()
+    {
+        $replacements = (function () {
+            yield 'key' => 'foo';
+            yield 'key' => 'bar';
+        })();
+
+        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', $replacements));
+    }
+
     public function testReplaceFirst()
     {
         $this->assertSame('fooqux foobar', (string) $this->stringable('foobar foobar')->replaceFirst('bar', 'qux'));

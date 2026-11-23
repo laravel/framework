@@ -993,6 +993,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
+    public function testReplaceArrayWithRepeatedIteratorKeys()
+    {
+        $replacements = (function () {
+            yield from ['foo', 'bar'];
+            yield from ['baz'];
+        })();
+
+        $this->assertSame('foo/bar/baz', Str::replaceArray('?', $replacements, '?/?/?'));
+    }
+
     public function testReplaceFirst()
     {
         $this->assertSame('fooqux foobar', Str::replaceFirst('bar', 'qux', 'foobar foobar'));

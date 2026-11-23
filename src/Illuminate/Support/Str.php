@@ -1252,7 +1252,7 @@ class Str
     public static function replaceArray($search, $replace, $subject)
     {
         if ($replace instanceof Traversable) {
-            $replace = iterator_to_array($replace);
+            $replace = iterator_to_array($replace, false);
         }
 
         $segments = explode($search, $subject);
