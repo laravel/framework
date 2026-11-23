@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
@@ -82,6 +83,20 @@ class RouteServiceProviderTest extends TestCase
 
         $response->assertOk();
         $this->assertSame('https://app.example/profile', $response->streamedContent());
+    }
+
+    #[WithConfig('app.url', 'https://app.example')]
+    public function test_application_origin_remains_available_to_request_handled_listeners()
+    {
+        $generatedUrl = null;
+        $this->app['events']->listen(RequestHandled::class, function () use (&$generatedUrl) {
+            $generatedUrl = url('profile');
+        });
+        $this->app['router']->get('handled-url', fn () => '');
+
+        $this->get('http://attacker.example/handled-url')->assertOk();
+
+        $this->assertSame('https://app.example/profile', $generatedUrl);
     }
 
     #[WithConfig('app.url', 'https://app.example')]

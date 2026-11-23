@@ -60,10 +60,12 @@ class RoutingServiceProvider extends ServiceProvider
             // and all the registered routes will be available to the generator.
             $app->instance('routes', $routes);
 
+            $config = $app->make('config');
+
             return new UrlGenerator(
                 $routes, $app->rebinding(
                     'request', $this->requestRebinder()
-                ), $app['config']['app.asset_url']
+                ), $config['app.asset_url'], $config['app.url']
             );
         });
 

@@ -37,8 +37,6 @@ class RoutingServiceProviderTest extends TestCase
         });
 
         $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
-        $url->flushState();
-        $this->assertSame('http://attacker.example:8080/profile', $url->route('profile'));
     }
 
     #[TestWith([[], 'https://example.com:8443/base/profile'])]
@@ -63,7 +61,7 @@ class RoutingServiceProviderTest extends TestCase
         }
     }
 
-    public function testApplicationOriginCanBeFlushedAfterExceptionsAndBetweenRequests()
+    public function testApplicationOriginCanBeResetAfterExceptionsAndBetweenRequests()
     {
         $this->app['config']->set('app.url', 'https://example.com');
         $request = Request::create('http://first.example/');
@@ -82,7 +80,8 @@ class RoutingServiceProviderTest extends TestCase
         }
 
         $this->assertSame('https://example.com/profile', $url->to('profile'));
-        $url->flushState();
+        $url->useOrigin(null);
+        $url->forceScheme(null);
         $this->assertSame('http://first.example/profile', $url->to('profile'));
         $request = Request::create('http://second.example/');
         $this->app->instance('request', $request);
@@ -97,10 +96,10 @@ class RoutingServiceProviderTest extends TestCase
         }
     }
 
-    #[TestWith(['http://custom.example', 'http', 'http://custom.example/profile', 'http://custom.example/profile'])]
-    #[TestWith(['http://custom.example', null, 'https://custom.example/profile', 'http://custom.example/profile'])]
-    #[TestWith([null, 'http', 'http://example.com/profile', 'http://request.example/profile'])]
-    public function testExplicitOriginAndSchemeArePreserved($origin, $scheme, $expected, $afterFlush)
+    #[TestWith(['http://custom.example', 'http', 'http://custom.example/profile'])]
+    #[TestWith(['http://custom.example', null, 'https://custom.example/profile'])]
+    #[TestWith([null, 'http', 'http://example.com/profile'])]
+    public function testExplicitOriginAndSchemeArePreserved($origin, $scheme, $expected)
     {
         $this->app['config']->set('app.url', 'https://example.com');
         $request = Request::create('http://request.example/');
@@ -113,27 +112,29 @@ class RoutingServiceProviderTest extends TestCase
             $this->assertSame($expected, $url->to('profile'));
         });
 
-        $url->flushState();
-
-        $this->assertSame($origin, $url->getOrigin());
-        $this->assertSame($afterFlush, $url->to('profile'));
     }
 
-    public function testFlushPreservesExplicitOverridesMadeDuringTheRequest()
+    #[TestWith(['http://custom.example', null, 'https://custom.example/profile'])]
+    #[TestWith([null, 'http', 'http://example.com/profile'])]
+    #[TestWith(['http://custom.example', 'http', 'http://custom.example/profile'])]
+    public function testExplicitOverridesMadeDuringTheRequestArePreserved($origin, $scheme, $expected)
     {
         $this->app['config']->set('app.url', 'https://example.com');
         $request = Request::create('http://request.example/');
         $this->app->instance('request', $request);
         $url = $this->app->make(UrlGeneratorContract::class);
 
-        $this->app->make(TrustProxies::class)->handle($request, function () use ($url) {
-            $url->useOrigin('https://example.com');
-            $url->forceScheme('https');
+        $this->app->make(TrustProxies::class)->handle($request, function () use ($url, $origin, $scheme) {
+            if ($origin !== null) {
+                $url->useOrigin($origin);
+            }
+
+            if ($scheme !== null) {
+                $url->forceScheme($scheme);
+            }
         });
 
-        $url->flushState();
-
-        $this->assertSame('https://example.com/profile', $url->to('profile'));
+        $this->assertSame($expected, $url->to('profile'));
     }
 
     #[TestWith(['http://localhost'])]

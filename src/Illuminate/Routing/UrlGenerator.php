@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -36,6 +37,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $request;
 
     /**
+     * The application root URL.
+     *
+     * @var string
+     */
+    protected $applicationRoot;
+
+    /**
      * The asset root URL.
      *
      * @var string
@@ -55,20 +63,6 @@ class UrlGenerator implements UrlGeneratorContract
      * @var string
      */
     protected $forceScheme;
-
-    /**
-     * Whether the forced origin was set from the application URL.
-     *
-     * @var bool
-     */
-    protected $usingApplicationOrigin = false;
-
-    /**
-     * Whether the forced scheme was set from the application URL.
-     *
-     * @var bool
-     */
-    protected $usingApplicationScheme = false;
 
     /**
      * A cached copy of the URL root for the current request.
@@ -139,11 +133,13 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
+     * @param  string|null  $applicationRoot
      */
-    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
+    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null, $applicationRoot = null)
     {
         $this->routes = $routes;
         $this->assetRoot = $assetRoot;
+        $this->applicationRoot = $applicationRoot;
 
         $this->setRequest($request);
     }
@@ -762,7 +758,6 @@ class UrlGenerator implements UrlGeneratorContract
     public function forceScheme($scheme)
     {
         $this->cachedScheme = null;
-        $this->usingApplicationScheme = false;
 
         $this->forceScheme = $scheme ? $scheme.'://' : null;
     }
@@ -770,37 +765,28 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Use the application origin and scheme unless they have been explicitly forced.
      *
-     * @param  string  $origin
-     * @param  string  $scheme
      * @return void
      */
-    public function useApplicationOrigin(string $origin, string $scheme)
+    public function usesOriginFromApplicationRoot(): void
     {
-        if ($this->forcedRoot === null) {
-            $this->useOrigin($origin);
-            $this->usingApplicationOrigin = true;
+        $applicationRoot = $this->applicationRoot;
+        $applicationUri = is_string($applicationRoot) && filter_var($applicationRoot, FILTER_VALIDATE_URL)
+            ? Uri::of($applicationRoot)
+            : null;
+
+        if (! $applicationUri
+            || ! in_array($applicationUri->scheme(), ['http', 'https'], true)
+            || ! str_starts_with($applicationRoot, $applicationUri->scheme().'://')
+            || ! $applicationUri->host()
+            || $applicationUri->getUri()->getQuery() !== null
+            || $applicationUri->fragment() !== null
+            || in_array(rtrim($applicationRoot, '/'), ['http://localhost', 'http://localhost:8000'])
+        ) {
+            return;
         }
 
-        if ($this->forceScheme === null) {
-            $this->forceScheme($scheme);
-            $this->usingApplicationScheme = true;
-        }
-    }
-
-    /**
-     * Flush the origin and scheme set from the application URL.
-     *
-     * @return void
-     */
-    public function flushState()
-    {
-        if ($this->usingApplicationOrigin) {
-            $this->useOrigin(null);
-        }
-
-        if ($this->usingApplicationScheme) {
-            $this->forceScheme(null);
-        }
+        $this->useOrigin($applicationRoot);
+        $this->forceScheme($applicationUri->scheme());
     }
 
     /**
@@ -847,7 +833,6 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function forceRootUrl($root)
     {
-        $this->usingApplicationOrigin = false;
         $this->forcedRoot = $root ? rtrim($root, '/') : null;
 
         $this->cachedRoot = null;
