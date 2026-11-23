@@ -1022,6 +1022,19 @@ class Vite implements Htmlable
      */
     protected function resolveImports($manifest, $chunk, $seen = [])
     {
+        return $this->collectImports($manifest, $chunk, $seen);
+    }
+
+    /**
+     * Recursively collect the imports for the given chunk, visiting each chunk only once.
+     *
+     * @param  array  $manifest
+     * @param  array  $chunk
+     * @param  array  $seen
+     * @return array
+     */
+    protected function collectImports($manifest, $chunk, &$seen)
+    {
         $imports = [];
 
         foreach ($chunk['imports'] ?? [] as $import) {
@@ -1034,7 +1047,7 @@ class Vite implements Htmlable
             $imports[] = $import;
 
             if (isset($manifest[$import])) {
-                $imports = array_merge($imports, $this->resolveImports($manifest, $manifest[$import], $seen));
+                $imports = array_merge($imports, $this->collectImports($manifest, $manifest[$import], $seen));
             }
         }
 

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Http;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Http\Request;
+use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\RateLimiter;
@@ -106,5 +107,39 @@ class ThrottleRequestsWithRedisTest extends TestCase
             $this->get('/')->assertNotFound();
             $this->get('/')->assertTooManyRequests()->assertContent('ah ah ah');
         });
+    }
+
+    public function testConcurrentRequestsCannotExceedTheLimit()
+    {
+        $this->ifRedisAvailable(function () {
+            RateLimiter::for('concurrent', fn () => Limit::perMinute(2)->by('key'));
+
+            Route::get('/', fn () => 'yes')->middleware(ThrottleRequestsWithConcurrentRequests::using('concurrent'));
+
+            ThrottleRequestsWithConcurrentRequests::$served = 0;
+
+            if ($this->get('/')->isOk()) {
+                ThrottleRequestsWithConcurrentRequests::$served++;
+            }
+
+            $this->assertSame(2, ThrottleRequestsWithConcurrentRequests::$served);
+        });
+    }
+}
+
+class ThrottleRequestsWithConcurrentRequests extends ThrottleRequestsWithRedis
+{
+    public static int $served = 0;
+
+    protected function getRedisConnection()
+    {
+        // Simulate another request being served before each Redis call this request makes...
+        $limiter = new DurationLimiter(parent::getRedisConnection(), md5('concurrent'.'key'), 2, 60);
+
+        if ($limiter->acquire()) {
+            static::$served++;
+        }
+
+        return parent::getRedisConnection();
     }
 }

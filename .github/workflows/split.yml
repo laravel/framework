@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - '*.x'
+      - '[0-9]+.x'
   # Scheduled runs only fire from the default branch, so they fan out to every supported branch as a retry net for failed push runs.
   schedule:
     - cron: '17 * * * *'
@@ -47,6 +47,18 @@ jobs:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
 
+      # bin/split.sh merges its hard-coded branch into whatever is checked out and force-pushes the result,
+      # so running it from any other branch (a manual dispatch, or a new major cut before split.sh is updated)
+      # would publish that branch's code as the component release branch.
+      - name: Verify split target
+        run: |
+          if ! grep -qx "CURRENT_BRANCH=\"$BRANCH\"" bin/split.sh; then
+            echo "::error::bin/split.sh does not target $BRANCH, refusing to split."
+            exit 1
+          fi
+        env:
+          BRANCH: ${{ matrix.branch }}
+
       - name: Restore splitsh-lite
         id: splitsh-lite
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -56,7 +68,7 @@ jobs:
 
       - name: Set up Go
         if: steps.splitsh-lite.outputs.cache-hit != 'true'
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: '1.22'
           cache: false

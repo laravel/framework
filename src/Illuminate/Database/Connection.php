@@ -1005,6 +1005,46 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Register a callback to be invoked when a transaction runs for longer than a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  (callable(\Illuminate\Database\Connection, \Illuminate\Database\Events\TransactionCommitted|\Illuminate\Database\Events\TransactionRolledBack, float): mixed)  $handler
+     * @return void
+     */
+    public function whenTransactionRunsLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $startedAt = null;
+
+        $this->events?->listen(TransactionBeginning::class, function ($event) use (&$startedAt) {
+            if ($event->connection === $this && $this->transactionLevel() === 1) {
+                $startedAt = microtime(true);
+            }
+        });
+
+        $this->events?->listen([TransactionCommitted::class, TransactionRolledBack::class], function ($event) use (&$startedAt, $threshold, $handler) {
+            if ($event->connection !== $this || $this->transactionLevel() !== 0 || is_null($startedAt)) {
+                return;
+            }
+
+            $duration = $this->getElapsedTime($startedAt);
+
+            $startedAt = null;
+
+            if ($duration > $threshold) {
+                $handler($this, $event, $duration);
+            }
+        });
+    }
+
+    /**
      * Handle a query exception.
      *
      * @param  \Illuminate\Database\QueryException  $e

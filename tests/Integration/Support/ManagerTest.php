@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Manager;
 use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
@@ -40,18 +41,6 @@ class ManagerTest extends TestCase
 
         $manager->extend(__CLASS__, $creator(...));
         $this->assertSame($driver, $manager->driver(__CLASS__));
-    }
-}
-
-class CustomDriver
-{
-    public function __construct(private object $object)
-    {
-    }
-
-    public function __invoke()
-    {
-        return $this->object;
     }
 
     public function testEnumDriverCanBeResolved()
@@ -94,6 +83,69 @@ class CustomDriver
 
         $manager->extend('MyDriver', static fn () => $driver);
         $this->assertSame($driver, $manager->driver(ManagerUnitDriverName::MyDriver));
+    }
+
+    public function testDefaultDriverCanBeBackedEnum()
+    {
+        $manager = $this->managerWithDefault(ManagerDriverName::MyDriver);
+        $driver = new stdClass;
+
+        $manager->extend('my_driver', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->driver());
+        $this->assertSame($driver, $manager->driver('my_driver'));
+        $this->assertSame(['my_driver' => $driver], $manager->getDrivers());
+    }
+
+    public function testDefaultDriverCanBeUnitEnum()
+    {
+        $manager = $this->managerWithDefault(ManagerUnitDriverName::MyDriver);
+        $driver = new stdClass;
+
+        $manager->extend('MyDriver', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->driver());
+        $this->assertSame(['MyDriver' => $driver], $manager->getDrivers());
+    }
+
+    public function testDefaultEnumDriverUsesCreateMethod()
+    {
+        $manager = $this->managerWithDefault(ManagerDriverName::MyDriver);
+
+        $this->assertSame('created', $manager->driver());
+    }
+
+    protected function managerWithDefault($default)
+    {
+        return new class($this->app, $default) extends Manager
+        {
+            public function __construct($container, protected $default)
+            {
+                parent::__construct($container);
+            }
+
+            public function getDefaultDriver()
+            {
+                return $this->default;
+            }
+
+            protected function createMyDriverDriver()
+            {
+                return 'created';
+            }
+        };
+    }
+}
+
+class CustomDriver
+{
+    public function __construct(private object $object)
+    {
+    }
+
+    public function __invoke()
+    {
+        return $this->object;
     }
 }
 

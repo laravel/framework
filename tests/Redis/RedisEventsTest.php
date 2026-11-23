@@ -10,9 +10,11 @@ use Illuminate\Redis\Events\CommandFailed;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
+#[RequiresPhpExtension('redis')]
 class RedisEventsTest extends TestCase
 {
     use VerifiesDoubles;

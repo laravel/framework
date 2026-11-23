@@ -405,6 +405,27 @@ class DatabaseConnectionTest extends TestCase
     }
 
     #[AllowMockObjectsWithoutExpectations]
+    public function testWhenTransactionRunsLongerThan()
+    {
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection([], $pdo);
+        $connection->setQueryGrammar(new Grammar($connection));
+        $connection->setEventDispatcher(new Dispatcher);
+        $called = 0;
+        $connection->whenTransactionRunsLongerThan(10, function () use (&$called) {
+            $called++;
+        });
+
+        $connection->transaction(fn () => null);
+        $this->assertSame(0, $called);
+
+        $connection->transaction(function ($connection) {
+            $connection->transaction(fn () => usleep(20000));
+        });
+        $this->assertSame(1, $called);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionMethodRunsSuccessfully()
     {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit'])->getMock();

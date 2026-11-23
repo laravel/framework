@@ -8,8 +8,10 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Connectors\ConnectorInterface;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\NullQueue;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -40,6 +42,20 @@ class UniqueJobSchedulingTest extends TestCase
         );
 
         Queue::assertPushed(UniqueTestJob::class, 1);
+    }
+
+    public function testUniqueJobSkippedEventIsDispatchedWhenUniqueJobIsSkipped(): void
+    {
+        Queue::fake();
+        Event::fake([UniqueJobSkipped::class]);
+
+        $this->dispatch(
+            UniqueTestJob::class,
+            UniqueTestJob::class
+        );
+
+        Queue::assertPushed(UniqueTestJob::class, 1);
+        Event::assertDispatchedTimes(UniqueJobSkipped::class, 1);
     }
 
     public function testUniqueLockIsReleasedWhenPushingToTheQueueFails(): void

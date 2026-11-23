@@ -7,9 +7,11 @@ use Illuminate\Broadcasting\Broadcasters\Ably2Broadcaster;
 use Illuminate\Http\Request;
 use JMac\Testing\Double;
 use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+#[IgnoreDeprecations]
 class Ably2BroadcasterTest extends TestCase
 {
     use VerifiesDoubles;
