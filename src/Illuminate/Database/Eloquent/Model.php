@@ -304,6 +304,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $classAttributes = [];
 
     /**
+     * Cache of whether each class declares any Eloquent class attributes.
+     *
+     * @var array<class-string<self>, bool>
+     */
+    protected static array $declaresEloquentAttributes = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -534,6 +541,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         static::$booted = [];
         static::$bootedCallbacks = [];
         static::$classAttributes = [];
+        static::$declaresEloquentAttributes = [];
         static::$globalScopes = [];
     }
 
@@ -2777,6 +2785,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class ??= static::class;
 
+        if (str_starts_with($attributeClass, 'Illuminate\\Database\\Eloquent\\Attributes\\') &&
+            ! (static::$declaresEloquentAttributes[$class] ??= static::declaresEloquentAttributes($class))) {
+            return null;
+        }
+
         $cacheKey = $class.'@'.$attributeClass.'@'.$property;
 
         if (array_key_exists($cacheKey, static::$classAttributes)) {
@@ -2810,6 +2823,33 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return static::$classAttributes[$cacheKey] = null;
+    }
+
+    /**
+     * Determine if the class, its parents, or their traits declare any Eloquent class attributes.
+     *
+     * @param  string  $class
+     * @return bool
+     */
+    protected static function declaresEloquentAttributes(string $class)
+    {
+        try {
+            $reflection = new ReflectionClass($class);
+        } catch (Exception) {
+            return false;
+        }
+
+        do {
+            foreach ([$reflection, ...$reflection->getTraits()] as $target) {
+                foreach ($target->getAttributes() as $attribute) {
+                    if (stripos($attribute->getName(), 'Illuminate\\Database\\Eloquent\\Attributes\\') === 0) {
+                        return true;
+                    }
+                }
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return false;
     }
 
     /**

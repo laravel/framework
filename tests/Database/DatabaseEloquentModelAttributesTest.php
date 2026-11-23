@@ -43,6 +43,12 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         Model::clearBootedModels();
     }
 
+    public function test_non_eloquent_attributes_resolve_on_models_without_eloquent_attributes(): void
+    {
+        $this->assertNull(ModelWithCustomAttribute::resolve(Table::class));
+        $this->assertSame('custom', ModelWithCustomAttribute::resolve(CustomModelAttribute::class, 'value'));
+    }
+
     public function test_table_attribute(): void
     {
         $model = new ModelWithTableAttribute;
@@ -1026,4 +1032,21 @@ trait TraitUsingConnectionAttribute
 class ModelOverridingTraitConnectionAttribute extends Model
 {
     use TraitUsingConnectionAttribute;
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class CustomModelAttribute
+{
+    public function __construct(public string $value)
+    {
+    }
+}
+
+#[CustomModelAttribute('custom')]
+class ModelWithCustomAttribute extends Model
+{
+    public static function resolve(string $attributeClass, ?string $property = null)
+    {
+        return static::resolveClassAttribute($attributeClass, $property);
+    }
 }
