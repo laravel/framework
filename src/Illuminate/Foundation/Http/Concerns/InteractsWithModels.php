@@ -19,12 +19,12 @@ trait InteractsWithModels
      */
     public function model($key, $modelClass = null, ?Closure $callback = null)
     {
-        if ($this->isNotFilled($key)) {
+        if (is_null($id = $this->modelIdentifier($key))) {
             return null;
         }
 
         return $this->newModelQuery($key, $modelClass, $callback)
-            ->whereKey($this->input($key))
+            ->whereKey($id)
             ->first();
     }
 
@@ -42,10 +42,8 @@ trait InteractsWithModels
      */
     public function modelOrFail($key, $modelClass = null, ?Closure $callback = null)
     {
-        $id = $this->isNotFilled($key) ? null : $this->input($key);
-
         return $this->newModelQuery($key, $modelClass, $callback)
-            ->whereKey($id)
+            ->whereKey($this->modelIdentifier($key))
             ->firstOrFail();
     }
 
@@ -63,6 +61,19 @@ trait InteractsWithModels
     {
         return $this->newModelQuery($key, $modelClass, $callback)
             ->findMany($this->array($key));
+    }
+
+    /**
+     * Get the single model identifier from the given input.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function modelIdentifier($key)
+    {
+        $id = $this->input($key);
+
+        return $this->isNotFilled($key) || is_array($id) ? null : $id;
     }
 
     /**
