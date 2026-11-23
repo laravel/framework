@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\TestCase as FoundationTestCase;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Testing\ParallelTesting;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -36,6 +37,17 @@ class InteractsWithTestCaseLifecycleTest extends TestCase
         $application = new Application;
 
         $application->instance('db', new stdClass);
+
+        $this->tearDownApplication($application);
+
+        $this->assertFalse($application->bound('db'));
+    }
+
+    public function testTearDownWithMockedDatabaseManager()
+    {
+        $application = new Application;
+
+        $application->instance('db', m::mock(DatabaseManager::class));
 
         $this->tearDownApplication($application);
 
