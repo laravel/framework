@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Uri;
 use Stringable;
 
 class RouteUrlGenerator
@@ -104,7 +105,9 @@ class RouteUrlGenerator
             $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
 
             if ($this->url->getOrigin()) {
-                if ($base = parse_url($root, PHP_URL_PATH)) {
+                // Preserve literal percent signs when the URI parser encodes the path.
+                if ($base = Uri::of(str_replace('%', '%25', $root))->getUri()->getPath()) {
+                    $base = rawurldecode($base);
                     $base = strtr(rawurlencode($base), $this->dontEncode);
                     $uri = preg_replace('#^'.preg_quote($base, '#').'(?=/|\?|$)#i', '', $uri);
                 }
@@ -170,8 +173,9 @@ class RouteUrlGenerator
     protected function addPortToDomain($domain)
     {
         if ($origin = $this->url->getOrigin()) {
-            $secure = parse_url($origin, PHP_URL_SCHEME) === 'https';
-            $port = parse_url($origin, PHP_URL_PORT) ?: ($secure ? 443 : 80);
+            $origin = Uri::of($origin);
+            $secure = $origin->scheme() === 'https';
+            $port = $origin->port() ?: ($secure ? 443 : 80);
         } else {
             $secure = $this->request->isSecure();
             $port = (int) $this->request->getPort();

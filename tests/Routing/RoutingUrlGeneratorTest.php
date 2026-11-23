@@ -66,14 +66,19 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://attacker.example/path', $url->to('path'));
     }
 
-    public function testConfiguredBasePathIsRemovedFromRelativeUrls()
+    #[TestWith(['base.1'])]
+    #[TestWith(['base%20name'])]
+    #[TestWith(['base[x]'])]
+    #[TestWith(['base%zz'])]
+    #[TestWith(['base%25zz'])]
+    public function testConfiguredBasePathIsRemovedFromRelativeUrls($base)
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://attacker.example/')
         );
 
-        $url->useOrigin('https://example.com/base.1');
+        $url->useOrigin('https://example.com/'.$base);
         $url->forceScheme('https');
         $routes->add(new Route(['GET'], '/', ['as' => 'home']));
         $routes->add(new Route(['GET'], '/baseX1', ['as' => 'domain', 'domain' => 'other.example']));

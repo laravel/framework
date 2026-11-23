@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Support\Uri;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -109,7 +110,7 @@ class ForgotPasswordTest extends TestCase
         $resetUrl = $response->json('reset');
         $verifyUrl = $response->json('verify');
         $this->assertStringStartsWith('https://app.example/password/reset/', $resetUrl);
-        $this->assertTrue(Password::broker()->tokenExists($user, basename(parse_url($resetUrl, PHP_URL_PATH))));
+        $this->assertTrue(Password::broker()->tokenExists($user, basename(Uri::of($resetUrl)->path())));
         $this->assertStringContainsString('email='.rawurlencode($user->email), $resetUrl);
         $this->assertStringStartsWith('https://app.example/email/verify/'.$user->getKey().'/', $verifyUrl);
         $this->assertTrue($this->app['url']->hasValidSignature(Request::create($verifyUrl)));

@@ -25,6 +25,7 @@
         "illuminate/pipeline": "^12.0",
         "illuminate/session": "^12.0",
         "illuminate/support": "^12.0",
+        "league/uri": "^7.5.1",
         "symfony/http-foundation": "^7.2.0",
         "symfony/http-kernel": "^7.2.0",
         "symfony/polyfill-php84": "^1.33",

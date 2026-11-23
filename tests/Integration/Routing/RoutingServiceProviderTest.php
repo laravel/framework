@@ -117,7 +117,10 @@ class RoutingServiceProviderTest extends TestCase
     #[TestWith(['ftp://example.com'])]
     #[TestWith(['https://example.com:99999'])]
     #[TestWith(['https://example.com/path?query=value'])]
+    #[TestWith(['https://example.com/path?'])]
     #[TestWith(['https://example.com/path#fragment'])]
+    #[TestWith(['https://example.com/path#'])]
+    #[TestWith(['HTTPS://example.com'])]
     #[TestWith(['https://example.com/invalid path'])]
     public function testInvalidApplicationUrlUsesRequestOrigin($appUrl)
     {
