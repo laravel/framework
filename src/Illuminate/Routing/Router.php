@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use ArrayObject;
+use BackedEnum;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -25,6 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use ReflectionClass;
@@ -1178,12 +1180,18 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Add a new route parameter binder.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|string  $key
      * @param  string|callable  $binder
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function bind($key, $binder)
     {
+        if ($key instanceof BackedEnum && ! is_string($key = $key->value)) {
+            throw new InvalidArgumentException('Enum must be string backed.');
+        }
+
         $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
             $this->container, $binder
         );
@@ -1192,10 +1200,12 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Register a model binder for a wildcard.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|string  $key
      * @param  string  $class
      * @param  \Closure|null  $callback
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function model($key, $class, ?Closure $callback = null)
     {
@@ -1228,12 +1238,18 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Set a global where pattern on all routes.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|string  $key
      * @param  string  $pattern
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function pattern($key, $pattern)
     {
+        if ($key instanceof BackedEnum && ! is_string($key = $key->value)) {
+            throw new InvalidArgumentException('Enum must be string backed.');
+        }
+
         $this->patterns[$key] = $pattern;
     }
 

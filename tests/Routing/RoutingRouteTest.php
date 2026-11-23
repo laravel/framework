@@ -39,6 +39,9 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteParameterEnum;
+use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1087,6 +1090,25 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testRouteBindingWithStringBackedEnum()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->bind(RouteParameterEnum::Bar, function ($value) {
+            return strtoupper($value);
+        });
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testRouteBindingWithIntegerBackedEnumThrows()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Enum must be string backed.'));
+
+        $this->getRouter()->bind(IntegerEnum::One, fn ($value) => $value);
+    }
+
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
@@ -1143,6 +1165,16 @@ class RoutingRouteTest extends TestCase
             return $name;
         }]);
         $router->model('bar', RouteModelBindingStub::class);
+        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testModelBindingWithStringBackedEnum()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model(RouteParameterEnum::Bar, RouteModelBindingStub::class);
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
@@ -1787,6 +1819,20 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->patterns(['test' => 'pattern', 'test2' => 'pattern2']);
         $this->assertEquals(['test' => 'pattern', 'test2' => 'pattern2'], $router->getPatterns());
+    }
+
+    public function testRouterPatternSettingWithStringBackedEnum()
+    {
+        $router = $this->getRouter();
+        $router->pattern(RouteParameterEnum::Bar, 'pattern');
+        $this->assertEquals(['bar' => 'pattern'], $router->getPatterns());
+    }
+
+    public function testRouterPatternSettingWithIntegerBackedEnumThrows()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Enum must be string backed.'));
+
+        $this->getRouter()->pattern(IntegerEnum::One, 'pattern');
     }
 
     public function testControllerRouting()

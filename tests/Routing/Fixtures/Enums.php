@@ -24,3 +24,8 @@ enum IntegerEnum: int
     case One = 1;
     case Two = 2;
 }
+
+enum RouteParameterEnum: string
+{
+    case Bar = 'bar';
+}
