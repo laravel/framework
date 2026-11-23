@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\With;
+use Illuminate\Database\Eloquent\Attributes\WithCount;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -478,6 +480,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         if ($this->refreshes === []) {
             $this->refreshes = static::resolveClassAttribute(Refreshes::class, 'columns') ?? [];
+        }
+
+        if ($this->with === []) {
+            $this->with = static::resolveClassAttribute(With::class, 'relations') ?? [];
+        }
+
+        if ($this->withCount === []) {
+            $this->withCount = static::resolveClassAttribute(WithCount::class, 'relations') ?? [];
         }
     }
 

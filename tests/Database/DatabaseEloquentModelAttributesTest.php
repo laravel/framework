@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\With;
+use Illuminate\Database\Eloquent\Attributes\WithCount;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
@@ -580,6 +582,116 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertSame('primary', $model->getConnectionName());
     }
+
+    public function test_with_attribute(): void
+    {
+        $model = new ModelWithWithAttribute;
+
+        $this->assertSame(['posts', 'comments'], array_keys($model->newQueryWithoutScopes()->getEagerLoads()));
+    }
+
+    public function test_with_attribute_variadic(): void
+    {
+        $model = new ModelWithWithAttributeVariadic;
+
+        $this->assertSame(['posts', 'comments'], array_keys($model->newQueryWithoutScopes()->getEagerLoads()));
+    }
+
+    public function test_with_property_takes_precedence(): void
+    {
+        $model = new ModelWithWithAttributeAndProperty;
+
+        $this->assertSame(['comments'], array_keys($model->newQueryWithoutScopes()->getEagerLoads()));
+    }
+
+    public function test_with_attribute_is_inherited_and_can_be_overridden_by_child_class(): void
+    {
+        $inherited = new ModelExtendingModelWithWithAttribute;
+        $overridden = new ModelOverridingParentWithAttribute;
+
+        $this->assertSame(['posts', 'comments'], array_keys($inherited->newQueryWithoutScopes()->getEagerLoads()));
+        $this->assertSame(['comments'], array_keys($overridden->newQueryWithoutScopes()->getEagerLoads()));
+    }
+
+    public function test_with_attribute_on_trait(): void
+    {
+        $model = new ModelUsingTraitWithAttribute;
+
+        $this->assertSame(['posts'], array_keys($model->newQueryWithoutScopes()->getEagerLoads()));
+    }
+
+    public function test_with_count_attribute(): void
+    {
+        $sql = (new ModelWithWithCountAttribute)->newQueryWithoutScopes()->toSql();
+
+        $this->assertStringContainsString('posts_count', $sql);
+        $this->assertStringContainsString('comments_count', $sql);
+    }
+
+    public function test_with_count_attribute_variadic(): void
+    {
+        $sql = (new ModelWithWithCountAttributeVariadic)->newQueryWithoutScopes()->toSql();
+
+        $this->assertStringContainsString('posts_count', $sql);
+        $this->assertStringContainsString('comments_count', $sql);
+    }
+
+    public function test_with_count_property_takes_precedence(): void
+    {
+        $sql = (new ModelWithWithCountAttributeAndProperty)->newQueryWithoutScopes()->toSql();
+
+        $this->assertStringNotContainsString('posts_count', $sql);
+        $this->assertStringContainsString('comments_count', $sql);
+    }
+
+    public function test_with_count_attribute_is_inherited_and_can_be_overridden_by_child_class(): void
+    {
+        $inheritedSql = (new ModelExtendingModelWithWithCountAttribute)->newQueryWithoutScopes()->toSql();
+        $overriddenSql = (new ModelOverridingParentWithCountAttribute)->newQueryWithoutScopes()->toSql();
+
+        $this->assertStringContainsString('posts_count', $inheritedSql);
+        $this->assertStringContainsString('comments_count', $inheritedSql);
+        $this->assertStringNotContainsString('posts_count', $overriddenSql);
+        $this->assertStringContainsString('comments_count', $overriddenSql);
+    }
+
+    public function test_with_count_attribute_on_trait(): void
+    {
+        $sql = (new ModelUsingTraitWithCountAttribute)->newQueryWithoutScopes()->toSql();
+
+        $this->assertStringContainsString('posts_count', $sql);
+    }
+
+    public function test_with_and_with_count_attributes_eager_load_on_query(): void
+    {
+        DB::schema()->create('with_attribute_authors', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+        });
+
+        DB::schema()->create('with_attribute_posts', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('author_id');
+            $table->string('title');
+        });
+
+        try {
+            $authorId = DB::table('with_attribute_authors')->insertGetId(['name' => 'Taylor']);
+            DB::table('with_attribute_posts')->insert([
+                ['author_id' => $authorId, 'title' => 'First Post'],
+                ['author_id' => $authorId, 'title' => 'Second Post'],
+            ]);
+
+            $author = ModelWithWithAndWithCountQuery::query()->first();
+
+            $this->assertTrue($author->relationLoaded('posts'));
+            $this->assertCount(2, $author->posts);
+            $this->assertEquals(2, $author->posts_count);
+        } finally {
+            DB::schema()->dropIfExists('with_attribute_posts');
+            DB::schema()->dropIfExists('with_attribute_authors');
+        }
+    }
 }
 
 enum ConnectionUnitEnum
@@ -1026,4 +1138,102 @@ trait TraitUsingConnectionAttribute
 class ModelOverridingTraitConnectionAttribute extends Model
 {
     use TraitUsingConnectionAttribute;
+}
+
+#[Table('with_attribute_posts')]
+class WithAttributePost extends Model
+{
+    public $timestamps = false;
+}
+
+#[Table('with_attribute_authors')]
+class WithAttributeBaseModel extends Model
+{
+    public $timestamps = false;
+
+    public function posts()
+    {
+        return $this->hasMany(WithAttributePost::class, 'author_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(WithAttributePost::class, 'author_id');
+    }
+}
+
+#[With(['posts', 'comments'])]
+class ModelWithWithAttribute extends Model
+{
+}
+
+#[With('posts', 'comments')]
+class ModelWithWithAttributeVariadic extends Model
+{
+}
+
+#[With(['posts'])]
+class ModelWithWithAttributeAndProperty extends Model
+{
+    protected $with = ['comments'];
+}
+
+class ModelExtendingModelWithWithAttribute extends ModelWithWithAttribute
+{
+}
+
+#[With('comments')]
+class ModelOverridingParentWithAttribute extends ModelWithWithAttribute
+{
+}
+
+#[With('posts')]
+trait TraitUsingWithAttribute
+{
+}
+
+class ModelUsingTraitWithAttribute extends Model
+{
+    use TraitUsingWithAttribute;
+}
+
+#[WithCount(['posts', 'comments'])]
+class ModelWithWithCountAttribute extends WithAttributeBaseModel
+{
+}
+
+#[WithCount('posts', 'comments')]
+class ModelWithWithCountAttributeVariadic extends WithAttributeBaseModel
+{
+}
+
+#[WithCount(['posts'])]
+class ModelWithWithCountAttributeAndProperty extends WithAttributeBaseModel
+{
+    protected $withCount = ['comments'];
+}
+
+class ModelExtendingModelWithWithCountAttribute extends ModelWithWithCountAttribute
+{
+}
+
+#[WithCount('comments')]
+class ModelOverridingParentWithCountAttribute extends ModelWithWithCountAttribute
+{
+}
+
+#[WithCount('posts')]
+trait TraitUsingWithCountAttribute
+{
+}
+
+class ModelUsingTraitWithCountAttribute extends WithAttributeBaseModel
+{
+    use TraitUsingWithCountAttribute;
+}
+
+#[With('posts')]
+#[WithCount('posts')]
+class ModelWithWithAndWithCountQuery extends WithAttributeBaseModel
+{
 }
