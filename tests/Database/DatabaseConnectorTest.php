@@ -66,6 +66,22 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testMySqlConnectSetsSessionTimezone()
+    {
+        $dsn = 'mysql:host=foo;dbname=bar';
+        $config = ['host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8', 'timezone' => '+00:00'];
+
+        $connector = $this->getMockBuilder(MySqlConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = Double::for(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $connection->expects('exec')->with('use `bar`;')->returns(true);
+        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci', time_zone='+00:00';")->returns(true);
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testPostgresConnectCallsCreateConnectionWithProperArguments()
     {
         $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;client_encoding=\'utf8\'';
