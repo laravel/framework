@@ -188,14 +188,9 @@ class DbCommand extends Command
     protected function getMysqlArguments(array $connection)
     {
         $optionalArguments = [
-            'password' => '--password='.$connection['password'],
             'unix_socket' => '--socket='.($connection['unix_socket'] ?? ''),
             'charset' => '--default-character-set='.($connection['charset'] ?? ''),
         ];
-
-        if (! $connection['password']) {
-            unset($optionalArguments['password']);
-        }
 
         return array_merge([
             '--host='.$connection['host'],
@@ -248,10 +243,46 @@ class DbCommand extends Command
         return array_merge(...$this->getOptionalArguments([
             'database' => ['-d', $connection['database']],
             'username' => ['-U', $connection['username']],
-            'password' => ['-P', $connection['password']],
             'host' => ['-S', 'tcp:'.$connection['host']
                         .($connection['port'] ? ','.$connection['port'] : ''), ],
             'trust_server_certificate' => ['-C'],
+        ], $connection));
+    }
+
+    /**
+     * Get the environment variables for the MySQL CLI.
+     *
+     * @param  array  $connection
+     * @return array
+     */
+    protected function getMysqlEnvironment(array $connection)
+    {
+        return array_merge(...$this->getOptionalArguments([
+            'password' => ['MYSQL_PWD' => $connection['password']],
+        ], $connection));
+    }
+
+    /**
+     * Get the environment variables for the MariaDB CLI.
+     *
+     * @param  array  $connection
+     * @return array
+     */
+    protected function getMariaDbEnvironment(array $connection)
+    {
+        return $this->getMysqlEnvironment($connection);
+    }
+
+    /**
+     * Get the environment variables for the SQL Server CLI.
+     *
+     * @param  array  $connection
+     * @return array
+     */
+    protected function getSqlsrvEnvironment(array $connection)
+    {
+        return array_merge(...$this->getOptionalArguments([
+            'password' => ['SQLCMDPASSWORD' => $connection['password']],
         ], $connection));
     }
 
