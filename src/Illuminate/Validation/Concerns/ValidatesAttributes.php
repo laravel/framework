@@ -964,8 +964,6 @@ trait ValidatesAttributes
             return $groups;
         })();
 
-        // The "preg_grep" function stops at the first invalid UTF-8 string, so the
-        // result depends on the order of every value and they must all be kept...
         if (isset($groups['invalid'])) {
             return $values;
         }
@@ -991,8 +989,6 @@ trait ValidatesAttributes
                 return 'invalid';
             }
 
-            // Case-insensitive matching ignores a trailing newline and lets "k", "s",
-            // and "i" match non-ASCII letters, so those are grouped together...
             return 's:'.strtr(strtolower(preg_replace('/[^\x00-\x7F]/u', '?', rtrim($value, "\n"))), 'iks', '???');
         }
 
