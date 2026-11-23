@@ -4624,6 +4624,18 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct:strict']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar', 1, '1.0']], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ['bar', 'baz', true]], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.1', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ['bar', "\u{212A}", 'k']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1', 'foo.2'], $v->errors()->keys());
+
         $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
 
@@ -10335,6 +10347,26 @@ class ValidationValidatorTest extends TestCase
         $validator = new Validator($trans, ['foo' => $value], ['foo' => 'numeric|min:3']);
 
         $this->assertFalse($validator->passes());
+    }
+
+    #[DataProvider('outsideRangeExponentRules')]
+    public function testItLimitsScientificNotationExponentForMultipleOfAndFieldComparisons($data, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, $data, ['foo' => ['numeric', $rule]]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function outsideRangeExponentRules()
+    {
+        return [
+            [['foo' => '1e-100000000'], 'multiple_of:2'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'gt:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'gte:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'lt:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'lte:bar'],
+        ];
     }
 
     public static function outsideRangeExponents()

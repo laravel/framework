@@ -97,7 +97,7 @@ class MySqlGrammar extends Grammar
         if ($this->isJsonSelector($columnValue)) {
             [$field, $path] = $this->wrapJsonFieldAndPath($columnValue);
 
-            return '(json_extract('.$field.$path.') is null OR json_type(json_extract('.$field.$path.')) = \'NULL\')';
+            return '(json_extract('.$field.$path.') is null OR json_type(json_extract('.$field.$path.')) = json_type(\'null\'))';
         }
 
         return parent::whereNull($query, $where);
@@ -117,7 +117,7 @@ class MySqlGrammar extends Grammar
         if ($this->isJsonSelector($columnValue)) {
             [$field, $path] = $this->wrapJsonFieldAndPath($columnValue);
 
-            return '(json_extract('.$field.$path.') is not null AND json_type(json_extract('.$field.$path.')) != \'NULL\')';
+            return '(json_extract('.$field.$path.') is not null AND json_type(json_extract('.$field.$path.')) != json_type(\'null\'))';
         }
 
         return parent::whereNotNull($query, $where);

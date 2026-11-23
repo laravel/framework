@@ -88,7 +88,7 @@ trait SerializesAndRestoresModelIdentifiers
             return $collection;
         }
 
-        $collection = $collection->keyBy->getKey();
+        $collection = $collection->keyBy->getQueueableId();
 
         $collectionClass = get_class($collection);
 

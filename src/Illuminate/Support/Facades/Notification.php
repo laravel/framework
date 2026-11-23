@@ -20,6 +20,8 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Notifications\ChannelManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Notifications\ChannelManager forgetDrivers()
+ * @method static \Illuminate\Notifications\ChannelManager|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static \Illuminate\Notifications\ChannelManager|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)

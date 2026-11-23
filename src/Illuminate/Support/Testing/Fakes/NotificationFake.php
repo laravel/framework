@@ -11,13 +11,14 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
-    use Macroable, MatchesProperties, ReflectsClosures;
+    use Conditionable, Macroable, MatchesProperties, ReflectsClosures;
 
     /**
      * All of the notifications that have been sent.

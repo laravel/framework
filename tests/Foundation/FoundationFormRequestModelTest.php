@@ -158,6 +158,24 @@ class FoundationFormRequestModelTest extends TestCase
         ];
     }
 
+    public function testArrayInputReturnsNull()
+    {
+        $first = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $second = BlogPost::create(['account_id' => 1, 'slug' => 'second']);
+        $request = FormRequest::create('/', 'POST', ['blog_post_id' => [$first->id, $second->id]]);
+        $request->setContainer($this->app);
+
+        $this->assertNull($request->model('blog_post_id'));
+    }
+
+    public function testArrayInputReturnsNullForStringKeys()
+    {
+        SlugKeyedBlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequest::create('/', 'POST', ['slug' => ['first']]);
+
+        $this->assertNull($request->model('slug', SlugKeyedBlogPost::class));
+    }
+
     public function testMissingRecordReturnsNull()
     {
         $request = FormRequest::create('/', 'POST', ['blog_post_id' => 1]);
@@ -281,6 +299,16 @@ class FoundationFormRequestModelTest extends TestCase
         $request->modelOrFail('blog_post_id', BlogPost::class, function (Builder $query) {
             $query->where('account_id', 1);
         });
+    }
+
+    public function testModelOrFailThrowsForArrayInput()
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequest::create('/', 'POST', ['blog_post_id' => [$post->id]]);
+
+        $this->expectExceptionObject((new ModelNotFoundException)->setModel(BlogPost::class));
+
+        $request->modelOrFail('blog_post_id', BlogPost::class);
     }
 
     public function testModelOrFailCanRetrieveAZeroIdentifier()

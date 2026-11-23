@@ -535,6 +535,30 @@ class NotificationChannelManagerTest extends TestCase
         $events->assertDispatchedOnce(NotificationSending::class);
         $events->assertDispatchedOnce(NotificationSent::class);
     }
+
+    public function testConditionableTraitMethods()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $events = new EventFake(new EventsDispatcher);
+        $container->instance(Dispatcher::class, $events);
+        $bus = new BusFake(new BusDispatcher(new Container));
+        $container->instance(Bus::class, $bus);
+        $queueRoutes = new QueueRoutes;
+        $container->instance('queue.routes', $queueRoutes);
+        Container::setInstance($container);
+        $manager = new ChannelManager($container);
+
+        $this->assertSame('mail', $manager->deliversVia());
+
+        $manager->when(true, fn ($manager) => $manager->deliverVia('slack'));
+
+        $this->assertSame('slack', $manager->deliversVia());
+
+        $manager->unless(false, fn ($manager) => $manager->deliverVia('database'));
+
+        $this->assertSame('database', $manager->deliversVia());
+    }
 }
 
 class TestSendQueuedNotifications implements ShouldQueue
