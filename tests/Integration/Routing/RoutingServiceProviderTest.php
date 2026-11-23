@@ -39,6 +39,22 @@ class RoutingServiceProviderTest extends TestCase
         $this->assertSame('https://example.com:8443/base/profile', $url->route('profile'));
     }
 
+    #[TestWith(['https://new.example', 'https://new.example/profile'])]
+    #[TestWith(['invalid', 'http://request.example/profile'])]
+    public function testApplicationUrlChangesAfterGeneratorResolutionAreRespected($appUrl, $expected)
+    {
+        $this->app['config']->set('app.url', 'https://old.example');
+        $this->app->forgetInstance('url');
+        $request = Request::create('http://request.example/');
+        $this->app->instance('request', $request);
+        $url = $this->app->make(UrlGeneratorContract::class);
+        $this->app['config']->set('app.url', $appUrl);
+
+        $this->app->make(TrustProxies::class)->handle($request, function () use ($url, $expected) {
+            $this->assertSame($expected, $url->to('profile'));
+        });
+    }
+
     #[TestWith([[], 'https://example.com:8443/base/profile'])]
     #[TestWith([['.*'], 'https://example.com:8443/base/profile'])]
     #[TestWith([['^.*$'], 'https://example.com:8443/base/profile'])]
@@ -111,7 +127,6 @@ class RoutingServiceProviderTest extends TestCase
         $this->app->make(TrustProxies::class)->handle($request, function () use ($url, $expected) {
             $this->assertSame($expected, $url->to('profile'));
         });
-
     }
 
     #[TestWith(['http://custom.example', null, 'https://custom.example/profile'])]

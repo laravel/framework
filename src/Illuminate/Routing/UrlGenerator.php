@@ -39,7 +39,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The application root URL.
      *
-     * @var string
+     * @var string|\Closure|null
      */
     protected $applicationRoot;
 
@@ -133,7 +133,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
-     * @param  string|null  $applicationRoot
+     * @param  string|\Closure|null  $applicationRoot
      */
     public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null, $applicationRoot = null)
     {
@@ -769,7 +769,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function usesOriginFromApplicationRoot(): void
     {
-        $applicationRoot = $this->applicationRoot;
+        $applicationRoot = value($this->applicationRoot);
         $applicationUri = is_string($applicationRoot) && filter_var($applicationRoot, FILTER_VALIDATE_URL)
             ? Uri::of($applicationRoot)
             : null;
@@ -785,8 +785,13 @@ class UrlGenerator implements UrlGeneratorContract
             return;
         }
 
-        $this->useOrigin($applicationRoot);
-        $this->forceScheme($applicationUri->scheme());
+        if ($this->forcedRoot === null) {
+            $this->useOrigin($applicationRoot);
+        }
+
+        if ($this->forceScheme === null) {
+            $this->forceScheme($applicationUri->scheme());
+        }
     }
 
     /**
