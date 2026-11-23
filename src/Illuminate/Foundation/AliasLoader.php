@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation;
 
+use RuntimeException;
+
 class AliasLoader
 {
     /**
@@ -115,7 +117,17 @@ class AliasLoader
 
         file_put_contents($tempPath, $stub);
 
-        rename($tempPath, $path);
+        // On Windows, renaming over a stub another process has open fails. Every process writes
+        // identical content, so a stub that now exists is the stub we wanted.
+        if (! @rename($tempPath, $path)) {
+            $error = error_get_last()['message'] ?? null;
+
+            @unlink($tempPath);
+
+            if (! is_file($path)) {
+                throw new RuntimeException("Unable to write the real-time facade stub [{$path}]".($error ? ": {$error}" : '.'));
+            }
+        }
 
         return $path;
     }
