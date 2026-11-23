@@ -10337,6 +10337,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    #[DataProvider('outsideRangeExponentRules')]
+    public function testItLimitsScientificNotationExponentForMultipleOfAndFieldComparisons($data, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, $data, ['foo' => ['numeric', $rule]]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function outsideRangeExponentRules()
+    {
+        return [
+            [['foo' => '1e-100000000'], 'multiple_of:2'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'gt:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'gte:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'lt:bar'],
+            [['foo' => '1e-100000000', 'bar' => 2], 'lte:bar'],
+        ];
+    }
+
     public static function outsideRangeExponents()
     {
         return [

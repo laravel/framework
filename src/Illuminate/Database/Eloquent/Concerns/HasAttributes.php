@@ -1548,8 +1548,14 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
+        $value = (string) $value;
+
+        if (preg_match('/e([+-]?\d+)$/i', $value, $matches) && abs((int) $matches[1]) > 1000) {
+            throw new MathException('Unable to cast value to a decimal.');
+        }
+
         try {
-            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HalfUp);
+            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HalfUp);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
