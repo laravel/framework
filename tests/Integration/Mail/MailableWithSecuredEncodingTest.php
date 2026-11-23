@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
+use DOMDocument;
+use DOMXPath;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailable;
@@ -123,6 +125,8 @@ TABLE, false);
             '<em>Hi</em> Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
         ];
 
+        yield ['Tea & coffee &amp; cake', '<em>Hi</em> Tea &amp; coffee &amp;amp; cake'];
+
         yield ['\[Laravel](https://laravel.com)', '<em>Hi</em> [Laravel](https://laravel.com)'];
 
         yield ['!\[Laravel](https://laravel.com)', '<em>Hi</em> ![Laravel](https://laravel.com)'];
@@ -162,5 +166,50 @@ TABLE, false);
         yield ['Taylor](https://example.com)', '<a href="https://laravel.com">Taylor](https://example.com)</a>'];
 
         yield ['Taylor\](https://example.com)', '<a href="https://laravel.com">Taylor](https://example.com)</a>'];
+    }
+
+    #[DataProvider('attributeValues')]
+    public function testSecuredEncodingProtectsHtmlAttributes($value)
+    {
+        $mailable = new class($value) extends Mailable
+        {
+            public function __construct(public string $value)
+            {
+                //
+            }
+
+            public function build()
+            {
+                return $this->markdown('attributes-with-template');
+            }
+        };
+
+        $document = new DOMDocument;
+        $document->loadHTML($mailable->render());
+        $xpath = new DOMXPath($document);
+
+        $image = $xpath->query('//img[@id="test-image"]')->item(0);
+        $this->assertNotNull($image);
+        $this->assertSame($value, $image->getAttribute('alt'));
+        $this->assertSame($value, $image->getAttribute('title'));
+        $this->assertFalse($image->hasAttribute('onerror'));
+
+        $helper = $xpath->query('//span[@id="test-helper"]')->item(0);
+        $this->assertNotNull($helper);
+        $this->assertSame(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'), $helper->getAttribute('title'));
+        $this->assertFalse($helper->hasAttribute('onerror'));
+
+        $button = $xpath->query('//a[contains(@class, "button")]')->item(0);
+        $this->assertNotNull($button);
+        $this->assertSame($value, rawurldecode($button->getAttribute('href')));
+        $this->assertFalse($button->hasAttribute('onerror'));
+    }
+
+    public static function attributeValues()
+    {
+        yield 'double quote' => ['Taylor" onerror="alert(1)'];
+        yield 'single quote' => ["Taylor' onerror='alert(1)"];
+        yield 'entities and ampersands' => ['Taylor &quot; &#39; &amp; & test'];
+        yield 'markdown and html' => ['[Taylor] <example>'];
     }
 }
