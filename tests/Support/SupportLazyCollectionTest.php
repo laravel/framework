@@ -3,13 +3,16 @@
 namespace Illuminate\Tests\Support;
 
 use Carbon\CarbonInterval as Duration;
+use EmptyIterator;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 
 class SupportLazyCollectionTest extends TestCase
 {
@@ -368,6 +371,28 @@ class SupportLazyCollectionTest extends TestCase
         $collapsed = $collection->collapseWithKeys();
 
         $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
+    }
+
+    public function testZipWithEmptyIterator()
+    {
+        $items = new class implements IteratorAggregate
+        {
+            public function getIterator(): Traversable
+            {
+                return new EmptyIterator;
+            }
+        };
+
+        $collection = new LazyCollection([1, 2]);
+
+        $this->assertSame([[1, null], [2, null]], $collection->zip($items)->toArray());
+    }
+
+    public function testZipWithEmptySourceIterator()
+    {
+        $collection = new LazyCollection(fn () => new EmptyIterator);
+
+        $this->assertSame([[null, 1], [null, 2]], $collection->zip([1, 2])->toArray());
     }
 
     public function testContainsOneItem()
