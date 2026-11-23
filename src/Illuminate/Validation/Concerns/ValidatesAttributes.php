@@ -1643,7 +1643,7 @@ trait ValidatesAttributes
             return is_int($value);
         }
 
-        return filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return filter_var($value, FILTER_VALIDATE_INT) !== false && (! is_string($value) || $this->isNumeric($value));
     }
 
     /**
@@ -2839,6 +2839,10 @@ trait ValidatesAttributes
         // entire length of the string will be considered the attribute size.
         if ($this->isNumeric($value) && $hasNumeric) {
             return (string) $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
+        } elseif ($hasNumeric && is_numeric($value)) {
+            // A number with a vertical tab or form feed has no numeric size, so it is
+            // returned as is. The size rules reject it and comparisons use its value.
+            return $value;
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -2940,7 +2944,7 @@ trait ValidatesAttributes
      */
     protected function shouldBeNumeric($attribute, $rule)
     {
-        if ($this->isNumeric($this->getValue($attribute))) {
+        if (is_numeric($this->getValue($attribute))) {
             $this->numericRules[] = $rule;
         }
     }

@@ -10328,6 +10328,62 @@ class ValidationValidatorTest extends TestCase
         return $data;
     }
 
+    #[DataProvider('verticalTabAndFormFeedNumbers')]
+    public function testNumericRulesAgreeOnVerticalTabAndFormFeedNumbers($value, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => $rule]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function verticalTabAndFormFeedNumbers()
+    {
+        $data = [];
+
+        foreach (["\x0B999", "999\x0B", "\x0C999", "999\x0C"] as $value) {
+            foreach (['integer', 'integer|max:4', 'integer|between:1,4', 'integer|size:4', 'numeric|max:4'] as $rule) {
+                $data[] = [$value, $rule];
+            }
+        }
+
+        $data[] = ["\x0B-99", 'integer|min:1'];
+
+        return $data;
+    }
+
+    public function testFieldComparisonsCompareVerticalTabAndFormFeedNumbersByValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        foreach (["\x0B", "\x0C"] as $char) {
+            $this->assertFalse((new Validator($trans, ['foo' => '3', 'bar' => $char.'5'], ['foo' => 'integer|gt:bar']))->passes());
+            $this->assertFalse((new Validator($trans, ['foo' => '3', 'bar' => '5'.$char], ['foo' => 'integer|gte:bar']))->passes());
+            $this->assertFalse((new Validator($trans, ['foo' => '1', 'bar' => $char.'0'], ['foo' => 'integer|lt:bar']))->passes());
+            $this->assertFalse((new Validator($trans, ['price' => $char.'99', 'budget' => '1.0'], ['price' => 'lte:budget']))->passes());
+
+            $this->assertTrue((new Validator($trans, ['foo' => '6', 'bar' => $char.'5'], ['foo' => 'integer|gt:bar']))->passes());
+            $this->assertTrue((new Validator($trans, ['price' => $char.'0.5', 'budget' => '1.0'], ['price' => 'lte:budget']))->passes());
+        }
+    }
+
+    #[DataProvider('ordinaryWhitespaceNumbers')]
+    public function testNumericRulesKeepAcceptingOrdinaryWhitespaceAroundNumbers($value)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        foreach (['integer|size:5', 'integer|between:5,5', 'numeric|max:5', 'numeric|min:5', 'integer|gt:bar', 'lte:baz'] as $rule) {
+            $this->assertTrue((new Validator($trans, ['foo' => $value, 'bar' => '4', 'baz' => '5.0'], ['foo' => $rule]))->passes(), $rule);
+        }
+
+        $this->assertFalse((new Validator($trans, ['foo' => $value], ['foo' => 'integer|max:4']))->passes());
+    }
+
+    public static function ordinaryWhitespaceNumbers()
+    {
+        return [[' 5'], ['5 '], ["\t5"], ["5\n"]];
+    }
+
     #[DataProvider('outsideRangeExponents')]
     public function testItLimitsLengthOfScientificNotationExponent($value)
     {
