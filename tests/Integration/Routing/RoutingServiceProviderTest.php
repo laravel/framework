@@ -111,7 +111,6 @@ class RoutingServiceProviderTest extends TestCase
         $this->app->make(TrustProxies::class)->handle($request, function () use ($url, $expected) {
             $this->assertSame($expected, $url->to('profile'));
         });
-
     }
 
     #[TestWith(['http://custom.example', null, 'https://custom.example/profile'])]
