@@ -10,6 +10,7 @@ on:
 jobs:
   redis:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     services:
       redis:
@@ -63,6 +64,7 @@ jobs:
 
   redis-cluster:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     strategy:
       fail-fast: true

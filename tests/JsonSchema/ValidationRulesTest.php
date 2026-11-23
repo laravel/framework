@@ -269,6 +269,15 @@ class ValidationRulesTest extends TestCase
         $this->assertTrue($this->passes($schema, ['tags' => ['a', 'b']]));
     }
 
+    public function test_unique_items_compares_scalar_items_strictly()
+    {
+        $schema = $this->schema(fn ($s) => ['codes' => $s->array()->items($s->string())->unique()->required()]);
+
+        $this->assertTrue($this->passes($schema, ['codes' => ['1', '01']]));
+        $this->assertTrue($this->passes($schema, ['codes' => ['1e3', '1000']]));
+        $this->assertFalse($this->passes($schema, ['codes' => ['01', '01']]));
+    }
+
     public function test_integer_enum()
     {
         $schema = $this->schema(fn ($s) => ['size' => $s->integer()->enum([1, 2, 3])->required()]);
