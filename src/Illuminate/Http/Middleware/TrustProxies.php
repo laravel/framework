@@ -3,7 +3,9 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Support\Uri;
 
 class TrustProxies
 {
@@ -55,7 +57,47 @@ class TrustProxies
 
         $this->setTrustedProxyIpAddresses($request);
 
+        $this->setApplicationUrlToUrlGenerator($request);
+
         return $next($request);
+    }
+
+    /**
+     * Set the application URL on the URL generator.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function setApplicationUrlToUrlGenerator(Request $request): void
+    {
+        $container = Container::getInstance();
+        $hosts = $request::getTrustedHosts();
+
+        if (! $container->bound('url')
+            || ($hosts && ! in_array('{.*}i', $hosts, true) && ! in_array('{^.*$}i', $hosts, true))
+        ) {
+            return;
+        }
+
+        $appUrl = $container->make('config')->get('app.url');
+        $appUri = is_string($appUrl) && filter_var($appUrl, FILTER_VALIDATE_URL)
+            ? Uri::of($appUrl)
+            : null;
+
+        if (! $appUri
+            || ! in_array($appUri->scheme(), ['http', 'https'], true)
+            || ! str_starts_with($appUrl, $appUri->scheme().'://')
+            || ! $appUri->host()
+            || $appUri->getUri()->getQuery() !== null
+            || $appUri->fragment() !== null
+            || in_array(rtrim($appUrl, '/'), ['http://localhost', 'http://localhost:8000'])
+        ) {
+            return;
+        }
+
+        /** @var \Illuminate\Routing\UrlGenerator $url */
+        $url = $container->make('url');
+        $url->useApplicationOrigin($appUrl, $appUri->scheme());
     }
 
     /**

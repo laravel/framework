@@ -57,6 +57,20 @@ class UrlGenerator implements UrlGeneratorContract
     protected $forceScheme;
 
     /**
+     * Whether the forced origin was set from the application URL.
+     *
+     * @var bool
+     */
+    protected $usingApplicationOrigin = false;
+
+    /**
+     * Whether the forced scheme was set from the application URL.
+     *
+     * @var bool
+     */
+    protected $usingApplicationScheme = false;
+
+    /**
      * A cached copy of the URL root for the current request.
      *
      * @var string|null
@@ -748,8 +762,45 @@ class UrlGenerator implements UrlGeneratorContract
     public function forceScheme($scheme)
     {
         $this->cachedScheme = null;
+        $this->usingApplicationScheme = false;
 
         $this->forceScheme = $scheme ? $scheme.'://' : null;
+    }
+
+    /**
+     * Use the application origin and scheme unless they have been explicitly forced.
+     *
+     * @param  string  $origin
+     * @param  string  $scheme
+     * @return void
+     */
+    public function useApplicationOrigin(string $origin, string $scheme)
+    {
+        if ($this->forcedRoot === null) {
+            $this->useOrigin($origin);
+            $this->usingApplicationOrigin = true;
+        }
+
+        if ($this->forceScheme === null) {
+            $this->forceScheme($scheme);
+            $this->usingApplicationScheme = true;
+        }
+    }
+
+    /**
+     * Flush the origin and scheme set from the application URL.
+     *
+     * @return void
+     */
+    public function flushState()
+    {
+        if ($this->usingApplicationOrigin) {
+            $this->useOrigin(null);
+        }
+
+        if ($this->usingApplicationScheme) {
+            $this->forceScheme(null);
+        }
     }
 
     /**
@@ -796,6 +847,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function forceRootUrl($root)
     {
+        $this->usingApplicationOrigin = false;
         $this->forcedRoot = $root ? rtrim($root, '/') : null;
 
         $this->cachedRoot = null;

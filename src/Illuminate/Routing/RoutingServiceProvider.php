@@ -9,7 +9,6 @@ use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Uri;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
@@ -69,24 +68,6 @@ class RoutingServiceProvider extends ServiceProvider
         });
 
         $this->app->extend('url', function (UrlGeneratorContract $url, $app) {
-            $appUrl = $app['config']['app.url'];
-
-            $appUri = is_string($appUrl) && filter_var($appUrl, FILTER_VALIDATE_URL)
-                ? Uri::of($appUrl)
-                : null;
-
-            if ($appUri
-                && in_array($appUri->scheme(), ['http', 'https'], true)
-                && str_starts_with($appUrl, $appUri->scheme().'://')
-                && $appUri->host()
-                && $appUri->getUri()->getQuery() === null
-                && $appUri->fragment() === null
-                && ! in_array(rtrim($appUrl, '/'), ['http://localhost', 'http://localhost:8000'])
-            ) {
-                $url->useOrigin($appUrl);
-                $url->forceScheme($appUri->scheme());
-            }
-
             // Next we will set a few service resolvers on the URL generator so it can
             // get the information it needs to function. This just provides some of
             // the convenience features to this URL generator like "signed" URLs.
