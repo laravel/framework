@@ -4624,6 +4624,18 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct:strict']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar', 1, '1.0']], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ['bar', 'baz', true]], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.1', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ['bar', "\u{212A}", 'k']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1', 'foo.2'], $v->errors()->keys());
+
         $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
 
