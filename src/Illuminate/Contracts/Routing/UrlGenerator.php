@@ -2,10 +2,6 @@
 
 namespace Illuminate\Contracts\Routing;
 
-/**
- * @method void setApplicationUrl(string|null $url)
- * @method string|null getApplicationUrl()
- */
 interface UrlGenerator
 {
     /**

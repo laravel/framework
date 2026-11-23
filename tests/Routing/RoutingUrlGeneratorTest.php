@@ -43,7 +43,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
     }
 
-    public function testConfiguredApplicationUrlRespectsExplicitOriginsAndSchemes()
+    public function testExplicitOriginsAndSchemesCanBeReset()
     {
         $url = new UrlGenerator(
             new RouteCollection,
@@ -52,7 +52,8 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $this->assertSame('http://attacker.example/path', $url->to('path'));
-        $url->setApplicationUrl('https://example.com/base/');
+        $url->useOrigin('https://example.com/base/');
+        $url->forceScheme('https');
         $this->assertSame('https://example.com/base/path', $url->to('path'));
         $this->assertSame('https://cdn.example/image.png', $url->asset('image.png'));
 
@@ -62,9 +63,6 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->useOrigin(null);
         $url->forceScheme(null);
-        $this->assertSame('https://example.com/base/path', $url->to('path'));
-
-        $url->setApplicationUrl(null);
         $this->assertSame('http://attacker.example/path', $url->to('path'));
     }
 
@@ -75,12 +73,38 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://attacker.example/')
         );
 
-        $url->setApplicationUrl('https://example.com/base.1');
+        $url->useOrigin('https://example.com/base.1');
+        $url->forceScheme('https');
         $routes->add(new Route(['GET'], '/', ['as' => 'home']));
         $routes->add(new Route(['GET'], '/baseX1', ['as' => 'domain', 'domain' => 'other.example']));
 
         $this->assertSame('/?query=value', $url->route('home', ['query' => 'value'], false));
         $this->assertSame('/baseX1', $url->route('domain', [], false));
+    }
+
+    public function testOriginControlsDomainRoutePortAndRelativeBasePath()
+    {
+        $request = Request::create('http://request.example:8080/subfolder/index.php/');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/public/subfolder/index.php');
+        $request->server->set('PHP_SELF', '/subfolder/index.php');
+
+        $url = new UrlGenerator($routes = new RouteCollection, $request);
+        $routes->add(new Route(['GET'], 'subfolder/index.php/profile', ['as' => 'profile', 'domain' => 'other.example']));
+
+        $this->assertSame('http://other.example:8080/subfolder/index.php/profile', $url->route('profile'));
+        $this->assertSame('/profile', $url->route('profile', [], false));
+
+        $url->useOrigin('https://example.com:8443/base');
+        $url->forceScheme('https');
+
+        $this->assertSame('https://other.example:8443/subfolder/index.php/profile', $url->route('profile'));
+        $this->assertSame('/subfolder/index.php/profile', $url->route('profile', [], false));
+
+        $url->useOrigin(null);
+        $url->forceScheme(null);
+
+        $this->assertSame('http://other.example:8080/subfolder/index.php/profile', $url->route('profile'));
+        $this->assertSame('/profile', $url->route('profile', [], false));
     }
 
     public function testQueryGeneration()

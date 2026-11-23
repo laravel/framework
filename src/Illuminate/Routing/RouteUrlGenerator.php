@@ -103,7 +103,7 @@ class RouteUrlGenerator
         if (! $absolute) {
             $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
 
-            if ($this->url->getApplicationUrl()) {
+            if ($this->url->getOrigin()) {
                 if ($base = parse_url($root, PHP_URL_PATH)) {
                     $base = strtr(rawurlencode($base), $this->dontEncode);
                     $uri = preg_replace('#^'.preg_quote($base, '#').'(?=/|\?|$)#i', '', $uri);
@@ -169,9 +169,9 @@ class RouteUrlGenerator
      */
     protected function addPortToDomain($domain)
     {
-        if ($appUrl = $this->url->getApplicationUrl()) {
-            $secure = parse_url($appUrl, PHP_URL_SCHEME) === 'https';
-            $port = parse_url($appUrl, PHP_URL_PORT) ?: ($secure ? 443 : 80);
+        if ($origin = $this->url->getOrigin()) {
+            $secure = parse_url($origin, PHP_URL_SCHEME) === 'https';
+            $port = parse_url($origin, PHP_URL_PORT) ?: ($secure ? 443 : 80);
         } else {
             $secure = $this->request->isSecure();
             $port = (int) $this->request->getPort();

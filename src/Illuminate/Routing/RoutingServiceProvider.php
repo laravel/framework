@@ -81,7 +81,7 @@ class RoutingServiceProvider extends ServiceProvider
                 && ! isset($components['fragment'])
                 && ! in_array(rtrim($appUrl, '/'), ['http://localhost', 'http://localhost:8000'])
             ) {
-                $url->setApplicationUrl($appUrl);
+                $url->useOrigin($appUrl);
             }
 
             // Next we will set a few service resolvers on the URL generator so it can
