@@ -82,6 +82,7 @@ class RoutingServiceProvider extends ServiceProvider
                 && ! in_array(rtrim($appUrl, '/'), ['http://localhost', 'http://localhost:8000'])
             ) {
                 $url->useOrigin($appUrl);
+                $url->forceScheme($components['scheme']);
             }
 
             // Next we will set a few service resolvers on the URL generator so it can
