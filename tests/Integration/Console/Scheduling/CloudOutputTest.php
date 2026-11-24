@@ -8,11 +8,12 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-#[RequiresOperatingSystem('Linux')]
+/**
+ * @requires OS Linux
+ */
 class CloudOutputTest extends TestCase
 {
     protected $socketPath;
