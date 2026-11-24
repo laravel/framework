@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use RuntimeException;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
 #[RequiresPhpExtension('pdo_pgsql')]
@@ -115,6 +116,30 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertTrue(DB::hasCommitId($second));
         $this->assertTrue(DB::hasCommitId($merged));
         $this->assertFalse(DB::hasCommitId('FFFFFFFF/FFFFFFFF'));
+    }
+
+    public function testHasCommitIdWithWait()
+    {
+        if (version_compare(DB::getServerVersion(), '19', '<')) {
+            $this->markTestSkipped('Waiting for a commit ID requires PostgreSQL 19 or newer.');
+        }
+
+        DB::table('json_table')->insert(['json_col' => '{"commit":"wait"}']);
+
+        $this->assertTrue(DB::hasCommitId(DB::getLastCommitId(), wait: 1));
+        $this->assertFalse(DB::hasCommitId('FFFFFFFF/FFFFFFFF', wait: 1));
+    }
+
+    public function testHasCommitIdWithWaitRequiresPostgres19()
+    {
+        if (version_compare(DB::getServerVersion(), '19', '>=')) {
+            $this->markTestSkipped('Waiting for a commit ID is supported on PostgreSQL 19 or newer.');
+        }
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('PostgreSQL 19 or newer is required.');
+
+        DB::hasCommitId(DB::getLastCommitId(), wait: 1);
     }
 
     public static function jsonContainsKeyDataProvider()
