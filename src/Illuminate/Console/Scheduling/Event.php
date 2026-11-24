@@ -11,6 +11,7 @@ use Illuminate\Console\Application;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Foundation\CloudBootstrapper;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Stringable;
@@ -198,13 +199,33 @@ class Event
      */
     protected function execute($container)
     {
-        return Process::fromShellCommandline(
-            $this->buildCommand(), base_path(), null, null, null
-        )->run(
-            laravel_cloud()
-                ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
-                : fn () => true
+        $env = [];
+
+        if (laravel_cloud() && (int) ($_ENV['SHELL_VERBOSITY'] ?? $_SERVER['SHELL_VERBOSITY'] ?? getenv('SHELL_VERBOSITY')) < 0) {
+            $env['SHELL_VERBOSITY'] = false;
+        }
+
+        if (laravel_cloud() && $this->runInBackground && $this->output === $this->getDefaultOutput()) {
+            $env['__LARAVEL_CLOUD_LOG_OUTPUT'] = '1';
+        }
+
+        $process = Process::fromShellCommandline(
+            $this->buildCommand(), base_path(), $env, null, null
         );
+
+        if (! laravel_cloud() || $this->runInBackground) {
+            return $process->run(fn () => true);
+        }
+
+        $socket = @stream_socket_client(CloudBootstrapper::socket(), timeout: 2) ?: STDOUT;
+
+        try {
+            return $process->run(fn ($type, $output) => @fwrite($socket, $output));
+        } finally {
+            if ($socket !== STDOUT) {
+                fclose($socket);
+            }
+        }
     }
 
     /**
