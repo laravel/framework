@@ -59,7 +59,7 @@ class CloudOutputTest extends TestCase
 
         $script = 'require '.var_export(realpath(__DIR__.'/../../../../vendor/autoload.php'), true).';'
             .' (new Symfony\Component\Console\SingleCommandApplication)'
-            .'->setCode(function ($input, $output) { $output->writeln("first line"); $output->writeln("second line"); return 0; })'
+            .'->setCode(function (Symfony\Component\Console\Input\InputInterface $input, Symfony\Component\Console\Output\OutputInterface $output) { $output->writeln("first line"); $output->writeln("second line"); return 0; })'
             .'->run();';
 
         (new Event($mutex, escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($script)))->run($this->app);
