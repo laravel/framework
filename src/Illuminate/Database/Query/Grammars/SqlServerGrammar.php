@@ -390,6 +390,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Get the lock value for updating rows while skipping rows that are already locked.
+     *
+     * @return string
+     */
+    public function getSkipLockedLock()
+    {
+        return 'with(rowlock,updlock,readpast)';
+    }
+
+    /**
      * Wrap a union subquery in parentheses.
      *
      * @param  string  $sql

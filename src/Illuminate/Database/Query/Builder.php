@@ -3435,6 +3435,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Lock the selected rows in the table for updating, skipping rows that are already locked.
+     *
+     * @return $this
+     */
+    public function lockForUpdateOrSkip()
+    {
+        return $this->lock($this->grammar->getSkipLockedLock());
+    }
+
+    /**
      * Share lock the selected rows in the table.
      *
      * @return $this

@@ -400,6 +400,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Get the lock value for updating rows while skipping rows that are already locked.
+     *
+     * @return string
+     */
+    public function getSkipLockedLock()
+    {
+        return 'for update skip locked';
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
