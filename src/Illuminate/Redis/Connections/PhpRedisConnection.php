@@ -448,6 +448,46 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Execute commands that can safely run twice in a pipeline, retrying once after a disconnect.
+     *
+     * With $atomic, the commands run in a transaction that is sent in the same round trip.
+     *
+     * @param  callable  $callback
+     * @param  bool  $atomic
+     * @return array|false
+     *
+     * @internal
+     */
+    public function idempotentPipeline(callable $callback, bool $atomic = false)
+    {
+        return $this->retryOnceOnLostConnection(function () use ($callback, $atomic) {
+            try {
+                $results = $this->executePipeline($this->client()->pipeline(), function ($pipeline) use ($callback, $atomic) {
+                    if ($atomic) {
+                        $pipeline->multi();
+                    }
+
+                    $callback($pipeline);
+
+                    if ($atomic) {
+                        $pipeline->exec();
+                    }
+                });
+            } catch (Throwable $e) {
+                // When a command in a pipelined transaction fails, PhpRedis stops reading and leaves the rest of the replies on the connection...
+                if ($atomic && ! $this->causedByLostConnection($e)) {
+                    $this->rebuildClient();
+                }
+
+                throw $e;
+            }
+
+            // Only the EXEC reply holds the results of the commands in a transaction...
+            return $atomic && is_array($results) ? end($results) : $results;
+        });
+    }
+
+    /**
      * Execute a pipeline and discard it if queuing or execution fails.
      *
      * @param  \Redis  $pipeline
