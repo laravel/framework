@@ -298,7 +298,6 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($session->has('password_hash_default'));
     }
 
-
     public function testSessionGuardIsMacroable()
     {
         $guard = $this->getGuard();
