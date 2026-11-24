@@ -120,16 +120,26 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
 
     public function testHasCommitIdWithWait()
     {
-        DB::table('json_table')->insert(['json_col' => '{"commit":"wait"}']);
-        $commitId = DB::getLastCommitId();
-
         if (version_compare(DB::getServerVersion(), '19', '<')) {
-            $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage('PostgreSQL 19 or newer is required.');
+            $this->markTestSkipped('Waiting for a commit ID requires PostgreSQL 19 or newer.');
         }
 
-        $this->assertTrue(DB::hasCommitId($commitId, wait: 1));
+        DB::table('json_table')->insert(['json_col' => '{"commit":"wait"}']);
+
+        $this->assertTrue(DB::hasCommitId(DB::getLastCommitId(), wait: 1));
         $this->assertFalse(DB::hasCommitId('FFFFFFFF/FFFFFFFF', wait: 1));
+    }
+
+    public function testHasCommitIdWithWaitRequiresPostgres19()
+    {
+        if (version_compare(DB::getServerVersion(), '19', '>=')) {
+            $this->markTestSkipped('Waiting for a commit ID is supported on PostgreSQL 19 or newer.');
+        }
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('PostgreSQL 19 or newer is required.');
+
+        DB::hasCommitId(DB::getLastCommitId(), wait: 1);
     }
 
     public static function jsonContainsKeyDataProvider()
