@@ -320,7 +320,7 @@ class CloudBootstrapper
     /**
      * The cloud socket address.
      */
-    protected static function socket(): string
+    public static function socket(): string
     {
         return $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
             $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
