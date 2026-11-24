@@ -441,7 +441,9 @@ class PostgresGrammar extends Grammar
      */
     public function compileInsertOrSelect(Builder $query, array $values, array $uniqueBy, array $returning)
     {
-        return "{$this->compileInsert($query, $values)} on conflict ({$this->columnize($uniqueBy)}) do select returning {$this->columnize($returning)}";
+        $insert = $this->compileInsert($query, $values);
+
+        return "{$insert} on conflict ({$this->columnize($uniqueBy)}) do select returning {$this->columnize($returning)}";
     }
 
     /**

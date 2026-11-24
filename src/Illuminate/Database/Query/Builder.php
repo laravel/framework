@@ -4318,11 +4318,13 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Insert new records into the database or select the existing records on conflict, returning the specified columns.
+     * Insert new records into the database or select the existing records on conflict.
      *
      * @param  non-empty-string|non-empty-array<non-empty-string>  $uniqueBy
      * @param  non-empty-array<non-empty-string>  $returning
      * @return \Illuminate\Support\Collection
+     *
+     * @throws \InvalidArgumentException
      */
     public function insertOrSelect(array $values, array|string $uniqueBy, array $returning = ['*'])
     {

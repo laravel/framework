@@ -4689,6 +4689,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('selectFromWriteConnection')->with('insert into "users" ("email", "name") values (?, ?) on conflict ("email", "name") do select returning "id", "email"',
             ['foo', 'bar'])->returns([['id' => 1, 'email' => 'foo']]);
         $result = $builder->from('users')->insertOrSelect(['email' => 'foo', 'name' => 'bar'], ['email', 'name'], ['id', 'email']);
+        $this->assertInstanceOf(Collection::class, $result);
         $this->assertEquals([['id' => 1, 'email' => 'foo']], $result->all());
     }
 
@@ -4702,7 +4703,8 @@ class DatabaseQueryBuilderTest extends TestCase
             [['name' => 'bar', 'email' => 'foo'], ['email' => 'baz', 'name' => 'qux']],
             'email'
         );
-        $this->assertCount(2, $result);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo', 'name' => 'bar'], ['id' => 2, 'email' => 'baz', 'name' => 'qux']], $result->all());
     }
 
     public function testInsertOrSelectWithEmptyUniqueBy()
