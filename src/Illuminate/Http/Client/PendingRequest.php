@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ResponseException;
+use GuzzleHttp\Exception\ResponseTimeoutException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -2110,8 +2111,8 @@ class PendingRequest
      */
     protected function responseFromException(Throwable $e)
     {
-        // Guzzle 8 uses ResponseException
-        if ($e instanceof ResponseException) {
+        // Guzzle 8 uses ResponseException, but a timeout while receiving the body is a connection failure, as in Guzzle 7...
+        if ($e instanceof ResponseException && ! $e instanceof ResponseTimeoutException) {
             return $e->getResponse();
         }
 

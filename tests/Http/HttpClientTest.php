@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\NetworkException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\ResponseException;
+use GuzzleHttp\Exception\ResponseTimeoutException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
@@ -23,6 +24,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Client\Batch;
 use Illuminate\Http\Client\BatchInProgressException;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
@@ -3444,6 +3446,62 @@ class HttpClientTest extends TestCase
         });
 
         $pendingRequest->get('https://timeout-laravel.example');
+    }
+
+    public function testResponseTimeoutIsTreatedAsConnectionFailure()
+    {
+        if (! class_exists(ResponseTimeoutException::class)) {
+            $this->markTestSkipped('Requires Guzzle 8.');
+        }
+
+        $events = new EventFake(new Dispatcher);
+
+        $factory = new Factory($events);
+
+        $factory->fake(function () {
+            throw new ResponseTimeoutException(
+                'cURL error 28: Operation timed out after 1000 milliseconds with 7 out of 100 bytes received',
+                new GuzzleRequest('GET', 'https://timeout.laravel.example'),
+                new Psr7Response(200, [], 'partial')
+            );
+        });
+
+        try {
+            $factory->get('https://timeout.laravel.example');
+            $this->fail('Expected ConnectionException was not thrown.');
+        } catch (ConnectionException $e) {
+            $this->assertStringContainsString('cURL error 28', $e->getMessage());
+        }
+
+        $events->assertDispatchedTimes(ConnectionFailed::class, 1);
+        $events->assertNotDispatched(ResponseReceived::class);
+    }
+
+    public function testResponseTimeoutIsTreatedAsConnectionFailureForAsyncRequests()
+    {
+        if (! class_exists(ResponseTimeoutException::class)) {
+            $this->markTestSkipped('Requires Guzzle 8.');
+        }
+
+        $events = new EventFake(new Dispatcher);
+
+        $factory = new Factory($events);
+
+        $factory->fake(function () {
+            return Create::rejectionFor(new ResponseTimeoutException(
+                'cURL error 28: Operation timed out after 1000 milliseconds with 7 out of 100 bytes received',
+                new GuzzleRequest('GET', 'https://timeout.laravel.example'),
+                new Psr7Response(200, [], 'partial')
+            ));
+        });
+
+        $responses = $factory->pool(fn (Pool $pool) => [
+            $pool->get('https://timeout.laravel.example'),
+        ]);
+
+        $this->assertInstanceOf(ConnectionException::class, $responses[0]);
+        $events->assertDispatchedTimes(ConnectionFailed::class, 1);
+        $events->assertNotDispatched(ResponseReceived::class);
     }
 
     public function testTooManyRedirectsExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
