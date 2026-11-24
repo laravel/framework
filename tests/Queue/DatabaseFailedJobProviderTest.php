@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
@@ -11,12 +13,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
-use Mockery as m;
+use JMac\Testing\Double;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class DatabaseFailedJobProviderTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected $db;
 
     protected $provider;
@@ -39,14 +44,18 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     public function testNonIntegerFailedJobIdsAreCastToStrings()
     {
-        $builder = m::mock(QueryBuilder::class);
-        $builder->shouldReceive('when')->andReturnSelf();
-        $builder->shouldReceive('orderBy')->andReturnSelf();
-        $builder->shouldReceive('pluck')->with('id')->andReturn(new Collection([new Stringable('4'), 3]));
+        $builder = Double::for(QueryBuilder::class);
+        $builder->allows('when')->returns($builder);
+        $builder->allows('orderBy')->returns($builder);
+        $builder->allows('pluck')->with('id')->returns(new Collection([new Stringable('4'), 3]));
 
-        $provider = m::mock(DatabaseFailedJobProvider::class, [$this->db->getDatabaseManager(), 'default', 'failed_jobs'])
-            ->makePartial();
-        $provider->shouldReceive('getTable')->andReturn($builder);
+        $connection = Double::for(ConnectionInterface::class);
+        $connection->allows('table')->with('failed_jobs')->returns($builder);
+
+        $resolver = Double::for(ConnectionResolverInterface::class);
+        $resolver->allows('connection')->with('default')->returns($connection);
+
+        $provider = new DatabaseFailedJobProvider($resolver, 'default', 'failed_jobs');
 
         $this->assertSame(['4', 3], $provider->ids());
     }
