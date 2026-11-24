@@ -10,7 +10,7 @@ class MigrationEnded extends MigrationEvent
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Migrations\Migration  $migration
-     * @param  string  $method
+     * @param  'down'|'up'  $method
      * @param  string|null  $name
      * @param  float|null  $duration  The number of milliseconds the migration took to run.
      */
