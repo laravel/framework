@@ -357,6 +357,44 @@ jobs:
           DB_USERNAME: forge
           DB_PASSWORD: password
 
+  pgsql_19:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+
+    services:
+      postgresql:
+        image: postgres:19
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: forge
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        volumes:
+          - /var/run/postgresql:/var/run/postgresql
+        options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=3
+
+    name: PostgreSQL 19
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: /var/run/postgresql
+          DB_USERNAME: forge
+          DB_PASSWORD: password
+
   mssql_2017:
     # Errs on Ubuntu 26.04 (likely 24.04 as well)
     runs-on: ubuntu-22.04

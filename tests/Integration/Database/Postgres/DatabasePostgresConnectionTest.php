@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use RuntimeException;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
 #[RequiresPhpExtension('pdo_pgsql')]
@@ -115,6 +116,20 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertTrue(DB::hasCommitId($second));
         $this->assertTrue(DB::hasCommitId($merged));
         $this->assertFalse(DB::hasCommitId('FFFFFFFF/FFFFFFFF'));
+    }
+
+    public function testHasCommitIdWithWait()
+    {
+        DB::table('json_table')->insert(['json_col' => '{"commit":"wait"}']);
+        $commitId = DB::getLastCommitId();
+
+        if (version_compare(DB::getServerVersion(), '19', '<')) {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('PostgreSQL 19 or newer is required.');
+        }
+
+        $this->assertTrue(DB::hasCommitId($commitId, wait: 1));
+        $this->assertFalse(DB::hasCommitId('FFFFFFFF/FFFFFFFF', wait: 1));
     }
 
     public static function jsonContainsKeyDataProvider()
