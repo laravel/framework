@@ -62,6 +62,34 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $new->decryptString($encrypted));
     }
 
+    public function testItDecryptsUsingTheFirstMacValidatedKey()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $encrypted = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16), str_repeat('c', 16)]);
+
+        $this->assertSame('foo', $new->decryptString($encrypted));
+    }
+
+    public function testItDoesNotDecryptWithAKeyWhoseMacDidNotValidate()
+    {
+        $iv = base64_encode('0123456789abcdef');
+        $value = openssl_encrypt('foo', 'aes-128-cbc', str_repeat('b', 16), 0, base64_decode($iv));
+
+        // Re-MAC the payload under a key that cannot decrypt it. Pre-fix, the sticky
+        // $foundValidMac flag let a later key decrypt without MAC validation.
+        $mac = hash_hmac('sha256', $iv.$value, str_repeat('c', 16));
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('c', 16), str_repeat('b', 16)]);
+
+        $this->expectException(DecryptException::class);
+
+        $new->decryptString(base64_encode(json_encode(['iv' => $iv, 'value' => $value, 'mac' => $mac])));
+    }
+
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));
