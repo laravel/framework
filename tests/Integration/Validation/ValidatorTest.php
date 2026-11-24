@@ -46,6 +46,38 @@ class ValidatorTest extends DatabaseTestCase
         $this->assertTrue($validator->passes());
     }
 
+    public function testExistsAndUniqueCompareJsonPathValuesAsStrings(): void
+    {
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->increments('id');
+            $table->json('meta');
+        });
+
+        Profile::create(['meta' => ['external_id' => 7, 'code' => '007']]);
+
+        foreach ([7, '7', [7], ['7']] as $value) {
+            $validator = $this->getValidator(['value' => $value], ['value' => 'exists:profiles,meta->external_id']);
+            $this->assertTrue($validator->passes());
+        }
+
+        $validator = $this->getValidator(['value' => [7, 8]], ['value' => 'exists:profiles,meta->external_id']);
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->getValidator(['value' => 7], ['value' => 'exists:profiles,meta->code']);
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->getValidator(['value' => 7], ['value' => 'unique:profiles,meta->external_id']);
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->getValidator(['value' => 8], ['value' => 'unique:profiles,meta->external_id']);
+        $this->assertTrue($validator->passes());
+
+        Profile::create(['meta' => ['external_id' => '7']]);
+
+        $validator = $this->getValidator(['value' => [7, 8]], ['value' => 'exists:profiles,meta->external_id']);
+        $this->assertFalse($validator->passes());
+    }
+
     public function testUniqueWithCustomModelKey(): void
     {
         $_SERVER['CUSTOM_MODEL_KEY_NAME'] = 'uuid';
@@ -115,4 +147,13 @@ class UserWithUuid extends Model
     {
         return 'uuid';
     }
+}
+
+class Profile extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    protected $casts = ['meta' => 'array'];
 }

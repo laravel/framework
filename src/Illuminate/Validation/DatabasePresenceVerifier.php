@@ -4,6 +4,8 @@ namespace Illuminate\Validation;
 
 use Closure;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 
 class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
 {
@@ -44,7 +46,9 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
     {
-        $query = $this->table($collection)->where($column, '=', $this->prepareValue($value));
+        $query = $this->table($collection);
+
+        $query->where($this->prepareColumn($query, $column), '=', $this->prepareValue($value));
 
         if (! is_null($excludeId) && $excludeId !== 'NULL') {
             $query->where($idColumn ?: 'id', '<>', $excludeId);
@@ -64,9 +68,32 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      */
     public function getMultiCount($collection, $column, array $values, array $extra = [])
     {
-        $query = $this->table($collection)->whereIn($column, array_map($this->prepareValue(...), $values));
+        $query = $this->table($collection);
+
+        $column = $this->prepareColumn($query, $column);
+
+        $query->whereIn($column, array_map($this->prepareValue(...), $values));
 
         return $this->addConditions($query, $extra)->distinct()->count($column);
+    }
+
+    /**
+     * Prepare a column for comparison with a string value.
+     *
+     * SQLite extracts JSON values with their JSON type, so a JSON number never
+     * equals a string. Other databases already extract JSON values as text.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $column
+     * @return \Illuminate\Contracts\Database\Query\Expression|string
+     */
+    protected function prepareColumn($query, $column)
+    {
+        if (! str_contains($column, '->') || ! $query->getGrammar() instanceof SQLiteGrammar) {
+            return $column;
+        }
+
+        return new Expression('cast('.$query->getGrammar()->wrap($column).' as text)');
     }
 
     /**
