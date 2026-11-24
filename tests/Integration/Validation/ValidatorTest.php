@@ -10,6 +10,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class ValidatorTest extends DatabaseTestCase
@@ -76,6 +77,34 @@ class ValidatorTest extends DatabaseTestCase
 
         $validator = $this->getValidator(['value' => [7, 8]], ['value' => 'exists:profiles,meta->external_id']);
         $this->assertFalse($validator->passes());
+    }
+
+    public function testExistsAndUniqueCompareJsonPathExtraConditionsAsStrings(): void
+    {
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email');
+            $table->json('meta');
+        });
+
+        Profile::create([
+            'email' => 'taylor@laravel.com',
+            'meta' => ['external_id' => 7, 'code' => '007', 'active' => true],
+        ]);
+
+        $data = ['email' => 'taylor@laravel.com'];
+
+        $this->assertTrue($this->getValidator($data, ['email' => 'exists:profiles,email,meta->external_id,7'])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => 'exists:profiles,email,meta->external_id,!7'])->passes());
+        $this->assertTrue($this->getValidator($data, ['email' => 'exists:profiles,email,meta->external_id,!8'])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => 'exists:profiles,email,meta->code,7'])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => 'unique:profiles,email,NULL,id,meta->external_id,7'])->passes());
+        $this->assertTrue($this->getValidator($data, ['email' => 'unique:profiles,email,7,meta->external_id'])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => 'unique:profiles,email,8,meta->external_id'])->passes());
+        $this->assertTrue($this->getValidator($data, ['email' => [Rule::exists('profiles', 'email')->where('meta->external_id', 7)]])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => [Rule::exists('profiles', 'email')->whereNot('meta->external_id', 7)]])->passes());
+        $this->assertTrue($this->getValidator($data, ['email' => [Rule::exists('profiles', 'email')->where('meta->active', true)]])->passes());
+        $this->assertFalse($this->getValidator($data, ['email' => [Rule::exists('profiles', 'email')->where('meta->active', false)]])->passes());
     }
 
     public function testUniqueWithCustomModelKey(): void

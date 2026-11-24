@@ -51,7 +51,9 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
         $query->where($this->prepareColumn($query, $column), '=', $this->prepareValue($value));
 
         if (! is_null($excludeId) && $excludeId !== 'NULL') {
-            $query->where($idColumn ?: 'id', '<>', $excludeId);
+            $idColumn = $this->prepareColumn($query, $idColumn ?: 'id');
+
+            $query->where($idColumn, '<>', $idColumn instanceof Expression ? $this->prepareValue($excludeId) : $excludeId);
         }
 
         return $this->addConditions($query, $extra)->count();
@@ -147,10 +149,12 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
             $query->whereNull($key);
         } elseif ($extraValue === 'NOT_NULL') {
             $query->whereNotNull($key);
-        } elseif (str_starts_with($extraValue, '!')) {
-            $query->where($key, '!=', mb_substr($extraValue, 1));
+        } elseif (is_string($extraValue) && str_starts_with($extraValue, '!')) {
+            $query->where($this->prepareColumn($query, $key), '!=', mb_substr($extraValue, 1));
         } else {
-            $query->where($key, $extraValue);
+            $column = $this->prepareColumn($query, $key);
+
+            $query->where($column, $column instanceof Expression ? $this->prepareValue($extraValue) : $extraValue);
         }
     }
 
