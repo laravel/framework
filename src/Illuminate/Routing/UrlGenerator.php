@@ -780,7 +780,7 @@ class UrlGenerator implements UrlGeneratorContract
             || ! $applicationUri->host()
             || $applicationUri->getUri()->getQuery() !== null
             || $applicationUri->fragment() !== null
-            || in_array(rtrim($applicationRoot, '/'), ['http://localhost', 'http://localhost:8000'])
+            || $applicationUri->host() === 'localhost'
         ) {
             return;
         }
@@ -789,7 +789,10 @@ class UrlGenerator implements UrlGeneratorContract
             $this->useOrigin($applicationRoot);
         }
 
-        if ($this->forceScheme === null) {
+        if ($this->forceScheme === null
+            && ! $this->request->isSecure()
+            && $applicationUri->scheme() === 'https'
+        ) {
             $this->forceScheme($applicationUri->scheme());
         }
     }

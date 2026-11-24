@@ -191,7 +191,7 @@ class RoutingServiceProviderTest extends TestCase
 
         $url = $this->app->make(UrlGeneratorContract::class);
         $this->app->make(TrustProxies::class)->handle($this->app['request'], function () use ($url) {
-            $this->assertSame('http://localhost.example/profile', $url->to('profile'));
+            $this->assertSame('https://localhost.example/profile', $url->to('profile'));
         });
     }
 
