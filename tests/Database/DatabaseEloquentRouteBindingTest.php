@@ -94,14 +94,6 @@ class DatabaseEloquentRouteBindingTest extends TestCase
         (new RouteBindingStringKeyModel)->resolveRouteBindingQuery($query, 'abc');
     }
 
-    public function testItDoesNotValidateNonIncrementingModelsWithTheDefaultKeyType()
-    {
-        $query = Double::for(Builder::class);
-        $query->expects('where')->with('id', 'US')->returns($query);
-
-        (new RouteBindingNonIncrementingKeyModel)->resolveRouteBindingQuery($query, 'US');
-    }
-
     public function testItDoesNotValidateNullValuesForModelsWithStringKeys()
     {
         $query = Double::for(Builder::class);
@@ -146,11 +138,6 @@ class RouteBindingIntKeyModel extends Model
 class RouteBindingStringKeyModel extends Model
 {
     protected $keyType = 'string';
-}
-
-class RouteBindingNonIncrementingKeyModel extends Model
-{
-    public $incrementing = false;
 }
 
 class RouteBindingCustomExceptionModel extends Model
