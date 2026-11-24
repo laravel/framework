@@ -11,6 +11,7 @@ use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Predis\Response\ErrorInterface;
 use RuntimeException;
 
 class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
@@ -207,6 +208,10 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
             $serializedValues[$this->prefix.$key] = $this->connectionAwareSerialize($value, $connection);
         }
 
+        if ($connection instanceof PhpRedisConnection || $connection instanceof PredisConnection) {
+            return $this->putManyViaPipeline($connection, $serializedValues, $seconds);
+        }
+
         $connection->multi();
 
         $manyResult = null;
@@ -222,6 +227,69 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
         $connection->exec();
 
         return $manyResult ?: false;
+    }
+
+    /**
+     * Send the MULTI, SETEX and EXEC commands of a write transaction in a single pipeline.
+     *
+     * @param  \Illuminate\Redis\Connections\PhpRedisConnection|\Illuminate\Redis\Connections\PredisConnection  $connection
+     * @param  array  $serializedValues
+     * @param  int  $seconds
+     * @return bool
+     */
+    protected function putManyViaPipeline($connection, array $serializedValues, $seconds)
+    {
+        $results = $connection->idempotentPipeline(function ($pipeline) use ($serializedValues, $seconds) {
+            foreach ($serializedValues as $key => $value) {
+                $pipeline->setex($key, (int) max(1, $seconds), $value);
+            }
+        }, atomic: true);
+
+        if (! is_array($results) || $results === []) {
+            return false;
+        }
+
+        foreach ($results as $result) {
+            // Predis returns errors inside a transaction instead of throwing them...
+            if (! $result || $result instanceof ErrorInterface) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Store multiple items in the cache indefinitely using a pipeline of individual writes.
+     *
+     * @param  array  $values
+     * @return array<array-key, bool>
+     *
+     * @internal
+     */
+    public function foreverMany(array $values)
+    {
+        $connection = $this->connection();
+
+        if (count($values) < 2 || $connection->isCluster() ||
+            ! ($connection instanceof PhpRedisConnection || $connection instanceof PredisConnection)) {
+            $results = [];
+
+            foreach ($values as $key => $value) {
+                $results[$key] = $this->forever($key, $value);
+            }
+
+            return $results;
+        }
+
+        // A single endpoint can enforce cluster slots even when the client is not cluster-aware...
+        $results = $connection->idempotentPipeline(function ($pipeline) use ($values, $connection) {
+            foreach ($values as $key => $value) {
+                $pipeline->set($this->prefix.$key, $this->connectionAwareSerialize($value, $connection));
+            }
+        });
+
+        return array_combine(array_keys($values), array_map(fn ($result) => (bool) $result, $results));
     }
 
     /**
@@ -333,6 +401,35 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     public function forget($key)
     {
         return (bool) $this->connection()->del($this->prefix.$key);
+    }
+
+    /**
+     * Remove multiple items from the cache using a pipeline of individual deletes.
+     *
+     * @param  array  $keys
+     * @return list<bool>
+     *
+     * @internal
+     */
+    public function forgetManyKeys(array $keys)
+    {
+        $keys = array_values($keys);
+
+        $connection = $this->connection();
+
+        if (count($keys) < 2 || $connection->isCluster() ||
+            ! ($connection instanceof PhpRedisConnection || $connection instanceof PredisConnection)) {
+            return array_map($this->forget(...), $keys);
+        }
+
+        // A single endpoint can enforce cluster slots even when the client is not cluster-aware...
+        $results = $connection->idempotentPipeline(function ($pipeline) use ($keys) {
+            foreach ($keys as $key) {
+                $pipeline->del($this->prefix.$key);
+            }
+        });
+
+        return array_map(fn ($result) => (bool) $result, $results);
     }
 
     /**

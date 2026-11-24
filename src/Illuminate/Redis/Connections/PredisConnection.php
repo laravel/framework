@@ -114,6 +114,42 @@ class PredisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Execute commands that can safely run twice in a pipeline, retrying once after a disconnect.
+     *
+     * With $atomic, the commands run in a transaction that is sent in the same round trip.
+     *
+     * @param  callable  $callback
+     * @param  bool  $atomic
+     * @return array
+     *
+     * @internal
+     */
+    public function idempotentPipeline(callable $callback, bool $atomic = false)
+    {
+        $pipeline = function ($pipeline) use ($callback, $atomic) {
+            if ($atomic) {
+                $pipeline->multi();
+            }
+
+            $callback($pipeline);
+
+            if ($atomic) {
+                $pipeline->exec();
+            }
+        };
+
+        try {
+            $results = $this->command('pipeline', [$pipeline]);
+        } catch (ConnectionException) {
+            // Predis already dropped the broken connection, so the next attempt reconnects...
+            $results = $this->command('pipeline', [$pipeline]);
+        }
+
+        // Only the EXEC reply holds the results of the commands in a transaction...
+        return $atomic ? end($results) : $results;
+    }
+
+    /**
      * Run a command against the Redis database.
      *
      * @param  string  $method

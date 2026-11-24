@@ -34,6 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use ReflectionMethod;
 
 use function Illuminate\Support\defer;
 use function Illuminate\Support\enum_value;
@@ -447,6 +448,28 @@ class Repository implements ArrayAccess, CacheContract
      */
     protected function putManyForever(array $values)
     {
+        if (count($values) > 1 && method_exists($this->store, 'foreverMany') && $this->usesOwnMethod('forever')) {
+            $itemKeys = [];
+
+            foreach ($values as $key => $value) {
+                $this->event(new WritingKey($this->getName(), $key, $value));
+
+                $itemKeys[$key] = $this->itemKey($key);
+            }
+
+            $results = $this->store->foreverMany(array_combine($itemKeys, $values));
+
+            foreach ($itemKeys as $key => $itemKey) {
+                if ($results[$itemKey]) {
+                    $this->event(new KeyWritten($this->getName(), $key, $values[$key]));
+                } else {
+                    $this->event(new KeyWriteFailed($this->getName(), $key, $values[$key]));
+                }
+            }
+
+            return ! in_array(false, $results, true);
+        }
+
         $result = true;
 
         foreach ($values as $key => $value) {
@@ -777,10 +800,44 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Determine if this repository keeps the repository's own implementation of the given method.
+     *
+     * Items are only written or removed together when no subclass needs to see each one.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function usesOwnMethod($method)
+    {
+        return (new ReflectionMethod($this, $method))->class === self::class;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function deleteMultiple($keys): bool
     {
+        if (method_exists($this->store, 'forgetManyKeys') && $this->usesOwnMethod('forget')) {
+            // A generator may repeat its keys, so they must not be preserved...
+            $keys = array_map(enum_value(...), is_array($keys) ? array_values($keys) : iterator_to_array($keys, false));
+
+            foreach ($keys as $key) {
+                $this->event(new ForgettingKey($this->getName(), $key));
+            }
+
+            $results = $this->store->forgetManyKeys(array_map($this->itemKey(...), $keys));
+
+            foreach ($keys as $index => $key) {
+                if ($results[$index]) {
+                    $this->event(new KeyForgotten($this->getName(), $key));
+                } else {
+                    $this->event(new KeyForgetFailed($this->getName(), $key));
+                }
+            }
+
+            return ! in_array(false, $results, true);
+        }
+
         $result = true;
 
         foreach ($keys as $key) {

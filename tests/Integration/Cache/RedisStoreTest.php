@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use DateTime;
+use Exception;
 use Illuminate\Cache\RedisStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -477,6 +479,216 @@ class RedisStoreTest extends TestCase
 
         $this->assertTrue($store->flush());
         $this->assertNull($store->get('fizz'));
+    }
+
+    public function testItStoresManyValuesForeverInOnePipeline(): void
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write each key separately.');
+        }
+
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $commands = $this->recordCommands($store->connection());
+
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'number' => 5, 'array' => ['a' => 1]]));
+
+        $this->assertSame([], array_intersect(['set', 'setex'], $commands()));
+        $this->assertEquals(['foo' => 'bar', 'number' => 5, 'array' => ['a' => 1]], $store->many(['foo', 'number', 'array']));
+        $this->assertSame(-1, $store->connection()->ttl($store->getPrefix().'foo'));
+        $this->assertSame(6, $store->increment('number'));
+    }
+
+    public function testItStoresManyValuesWithTtlInOneTransactionPipeline(): void
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write each key separately.');
+        }
+
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $commands = $this->recordCommands($store->connection());
+        $store->connection()->executeRaw(['CONFIG', 'RESETSTAT']);
+
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'fizz' => 'buzz'], 60));
+
+        $this->assertSame([], array_intersect(['multi', 'setex', 'exec'], $commands()));
+
+        // The writes still run in one transaction...
+        $stats = $store->connection()->executeRaw(['INFO', 'commandstats']);
+        $this->assertMatchesRegularExpression('/cmdstat_multi:calls=1,/', $stats);
+        $this->assertMatchesRegularExpression('/cmdstat_exec:calls=1,/', $stats);
+        $this->assertSame(['foo' => 'bar', 'fizz' => 'buzz'], $store->many(['foo', 'fizz']));
+
+        $ttl = $store->connection()->ttl($store->getPrefix().'fizz');
+        $this->assertGreaterThan(0, $ttl);
+        $this->assertLessThanOrEqual(60, $ttl);
+    }
+
+    public function testItDeletesManyValuesInOnePipeline(): void
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections delete each key separately.');
+        }
+
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->putMany(['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz']);
+
+        $commands = $this->recordCommands($store->connection());
+
+        $keys = (function () {
+            yield 'foo';
+            yield 'fizz';
+            yield 'foo';
+        })();
+
+        // The repeated key no longer exists when it is deleted the second time...
+        $this->assertFalse($store->deleteMultiple($keys));
+
+        $this->assertNotContains('del', $commands());
+        $this->assertSame(['foo' => null, 'fizz' => null, 'norf' => 'quz'], $store->many(['foo', 'fizz', 'norf']));
+        $this->assertTrue($store->deleteMultiple(['norf']));
+    }
+
+    public function testTaggedValuesStoredManyForeverCanBeFlushed(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->tags(['people'])->putMany(['person-1' => 'Sally', 'person-2' => 'John']);
+        $this->assertSame(['person-1' => 'Sally', 'person-2' => 'John'], $store->tags(['people'])->many(['person-1', 'person-2']));
+
+        $store->tags(['people'])->flush();
+
+        $this->assertSame(['person-1' => null, 'person-2' => null], $store->tags(['people'])->many(['person-1', 'person-2']));
+    }
+
+    public function testItWritesAndDeletesManyValuesAfterTheConnectionWasDropped(): void
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write and delete each key separately.');
+        }
+
+        $store = Cache::store('redis');
+        $store->clear();
+        $store->get('connect');
+
+        $dropConnections = fn () => $this->app['redis']->connection('default')->executeRaw(['CLIENT', 'KILL', 'TYPE', 'normal', 'SKIPME', 'yes']);
+
+        $dropConnections();
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'fizz' => 'buzz']));
+
+        $dropConnections();
+        $this->assertTrue($store->putMany(['norf' => 'quz', 'baz' => 'qux'], 60));
+
+        $dropConnections();
+        $this->assertTrue($store->deleteMultiple(['foo', 'norf']));
+
+        $this->assertSame(['foo' => null, 'fizz' => 'buzz', 'norf' => null, 'baz' => 'qux'], $store->many(['foo', 'fizz', 'norf', 'baz']));
+    }
+
+    public function testAFailedTransactionLeavesTheConnectionReadingItsOwnReplies(): void
+    {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not write many keys in a transaction.');
+        }
+
+        $store = Cache::store('redis');
+        $store->clear();
+        $store->putMany(['first' => 'one', 'second' => 'two', 'third' => 'three']);
+
+        $admin = $this->app['redis']->connection('default');
+        $admin->executeRaw(['CONFIG', 'SET', 'maxmemory', '1']);
+
+        try {
+            $store->putMany(['foo' => 'bar', 'fizz' => 'buzz'], 60);
+            $this->fail('Redis accepted writes over its memory limit.');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('OOM', $e->getMessage());
+        } finally {
+            $admin->executeRaw(['CONFIG', 'SET', 'maxmemory', '0']);
+        }
+
+        $this->assertSame('one', $store->get('first'));
+        $this->assertSame('two', $store->get('second'));
+        $this->assertSame('three', $store->get('third'));
+    }
+
+    public function testDeletingManyMemoizedTaggedValuesDeletesThem(): void
+    {
+        Cache::store('redis')->clear();
+
+        $memoized = Cache::memo('redis')->tags(['people']);
+        $memoized->putMany(['person-1' => 'Sally', 'person-2' => 'John'], 60);
+        $this->assertSame('Sally', $memoized->get('person-1'));
+
+        $this->assertTrue($memoized->deleteMultiple(['person-1', 'person-2']));
+
+        $this->assertNull($memoized->get('person-1'));
+        $this->assertNull(Cache::store('redis')->tags(['people'])->get('person-1'));
+    }
+
+    public function testRepositoriesThatOverrideForeverOrForgetStillSeeEachKey(): void
+    {
+        $repository = new class(Cache::store('redis')->getStore()) extends Repository
+        {
+            public array $calls = [];
+
+            public function forever($key, $value)
+            {
+                $this->calls[] = "forever $key";
+
+                return parent::forever($key, $value);
+            }
+
+            public function forget($key)
+            {
+                $this->calls[] = "forget $key";
+
+                return parent::forget($key);
+            }
+        };
+
+        $repository->putMany(['foo' => 'bar', 'fizz' => 'buzz']);
+        $repository->deleteMultiple(['foo', 'fizz']);
+
+        $this->assertSame(['forever foo', 'forever fizz', 'forget foo', 'forget fizz'], $repository->calls);
+    }
+
+    /**
+     * Record the names of the commands the connection runs outside a pipeline.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return \Closure(): list<string>
+     */
+    protected function recordCommands($connection)
+    {
+        $commands = [];
+
+        $connection->setEventDispatcher($this->app['events']);
+        $connection->listen(function (CommandExecuted $event) use (&$commands) {
+            $commands[] = strtolower($event->command);
+        });
+
+        $this->beforeApplicationDestroyed(fn () => $connection->unsetEventDispatcher());
+
+        return function () use (&$commands) {
+            return $commands;
+        };
     }
 
     public function testFlushingManyTagsOnlyPassesEachEntrysOwnTagToTheScript()
