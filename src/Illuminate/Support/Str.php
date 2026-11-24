@@ -1294,11 +1294,11 @@ class Str
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = iterator_to_array($search);
+            $search = iterator_to_array($search, false);
         }
 
         if ($replace instanceof Traversable) {
-            $replace = iterator_to_array($replace);
+            $replace = iterator_to_array($replace, false);
         }
 
         if ($subject instanceof Traversable) {
@@ -1482,7 +1482,7 @@ class Str
     public static function remove($search, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = iterator_to_array($search);
+            $search = iterator_to_array($search, false);
         }
 
         if ($subject instanceof Traversable) {

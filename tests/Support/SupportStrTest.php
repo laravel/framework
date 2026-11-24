@@ -971,6 +971,50 @@ class SupportStrTest extends TestCase
         $this->assertSame("caf\xC3 X", Str::replace('ž', 'X', "caf\xC3 ž", false));
     }
 
+    #[DataProvider('provideRepeatedIteratorKeys')]
+    public function testReplaceWithRepeatedSearchIteratorKeys($key, $caseSensitive)
+    {
+        $search = (function () use ($key) {
+            yield $key => 'a';
+            yield $key => 'b';
+            yield $key => 'c';
+        })();
+
+        $this->assertSame('X-X-X', Str::replace($search, 'X', $caseSensitive ? 'a-b-c' : 'A-B-C', $caseSensitive));
+    }
+
+    #[DataProvider('provideRepeatedIteratorKeys')]
+    public function testReplaceWithRepeatedReplacementIteratorKeys($key, $caseSensitive)
+    {
+        $replace = (function () use ($key) {
+            yield $key => 'a';
+            yield $key => 'b';
+            yield $key => 'c';
+        })();
+
+        $this->assertSame('a-b-c', Str::replace(['x', 'y', 'z'], $replace, $caseSensitive ? 'x-y-z' : 'X-Y-Z', $caseSensitive));
+    }
+
+    public static function provideRepeatedIteratorKeys()
+    {
+        yield 'numeric keys, case sensitive' => [0, true];
+        yield 'string keys, case sensitive' => ['key', true];
+        yield 'numeric keys, case insensitive' => [0, false];
+        yield 'string keys, case insensitive' => ['key', false];
+    }
+
+    public function testReplacePreservesSubjectIteratorKeys()
+    {
+        foreach ([true, false] as $caseSensitive) {
+            $subject = (function () {
+                yield 'first' => 'foo';
+                yield 5 => 'bar';
+            })();
+
+            $this->assertSame(['first' => 'fXX', 5 => 'bar'], Str::replace('o', 'X', $subject, $caseSensitive));
+        }
+    }
+
     public function testReplaceThrowsForScalarSearchAndArrayReplacement()
     {
         $this->expectException(\TypeError::class);
@@ -1076,6 +1120,30 @@ class SupportStrTest extends TestCase
         $this->assertSame(['Fbr', 'Br'], Str::remove(collect(['o', 'a']), collect(['Foobar', 'Boar'])));
         $this->assertSame(['Fooar', 'oar'], Str::remove('b', collect(['Foobar', 'Boar']), false));
         $this->assertSame(['ltý', 'ito'], Str::remove('ž', collect(['Žltý', 'žito']), false));
+    }
+
+    #[DataProvider('provideRepeatedIteratorKeys')]
+    public function testRemoveWithRepeatedSearchIteratorKeys($key, $caseSensitive)
+    {
+        $search = (function () use ($key) {
+            yield $key => 'a';
+            yield $key => 'b';
+            yield $key => 'c';
+        })();
+
+        $this->assertSame('--', Str::remove($search, $caseSensitive ? 'a-b-c' : 'A-B-C', $caseSensitive));
+    }
+
+    public function testRemovePreservesSubjectIteratorKeys()
+    {
+        foreach ([true, false] as $caseSensitive) {
+            $subject = (function () {
+                yield 'first' => 'foo';
+                yield 5 => 'bar';
+            })();
+
+            $this->assertSame(['first' => 'f', 5 => 'bar'], Str::remove('o', $subject, $caseSensitive));
+        }
     }
 
     public function testReverse()
