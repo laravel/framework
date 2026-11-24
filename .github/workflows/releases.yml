@@ -152,7 +152,7 @@ jobs:
 
     name: Update changelog
 
-    uses: laravel/.github/.github/workflows/update-changelog.yml@dd86ce0a18475504e42fa809d7454c1cb1a88028 # main
+    uses: laravel/.github/.github/workflows/update-changelog.yml@1e24359c5622f79e21f46d3cd46645f634f1affb # main
     with:
       branch: ${{ github.ref_name }}
       version: "v${{ needs.release.outputs.version }}"
