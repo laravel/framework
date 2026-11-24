@@ -316,12 +316,12 @@ trait ValidatesAttributes
      * Get a DateTime instance from a string.
      *
      * @param  string  $format
-     * @param  string  $value
+     * @param  mixed  $value
      * @return \DateTime|null
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
     {
-        if ($date = DateTime::createFromFormat('!'.$format, $value)) {
+        if ((is_string($value) || is_numeric($value)) && $date = DateTime::createFromFormat('!'.$format, $value)) {
             return $date;
         }
 
@@ -331,11 +331,15 @@ trait ValidatesAttributes
     /**
      * Get a DateTime instance from a string with no format.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return \DateTime|null
      */
     protected function getDateTime($value)
     {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+            return null;
+        }
+
         try {
             return @Date::parse($value) ?: null;
         } catch (Exception) {
