@@ -1248,7 +1248,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return null;
         }
 
-        $position = ($keys = $this->keys())->search($key);
+        $position = ($keys = $this->keys())->search($key, strict: true);
 
         if ($position === 0) {
             return null;
@@ -1272,7 +1272,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return null;
         }
 
-        $position = ($keys = $this->keys())->search($key);
+        $position = ($keys = $this->keys())->search($key, strict: true);
 
         if ($position === $keys->count() - 1) {
             return null;

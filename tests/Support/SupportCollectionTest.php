@@ -4500,6 +4500,14 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testBeforeDistinguishesNumericStringAndIntegerKeys($collection)
+    {
+        $c = new $collection(['01' => 'first', 'middle', 1 => 'target', 'last']);
+
+        $this->assertSame('middle', $c->before('target'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testBeforeInStrictMode($collection)
     {
         $c = new $collection([false, 0, 1, [], '']);
@@ -4559,6 +4567,14 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('laravel', $c->after(function ($value) {
             return ! is_numeric($value);
         }));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterDistinguishesNumericStringAndIntegerKeys($collection)
+    {
+        $c = new $collection(['01' => 'first', 'middle', 1 => 'target', 'last']);
+
+        $this->assertSame('last', $c->after('target'));
     }
 
     #[DataProvider('collectionClassProvider')]
