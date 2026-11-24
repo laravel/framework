@@ -239,6 +239,51 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         ]);
     }
 
+    public function testPutManyForeverWritesAllValuesInOneQuery()
+    {
+        $store = $this->getStore();
+
+        $queries = $this->countQueries(fn () => $this->assertTrue($store->putMany(['first' => 'a', 'second' => 'b', 'third' => 'c'])));
+
+        $this->assertSame(1, $queries);
+        $this->assertSame(['first' => 'a', 'second' => 'b', 'third' => 'c'], $store->many(['first', 'second', 'third']));
+        $this->assertGreaterThan(
+            Carbon::now()->addYears(9)->getTimestamp(),
+            DB::table($this->getCacheTableName())->where('key', $this->withCachePrefix('third'))->value('expiration')
+        );
+    }
+
+    public function testDeleteMultipleRemovesAllKeysInOneQuery()
+    {
+        $store = $this->getStore();
+        $this->insertToCacheTable('first', 'a');
+        $this->insertToCacheTable('second', 'b');
+        $this->insertToCacheTable('third', 'c');
+        $this->insertToCacheTable('illuminate:cache:flexible:created:first', 123);
+
+        $queries = $this->countQueries(fn () => $this->assertTrue($store->deleteMultiple(['first', 'second', 'first'])));
+
+        $this->assertSame(1, $queries);
+        $this->assertSame(['first' => null, 'second' => null, 'third' => 'c'], $store->many(['first', 'second', 'third']));
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('illuminate:cache:flexible:created:first')]);
+    }
+
+    public function testManyValuesAreWrittenAndDeletedInChunks()
+    {
+        $store = $this->getStore();
+        $values = [];
+
+        for ($i = 1; $i <= 600; $i++) {
+            $values["key-$i"] = "value-$i";
+        }
+
+        $this->assertSame(3, $this->countQueries(fn () => $this->assertTrue($store->putMany($values))));
+        $this->assertSame(600, DB::table($this->getCacheTableName())->count());
+
+        $this->assertSame(3, $this->countQueries(fn () => $this->assertTrue($store->deleteMultiple(array_keys($values)))));
+        $this->assertSame(0, DB::table($this->getCacheTableName())->count());
+    }
+
     public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
     {
         $originalConfiguration = config('database');
@@ -334,6 +379,22 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     protected function getStore()
     {
         return Cache::store('database');
+    }
+
+    protected function countQueries(callable $callback)
+    {
+        $connection = $this->getStore()->getStore()->getConnection();
+
+        $connection->flushQueryLog();
+        $connection->enableQueryLog();
+
+        try {
+            $callback();
+
+            return count($connection->getQueryLog());
+        } finally {
+            $connection->disableQueryLog();
+        }
     }
 
     protected function getCacheTableName()
