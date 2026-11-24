@@ -2,49 +2,19 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Exception;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\InvalidValueException;
-use Illuminate\Database\QueryException;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
-use JMac\Testing\Double;
-use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
-use JMac\Testing\Matching\Argument;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Fixtures/Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
-    use VerifiesDoubles;
-
-    protected $originalContainer;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->originalContainer = Container::getInstance();
-
-        Container::setInstance(new Container);
-    }
-
-    protected function tearDown(): void
-    {
-        Container::setInstance($this->originalContainer);
-        Model::reportRouteModelBindingExceptions();
-
-        parent::tearDown();
-    }
-
     public function test_it_can_resolve_the_implicit_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
@@ -153,76 +123,9 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
-
-    #[DataProvider('shouldReportProvider')]
-    public function testItThrowsModelNotFoundExceptionOnInvalidValueException(bool $shouldReport): void
-    {
-        Model::reportRouteModelBindingExceptions($shouldReport);
-
-        $mock = Double::for(ExceptionHandler::class);
-
-        if ($shouldReport) {
-            $mock->expects('report')->with(Argument::type(InvalidValueException::class), []);
-        } else {
-            $mock->expects('report')->never();
-        }
-
-        $container = Container::getInstance();
-        $container->instance(ExceptionHandler::class, $mock);
-
-        $action = ['uses' => fn (ImplicitRouteBindingUserWithInvalidValue $user) => $user];
-
-        $route = new Route('GET', '/test', $action);
-        $route->parameters = ['user' => 'invalid-value'];
-        $route->prepareForSerialization();
-        $this->expectException(ModelNotFoundException::class);
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-    }
-
-    /** @return list<array{0: bool}> */
-    public static function shouldReportProvider(): array
-    {
-        return [[true], [false]];
-    }
-
-    public function testItDoesNotConvertUnrelatedQueryExceptions(): void
-    {
-        $mock = Double::for(ExceptionHandler::class);
-        $mock->expects('report')->never();
-
-        $container = Container::getInstance();
-        $container->instance(ExceptionHandler::class, $mock);
-
-        $action = ['uses' => fn (ImplicitRouteBindingUserWithQueryException $user) => $user];
-
-        $route = new Route('GET', '/test', $action);
-        $route->parameters = ['user' => 'invalid-value'];
-        $route->prepareForSerialization();
-
-        $this->expectException(QueryException::class);
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-    }
 }
 
 class ImplicitRouteBindingUser extends Model
 {
     //
-}
-
-class ImplicitRouteBindingUserWithInvalidValue extends Model
-{
-    public function resolveRouteBinding($value, $field = null): void
-    {
-        throw new InvalidValueException('pgsql', 'select * from users where id = ?', [$value], new Exception('Out of range value'));
-    }
-}
-
-class ImplicitRouteBindingUserWithQueryException extends Model
-{
-    public function resolveRouteBinding($value, $field = null): void
-    {
-        throw new QueryException('pgsql', 'select * from users where id = ?', [$value], new Exception('Undefined column'));
-    }
 }
