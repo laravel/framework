@@ -483,6 +483,12 @@ class RedisStoreTest extends TestCase
 
     public function testItStoresManyValuesForeverInOnePipeline(): void
     {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write each key separately.');
+        }
+
         $store = Cache::store('redis');
         $store->clear();
 
@@ -498,6 +504,12 @@ class RedisStoreTest extends TestCase
 
     public function testItStoresManyValuesWithTtlInOneTransactionPipeline(): void
     {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write each key separately.');
+        }
+
         $store = Cache::store('redis');
         $store->clear();
 
@@ -521,6 +533,12 @@ class RedisStoreTest extends TestCase
 
     public function testItDeletesManyValuesInOnePipeline(): void
     {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections delete each key separately.');
+        }
+
         $store = Cache::store('redis');
         $store->clear();
 
@@ -557,6 +575,12 @@ class RedisStoreTest extends TestCase
 
     public function testItWritesAndDeletesManyValuesAfterTheConnectionWasDropped(): void
     {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections write and delete each key separately.');
+        }
+
         $store = Cache::store('redis');
         $store->clear();
         $store->get('connect');
@@ -577,6 +601,12 @@ class RedisStoreTest extends TestCase
 
     public function testAFailedTransactionLeavesTheConnectionReadingItsOwnReplies(): void
     {
+        $connection = Cache::store('redis')->connection();
+
+        if ($connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection) {
+            $this->markTestSkipped('Clustered connections do not write many keys in a transaction.');
+        }
+
         $store = Cache::store('redis');
         $store->clear();
         $store->putMany(['first' => 'one', 'second' => 'two', 'third' => 'three']);
