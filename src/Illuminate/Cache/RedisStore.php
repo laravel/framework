@@ -267,7 +267,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
      *
      * @internal
      */
-    public function foreverManyViaPipeline(array $values)
+    public function foreverMany(array $values)
     {
         $connection = $this->connection();
 
@@ -411,7 +411,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
      *
      * @internal
      */
-    public function forgetManyViaPipeline(array $keys)
+    public function forgetManyKeys(array $keys)
     {
         $keys = array_values($keys);
 

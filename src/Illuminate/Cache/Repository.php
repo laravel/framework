@@ -448,7 +448,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     protected function putManyForever(array $values)
     {
-        if (count($values) > 1 && method_exists($this->store, 'foreverManyViaPipeline') && $this->usesOwnMethod('forever')) {
+        if (count($values) > 1 && method_exists($this->store, 'foreverMany') && $this->usesOwnMethod('forever')) {
             $itemKeys = [];
 
             foreach ($values as $key => $value) {
@@ -457,7 +457,7 @@ class Repository implements ArrayAccess, CacheContract
                 $itemKeys[$key] = $this->itemKey($key);
             }
 
-            $results = $this->store->foreverManyViaPipeline(array_combine($itemKeys, $values));
+            $results = $this->store->foreverMany(array_combine($itemKeys, $values));
 
             foreach ($itemKeys as $key => $itemKey) {
                 if ($results[$itemKey]) {
@@ -817,7 +817,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function deleteMultiple($keys): bool
     {
-        if (method_exists($this->store, 'forgetManyViaPipeline') && $this->usesOwnMethod('forget')) {
+        if (method_exists($this->store, 'forgetManyKeys') && $this->usesOwnMethod('forget')) {
             // A generator may repeat its keys, so they must not be preserved...
             $keys = array_map(enum_value(...), is_array($keys) ? array_values($keys) : iterator_to_array($keys, false));
 
@@ -825,7 +825,7 @@ class Repository implements ArrayAccess, CacheContract
                 $this->event(new ForgettingKey($this->getName(), $key));
             }
 
-            $results = $this->store->forgetManyViaPipeline(array_map($this->itemKey(...), $keys));
+            $results = $this->store->forgetManyKeys(array_map($this->itemKey(...), $keys));
 
             foreach ($keys as $index => $key) {
                 if ($results[$index]) {
