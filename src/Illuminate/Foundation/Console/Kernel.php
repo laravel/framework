@@ -12,12 +12,14 @@ use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\CloudBootstrapper;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 
@@ -152,6 +154,8 @@ class Kernel implements KernelContract
 
             $this->bootstrap();
 
+            $output = $this->cloudLogOutput() ?? $output;
+
             return $this->getArtisan()->run($input, $output);
         } catch (Throwable $e) {
             $this->reportException($e);
@@ -160,6 +164,22 @@ class Kernel implements KernelContract
 
             return 1;
         }
+    }
+
+    /**
+     * Get an output that writes to the Laravel Cloud log socket, if the command should log its output there.
+     *
+     * @return \Symfony\Component\Console\Output\StreamOutput|null
+     */
+    protected function cloudLogOutput()
+    {
+        if (! laravel_cloud() || ! ($_SERVER['__LARAVEL_CLOUD_LOG_OUTPUT'] ?? getenv('__LARAVEL_CLOUD_LOG_OUTPUT'))) {
+            return null;
+        }
+
+        $socket = @stream_socket_client(CloudBootstrapper::socket(), timeout: 2);
+
+        return $socket ? new StreamOutput($socket) : null;
     }
 
     /**
