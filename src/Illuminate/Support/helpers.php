@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -135,7 +136,7 @@ if (! function_exists('e')) {
             $value = $value->value;
         }
 
-        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+        return (new EncodedHtmlString($value ?? '', $doubleEncode))->toHtml();
     }
 }
 

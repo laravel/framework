@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -77,6 +78,20 @@ class SupportHelpersTest extends TestCase
 
         $enumValue = IntBackedEnum::ROLE_ADMIN;
         $this->assertSame('1', e($enumValue));
+    }
+
+    public function testEDoubleEncodingAndCustomEncoder()
+    {
+        $this->assertSame('&amp; &amp;amp; &quot;', e('& &amp; "'));
+        $this->assertSame('&amp; &amp; &quot;', e('& &amp; "', false));
+
+        EncodedHtmlString::encodeUsing(fn ($value, $doubleEncode) => $value.($doubleEncode ? '-true' : '-false'));
+
+        try {
+            $this->assertSame('value-false', e('value', false));
+        } finally {
+            EncodedHtmlString::flushState();
+        }
     }
 
     public function testBlank()

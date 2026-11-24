@@ -85,16 +85,14 @@ class Markdown
             'new \Illuminate\Support\EncodedHtmlString(%s)',
             function () use ($view, $data) {
                 if (static::$withSecuredEncoding === true) {
-                    EncodedHtmlString::encodeUsing(function ($value) {
+                    EncodedHtmlString::encodeUsing(function ($value, $doubleEncode) {
                         $replacements = [
                             '\\' => '\\\\',
                             '[' => '\[',
                             ']' => '\]',
-                            '<' => '&lt;',
-                            '>' => '&gt;',
                         ];
 
-                        return strtr($value, $replacements);
+                        return strtr(EncodedHtmlString::convert($value, doubleEncode: $doubleEncode), $replacements);
                     });
                 }
 
