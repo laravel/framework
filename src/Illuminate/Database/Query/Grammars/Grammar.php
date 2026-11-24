@@ -1340,6 +1340,22 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an insert statement that selects the existing records on conflict into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $returning
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileInsertOrSelect(Builder $query, array $values, array $uniqueBy, array $returning)
+    {
+        throw new RuntimeException('This database engine does not support insert or select.');
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

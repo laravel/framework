@@ -850,6 +850,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $builder->insertOrIgnoreReturning(['bar'], ['baz']));
 
         $builder = $this->getBuilder();
+        $builder->getQuery()->expects('insertOrSelect')->with(['bar'], 'baz')->returns('foo');
+
+        $this->assertSame('foo', $builder->insertOrSelect(['bar'], 'baz'));
+
+        $builder = $this->getBuilder();
         $builder->getQuery()->expects('insertOrIgnoreUsing')->with(['bar'], 'baz')->returns('foo');
 
         $this->assertSame('foo', $builder->insertOrIgnoreUsing(['bar'], 'baz'));

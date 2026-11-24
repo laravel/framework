@@ -4656,6 +4656,69 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result->isEmpty());
     }
 
+    public function testInsertOrSelectMethod()
+    {
+        $this->expectExceptionObject(new RuntimeException('does not support'));
+        $builder = $this->getBuilder();
+        $builder->from('users')->insertOrSelect(['email' => 'foo'], 'email');
+    }
+
+    public function testInsertOrSelectMethodWithEmptyValues()
+    {
+        $builder = $this->getPostgresBuilder();
+        $result = $builder->from('users')->insertOrSelect([], 'email');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertTrue($result->isEmpty());
+    }
+
+    public function testPostgresInsertOrSelectMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with('insert into "users" ("email", "name") values (?, ?) on conflict ("email") do select returning *',
+            ['foo', 'bar'])->returns([['id' => 1, 'email' => 'foo', 'name' => 'baz']]);
+        $result = $builder->from('users')->insertOrSelect(['email' => 'foo', 'name' => 'bar'], 'email');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo', 'name' => 'baz']], $result->all());
+    }
+
+    public function testPostgresInsertOrSelectMethodWithUniqueByColumnsAndReturning()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with('insert into "users" ("email", "name") values (?, ?) on conflict ("email", "name") do select returning "id", "email"',
+            ['foo', 'bar'])->returns([['id' => 1, 'email' => 'foo']]);
+        $result = $builder->from('users')->insertOrSelect(['email' => 'foo', 'name' => 'bar'], ['email', 'name'], ['id', 'email']);
+        $this->assertEquals([['id' => 1, 'email' => 'foo']], $result->all());
+    }
+
+    public function testPostgresInsertOrSelectMethodWithMultipleRecords()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do select returning *',
+            ['foo', 'bar', 'baz', 'qux'])->returns([['id' => 1, 'email' => 'foo', 'name' => 'bar'], ['id' => 2, 'email' => 'baz', 'name' => 'qux']]);
+        $result = $builder->from('users')->insertOrSelect(
+            [['name' => 'bar', 'email' => 'foo'], ['email' => 'baz', 'name' => 'qux']],
+            'email'
+        );
+        $this->assertCount(2, $result);
+    }
+
+    public function testInsertOrSelectWithEmptyUniqueBy()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('The unique columns must not be empty.'));
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertOrSelect(['email' => 'foo'], []);
+    }
+
+    public function testInsertOrSelectWithEmptyReturning()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('The returning columns must not be empty.'));
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertOrSelect(['email' => 'foo'], 'email', []);
+    }
+
     public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectExceptionObject(new RuntimeException('does not support'));

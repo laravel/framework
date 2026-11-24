@@ -131,6 +131,7 @@ class Builder implements BuilderContract
         'insertgetid',
         'insertorignore',
         'insertorignorereturning',
+        'insertorselect',
         'insertusing',
         'insertorignoreusing',
         'max',
