@@ -269,7 +269,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locale = $locale ?: $this->locale;
 
-        return $this->hasForLocale($key, $locale) ? $locale : $this->fallback;
+        foreach ($this->localeArray($locale) as $candidate) {
+            if ($this->hasForLocale($key, $candidate)) {
+                return $candidate;
+            }
+        }
+
+        return $this->fallback;
     }
 
     /**

@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Tests\Translation\Fixtures\Enums\Bar;
 use Illuminate\Tests\Translation\Fixtures\Enums\Baz;
 use Illuminate\Tests\Translation\Fixtures\Enums\Foo;
+use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use InvalidArgumentException;
@@ -236,7 +237,10 @@ class TranslationTranslatorTest extends TestCase
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'hasForLocale'])->setConstructorArgs([$this->getLoader(), 'cs'])->getMock();
         $t->setFallback('en');
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
-        $t->expects($this->once())->method('hasForLocale')->with('foo', 'cs')->willReturn(false);
+        $t->expects($this->exactly(2))->method('hasForLocale')->willReturnMap([
+            ['foo', 'cs', false],
+            ['foo', 'en', true],
+        ]);
         $selector = Double::for(MessageSelector::class);
         $selector->expects('choose')->with('line', 10, 'en')->returns('choiced');
         $t->setSelector($selector);
@@ -254,6 +258,81 @@ class TranslationTranslatorTest extends TestCase
         $t->setSelector($selector);
 
         $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
+    }
+
+    public function testChoiceMethodUsesCustomFallbackLocalesAndTheirPluralRules()
+    {
+        $loader = new ArrayLoader;
+        $loader->addMessages('fr', 'messages', ['apples' => ':count pomme|:count pommes']);
+        $loader->addMessages('en', 'messages', ['apples' => ':count apple|:count apples']);
+
+        $t = new Translator($loader, 'fr_CA');
+        $t->setFallback('en');
+        $t->determineLocalesUsing(function ($locales) {
+            $expanded = [];
+
+            foreach ($locales as $locale) {
+                $expanded[] = $locale;
+                $expanded[] = explode('_', $locale)[0];
+            }
+
+            return $expanded;
+        });
+
+        $this->assertSame('0 pomme', $t->choice('messages.apples', 0));
+        $this->assertSame('3 pommes', $t->choice('messages.apples', 3, [], 'fr_CA'));
+    }
+
+    public function testChoiceMethodRespectsCustomLocaleOrder()
+    {
+        $loader = new ArrayLoader;
+        $loader->addMessages('en', 'messages', ['apples' => ':count apple|:count apples']);
+        $loader->addMessages('fr', 'messages', ['apples' => ':count pomme|:count pommes']);
+
+        $t = new Translator($loader, 'en');
+        $t->setFallback('en');
+        $t->determineLocalesUsing(fn ($locales) => ['fr', 'en']);
+
+        $this->assertSame('0 pomme', $t->choice('messages.apples', 0));
+    }
+
+    public function testChoiceMethodUsesDefaultLocaleAndFallbackPluralRules()
+    {
+        $loader = new ArrayLoader;
+        $loader->addMessages('fr', 'messages', ['apples' => ':count pomme|:count pommes']);
+        $loader->addMessages('en', 'messages', ['apples' => ':count apple|:count apples', 'pears' => ':count pear|:count pears']);
+
+        $t = new Translator($loader, 'fr');
+        $t->setFallback('en');
+
+        $this->assertSame('0 pomme', $t->choice('messages.apples', 0));
+        $this->assertSame('0 pears', $t->choice('messages.pears', 0));
+        $this->assertSame('0 apples', $t->choice('messages.apples', 0, [], 'en'));
+        $this->assertSame('messages.missing', $t->choice('messages.missing', 0));
+    }
+
+    public function testChoiceMethodWithoutFallbackLocale()
+    {
+        $loader = new ArrayLoader;
+        $loader->addMessages('en', 'messages', ['apples' => ':count apple|:count apples']);
+
+        $t = new Translator($loader, 'en');
+
+        $this->assertSame('2 apples', $t->choice('messages.apples', 2));
+        $this->assertSame('messages.missing', $t->choice('messages.missing', 2));
+    }
+
+    public function testChoiceMethodUsesDefaultLocaleAndFallbackForJsonTranslations()
+    {
+        $loader = new ArrayLoader;
+        $loader->addMessages('fr', '*', ['apples' => ':count pomme|:count pommes']);
+        $loader->addMessages('en', '*', ['apples' => ':count apple|:count apples', 'pears' => ':count pear|:count pears']);
+
+        $t = new Translator($loader, 'fr');
+        $t->setFallback('en');
+
+        $this->assertSame('0 pomme', $t->choice('apples', 0));
+        $this->assertSame('0 pears', $t->choice('pears', 0));
     }
 
     public function testGetJson()
