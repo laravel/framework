@@ -4,10 +4,14 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Repository;
+use Illuminate\Cache\SessionStore;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
@@ -397,6 +401,71 @@ class RepositoryTest extends TestCase
         $this->assertSame('posts-refreshed', $posts->get('profile'));
 
         $usersLock->release();
+    }
+
+    public function testFlexibleWaitsForConcurrentPopulationOnColdMiss(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        Sleep::fake();
+
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        // Another process is already computing the value...
+        $lock = $cache->lock('illuminate:cache:flexible:lock:foo', 10);
+        $this->assertTrue($lock->acquire());
+
+        Sleep::whenFakingSleep(function () use ($cache, $lock) {
+            $cache->putMany([
+                'foo' => 'computed elsewhere',
+                Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo' => Carbon::now()->getTimestamp(),
+            ], 20);
+
+            $lock->release();
+        });
+
+        $value = $cache->flexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        });
+
+        $this->assertSame('computed elsewhere', $value);
+        $this->assertSame(0, $count);
+        Sleep::assertSleptTimes(1);
+    }
+
+    public function testFlexibleComputesValueWhenColdMissLockTimesOut(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        Sleep::fake(syncWithCarbon: true);
+
+        $cache = Cache::driver('array');
+
+        $lock = $cache->lock('illuminate:cache:flexible:lock:foo');
+        $this->assertTrue($lock->acquire());
+
+        $value = $cache->flexible('foo', [10, 20], fn () => 'bar', ['seconds' => 1]);
+
+        $this->assertSame('bar', $value);
+        $this->assertSame('bar', $cache->get('foo'));
+        Sleep::assertSleptTimes(3);
+
+        $lock->release();
+    }
+
+    public function testFlexibleReleasesColdMissLockAfterPopulating(): void
+    {
+        $cache = Cache::driver('array');
+
+        $this->assertSame('bar', $cache->flexible('foo', [10, 20], fn () => 'bar'));
+        $this->assertTrue($cache->lock('illuminate:cache:flexible:lock:foo')->acquire());
+    }
+
+    public function testFlexibleWorksWithStoresThatDoNotSupportLocks(): void
+    {
+        $cache = new Repository(new SessionStore(new Store('test', new ArraySessionHandler(10))));
+
+        $this->assertSame('bar', $cache->flexible('foo', [10, 20], fn () => 'bar'));
+        $this->assertSame('bar', $cache->get('foo'));
     }
 }
 

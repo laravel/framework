@@ -26,6 +26,7 @@ use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -682,10 +683,9 @@ class Repository implements ArrayAccess, CacheContract
         ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
 
         if (in_array(null, [$value, $created], true)) {
-            return tap(value($callback), fn ($value) => $this->putMany([
-                $key => $value,
-                self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
-            ], $ttl[1]));
+            return $this->store instanceof LockProvider
+                ? $this->populateFlexible($key, $ttl, $callback, $lock)
+                : $this->putFlexible($key, $ttl, $callback);
         }
 
         if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
@@ -702,16 +702,66 @@ class Repository implements ArrayAccess, CacheContract
                     return;
                 }
 
-                $this->putMany([
-                    $key => value($callback),
-                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
-                ], $ttl[1]);
+                $this->putFlexible($key, $ttl, $callback);
             });
         };
 
         defer($refresh, "illuminate:cache:flexible:{$this->itemKey($key)}", $alwaysDefer);
 
         return $value;
+    }
+
+    /**
+     * Populate a missing flexible item while other processes wait for the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @return TCacheValue
+     */
+    protected function populateFlexible($key, $ttl, $callback, $lock)
+    {
+        $seconds = $lock['seconds'] ?? 10;
+
+        try {
+            return $this->store->lock(
+                "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
+                $seconds,
+                $lock['owner'] ?? null,
+            )->block($seconds, function () use ($key, $ttl, $callback) {
+                [
+                    $key => $value,
+                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
+                ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
+
+                return in_array(null, [$value, $created], true)
+                    ? $this->putFlexible($key, $ttl, $callback)
+                    : $value;
+            });
+        } catch (LockTimeoutException) {
+            return $this->putFlexible($key, $ttl, $callback);
+        }
+    }
+
+    /**
+     * Resolve the callback and store its result as a fresh flexible item.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @return TCacheValue
+     */
+    protected function putFlexible($key, $ttl, $callback)
+    {
+        return tap(value($callback), fn ($value) => $this->putMany([
+            $key => $value,
+            self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+        ], $ttl[1]));
     }
 
     /**
