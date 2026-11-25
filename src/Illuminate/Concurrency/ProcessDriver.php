@@ -6,12 +6,13 @@ use Carbon\CarbonInterval;
 use Closure;
 use Exception;
 use Illuminate\Console\Application;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Concurrency\Driver;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Defer\DeferredCallback;
-use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
 use RuntimeException;
@@ -45,8 +46,7 @@ class ProcessDriver implements Driver
 
                 $process = $pool->as($key)->path(base_path())->env([
                     'LARAVEL_CONCURRENCY_HMAC_KEY' => $envelopeKeys[$key],
-                    /** @phpstan-ignore staticMethod.notFound */
-                    '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
+                    '__LARAVEL_CONTEXT' => $this->dehydrateContext(),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
                     ),
@@ -107,6 +107,14 @@ class ProcessDriver implements Driver
     }
 
     /**
+     * Get the dehydrated context to pass to the child process.
+     */
+    protected function dehydrateContext(): string|false
+    {
+        return json_encode(Container::getInstance()->make(ContextRepository::class)->dehydrate());
+    }
+
+    /**
      * Start the given tasks in the background after the current task has finished.
      */
     public function defer(Closure|array $tasks): DeferredCallback
@@ -116,8 +124,7 @@ class ProcessDriver implements Driver
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
                 $this->processFactory->path(base_path())->env([
-                    /** @phpstan-ignore staticMethod.notFound */
-                    '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
+                    '__LARAVEL_CONTEXT' => $this->dehydrateContext(),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
                     ),
