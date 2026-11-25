@@ -143,7 +143,7 @@ class PostgresConnection extends Connection
     public function hasCommitId(string $value, int $wait = 0)
     {
         if ($wait > 0) {
-            if (version_compare($this->getServerVersion(), '19', '<')) {
+            if (version_compare($this->getReadPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), '19', '<')) {
                 throw new RuntimeException('The PostgreSQL version does not support waiting for a commit ID. PostgreSQL 19 or newer is required.');
             }
 

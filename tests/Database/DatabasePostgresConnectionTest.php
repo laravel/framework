@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\PostgresConnection;
 use PDO;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabasePostgresConnectionTest extends TestCase
 {
@@ -73,6 +75,22 @@ class DatabasePostgresConnectionTest extends TestCase
         $connection->setReadWriteType('direct');
 
         $this->assertSame([1, 0], $connection->prepareBindings([true, false]));
+    }
+
+    public function testHasCommitIdWithWaitDoesNotConnectToTheWriteConnection()
+    {
+        $statement = $this->createStub(PDOStatement::class);
+        $statement->method('fetchAll')->willReturn([(object) ['status' => 'success']]);
+
+        $readPdo = $this->createStub(PDO::class);
+        $readPdo->method('getAttribute')->willReturn('19.0');
+        $readPdo->method('quote')->willReturnCallback(fn ($value) => "'{$value}'");
+        $readPdo->method('prepare')->willReturn($statement);
+
+        $connection = new PostgresConnection(fn () => throw new RuntimeException('Connected to the write connection.'));
+        $connection->setReadPdo($readPdo);
+
+        $this->assertTrue($connection->hasCommitId('0/16B3748', wait: 1));
     }
 }
 
