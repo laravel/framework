@@ -1173,6 +1173,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'Hell[*] ?orld[?]*'], $builder->getBindings());
 
         $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereLike('description', '[Hello] %_', true);
+        $this->assertSame('select * from "users" where "description" glob ?', $builder->toSql());
+        $this->assertEquals([0 => '[[]Hello[]] *?'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereNotLike('id', '1');
         $this->assertSame('select * from "users" where "id" not like ?', $builder->toSql());
         $this->assertEquals([0 => '1'], $builder->getBindings());

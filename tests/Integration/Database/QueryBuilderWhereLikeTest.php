@@ -107,4 +107,27 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
         $this->assertSame('Earl.Smith@example.com', $users[0]->email);
         $this->assertSame('tim.smith@example.com', $users[1]->email);
     }
+
+    public function testWhereLikeWithBracketsCaseSensitive()
+    {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('The case-sensitive whereLike clause is not supported on MSSQL.');
+        }
+
+        DB::table('users')->insert([
+            ['name' => 'Tim [Admin]', 'email' => 'tim.admin@example.com'],
+            ['name' => 'Tim Admin', 'email' => 'tim.admin2@example.com'],
+        ]);
+
+        $users = DB::table('users')->whereLike('name', 'Tim [Admin]', true)->get();
+        $this->assertCount(1, $users);
+        $this->assertSame('Tim [Admin]', $users[0]->name);
+
+        $users = DB::table('users')->whereLike('name', '%[%', true)->get();
+        $this->assertCount(1, $users);
+        $this->assertSame('Tim [Admin]', $users[0]->name);
+
+        $this->assertSame(0, DB::table('users')->whereLike('name', 'tim [admin]', true)->count());
+        $this->assertSame(6, DB::table('users')->whereNotLike('name', '%]', true)->count());
+    }
 }

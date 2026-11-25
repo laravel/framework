@@ -70,11 +70,18 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareWhereLikeBinding($value, $caseSensitive)
     {
-        return $caseSensitive === false ? $value : str_replace(
-            ['*', '?', '%', '_'],
-            ['[*]', '[?]', '*', '?'],
-            $value
-        );
+        if ($caseSensitive === false) {
+            return $value;
+        }
+
+        return strtr($value, [
+            '[' => '[[]',
+            ']' => '[]]',
+            '*' => '[*]',
+            '?' => '[?]',
+            '%' => '*',
+            '_' => '?',
+        ]);
     }
 
     /**
