@@ -348,6 +348,19 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an "order by" clause with explicit null placement.
+     *
+     * @param  array  $order
+     * @return string
+     */
+    protected function compileNullsOrder($order)
+    {
+        $column = $this->wrap($order['column']);
+
+        return $column.($order['nulls'] === 'last' ? ' is null' : ' is not null').', '.$column.' '.$order['sort'];
+    }
+
+    /**
      * Compile the random statement into SQL.
      *
      * @param  string|int  $seed

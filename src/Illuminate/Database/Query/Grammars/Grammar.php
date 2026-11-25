@@ -1065,6 +1065,10 @@ class Grammar extends BaseGrammar
                 return $this->compileInOrderOf($order);
             }
 
+            if (isset($order['type']) && $order['type'] === 'Nulls') {
+                return $this->compileNullsOrder($order);
+            }
+
             return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
     }
@@ -1086,6 +1090,17 @@ class Grammar extends BaseGrammar
         }
 
         return 'case '.implode(' ', $cases).' else '.count($order['values']).' end';
+    }
+
+    /**
+     * Compile an "order by" clause with explicit null placement.
+     *
+     * @param  array  $order
+     * @return string
+     */
+    protected function compileNullsOrder($order)
+    {
+        return $this->wrap($order['column']).' '.$order['sort'].' nulls '.$order['nulls'];
     }
 
     /**

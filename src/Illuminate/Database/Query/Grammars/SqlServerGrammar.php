@@ -315,6 +315,19 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile an "order by" clause with explicit null placement.
+     *
+     * @param  array  $order
+     * @return string
+     */
+    protected function compileNullsOrder($order)
+    {
+        $column = $this->wrap($order['column']);
+
+        return 'case when '.$column.' is null then '.($order['nulls'] === 'last' ? '1 else 0' : '0 else 1').' end, '.$column.' '.$order['sort'];
+    }
+
+    /**
      * Compile the random statement into SQL.
      *
      * @param  string|int  $seed

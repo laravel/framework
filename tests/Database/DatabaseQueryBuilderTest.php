@@ -44,6 +44,7 @@ use JMac\Testing\Matching\Argument;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use SortDirection;
 use stdClass;
 
 include_once 'Fixtures/Enums/Enums.php';
@@ -2613,6 +2614,41 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->inOrderOf('status', ['active']);
         $this->assertSame('select * from "users" order by case when "status" = ? then 0 else 1 end', $builder->toSql());
         $this->assertEquals(['active'], $builder->getBindings());
+    }
+
+    public function testOrderByNulls()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByNullsLast('email')->orderByNullsFirst('name', 'desc');
+        $this->assertSame('select * from "users" order by "email" asc nulls last, "name" desc nulls first', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->orderByNullsLast('email', SortDirection::Descending);
+        $this->assertSame('select * from "users" order by "email" desc nulls last', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->orderByNullsFirst('email');
+        $this->assertSame('select * from "users" order by "email" asc nulls first', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByNullsLast('email')->orderByNullsFirst('name', 'desc');
+        $this->assertSame('select * from `users` order by `email` is null, `email` asc, `name` is not null, `name` desc', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->orderByNullsLast('email', 'desc');
+        $this->assertSame('select * from `users` order by `email` is null, `email` desc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByNullsLast('email')->orderByNullsFirst('name', 'desc');
+        $this->assertSame('select * from [users] order by case when [email] is null then 1 else 0 end, [email] asc, case when [name] is null then 0 else 1 end, [name] desc', $builder->toSql());
+    }
+
+    public function testOrderByNullsWithInvalidDirection()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Order direction must be a SortDirection, "asc" or "desc".');
+
+        $this->getBuilder()->select('*')->from('users')->orderByNullsLast('email', 'sideways');
     }
 
     public function testInOrderOfMySql()

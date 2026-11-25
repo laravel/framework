@@ -144,6 +144,26 @@ class QueryBuilderTest extends DatabaseTestCase
         Schema::drop('accounting');
     }
 
+    public function testOrderByNulls()
+    {
+        Schema::create('tasks', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->date('due_at')->nullable();
+        });
+
+        DB::table('tasks')->insert([
+            ['name' => 'Someday', 'due_at' => null],
+            ['name' => 'Later', 'due_at' => '2026-03-01'],
+            ['name' => 'Soon', 'due_at' => '2026-01-01'],
+        ]);
+
+        $this->assertSame(['Soon', 'Later', 'Someday'], DB::table('tasks')->orderByNullsLast('due_at')->pluck('name')->all());
+        $this->assertSame(['Later', 'Soon', 'Someday'], DB::table('tasks')->orderByNullsLast('due_at', 'desc')->pluck('name')->all());
+        $this->assertSame(['Someday', 'Soon', 'Later'], DB::table('tasks')->orderByNullsFirst('due_at')->pluck('name')->all());
+        $this->assertSame(['Someday', 'Later', 'Soon'], DB::table('tasks')->orderByNullsFirst('due_at', 'desc')->pluck('name')->all());
+    }
+
     public function testSole()
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];

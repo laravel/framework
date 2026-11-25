@@ -3049,7 +3049,75 @@ class Builder implements BuilderContract
             $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
         }
 
-        $direction = match (true) {
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => $column,
+            'direction' => $this->normalizeOrderDirection($direction),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add an "order by" clause to the query that sorts null values last.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  SortDirection|'asc'|'desc'  $direction
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function orderByNullsLast($column, $direction = SortDirection::Ascending)
+    {
+        return $this->addNullsOrder($column, $direction, 'last');
+    }
+
+    /**
+     * Add an "order by" clause to the query that sorts null values first.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  SortDirection|'asc'|'desc'  $direction
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function orderByNullsFirst($column, $direction = SortDirection::Ascending)
+    {
+        return $this->addNullsOrder($column, $direction, 'first');
+    }
+
+    /**
+     * Add an "order by" clause with explicit null placement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  SortDirection|'asc'|'desc'  $direction
+     * @param  'first'|'last'  $nulls
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function addNullsOrder($column, $direction, $nulls)
+    {
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'type' => 'Nulls',
+            'column' => $column,
+            'sort' => $this->normalizeOrderDirection($direction),
+            'nulls' => $nulls,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Normalize the given order direction to "asc" or "desc".
+     *
+     * @param  SortDirection|string  $direction
+     * @return 'asc'|'desc'
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function normalizeOrderDirection($direction)
+    {
+        return match (true) {
             $direction instanceof SortDirection => match ($direction) {
                 SortDirection::Ascending => 'asc',
                 SortDirection::Descending => 'desc',
@@ -3058,13 +3126,6 @@ class Builder implements BuilderContract
             strtolower($direction) === 'desc' => 'desc',
             default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc".'),
         };
-
-        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
-            'column' => $column,
-            'direction' => $direction,
-        ];
-
-        return $this;
     }
 
     /**
