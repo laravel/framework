@@ -97,15 +97,27 @@ trait DatabaseTruncation
                     return $tables->reject(fn (array $table) => $this->tableExistsIn($table, $exceptTables));
                 }
             )
-            ->each(function (array $table) use ($connection) {
-                $connection->withoutTablePrefix(function ($connection) use ($table) {
-                    $table = $connection->table($table['schema_qualified_name']);
+            ->pluck('schema_qualified_name')
+            ->chunk(100)
+            ->each(fn ($tables) => $connection->withoutTablePrefix(function ($connection) use ($tables) {
+                // Check these tables for rows in a single query...
+                $query = $connection->query();
 
+                $tables->each(
+                    fn ($table, $key) => $query->selectSub($connection->table($table)->selectRaw('1')->limit(1), $key)
+                );
+
+                $hasRows = (array) $query->first();
+
+                $tables->filter(fn ($table, $key) => $hasRows[$key])->each(function ($table) use ($connection) {
+                    $table = $connection->table($table);
+
+                    // A previous truncation may have already emptied this table...
                     if ($table->exists()) {
                         $table->truncate();
                     }
                 });
-            });
+            }));
 
         $connection->setEventDispatcher($dispatcher);
     }

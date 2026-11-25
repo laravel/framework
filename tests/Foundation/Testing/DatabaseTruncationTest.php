@@ -174,10 +174,23 @@ class DatabaseTruncationTest extends TestCase
         $this->assertEquals(['public.foo', 'public.bar', 'my_schema.foo', 'my_schema.baz'], $truncatedTables);
     }
 
+    public function testTruncateTablesInChunks()
+    {
+        $connection = $this->arrangeConnection($truncatedTables, array_map(
+            fn ($i) => ['schema' => null, 'name' => "foo_{$i}", 'schema_qualified_name' => "foo_{$i}"], range(1, 101)
+        ), tablesWithRows: ['foo_1', 'foo_100', 'foo_101'], emptiedTables: ['foo_100']);
+
+        $this->truncateTablesForConnection($connection, 'test');
+
+        $this->assertEquals(['foo_1', 'foo_101'], $truncatedTables);
+        $connection->received('query')->times(2);
+    }
+
     private function arrangeConnection(
-        ?array &$actual, array $allTables, string $prefix = '', ?string $builder = null, ?array $schemas = []
+        ?array &$actual, array $allTables, string $prefix = '', ?string $builder = null, ?array $schemas = [], ?array $tablesWithRows = null, array $emptiedTables = []
     ): Connection {
         $actual = [];
+        $tablesWithRows ??= array_column($allTables, 'schema_qualified_name');
 
         $schema = Double::for($builder ?? Builder::class);
         $schema->expects('getTables')->with($schemas)->returns(empty($schemas)
@@ -195,12 +208,30 @@ class DatabaseTruncationTest extends TestCase
         $connection->allows('withoutTablePrefix')->resolves(function ($callback) use ($connection) {
             $callback($connection);
         });
-        $connection->allows('table')->resolves(function (string $tableName) use (&$actual) {
-            $actual[] = $tableName;
+        $connection->allows('query')->resolves(function () use ($tablesWithRows) {
+            $columns = [];
 
+            $query = Double::for(QueryBuilder::class);
+            $query->allows('selectSub')->resolves(function ($table, $key) use ($query, &$columns) {
+                $columns[$key] = $table->from;
+
+                return $query;
+            });
+            $query->allows('first')->resolves(function () use ($tablesWithRows, &$columns) {
+                return (object) array_map(fn ($table) => in_array($table, $tablesWithRows), $columns);
+            });
+
+            return $query;
+        });
+        $connection->allows('table')->resolves(function (string $tableName) use (&$actual, $emptiedTables) {
             $table = Double::for(QueryBuilder::class);
-            $table->expects('exists')->returns(true);
-            $table->expects('truncate');
+            $table->from = $tableName;
+            $table->allows('selectRaw')->returns($table);
+            $table->allows('limit')->returns($table);
+            $table->allows('exists')->returns(! in_array($tableName, $emptiedTables));
+            $table->allows('truncate')->resolves(function () use (&$actual, $tableName) {
+                $actual[] = $tableName;
+            });
 
             return $table;
         });
