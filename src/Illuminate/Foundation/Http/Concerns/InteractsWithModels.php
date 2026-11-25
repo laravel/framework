@@ -60,7 +60,7 @@ trait InteractsWithModels
     public function models($key, $modelClass = null, ?Closure $callback = null)
     {
         return $this->newModelQuery($key, $modelClass, $callback)
-            ->findMany($this->array($key));
+            ->findMany($this->modelIdentifiers($key));
     }
 
     /**
@@ -74,6 +74,20 @@ trait InteractsWithModels
         $id = $this->input($key);
 
         return $this->isNotFilled($key) || is_array($id) ? null : $id;
+    }
+
+    /**
+     * Get the model identifiers from the given input.
+     *
+     * @param  string  $key
+     * @return array<int, mixed>
+     */
+    protected function modelIdentifiers($key)
+    {
+        return array_values(array_filter(
+            $this->array($key),
+            fn ($id) => ! is_array($id)
+        ));
     }
 
     /**
