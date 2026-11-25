@@ -421,6 +421,28 @@ class ValidationRulesTest extends TestCase
         $this->assertFalse($this->passes($schema, ['target' => ['email' => 'nope']]));
     }
 
+    public function test_an_optional_any_of_accepts_an_empty_array_or_object_branch()
+    {
+        $schema = $this->schema(fn ($s) => [
+            'tags' => $s->union(['array', 'string']),
+            'meta' => $s->anyOf([$s->object(), $s->string()]),
+            'id' => $s->union(['integer', 'string']),
+        ]);
+
+        $this->assertTrue($this->passes($schema, ['tags' => []]));
+        $this->assertTrue($this->passes($schema, ['meta' => []]));
+        $this->assertFalse($this->passes($schema, ['id' => []]));
+        $this->assertFalse($this->passes($schema, ['tags' => null]));
+    }
+
+    public function test_a_required_any_of_rejects_an_empty_array_like_a_required_array()
+    {
+        $schema = $this->schema(fn ($s) => ['tags' => $s->union(['array', 'string'])->required()]);
+
+        $this->assertFalse($this->passes($schema, ['tags' => []]));
+        $this->assertTrue($this->passes($schema, ['tags' => ['php']]));
+    }
+
     public function test_nullable_union_accepts_null()
     {
         $schema = $this->schema(fn ($s) => ['id' => $s->union(['string', 'integer', 'null'])->required()]);

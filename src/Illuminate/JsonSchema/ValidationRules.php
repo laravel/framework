@@ -286,7 +286,7 @@ class ValidationRules
         $schemas = array_filter($schemas, fn (array $schema) => ($schema['type'] ?? null) !== 'null');
 
         return new MatchesAnyOf(array_values(array_map(
-            fn (array $schema) => $this->rules($schema, 'value', true), $schemas,
+            fn (array $schema) => $this->rules($schema, 'value', false), $schemas,
         )));
     }
 
