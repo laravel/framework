@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
 use Illuminate\Support\Stringable;
+use InvalidArgumentException;
+use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
 use stdClass;
 use Symfony\Component\Uid\Ulid;
@@ -424,7 +426,13 @@ trait InteractsWithData
             return null;
         }
 
-        return Uuid::fromString($this->data($key));
+        $value = $this->data($key);
+
+        if (is_array($value)) {
+            throw new InvalidUuidStringException('Invalid UUID string: array given.');
+        }
+
+        return Uuid::fromString($value);
     }
 
     /**
@@ -441,7 +449,13 @@ trait InteractsWithData
             return null;
         }
 
-        return new Ulid($this->data($key));
+        $value = $this->data($key);
+
+        if (is_array($value)) {
+            throw new InvalidArgumentException('Invalid ULID: array given.');
+        }
+
+        return new Ulid($value);
     }
 
     /**
