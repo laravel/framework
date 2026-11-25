@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\PerPage;
 use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\With;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
@@ -425,6 +427,64 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithRefreshesAttributeAndProperty;
 
         $this->assertSame(['email'], $model->getRefreshes());
+    }
+
+    public function test_with_attribute(): void
+    {
+        $query = (new ModelWithWithAttribute)->newQuery();
+
+        $this->assertSame(['author', 'tags'], array_keys($query->getEagerLoads()));
+    }
+
+    public function test_with_attribute_variadic(): void
+    {
+        $query = (new ModelWithWithAttributeVariadic)->newQuery();
+
+        $this->assertSame(['author', 'tags'], array_keys($query->getEagerLoads()));
+    }
+
+    public function test_with_property_takes_precedence(): void
+    {
+        $query = (new ModelWithWithAttributeAndProperty)->newQuery();
+
+        $this->assertSame(['comments'], array_keys($query->getEagerLoads()));
+    }
+
+    public function test_without_removes_relations_from_with_attribute(): void
+    {
+        $query = ModelWithWithAttribute::without('author');
+
+        $this->assertSame(['tags'], array_keys($query->getEagerLoads()));
+    }
+
+    public function test_per_page_attribute(): void
+    {
+        $this->assertSame(50, (new ModelWithPerPageAttribute)->getPerPage());
+    }
+
+    public function test_per_page_property_takes_precedence(): void
+    {
+        $this->assertSame(25, (new ModelWithPerPageAttributeAndProperty)->getPerPage());
+    }
+
+    public function test_per_page_attribute_is_used_by_paginate(): void
+    {
+        DB::schema()->create('per_page_models', function ($table) {
+            $table->id();
+        });
+
+        $paginator = ModelWithPerPageAttribute::query()->paginate();
+
+        $this->assertSame(50, $paginator->perPage());
+    }
+
+    public function test_set_per_page_overrides_per_page_attribute(): void
+    {
+        $model = new ModelWithPerPageAttribute;
+
+        $model->setPerPage(10);
+
+        $this->assertSame(10, $model->getPerPage());
     }
 
     public function test_merge_fillable_works_with_attribute(): void
@@ -902,6 +962,34 @@ class ModelWithRefreshesAttributeVariadic extends ModelWithRefreshesAttribute
 class ModelWithRefreshesAttributeAndProperty extends ModelWithRefreshesAttribute
 {
     protected array $refreshes = ['email'];
+}
+
+#[With(['author', 'tags'])]
+class ModelWithWithAttribute extends Model
+{
+    //
+}
+
+#[With('author', 'tags')]
+class ModelWithWithAttributeVariadic extends Model
+{
+    //
+}
+
+class ModelWithWithAttributeAndProperty extends ModelWithWithAttribute
+{
+    protected $with = ['comments'];
+}
+
+#[PerPage(50)]
+class ModelWithPerPageAttribute extends Model
+{
+    protected $table = 'per_page_models';
+}
+
+class ModelWithPerPageAttributeAndProperty extends ModelWithPerPageAttribute
+{
+    protected $perPage = 25;
 }
 
 #[DateFormat('Y-m-d')]
