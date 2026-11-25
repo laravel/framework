@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Http\Concerns;
 
 use Closure;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 trait InteractsWithModels
 {
@@ -107,12 +107,20 @@ trait InteractsWithModels
     /**
      * Guess the model class for the given input key.
      *
+     * Nested keys use their last segment, so "items.*.product_id" guesses "Product".
+     *
      * @param  string  $key
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function guessModelClass($key)
     {
-        $name = Str::studly(Str::singular(Str::chopEnd($key, ['_ids', '_id'])));
+        $name = (new Stringable($key))
+            ->chopEnd(['_ids', '_id', '.ids', '.id'])
+            ->replace('.*', '')
+            ->afterLast('.')
+            ->singular()
+            ->studly()
+            ->toString();
 
         $namespace = $this->container->getNamespace();
 

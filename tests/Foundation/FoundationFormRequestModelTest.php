@@ -73,6 +73,24 @@ class FoundationFormRequestModelTest extends TestCase
         $this->assertTrue($request->model('blog_post_id')->is($post));
     }
 
+    #[DataProvider('nestedKeyProvider')]
+    public function testModelClassCanBeDiscoveredFromANestedInputKey($key, $input)
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequest::create('/', 'POST', $input($post->id));
+        $request->setContainer($this->app);
+
+        $this->assertTrue($request->model($key)->is($post));
+    }
+
+    public static function nestedKeyProvider()
+    {
+        return [
+            ['comment.blog_post_id', fn ($id) => ['comment' => ['blog_post_id' => $id]]],
+            ['blog_post.id', fn ($id) => ['blog_post' => ['id' => $id]]],
+        ];
+    }
+
     public function testDiscoveryPrefersTheModelsNamespaceWhenBothClassesExist()
     {
         $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
@@ -353,6 +371,28 @@ class FoundationFormRequestModelTest extends TestCase
         return [
             ['blog_post_ids'],
             ['blog_posts'],
+        ];
+    }
+
+    #[DataProvider('nestedCollectionKeyProvider')]
+    public function testModelsCanDiscoverTheModelClassFromANestedInputKey($key, $input)
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequest::create('/', 'POST', $input($post->id));
+        $request->setContainer($this->app);
+
+        $models = $request->models($key);
+
+        $this->assertSame(BlogPost::class, $models->first()::class);
+        $this->assertSame([$post->id], $models->modelKeys());
+    }
+
+    public static function nestedCollectionKeyProvider()
+    {
+        return [
+            ['comment.blog_post_ids', fn ($id) => ['comment' => ['blog_post_ids' => [$id]]]],
+            ['items.*.blog_post_id', fn ($id) => ['items' => [['blog_post_id' => $id]]]],
+            ['blog_posts.*.id', fn ($id) => ['blog_posts' => [['id' => $id]]]],
         ];
     }
 
