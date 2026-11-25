@@ -332,6 +332,26 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Store multiple items in the cache indefinitely with one upsert per chunk.
+     *
+     * @param  array  $values
+     * @return array<array-key, bool>
+     *
+     * @internal
+     */
+    public function foreverMany(array $values)
+    {
+        $results = [];
+
+        // Chunks keep each query under the bound parameter limits of SQL Server and older SQLite versions...
+        foreach (array_chunk($values, 250, true) as $chunk) {
+            $results += array_fill_keys(array_keys($chunk), $this->putMany($chunk, 315360000));
+        }
+
+        return $results;
+    }
+
+    /**
      * Get a lock instance.
      *
      * @param  string  $name
@@ -388,6 +408,23 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     public function forget($key)
     {
         return $this->forgetMany([$key]);
+    }
+
+    /**
+     * Remove multiple items from the cache with one query per chunk.
+     *
+     * @param  array  $keys
+     * @return list<bool>
+     *
+     * @internal
+     */
+    public function forgetManyKeys(array $keys)
+    {
+        foreach (array_chunk(array_values(array_unique($keys)), 250) as $chunk) {
+            $this->forgetMany($chunk);
+        }
+
+        return array_fill(0, count($keys), true);
     }
 
     /**
