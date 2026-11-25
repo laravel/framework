@@ -803,6 +803,39 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/1', $url->route('foo', ['bar' => 1]));
     }
 
+    public function testRouteParametersContainingBracesAreEncoded()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'foo/{bar}', ['as' => 'foo', function () {
+            //
+        }]));
+
+        $routes->add(new Route(['GET'], 'baz/{bar}/{qux?}', ['as' => 'baz', function () {
+            //
+        }]));
+
+        // Braces in a value must not be mistaken for an unfilled route parameter...
+        $this->assertSame('http://www.foo.com/foo/%7Bfancy%7D', $url->route('foo', ['bar' => '{fancy}']));
+        $this->assertSame('http://www.foo.com/foo/%7Bfancy%7D', $url->route('foo', ['{fancy}']));
+        $this->assertSame('http://www.foo.com/foo/%7Bbar%7D', $url->route('foo', ['bar' => '{bar}']));
+        $this->assertSame('http://www.foo.com/foo/%7Bfancy', $url->route('foo', ['bar' => '{fancy']));
+        $this->assertSame('http://www.foo.com/foo/%7B%7D', $url->route('foo', ['bar' => '{}']));
+
+        // Including values that look like an optional parameter...
+        $this->assertSame('http://www.foo.com/baz/%7Bqux%3F%7D', $url->route('baz', ['bar' => '{qux?}']));
+        $this->assertSame('http://www.foo.com/baz/%7Bbar%7D/%7Bqux%7D', $url->route('baz', ['bar' => '{bar}', 'qux' => '{qux}']));
+
+        // Encoded values are still decoded to the original value by the router...
+        $this->assertSame('{fancy}', rawurldecode('%7Bfancy%7D'));
+
+        // Values that have already been encoded are used as-is...
+        $this->assertSame('http://www.foo.com/foo/%7Bfancy%7D', $url->route('foo', ['bar' => new EncodedParameter('%7Bfancy%7D')]));
+    }
+
     public function testEncodedRouteParametersAreNotEncodedAgain()
     {
         $url = new UrlGenerator(

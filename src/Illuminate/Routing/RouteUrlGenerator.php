@@ -384,7 +384,7 @@ class RouteUrlGenerator
         }
 
         return is_string($value) || $value instanceof Stringable
-            ? strtr((string) $value, ['%' => '%25', '?' => '%3F', '#' => '%23'])
+            ? strtr((string) $value, ['%' => '%25', '?' => '%3F', '#' => '%23', '{' => '%7B', '}' => '%7D'])
             : $value;
     }
 
