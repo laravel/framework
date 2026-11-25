@@ -135,6 +135,25 @@ class MigratorEventsTest extends TestCase
         });
     }
 
+    public function testMigrationEndedEventContainsTheDuration()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', $this->migrateOptions());
+        $this->artisan('migrate:rollback', $this->migrateOptions());
+
+        Event::assertDispatched(MigrationEnded::class, function ($event) {
+            return $event->method === 'up'
+                && is_float($event->duration)
+                && $event->duration >= 0;
+        });
+        Event::assertDispatched(MigrationEnded::class, function ($event) {
+            return $event->method === 'down'
+                && is_float($event->duration)
+                && $event->duration >= 0;
+        });
+    }
+
     public function testTheNoMigrationEventIsFiredWhenNothingToMigrate()
     {
         Event::fake();
