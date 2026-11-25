@@ -36,6 +36,28 @@ class BladeTest extends TestCase
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
     }
 
+    public function test_rendering_blade_string_is_never_resolved_as_a_view_name()
+    {
+        $this->assertTrue(View::exists('hello'));
+
+        $this->assertSame('hello', Blade::render('hello'));
+    }
+
+    public function test_rendering_blade_string_with_delete_cached_view_does_not_delete_a_view_of_the_same_name()
+    {
+        $directory = sys_get_temp_dir().'/blade-render-'.uniqid();
+        mkdir($directory);
+        file_put_contents($directory.'/greeting.blade.php', 'Hi');
+        View::addLocation($directory);
+
+        Blade::render('greeting', [], deleteCachedView: true);
+
+        $this->assertFileExists($directory.'/greeting.blade.php');
+
+        unlink($directory.'/greeting.blade.php');
+        rmdir($directory);
+    }
+
     public function test_rendering_blade_long_maxpathlen_string()
     {
         $longString = str_repeat('a', PHP_MAXPATHLEN);

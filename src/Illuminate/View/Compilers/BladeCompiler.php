@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
+use Illuminate\View\RawTemplate;
 use InvalidArgumentException;
 use ParseError;
 
@@ -352,7 +353,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             public function render()
             {
-                return $this->template;
+                return new RawTemplate($this->template);
             }
         };
 
