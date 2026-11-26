@@ -58,6 +58,32 @@ class HttpResponseTest extends TestCase
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }
 
+    public function testConstructorSetsHeadersStatusAndProtocolVersionWithoutDeprecations()
+    {
+        $deprecations = [];
+
+        set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, E_USER_DEPRECATED | E_DEPRECATED);
+
+        try {
+            $response = new Response(['foo' => 'bar'], 201, ['X-Foo' => 'baz']);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertInstanceOf(ResponseHeaderBag::class, $response->headers);
+        $this->assertSame('baz', $response->headers->get('X-Foo'));
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame(['foo' => 'bar'], $response->getOriginalContent());
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('1.0', $response->getProtocolVersion());
+    }
+
     public function testRenderablesAreRendered()
     {
         $renderable = new class implements Renderable
