@@ -902,7 +902,8 @@ class Validator implements ValidatorContract
             return $this->isImplicit($rule);
         }
 
-        return $this->validatePresent($attribute, $value) ||
+        return ! is_null($value) ||
+               $this->validatePresent($attribute, $value) ||
                $this->isImplicit($rule);
     }
 
@@ -1044,8 +1045,8 @@ class Validator implements ValidatorContract
         // In case the attribute has any rule that indicates that the field is required
         // and that rule already failed then we should stop validation at this point
         // as now there is no point in calling other rules with this field empty.
-        return $this->hasRule($attribute, $this->implicitRules) &&
-               isset($this->failedRules[$cleanedAttribute]) &&
+        return isset($this->failedRules[$cleanedAttribute]) &&
+               $this->hasRule($attribute, $this->implicitRules) &&
                array_intersect(array_keys($this->failedRules[$cleanedAttribute]), $this->implicitRules);
     }
 
