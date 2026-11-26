@@ -20,6 +20,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use ReflectionClass;
 
+/**
+ * @method TModel|null model<TModel of \Illuminate\Database\Eloquent\Model>(string $key, class-string<TModel>|\Closure|null $modelClass = null, \Closure|null $callback = null)
+ * @method TModel modelOrFail<TModel of \Illuminate\Database\Eloquent\Model>(string $key, class-string<TModel>|\Closure|null $modelClass = null, \Closure|null $callback = null)
+ * @method \Illuminate\Database\Eloquent\Collection<int, TModel> models<TModel of \Illuminate\Database\Eloquent\Model>(string $key, class-string<TModel>|\Closure|null $modelClass = null, \Closure|null $callback = null)
+ */
 class FormRequest extends Request implements ValidatesWhenResolved
 {
     use InteractsWithModels, ValidatesWhenResolvedTrait;
@@ -502,5 +507,23 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public static function flushState(): void
     {
         static::$globalFailOnUnknownFields = false;
+    }
+
+    /**
+     * Dynamically handle calls to the model retrieval helpers.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (in_array($method, ['model', 'modelOrFail', 'models'], true) && ! static::hasMacro($method)) {
+            return $this->{'retrieve'.ucfirst($method)}(...$parameters);
+        }
+
+        return parent::__call($method, $parameters);
     }
 }

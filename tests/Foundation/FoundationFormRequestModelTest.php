@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use BadMethodCallException;
+use Closure;
 use Error;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -49,6 +51,7 @@ class FoundationFormRequestModelTest extends TestCase
     protected function tearDown(): void
     {
         BlogPost::clearBootedModels();
+        FormRequest::flushMacros();
         Model::unsetConnectionResolver();
         $this->db->getConnection()->disconnect();
         Container::setInstance(null);
@@ -505,6 +508,80 @@ class FoundationFormRequestModelTest extends TestCase
 
         $request = FormRequest::create('/', 'POST', ['slugs' => ['first', ['second']]]);
         $this->assertSame(['first'], $request->models('slugs', SlugKeyedBlogPost::class)->modelKeys());
+    }
+
+    public function testFormRequestsMayDefineTheirOwnModelMethods()
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequestWithOwnModelMethods::create('/', 'POST', ['blog_post_ids' => [$post->id]]);
+        $request->setContainer($this->app);
+
+        $this->assertSame('own model', $request->model());
+        $this->assertSame('own model or fail', $request->ownModelOrFail());
+        $this->assertSame([$post->id], $request->models('blog_post_ids')->modelKeys());
+    }
+
+    public function testFormRequestsMayExtendTheModelMethods()
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+        $request = FormRequestExtendingModelMethods::create('/', 'POST', ['blog_post_id' => $post->id]);
+        $request->setContainer($this->app);
+
+        $this->assertSame('own model', $request->model());
+        $this->assertTrue($request->model('blog_post_id')->is($post));
+        $this->assertNull($request->model('blog_post_id', function (Builder $query) {
+            $query->where('account_id', 2);
+        }));
+    }
+
+    public function testMacrosTakePrecedenceOverTheModelMethods()
+    {
+        $post = BlogPost::create(['account_id' => 1, 'slug' => 'first']);
+
+        FormRequest::macro('model', function () {
+            return 'macro';
+        });
+
+        $request = FormRequest::create('/', 'POST', ['blog_post_id' => $post->id]);
+        $request->setContainer($this->app);
+
+        $this->assertSame('macro', $request->model('blog_post_id'));
+        $this->assertTrue($request->modelOrFail('blog_post_id')->is($post));
+    }
+
+    public function testUnknownMethodsStillThrowAnException()
+    {
+        $request = FormRequest::create('/', 'POST');
+
+        $this->expectException(BadMethodCallException::class);
+
+        $request->retrieveModel('blog_post_id');
+    }
+}
+
+class FormRequestWithOwnModelMethods extends FormRequest
+{
+    public function model()
+    {
+        return 'own model';
+    }
+
+    protected function modelOrFail(): string
+    {
+        return 'own model or fail';
+    }
+
+    public function ownModelOrFail()
+    {
+        return $this->modelOrFail();
+    }
+}
+
+class FormRequestExtendingModelMethods extends FormRequest
+{
+    public function model($key = null, $modelClass = null, ?Closure $callback = null)
+    {
+        return is_null($key) ? 'own model' : parent::model($key, $modelClass, $callback);
     }
 }
 

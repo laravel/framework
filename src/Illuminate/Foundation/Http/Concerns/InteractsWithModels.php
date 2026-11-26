@@ -17,7 +17,7 @@ trait InteractsWithModels
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|null  $callback
      * @return TModel|null
      */
-    public function model($key, $modelClass = null, ?Closure $callback = null)
+    protected function retrieveModel($key, $modelClass = null, ?Closure $callback = null)
     {
         if (is_null($id = $this->modelIdentifier($key))) {
             return null;
@@ -40,7 +40,7 @@ trait InteractsWithModels
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
      */
-    public function modelOrFail($key, $modelClass = null, ?Closure $callback = null)
+    protected function retrieveModelOrFail($key, $modelClass = null, ?Closure $callback = null)
     {
         return $this->newModelQuery($key, $modelClass, $callback)
             ->whereKey($this->modelIdentifier($key))
@@ -57,7 +57,7 @@ trait InteractsWithModels
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|null  $callback
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
-    public function models($key, $modelClass = null, ?Closure $callback = null)
+    protected function retrieveModels($key, $modelClass = null, ?Closure $callback = null)
     {
         return $this->newModelQuery($key, $modelClass, $callback)
             ->findMany($this->modelIdentifiers($key));
