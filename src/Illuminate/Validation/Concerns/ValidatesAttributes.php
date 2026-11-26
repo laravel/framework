@@ -938,7 +938,9 @@ trait ValidatesAttributes
 
         $groups ??= $this->groupDistinctValues($values, $mode);
 
-        foreach ($this->getDistinctValueGroups($value, $mode)[1] as $group) {
+        [, $groupsToCompare] = $this->getDistinctValueGroups($value, $mode);
+
+        foreach ($groupsToCompare as $group) {
             if (str_starts_with($group, 'equal-to:')) {
                 $groups[$group] ??= array_slice(array_filter($values, fn ($item) => $item == $value), 0, 2, true);
             }
@@ -959,7 +961,9 @@ trait ValidatesAttributes
         $groups = $counts = [];
 
         foreach ($values as $key => $value) {
-            foreach ($this->getDistinctValueGroups($value, $mode)[0] as $group => $identifier) {
+            [$valueGroups] = $this->getDistinctValueGroups($value, $mode);
+
+            foreach ($valueGroups as $group => $identifier) {
                 $counts[$group][$identifier] ??= 0;
 
                 if (++$counts[$group][$identifier] <= 2) {
@@ -998,7 +1002,7 @@ trait ValidatesAttributes
         $group = match (true) {
             is_string($value) => "string:$value",
             is_int($value) => "integer:$value",
-            is_float($value) => 'float:'.pack('E', $value ?: 0.0),
+            is_float($value) => 'float:'.$this->getDistinctFloatKey($value),
             default => 'value:'.$this->getDistinctValueIdentity($value),
         };
 
@@ -1054,32 +1058,66 @@ trait ValidatesAttributes
             return [['any' => $identity], ["equal-to:$identity"]];
         }
 
-        $float = pack('E', (float) $value ?: 0.0);
+        $float = (float) $value ?: 0.0;
+
+        if (abs($float) >= 2 ** 53) {
+            return $this->getLargeNumberDistinctValueGroups($value, $float);
+        }
+
+        $group = 'number:'.$this->getDistinctFloatKey($float);
+
+        return [[$group => ''], [$group, 'any']];
+    }
+
+    /**
+     * Get the distinct value groups for a number too large to be exact as a float.
+     *
+     * @param  int|float|string  $value
+     * @param  float  $float
+     * @return array{array<string, string>, array<int, string>}
+     */
+    protected function getLargeNumberDistinctValueGroups($value, $float)
+    {
+        $float = $this->getDistinctFloatKey($float);
 
         $number = is_string($value) ? $value + 0 : $value;
 
-        if (is_int($number) && abs($number) < 2 ** 53) {
-            return [["integer:$float" => ''], ["integer:$float", "float:$float", 'any']];
-        }
+        $type = match (true) {
+            is_int($value) => 'int',
+            is_float($value) => 'float',
+            is_int($number) => 'integer-string',
+            is_infinite($number) || preg_match('/^\s*[+-]?\d+\s*\z/', $value) => 'overflowing-string',
+            default => 'float',
+        };
 
-        if (is_int($number)) {
-            $groups = ["integer:$float:$number" => '', "integer:$float" => ''];
+        $exact = match ($type) {
+            'int', 'integer-string' => ["exact:integer:$number"],
+            'overflowing-string' => ["exact:string:$value"],
+            'float' => [],
+        };
 
-            return is_int($value)
-                ? [$groups + ["int-type:$float" => ''], ["integer:$float:$number", "float:$float", "beyond-range:$float", 'any']]
-                : [$groups, ["integer:$float:$number", "float:$float", 'any']];
-        }
+        $typesComparedAsFloats = match ($type) {
+            'int' => ['float', 'overflowing-string'],
+            'integer-string' => ['float'],
+            'overflowing-string' => ['float', 'int'],
+            'float' => ['float', 'int', 'integer-string', 'overflowing-string'],
+        };
 
-        $beyondRange = is_string($value) && (is_infinite($number) || preg_match('/^\s*[+-]?\d+\s*\z/', $value));
+        return [
+            array_fill_keys(["$type:$float", ...$exact], ''),
+            [...$exact, ...array_map(fn ($type) => "$type:$float", $typesComparedAsFloats), 'any'],
+        ];
+    }
 
-        if ($beyondRange) {
-            return [
-                ["beyond-range:$float:$value" => '', "beyond-range:$float" => ''],
-                ["beyond-range:$float:$value", "float:$float", "int-type:$float", 'any'],
-            ];
-        }
-
-        return [["float:$float" => ''], ["float:$float", "integer:$float", "beyond-range:$float", 'any']];
+    /**
+     * Get a key that is unique to the given float.
+     *
+     * @param  float  $float
+     * @return string
+     */
+    protected function getDistinctFloatKey($float)
+    {
+        return is_finite($float) ? sprintf('%.17g', $float ?: 0.0) : (string) $float;
     }
 
     /**
