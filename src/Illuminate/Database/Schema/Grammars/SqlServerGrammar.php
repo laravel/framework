@@ -756,6 +756,11 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
+        // SQL Server 2025 (17.x) introduced a native json data type.
+        if (version_compare($this->connection->getServerVersion(), '17', '>=')) {
+            return 'json';
+        }
+
         return 'nvarchar(max)';
     }
 
@@ -767,7 +772,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'nvarchar(max)';
+        return $this->typeJson($column);
     }
 
     /**
