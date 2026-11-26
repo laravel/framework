@@ -4644,6 +4644,33 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ["caf\xE9", "caf\xE9"]], ['foo.*' => 'distinct:ignore_case']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ["\xFF", 'bar', 'BAR']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ["\xFF" => 'bar', "\xFE" => 'bar']], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['' => ['bar' => ['a' => 'baz', 'b' => 'baz']]]], ['foo.*.bar.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['99999999999999999999', '099999999999999999999', '1e400', '2e400']], ['foo.*' => 'distinct']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['99999999999999999999', 1e20, '1e400', INF]], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.1', 'foo.2', 'foo.3'], $v->errors()->keys());
+
+        $file = new UploadedFile(__FILE__, 'foo.php', null, null, true);
+
+        $v = new Validator($trans, ['foo' => [['file' => $file, 'name' => 'bar'], ['name' => 'baz']]], ['foo.*' => 'distinct:strict']);
+        $this->assertTrue($v->passes());
+
+        foreach (["\u{A7DA}" => "\u{A7DB}", "\u{1FD3}" => "\u{0390}"] as $upper => $lower) {
+            $v = new Validator($trans, ['foo' => [$upper, $lower]], ['foo.*' => 'distinct:ignore_case']);
+            $this->assertSame(preg_match('/^'.$upper.'$/iu', $lower) === 1, $v->fails());
+        }
     }
 
     public function testValidateDistinctForTopLevelArrays()
@@ -4652,6 +4679,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo', 'foo'], ['*' => 'distinct']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['bar', 'foo', 'foo'], ['*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame([1, 2], $v->errors()->keys());
 
         $v = new Validator($trans, [['foo' => 1], ['foo' => 1]], ['*' => 'array', '*.foo' => 'distinct']);
         $this->assertFalse($v->passes());
