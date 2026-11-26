@@ -944,20 +944,19 @@ trait ValidatesAttributes
     /**
      * Determine if any value other than the attribute's own passes the given callback.
      *
-     * @param  array  $values
+     * @template TValue
+     *
+     * @param  array<array-key, TValue>  $values
      * @param  string  $attribute
-     * @param  callable  $callback
+     * @param  callable(TValue): bool  $callback
      * @return bool
      */
     protected function distinctValuesContain($values, $attribute, $callback)
     {
-        foreach ($values as $key => $item) {
-            if ((string) $key !== (string) $attribute && $callback($item)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(
+            $values,
+            fn ($item, $key) => (string) $key !== (string) $attribute && $callback($item),
+        );
     }
 
     /**
@@ -970,7 +969,7 @@ trait ValidatesAttributes
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  bool  $ignoreCase
-     * @return array{0: array, 1: array}
+     * @return array{0: array<array-key, mixed>, 1: array<array-key, mixed>}
      */
     protected function getDistinctValuesToCompare($attribute, $value, $ignoreCase)
     {
@@ -1710,7 +1709,7 @@ trait ValidatesAttributes
      * Get the values of the given attribute and a lookup of their keys.
      *
      * @param  string  $attribute
-     * @return array{0: array, 1: array}
+     * @return array{0: array<array-key, mixed>, 1: array<non-empty-string, array-key>}
      */
     protected function getInArrayValues($attribute)
     {
@@ -1727,7 +1726,7 @@ trait ValidatesAttributes
      * Get a key that only identical values share, or null if the value has none.
      *
      * @param  mixed  $value
-     * @return string|null
+     * @return non-empty-string|null
      */
     protected function getInArrayKey($value)
     {

@@ -619,7 +619,7 @@ class Validator implements ValidatorContract
         Arr::forget($this->rules, $attribute);
 
         $this->inArrayValues = array_filter($this->inArrayValues, function ($parameter) use ($attribute) {
-            $prefix = explode('*', $parameter)[0];
+            $prefix = Str::before($parameter, '*');
 
             return ! str_starts_with($attribute.'.', $prefix) && ! str_starts_with($prefix, $attribute.'.');
         }, ARRAY_FILTER_USE_KEY);
