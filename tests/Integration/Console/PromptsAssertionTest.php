@@ -5,19 +5,27 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\AssertionFailedError;
 
+use function Laravel\Prompts\alert;
 use function Laravel\Prompts\autocomplete;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\intro;
 use function Laravel\Prompts\multisearch;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\number;
+use function Laravel\Prompts\outro;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\pause;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\suggest;
+use function Laravel\Prompts\table;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\textarea;
+use function Laravel\Prompts\warning;
 
 class PromptsAssertionTest extends TestCase
 {
@@ -443,5 +451,153 @@ class PromptsAssertionTest extends TestCase
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
             ->expectsSearch('What is your title?', ['Dr'], 'D', ['Dr'])
             ->expectsOutput('I will refer to you Dr Jane.');
+    }
+
+    public function testAssertionForSelectPromptWithDifferentOptions(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['john' => 'John', 'jane' => 'Jane']
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Question "What is your name?" has different options.');
+
+        $this
+            ->artisan('test:select')
+            ->expectsChoice('What is your name?', 'jane', ['john' => 'John', 'sally' => 'Sally']);
+    }
+
+    public function testAssertionForUnexpectedPrompt(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:confirm';
+
+                public function handle()
+                {
+                    confirm('Is your name John?');
+                }
+            }
+        );
+
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected question "Is your name John?" was asked.'));
+
+        $this->artisan('test:confirm');
+    }
+
+    public function testAssertionForNotePrompts(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:notes';
+
+                public function handle()
+                {
+                    intro('Starting');
+                    info('Information');
+                    warning('Careful');
+                    error('Failure');
+                    alert('Attention');
+                    outro('Finished');
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:notes')
+            ->expectsPromptsIntro('Starting')
+            ->expectsPromptsInfo('Information')
+            ->expectsPromptsWarning('Careful')
+            ->expectsPromptsError('Failure')
+            ->expectsPromptsAlert('Attention')
+            ->expectsPromptsOutro('Finished');
+    }
+
+    public function testAssertionForMissingNotePrompt(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:notes';
+
+                public function handle()
+                {
+                    info('Information');
+                }
+            }
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output does not contain "');
+
+        $this
+            ->artisan('test:notes')
+            ->expectsPromptsWarning('Information');
+    }
+
+    public function testAssertionForTablePrompt(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:table';
+
+                public function handle()
+                {
+                    table(['Name', 'Email'], [
+                        ['Taylor Otwell', 'taylor@laravel.com'],
+                        ['Jess Archer', 'jess@laravel.com'],
+                    ]);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:table')
+            ->expectsPromptsTable(['Name', 'Email'], [
+                ['Taylor Otwell', 'taylor@laravel.com'],
+                ['Jess Archer', 'jess@laravel.com'],
+            ]);
+    }
+
+    public function testAssertionForDifferentTablePrompt(): void
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:table';
+
+                public function handle()
+                {
+                    table(['Name', 'Email'], [
+                        ['Taylor Otwell', 'taylor@laravel.com'],
+                    ]);
+                }
+            }
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output does not contain "');
+
+        $this
+            ->artisan('test:table')
+            ->expectsPromptsTable(['Name', 'Email'], [
+                ['Jess Archer', 'jess@laravel.com'],
+            ]);
     }
 }
