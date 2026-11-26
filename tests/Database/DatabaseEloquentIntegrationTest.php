@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -1801,6 +1802,56 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+    }
+
+    public function testFirstKey()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(2, EloquentTestUser::latest('id')->firstKey());
+        $this->assertNull(EloquentTestUser::where('email', 'foo@gmail.com')->firstKey());
+    }
+
+    public function testFirstKeyWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame('first', EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->firstKey());
+    }
+
+    public function testSoleKey()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(2, EloquentTestUser::where('email', 'abigailotwell@gmail.com')->soleKey());
+    }
+
+    public function testSoleKeyThrowsWhenNoRecordsFound()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        EloquentTestUser::where('email', 'taylorotwell@gmail.com')->soleKey();
+    }
+
+    public function testSoleKeyThrowsWhenMultipleRecordsFound()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        EloquentTestUser::query()->soleKey();
     }
 
     public function testModelKeysWithCastPrimaryKey()

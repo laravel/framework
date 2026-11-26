@@ -1165,6 +1165,29 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the primary key from the first result of the query.
+     *
+     * @return mixed
+     */
+    public function firstKey()
+    {
+        return $this->value($this->model->getQualifiedKeyName());
+    }
+
+    /**
+     * Get the primary key from the first result of the query if it's the sole matching record.
+     *
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function soleKey()
+    {
+        return $this->soleValue($this->model->getQualifiedKeyName());
+    }
+
+    /**
      * Paginate the given query.
      *
      * @param  int|null|\Closure  $perPage
