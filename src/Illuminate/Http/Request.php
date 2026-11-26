@@ -320,7 +320,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         return strcasecmp($this->server->get('HTTP_X_MOZ') ?? '', 'prefetch') === 0 ||
                strcasecmp($this->headers->get('Purpose') ?? '', 'prefetch') === 0 ||
-               strcasecmp($this->headers->get('Sec-Purpose') ?? '', 'prefetch') === 0;
+               strcasecmp(trim(explode(';', $this->headers->get('Sec-Purpose') ?? '', 2)[0]), 'prefetch') === 0;
     }
 
     /**

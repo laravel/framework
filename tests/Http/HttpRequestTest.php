@@ -278,6 +278,16 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->prefetch());
         $request->headers->set('Sec-Purpose', 'Prefetch');
         $this->assertTrue($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'prefetch;prerender');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'prefetch;anonymous-client-ip');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'Prefetch ;prerender');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'prefetchfoo');
+        $this->assertFalse($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'foo;prefetch');
+        $this->assertFalse($request->prefetch());
     }
 
     public function testPjaxMethod()
