@@ -72,12 +72,14 @@ class Redirector
     {
         $request = $this->generator->getRequest();
 
-        $intended = $request->isMethod('GET') && $request->route() && ! $request->expectsJson()
-            ? $this->generator->full()
-            : $this->generator->previous();
+        if (! $request->prefetch()) {
+            $intended = $request->isMethod('GET') && $request->route() && ! $request->expectsJson()
+                ? $this->generator->full()
+                : $this->generator->previous();
 
-        if ($intended) {
-            $this->setIntendedUrl($intended);
+            if ($intended) {
+                $this->setIntendedUrl($intended);
+            }
         }
 
         return $this->to($path, $status, $headers, $secure);

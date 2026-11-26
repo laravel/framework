@@ -87,6 +87,42 @@ class RoutingRedirectorTest extends TestCase
         $this->assertSame('http://foo.com/bar', $this->session->get('url.intended'));
     }
 
+    public function testGuestDoesNotPutPrefetchedUrlInSession()
+    {
+        $this->headers->set('Sec-Purpose', 'prefetch');
+        $this->url->allows('full')->returns('http://foo.com/baz');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertSame('http://foo.com/login', $response->getTargetUrl());
+        $this->assertFalse($this->session->has('url.intended'));
+    }
+
+    public function testGuestKeepsIntendedUrlInSessionForPrefetch()
+    {
+        $this->session->put('url.intended', 'http://foo.com/bar');
+        $this->headers->set('Purpose', 'prefetch');
+        $this->url->allows('full')->returns('http://foo.com/baz');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertSame('http://foo.com/login', $response->getTargetUrl());
+        $this->assertSame('http://foo.com/bar', $this->session->get('url.intended'));
+    }
+
+    public function testGuestKeepsIntendedUrlInSessionForPrefetchUsingPreviousUrl()
+    {
+        $this->session->put('url.intended', 'http://foo.com/bar');
+        $this->headers->set('Sec-Purpose', 'prefetch');
+        $this->headers->set('Accept', 'application/json');
+        $this->url->allows('previous')->returns('http://foo.com/baz');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertSame('http://foo.com/login', $response->getTargetUrl());
+        $this->assertSame('http://foo.com/bar', $this->session->get('url.intended'));
+    }
+
     public function testIntendedRedirectToIntendedUrlInSession()
     {
         $this->session->put('url.intended', 'http://foo.com/bar');
