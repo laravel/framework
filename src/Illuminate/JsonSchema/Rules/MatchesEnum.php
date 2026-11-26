@@ -31,12 +31,12 @@ class MatchesEnum implements ValidationRule
     /**
      * Determine if the value is one of the enumerated values.
      *
-     * Arrays are compared strictly by content, since loose comparison treats "1" and "01" (or true and any array) as equal.
+     * Values are compared strictly, since loose comparison treats "1" and "01" (or true and any non-empty string or array) as equal.
      */
     protected function matches(mixed $value): bool
     {
         if (! is_array($value)) {
-            return in_array($value, array_filter($this->values, fn (mixed $allowed) => ! is_array($allowed)));
+            return in_array($value, array_filter($this->values, fn (mixed $allowed) => ! is_array($allowed)), true);
         }
 
         $value = DistinctArrayItems::normalize($value);
