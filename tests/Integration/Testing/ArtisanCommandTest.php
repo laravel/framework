@@ -4,9 +4,6 @@ namespace Illuminate\Tests\Integration\Testing;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Mockery;
-use Mockery\Exception\InvalidCountException;
-use Mockery\Exception\InvalidOrderException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\AssertionFailedError;
@@ -150,13 +147,11 @@ class ArtisanCommandTest extends TestCase
     {
         $this->expectExceptionObject(new AssertionFailedError('Output "Your name is Taylor Otwell and you prefer PHP." was not printed.'));
 
-        $this->ignoringMockOnceExceptions(function () {
-            $this->artisan('survey')
-                ->expectsQuestion('What is your name?', 'Taylor Otwell')
-                ->expectsQuestion('Which language do you prefer?', 'Ruby')
-                ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
-                ->assertExitCode(0);
-        });
+        $this->artisan('survey')
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsQuestion('Which language do you prefer?', 'Ruby')
+            ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_fails_from_exit_code_mismatch()
@@ -171,18 +166,16 @@ class ArtisanCommandTest extends TestCase
 
     public function test_console_command_that_fails_from_unordered_output()
     {
-        $this->expectException(InvalidOrderException::class);
+        $this->expectExceptionObject(new AssertionFailedError('Output "Danger" was printed before "Otwell".'));
 
-        $this->ignoringMockOnceExceptions(function () {
-            $this->artisan('slim')
-                ->expectsQuestion('Who?', 'Taylor')
-                ->expectsQuestion('What?', 'Danger')
-                ->expectsQuestion('Huh?', 'Otwell')
-                ->expectsOutput('Taylor')
-                ->expectsOutput('Otwell')
-                ->expectsOutput('Danger')
-                ->assertExitCode(0);
-        });
+        $this->artisan('slim')
+            ->expectsQuestion('Who?', 'Taylor')
+            ->expectsQuestion('What?', 'Danger')
+            ->expectsQuestion('Huh?', 'Otwell')
+            ->expectsOutput('Taylor')
+            ->expectsOutput('Otwell')
+            ->expectsOutput('Danger')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_fails_from_unexpected_question()
@@ -253,25 +246,21 @@ class ArtisanCommandTest extends TestCase
 
     public function test_console_command_that_fail_if_doesnt_output_something()
     {
-        $this->expectException(InvalidCountException::class);
+        $this->expectExceptionObject(new AssertionFailedError('No output was printed.'));
 
         $this->artisan('exit', ['code' => 0])
             ->expectsOutput()
             ->assertExitCode(0);
-
-        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fail_if_doesnt_output_something_and_is_not_the_expected_output()
     {
-        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionObject(new AssertionFailedError('Output "My name is Taylor Otwell" was not printed.'));
 
-        $this->ignoringMockOnceExceptions(function () {
-            $this->artisan('exit', ['code' => 0])
-                ->expectsOutput()
-                ->expectsOutput('My name is Taylor Otwell')
-                ->assertExitCode(0);
-        });
+        $this->artisan('exit', ['code' => 0])
+            ->expectsOutput()
+            ->expectsOutput('My name is Taylor Otwell')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_passes_if_does_not_output_anything()
@@ -301,7 +290,7 @@ class ArtisanCommandTest extends TestCase
 
     public function test_console_command_that_fails_if_doesnt_expect_output_but__there_is_interactions()
     {
-        $this->expectException(InvalidCountException::class);
+        $this->expectExceptionObject(new AssertionFailedError('Output "+---------------+--------------------+" was printed.'));
 
         $this->artisan('interactions', ['--no-interaction' => true])
             ->doesntExpectOutput()
@@ -309,42 +298,34 @@ class ArtisanCommandTest extends TestCase
             ->expectsChoice('Which language do you prefer?', 'PHP', ['PHP', 'PHP', 'PHP'])
             ->expectsConfirmation('Do you want to continue?', true)
             ->assertExitCode(0);
-
-        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_doesnt_expect_output_but_outputs_something()
     {
-        $this->expectException(InvalidCountException::class);
+        $this->expectExceptionObject(new AssertionFailedError('Output "My name is Taylor Otwell" was printed.'));
 
         $this->artisan('contains')
             ->doesntExpectOutput()
             ->assertExitCode(0);
-
-        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_doesnt_expect_output_and_does_expect_output()
     {
-        $this->expectException(InvalidCountException::class);
+        $this->expectExceptionObject(new AssertionFailedError('Output "My name is Taylor Otwell" was printed.'));
 
         $this->artisan('contains')
             ->doesntExpectOutput()
             ->doesntExpectOutput('My name is Taylor Otwell')
             ->assertExitCode(0);
-
-        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_the_output_does_not_contain()
     {
         $this->expectExceptionObject(new AssertionFailedError('Output does not contain "Otwell Taylor".'));
 
-        $this->ignoringMockOnceExceptions(function () {
-            $this->artisan('contains')
-                ->expectsOutputToContain('Otwell Taylor')
-                ->assertExitCode(0);
-        });
+        $this->artisan('contains')
+            ->expectsOutputToContain('Otwell Taylor')
+            ->assertExitCode(0);
     }
 
     public function test_pending_command_can_be_tapped()
@@ -385,34 +366,5 @@ class ArtisanCommandTest extends TestCase
     public function test_real_console_command_returns_code_with_enabled_mocking()
     {
         Assert::assertSame(0, $this->realArtisan('exit', ['code' => 0]));
-    }
-
-    /**
-     * Verify the PendingCommand mock expectations immediately, so an unmet
-     * expectation throws here and is caught by the test's expectException().
-     */
-    protected function verifyMockeryExpectationsNow(): void
-    {
-        Mockery::close();
-    }
-
-    /**
-     * Don't allow Mockery's InvalidCountException to be reported. Mocks setup
-     * in PendingCommand cause PHPUnit tearDown() to later throw the exception.
-     *
-     * @param  callable  $callback
-     * @return void
-     */
-    protected function ignoringMockOnceExceptions(callable $callback)
-    {
-        try {
-            $callback();
-        } finally {
-            try {
-                Mockery::close();
-            } catch (InvalidCountException) {
-                // Ignore mock exception from PendingCommand::expectsOutput().
-            }
-        }
     }
 }

@@ -7,16 +7,15 @@ use Illuminate\Console\PromptValidationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Testing\Console\FakeBufferedOutput;
 use Illuminate\Testing\Console\FakeOutputStyle;
 use Laravel\Prompts\Note as PromptsNote;
 use Laravel\Prompts\Prompt as BasePrompt;
 use Laravel\Prompts\Table as PromptsTable;
-use Mockery;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -452,8 +451,7 @@ class PendingCommand
 
         $this->consoleOutput = $this->mockConsoleOutput();
 
-        $this->test->expectedQuestions = [];
-        $this->test->expectedChoices = [];
+        $this->flushExpectations();
 
         try {
             $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $this->consoleOutput);
@@ -474,7 +472,6 @@ class PendingCommand
         }
 
         $this->verifyExpectations();
-        $this->flushExpectations();
 
         $this->app->offsetUnset(OutputStyle::class);
 
@@ -523,20 +520,8 @@ class PendingCommand
             );
         }
 
-        if (count($this->test->expectedOutput)) {
-            $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
-        }
-
-        if (count($this->test->expectedOutputSubstrings)) {
-            $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
-        }
-
-        if (($output = array_search(true, $this->test->unexpectedOutput)) !== false) {
-            $this->test->fail('Output "'.$output.'" was printed.');
-        }
-
-        if (($output = array_search(true, $this->test->unexpectedOutputSubstrings)) !== false) {
-            $this->test->fail('Output "'.$output.'" was printed.');
+        if ($failure = $this->consoleOutput->getOutput()->failure()) {
+            $this->test->fail($failure);
         }
     }
 
@@ -549,7 +534,13 @@ class PendingCommand
     {
         $output = new FakeOutputStyle(
             new ArrayInput($this->parameters),
-            $this->createABufferedOutputMock(),
+            new FakeBufferedOutput(
+                $this->test->expectedOutput,
+                $this->test->expectedOutputSubstrings,
+                array_keys($this->test->unexpectedOutput),
+                array_keys($this->test->unexpectedOutputSubstrings),
+                $this->test->expectsOutput,
+            ),
             $this->test->expectedQuestions,
             $this->test->expectedChoices,
         );
@@ -559,73 +550,6 @@ class PendingCommand
         });
 
         return $output;
-    }
-
-    /**
-     * Create a mock for the buffered output.
-     *
-     * @return \Mockery\MockInterface
-     */
-    private function createABufferedOutputMock()
-    {
-        $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldIgnoreMissing();
-
-        if ($this->test->expectsOutput === false) {
-            $mock->shouldReceive('doWrite')->never();
-
-            return $mock;
-        }
-
-        if ($this->test->expectsOutput === true
-            && count($this->test->expectedOutput) === 0
-            && count($this->test->expectedOutputSubstrings) === 0) {
-            $mock->shouldReceive('doWrite')->atLeast()->once();
-        }
-
-        foreach ($this->test->expectedOutput as $i => $output) {
-            $mock->shouldReceive('doWrite')
-                ->once()
-                ->ordered()
-                ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutput[$i]);
-                });
-        }
-
-        foreach ($this->test->expectedOutputSubstrings as $i => $text) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutputSubstrings[$i]);
-                });
-        }
-
-        foreach ($this->test->unexpectedOutput as $output => $displayed) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->ordered()
-                ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($output) {
-                    $this->test->unexpectedOutput[$output] = true;
-                });
-        }
-
-        foreach ($this->test->unexpectedOutputSubstrings as $text => $displayed) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
-                ->andReturnUsing(function () use ($text) {
-                    $this->test->unexpectedOutputSubstrings[$text] = true;
-                });
-        }
-
-        return $mock;
     }
 
     /**
@@ -642,6 +566,7 @@ class PendingCommand
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];
+        $this->test->expectsOutput = null;
     }
 
     /**
