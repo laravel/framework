@@ -884,7 +884,7 @@ class Validator implements ValidatorContract
 
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
-               $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
+               (! is_null($value) || $this->isNotNullIfMarkedAsNullable($rule, $attribute)) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
