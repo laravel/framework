@@ -10,6 +10,7 @@ use Mockery\Exception\InvalidOrderException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\AssertionFailedError;
+use Throwable;
 
 class ArtisanCommandTest extends TestCase
 {
@@ -182,6 +183,50 @@ class ArtisanCommandTest extends TestCase
                 ->expectsOutput('Danger')
                 ->assertExitCode(0);
         });
+    }
+
+    public function test_console_command_that_fails_from_unexpected_question()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected question "What?" was asked.'));
+
+        $this->artisan('slim')
+            ->expectsQuestion('Who?', 'Taylor');
+    }
+
+    public function test_console_command_that_fails_from_unasked_question()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Question "When?" was not asked.'));
+
+        $this->artisan('slim')
+            ->expectsQuestion('Who?', 'Taylor')
+            ->expectsQuestion('What?', 'Danger')
+            ->expectsQuestion('Huh?', 'Otwell')
+            ->expectsQuestion('When?', 'Now');
+    }
+
+    public function test_console_command_that_fails_from_unordered_questions()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Question "What?" was asked before "Huh?".'));
+
+        $this->artisan('slim')
+            ->expectsQuestion('Who?', 'Taylor')
+            ->expectsQuestion('Huh?', 'Otwell')
+            ->expectsQuestion('What?', 'Danger');
+    }
+
+    public function test_console_command_that_fails_from_unexpected_question_the_command_swallows()
+    {
+        Artisan::command('swallow', function () {
+            try {
+                $this->ask('Who?');
+            } catch (Throwable) {
+                //
+            }
+        });
+
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected question "Who?" was asked.'));
+
+        $this->artisan('swallow');
     }
 
     public function test_console_command_that_passes_if_the_output_contains()
