@@ -328,6 +328,111 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_console_command_that_passes_if_one_line_contains_several_expected_substrings()
+    {
+        $this->artisan('contains')
+            ->expectsOutput('My name is Taylor Otwell')
+            ->expectsOutputToContain('Taylor')
+            ->expectsOutputToContain('Otwell')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_if_expected_output_contains_an_unexpected_substring()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Output "Otwell" was printed.'));
+
+        $this->artisan('contains')
+            ->expectsOutputToContain('Taylor')
+            ->doesntExpectOutputToContain('Otwell')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_if_outputs_something_unexpected()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Output "My name is Taylor Otwell" was printed.'));
+
+        $this->artisan('contains')
+            ->expectsOutput()
+            ->doesntExpectOutput('My name is Taylor Otwell')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_passes_if_expected_output_repeats_after_later_output()
+    {
+        $this->artisan('slim')
+            ->expectsQuestion('Who?', 'Taylor')
+            ->expectsQuestion('What?', 'Otwell')
+            ->expectsQuestion('Huh?', 'Taylor')
+            ->expectsOutput('Taylor')
+            ->expectsOutput('Otwell')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_passes_with_expected_table()
+    {
+        $this->artisan('interactions', ['--no-interaction' => true])
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsChoice('Which language do you prefer?', 'PHP', ['PHP', 'PHP', 'PHP'])
+            ->expectsTable(['Name', 'Email'], [
+                ['Taylor Otwell', 'taylor@laravel.com'],
+            ])
+            ->expectsConfirmation('Do you want to continue?', 'yes')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_with_different_table()
+    {
+        $this->expectExceptionObject(new AssertionFailedError('Output "| Taylor Otwell | taylor@laravel.org |" was not printed.'));
+
+        $this->artisan('interactions', ['--no-interaction' => true])
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsChoice('Which language do you prefer?', 'PHP', ['PHP', 'PHP', 'PHP'])
+            ->expectsTable(['Name', 'Email'], [
+                ['Taylor Otwell', 'taylor@laravel.org'],
+            ])
+            ->expectsConfirmation('Do you want to continue?', 'yes')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_with_different_choices()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Question "Which language do you prefer?" has different options.');
+
+        $this->artisan('survey')
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsChoice('Which language do you prefer?', 'PHP', ['PHP', 'Ruby', 'Go']);
+    }
+
+    public function test_console_command_expectations_do_not_leak_into_nested_commands()
+    {
+        $test = $this;
+
+        Artisan::command('outer', function () use ($test) {
+            $this->line('Outer');
+
+            $test->artisan('contains')->expectsOutput('My name is Taylor Otwell');
+
+            $this->line('Done');
+        });
+
+        $this->artisan('outer')
+            ->expectsOutput('Outer')
+            ->expectsOutput('Done')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_output_expectation_does_not_carry_over_to_the_next_command()
+    {
+        $this->artisan('exit', ['code' => 0])
+            ->doesntExpectOutput()
+            ->assertExitCode(0);
+
+        $this->artisan('contains')
+            ->expectsOutput('My name is Taylor Otwell')
+            ->assertExitCode(0);
+    }
+
     public function test_pending_command_can_be_tapped()
     {
         $newEngland = [
