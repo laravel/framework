@@ -1835,6 +1835,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(2, EloquentTestUser::where('email', 'abigailotwell@gmail.com')->soleKey());
     }
 
+    public function testSoleKeyWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame('second', EloquentTestUniqueUserWithCustomKey::where('email', 'abigailotwell@gmail.com')->soleKey());
+    }
+
     public function testSoleKeyThrowsWhenNoRecordsFound()
     {
         $this->expectException(ModelNotFoundException::class);
