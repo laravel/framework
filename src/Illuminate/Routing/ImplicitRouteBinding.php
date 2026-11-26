@@ -41,28 +41,31 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            $routeBindingMethod = match (true) {
-                $route->onlyAllowsTrashedBindings() && $instance::isSoftDeletable() => 'resolveOnlyTrashedRouteBinding',
-                $route->allowsTrashedBindings() && $instance::isSoftDeletable() => 'resolveSoftDeletableRouteBinding',
-                default => 'resolveRouteBinding',
-            };
-
             if ($parent instanceof UrlRoutable &&
                 ! $route->preventsScopedBindings() &&
                 ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
                 $childRouteBindingMethod = match (true) {
-                    $route->onlyAllowsTrashedBindings() && $instance::isSoftDeletable() => 'resolveOnlyTrashedChildRouteBinding',
-                    $route->allowsTrashedBindings() && $instance::isSoftDeletable() => 'resolveSoftDeletableChildRouteBinding',
-                    default => 'resolveChildRouteBinding',
+                    $route->onlyAllowsTrashedBindings() && $instance::isSoftDeletable() => $parent->resolveOnlyTrashedChildRouteBinding(...),
+                    $route->allowsTrashedBindings() && $instance::isSoftDeletable() => $parent->resolveSoftDeletableChildRouteBinding(...),
+                    default => $parent->resolveChildRouteBinding(...),
                 };
 
-                if (! $model = $parent->{$childRouteBindingMethod}(
+                if (! $model = $childRouteBindingMethod(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
                 )) {
                     throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
                 }
-            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+            } else {
+                // Resolve $routeBindingMethod here instead of upfront as it's only used here.
+                $routeBindingMethod = match (true) {
+                    $route->onlyAllowsTrashedBindings() && $instance::isSoftDeletable() => $instance->resolveOnlyTrashedRouteBinding(...),
+                    $route->allowsTrashedBindings() && $instance::isSoftDeletable() => $instance->resolveSoftDeletableRouteBinding(...),
+                    default => $instance->resolveRouteBinding(...),
+                };
+
+                if (! $model = $routeBindingMethod($parameterValue, $route->bindingFieldFor($parameterName))) {
+                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                }
             }
 
             $route->setParameter($parameterName, $model);
