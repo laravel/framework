@@ -43,6 +43,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals($expected, $statements);
     }
 
+    public function testCheckConstraints()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->create();
+        $blueprint->integer('price');
+        $blueprint->check('price', 'price >= 0');
+
+        $this->assertSame(
+            'create table "users" ("price" integer not null, constraint "users_price_check" check (price >= 0))',
+            $blueprint->toSql()[0]
+        );
+    }
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

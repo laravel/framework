@@ -49,6 +49,28 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testCheckConstraints()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->create();
+        $blueprint->integer('price');
+        $blueprint->check('price', 'price >= 0');
+
+        $this->assertSame(
+            'create table "users" ("price" integer not null, constraint "users_price_check" check (price >= 0))',
+            $blueprint->toSql()[0]
+        );
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->check('price', 'price >= 0', 'price_check');
+        $blueprint->dropCheck('price_check');
+
+        $this->assertSame([
+            'alter table "users" add constraint "price_check" check (price >= 0)',
+            'alter table "users" drop constraint "price_check"',
+        ], $blueprint->toSql());
+    }
+
     public function testAddingVector()
     {
         $blueprint = new Blueprint($this->getConnection(), 'embeddings');

@@ -245,7 +245,7 @@ class PostgresGrammar extends Grammar
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', array_merge($this->getColumns($blueprint), $this->getCheckConstraints($blueprint)))
         );
     }
 

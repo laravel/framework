@@ -230,13 +230,25 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s%s%s)',
+        return sprintf('%s table %s (%s%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
             $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
-            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
+            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary')),
+            $this->addCheckConstraints($this->getCheckConstraints($blueprint))
         );
+    }
+
+    /**
+     * Get the check constraint syntax for a table creation statement.
+     *
+     * @param  array  $checks
+     * @return string
+     */
+    protected function addCheckConstraints($checks)
+    {
+        return (new Collection($checks))->reduce(fn ($sql, $check) => $sql.', '.$check, '');
     }
 
     /**
@@ -559,6 +571,34 @@ class SQLiteGrammar extends Grammar
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('SQLite does not support adding check constraints to existing tables.');
+    }
+
+    /**
+     * Compile a drop check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('SQLite does not support dropping check constraints.');
     }
 
     /**

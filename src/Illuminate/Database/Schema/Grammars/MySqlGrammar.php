@@ -253,6 +253,8 @@ class MySqlGrammar extends Grammar
             $primaryKey->shouldBeSkipped = true;
         }
 
+        $tableStructure = array_merge($tableStructure, $this->getCheckConstraints($blueprint));
+
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
@@ -584,6 +586,21 @@ class MySqlGrammar extends Grammar
         $index = $this->wrap($command->index);
 
         return "alter table {$this->wrapTable($blueprint)} drop index {$index}";
+    }
+
+    /**
+     * Compile a drop check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s drop check %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index)
+        );
     }
 
     /**

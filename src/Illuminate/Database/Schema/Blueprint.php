@@ -194,6 +194,7 @@ class Blueprint
     protected function addImpliedCommands()
     {
         $this->addFluentIndexes();
+        $this->addFluentCheckConstraints();
         $this->addFluentCommands();
 
         if (! $this->creating()) {
@@ -261,6 +262,22 @@ class Blueprint
 
                     continue 2;
                 }
+            }
+        }
+    }
+
+    /**
+     * Add the check constraints fluently specified on columns.
+     *
+     * @return void
+     */
+    protected function addFluentCheckConstraints()
+    {
+        foreach ($this->columns as $column) {
+            if (isset($column->check)) {
+                $this->check($column->name, $column->check);
+
+                $column->check = null;
             }
         }
     }
@@ -516,6 +533,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given check constraint should be dropped.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropCheck($name)
+    {
+        return $this->addCommand('dropCheck', ['index' => $name]);
+    }
+
+    /**
      * Indicate that the given column and foreign key should be dropped.
      *
      * @param  string  $column
@@ -756,6 +784,22 @@ class Blueprint
         );
 
         $this->commands[count($this->commands) - 1] = $command;
+
+        return $command;
+    }
+
+    /**
+     * Specify a check constraint for the table.
+     *
+     * @param  string|array  $columns
+     * @param  string  $expression
+     * @param  string|null  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function check($columns, $expression, $name = null)
+    {
+        $command = $this->indexCommand('check', $columns, $name);
+        $command->expression = $expression;
 
         return $command;
     }

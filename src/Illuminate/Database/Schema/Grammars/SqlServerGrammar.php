@@ -207,7 +207,7 @@ class SqlServerGrammar extends Grammar
     {
         return sprintf('create table %s (%s)',
             $this->wrapTable($blueprint, $blueprint->temporary ? '#'.$this->connection->getTablePrefix() : null),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', array_merge($this->getColumns($blueprint), $this->getCheckConstraints($blueprint)))
         );
     }
 

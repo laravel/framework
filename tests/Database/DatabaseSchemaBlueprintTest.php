@@ -52,6 +52,32 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertSame('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
+    public function testCheckConstraintCanBeAddedAfterItsColumn()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function ($table) {
+                $table->create();
+                $table->integer('price')->check('price >= 0');
+            })->toSql();
+        };
+
+        $this->assertSame([
+            'create table `users` (`price` int not null, constraint `users_price_check` check (price >= 0))',
+        ], $getSql('MySql'));
+
+        $this->assertSame([
+            'create table "users" ("price" integer not null, constraint "users_price_check" check (price >= 0))',
+        ], $getSql('Postgres'));
+
+        $this->assertSame([
+            'create table "users" ("price" integer not null, constraint "users_price_check" check (price >= 0))',
+        ], $getSql('SQLite'));
+
+        $this->assertSame([
+            'create table "users" ("price" int not null, constraint "users_price_check" check (price >= 0))',
+        ], $getSql('SqlServer'));
+    }
+
     public function testIndexDefaultNamesWhenPrefixSupplied()
     {
         $blueprint = $this->getBlueprint(table: 'users', prefix: 'prefix_');

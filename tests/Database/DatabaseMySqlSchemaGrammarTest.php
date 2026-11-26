@@ -63,6 +63,28 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('create table `users` (`id` char(36) not null, primary key (`id`))', $statements[0]);
     }
 
+    public function testCheckConstraints()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->create();
+        $blueprint->integer('price');
+        $blueprint->check('price', 'price >= 0');
+
+        $this->assertSame(
+            'create table `users` (`price` int not null, constraint `users_price_check` check (price >= 0))',
+            $blueprint->toSql()[0]
+        );
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->check('price', 'price >= 0', 'price_check');
+        $blueprint->dropCheck('price_check');
+
+        $this->assertSame([
+            'alter table `users` add constraint `price_check` check (price >= 0)',
+            'alter table `users` drop check `price_check`',
+        ], $blueprint->toSql());
+    }
+
     public function testAutoIncrementStartingValue()
     {
         $conn = $this->getConnection();

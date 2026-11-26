@@ -295,6 +295,37 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s add constraint %s check (%s)',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index),
+            $command->expression
+        );
+    }
+
+    /**
+     * Compile a drop check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s drop constraint %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index)
+        );
+    }
+
+    /**
      * Compile a drop foreign key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -450,6 +481,24 @@ abstract class Grammar extends BaseGrammar
         return array_filter($blueprint->getCommands(), function ($value) use ($name) {
             return $value->name == $name;
         });
+    }
+
+    /**
+     * Get the check constraints for a create table statement.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return array
+     */
+    protected function getCheckConstraints(Blueprint $blueprint)
+    {
+        return array_map(function ($check) {
+            $check->shouldBeSkipped = true;
+
+            return sprintf('constraint %s check (%s)',
+                $this->wrap($check->index),
+                $check->expression
+            );
+        }, $this->getCommandsByName($blueprint, 'check'));
     }
 
     /**
