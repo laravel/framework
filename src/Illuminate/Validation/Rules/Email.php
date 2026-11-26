@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 
 class Email implements Rule, DataAwareRule, ValidatorAwareRule
@@ -189,7 +190,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
         $this->messages = [];
 
         $validator = Validator::make(
-            $this->data,
+            $this->customRules ? $this->data : ValidationData::extractDataFromPath($attribute, $this->data),
             [$attribute => $this->buildValidationRules()],
             $this->validator->customMessages,
             $this->validator->customAttributes

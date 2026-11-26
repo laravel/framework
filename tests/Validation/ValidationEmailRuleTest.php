@@ -824,6 +824,27 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testValidatesArrayItems()
+    {
+        $data = ['emails' => ['taylor@laravel.com', 'invalid', 'taylor@example.com', 'other' => 'taylor@laravel.com']];
+
+        $v = new Validator(resolve('translator'), $data, ['emails.*' => [Rule::email()]], [], ['emails.*' => 'email #:position']);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame([
+            'emails.1' => ['The email #2 must be a valid email address.'],
+        ], $v->messages()->toArray());
+
+        $v = new Validator(resolve('translator'), $data, ['emails.*' => [Rule::email()->rules('different:emails.other')]]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame([
+            'emails.0' => ['validation.different'],
+            'emails.1' => ['The emails.1 must be a valid email address.'],
+            'emails.other' => ['validation.different'],
+        ], $v->messages()->toArray());
+    }
+
     public function testMacro()
     {
         Email::macro('laravelEmployee', function () {

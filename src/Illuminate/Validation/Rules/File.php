@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 
 class File implements Rule, DataAwareRule, ValidatorAwareRule
@@ -278,7 +279,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $this->messages = [];
 
         $validator = Validator::make(
-            $this->data,
+            $this->customRules ? $this->data : ValidationData::extractDataFromPath($attribute, $this->data),
             [$attribute => $this->buildValidationRules()],
             $this->validator->customMessages,
             $this->validator->customAttributes

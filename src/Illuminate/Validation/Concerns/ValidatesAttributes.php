@@ -924,13 +924,40 @@ trait ValidatesAttributes
     {
         $ignoreCase = in_array('ignore_case', $parameters) && is_string($value) && mb_check_encoding($value, 'UTF-8');
 
-        $data = Arr::except($this->getDistinctValuesToCompare($attribute, $value, $ignoreCase), $attribute);
+        [$groupValues, $otherValues] = $this->getDistinctValuesToCompare($attribute, $value, $ignoreCase);
 
         if ($ignoreCase) {
-            return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
+            $pattern = '/^'.preg_quote($value, '/').'$/iu';
+
+            return empty(preg_grep($pattern, Arr::except($otherValues, $attribute)))
+                && ! $this->distinctValuesContain($groupValues, $attribute, fn ($item) => preg_match($pattern, $item) === 1);
         }
 
-        return ! in_array($value, array_values($data), in_array('strict', $parameters));
+        $strict = in_array('strict', $parameters);
+
+        $equals = fn ($item) => $strict ? $value === $item : $value == $item;
+
+        return ! $this->distinctValuesContain($groupValues, $attribute, $equals)
+            && ! $this->distinctValuesContain($otherValues, $attribute, $equals);
+    }
+
+    /**
+     * Determine if any value other than the attribute's own passes the given callback.
+     *
+     * @param  array  $values
+     * @param  string  $attribute
+     * @param  callable  $callback
+     * @return bool
+     */
+    protected function distinctValuesContain($values, $attribute, $callback)
+    {
+        foreach ($values as $key => $item) {
+            if ((string) $key !== (string) $attribute && $callback($item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -938,11 +965,12 @@ trait ValidatesAttributes
      *
      * Values are grouped so that equal values always share a group, letting each
      * item be compared against its own group instead of against every value.
+     * Returns the value's group and the values that may be equal to any value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  bool  $ignoreCase
-     * @return array
+     * @return array{0: array, 1: array}
      */
     protected function getDistinctValuesToCompare($attribute, $value, $ignoreCase)
     {
@@ -951,7 +979,7 @@ trait ValidatesAttributes
         $group = $this->getDistinctValueGroup($value, $ignoreCase);
 
         if ($group === '*' || ! property_exists($this, 'distinctValueGroups')) {
-            return $values;
+            return [[], $values];
         }
 
         $groups = $this->distinctValueGroups[$this->getPrimaryAttribute($attribute)][(int) $ignoreCase] ??= (function () use ($values, $ignoreCase) {
@@ -965,10 +993,10 @@ trait ValidatesAttributes
         })();
 
         if (isset($groups['invalid'])) {
-            return $values;
+            return [[], $values];
         }
 
-        return ($groups[$group] ?? []) + ($groups['*'] ?? []);
+        return [$groups[$group] ?? [], $groups['*'] ?? []];
     }
 
     /**
@@ -1669,15 +1697,45 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $explicitPath = ValidationData::getLeadingExplicitAttributePath($parameters[0]);
+        [$otherValues, $lookup] = property_exists($this, 'inArrayValues')
+            ? $this->inArrayValues[$parameters[0]] ??= $this->getInArrayValues($parameters[0])
+            : $this->getInArrayValues($parameters[0]);
 
-        $attributeData = ValidationData::extractDataFromPath($explicitPath, $this->data);
+        $key = $this->getInArrayKey($value);
 
-        $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
-            return Str::is($parameters[0], $key);
-        });
+        return is_null($key) ? in_array($value, $otherValues, true) : isset($lookup[$key]);
+    }
 
-        return in_array($value, $otherValues, true);
+    /**
+     * Get the values of the given attribute and a lookup of their keys.
+     *
+     * @param  string  $attribute
+     * @return array{0: array, 1: array}
+     */
+    protected function getInArrayValues($attribute)
+    {
+        $attributeData = ValidationData::extractDataFromPath(
+            ValidationData::getLeadingExplicitAttributePath($attribute), $this->data
+        );
+
+        $values = Arr::where(Arr::dot($attributeData), fn ($value, $key) => Str::is($attribute, $key));
+
+        return [$values, array_flip(array_filter(array_map($this->getInArrayKey(...), $values)))];
+    }
+
+    /**
+     * Get a key that only identical values share, or null if the value has none.
+     *
+     * @param  mixed  $value
+     * @return string|null
+     */
+    protected function getInArrayKey($value)
+    {
+        return match (true) {
+            is_float($value) => is_nan($value) ? null : 'float:'.pack('e', $value ?: 0.0),
+            is_scalar($value), is_null($value) => get_debug_type($value).':'.$value,
+            default => null,
+        };
     }
 
     /**

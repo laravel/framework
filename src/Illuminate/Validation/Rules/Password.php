@@ -12,6 +12,7 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Traversable;
@@ -346,7 +347,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
         }
 
         $validator = Validator::make(
-            $this->data,
+            $this->customRules ? $this->data : ValidationData::extractDataFromPath($attribute, $this->data),
             [$attribute => [...$this]],
             $this->validator->customMessages,
             $this->validator->customAttributes

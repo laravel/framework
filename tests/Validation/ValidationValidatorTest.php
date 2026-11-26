@@ -2409,6 +2409,52 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
     }
 
+    public function testValidateInArrayComparesValuesStrictly()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'foo' => [1, '1', 1.0, '100', '1e2', 0.0, -0.0, true, null, [1], NAN],
+            'bar' => [1, '1e2', -0.0, true, null, [1], NAN],
+        ], ['foo.*' => 'in_array:bar.*']);
+
+        $this->assertFalse($v->passes());
+        $this->assertEqualsCanonicalizing(['foo.1', 'foo.2', 'foo.3', 'foo.9', 'foo.10'], $v->errors()->keys());
+    }
+
+    public function testValidateInArraySeesDataChangedDuringValidation()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 1], 'bar' => [1], 'baz' => 'qux'], [
+            'foo.0' => 'in_array:bar.*',
+            'baz' => [function () use (&$v) {
+                $v->setValue('bar', [2]);
+            }],
+            'foo.1' => 'in_array:bar.*',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => [1, 1], 'bar' => ['baz' => 1], 'exclude' => true], [
+            'foo.0' => 'in_array:bar.*',
+            'bar' => 'exclude_if:exclude,true',
+            'bar.baz' => 'integer',
+            'foo.1' => 'in_array:bar.*',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => [1, 1], 'bar' => ['baz' => ['qux' => [1]]], 'exclude' => true], [
+            'foo.0' => 'in_array:bar.baz.qux.*',
+            'bar' => 'exclude_if:exclude,true',
+            'bar.baz' => 'array',
+            'foo.1' => 'in_array:bar.baz.qux.*',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.1'], $v->errors()->keys());
+    }
+
     public function testValidateHexColor()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4644,6 +4690,18 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ["caf\xE9", "caf\xE9"]], ['foo.*' => 'distinct:ignore_case']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [null, 'a', null, false, 0]], ['foo.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.2', 'foo.3', 'foo.4'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => [null, 'a', null, false, 0]], ['foo.*' => 'distinct:strict']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.2'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => ['a', 'A', 'b', 1, '2', 2]], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+        $this->assertSame(['foo.0', 'foo.1', 'foo.4', 'foo.5'], $v->errors()->keys());
     }
 
     public function testValidateDistinctForTopLevelArrays()

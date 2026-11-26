@@ -132,6 +132,13 @@ class Validator implements ValidatorContract
     protected $distinctValueGroups = [];
 
     /**
+     * The cached data for the "in_array" rule.
+     *
+     * @var array
+     */
+    protected $inArrayValues = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -482,7 +489,7 @@ class Validator implements ValidatorContract
     {
         $this->messages = new MessageBag;
 
-        [$this->distinctValues, $this->distinctValueGroups, $this->failedRules] = [[], [], []];
+        [$this->distinctValues, $this->distinctValueGroups, $this->inArrayValues, $this->failedRules] = [[], [], [], []];
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
@@ -610,6 +617,12 @@ class Validator implements ValidatorContract
     {
         Arr::forget($this->data, $attribute);
         Arr::forget($this->rules, $attribute);
+
+        $this->inArrayValues = array_filter($this->inArrayValues, function ($parameter) use ($attribute) {
+            $prefix = explode('*', $parameter)[0];
+
+            return ! str_starts_with($attribute.'.', $prefix) && ! str_starts_with($prefix, $attribute.'.');
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -1259,6 +1272,8 @@ class Validator implements ValidatorContract
     {
         $this->data = $this->parseData($data);
 
+        $this->inArrayValues = [];
+
         $this->setRules($this->initialRules);
 
         return $this;
@@ -1285,6 +1300,8 @@ class Validator implements ValidatorContract
     public function setValue($attribute, $value)
     {
         Arr::set($this->data, $attribute, $value);
+
+        $this->inArrayValues = [];
     }
 
     /**

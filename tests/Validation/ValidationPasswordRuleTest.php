@@ -265,6 +265,40 @@ class ValidationPasswordRuleTest extends TestCase
         );
     }
 
+    public function testItValidatesArrayItems()
+    {
+        $data = [
+            'users' => [
+                ['password' => 'password', 'password_confirmation' => 'password'],
+                ['password' => 'ab', 'password_confirmation' => 'ab'],
+                ['password' => 'password', 'password_confirmation' => 'other'],
+                ['password' => null],
+                ['name' => 'Taylor'],
+            ],
+        ];
+
+        $v = new Validator(resolve('translator'), $data, [
+            'users.*.password' => [Password::required()],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame([
+            'users.1.password' => ['validation.min.string'],
+            'users.3.password' => ['validation.required'],
+            'users.4.password' => ['validation.required'],
+        ], $v->messages()->toArray());
+
+        $v = new Validator(resolve('translator'), $data, [
+            'users.*.password' => ['nullable', Password::min(8)->rules(['confirmed'])],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame([
+            'users.1.password' => ['validation.min.string'],
+            'users.2.password' => ['validation.confirmed'],
+        ], $v->messages()->toArray());
+    }
+
     public function testItCanUseDefault()
     {
         $this->assertInstanceOf(Password::class, Password::default());
