@@ -125,6 +125,13 @@ class Validator implements ValidatorContract
     protected $distinctValues = [];
 
     /**
+     * The cached results of parsing string rules.
+     *
+     * @var array<string, array>
+     */
+    protected $parsedRules = [];
+
+    /**
      * The cached groups of values for the "distinct" rule.
      *
      * @var array
@@ -734,7 +741,7 @@ class Validator implements ValidatorContract
     {
         $this->currentRule = $rule;
 
-        [$rule, $parameters] = ValidationRuleParser::parse($rule);
+        [$rule, $parameters] = $this->parseRule($rule);
 
         if ($rule === '') {
             return;
@@ -1206,6 +1213,21 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Parse the given rule, caching the result for string rules.
+     *
+     * @param  mixed  $rule
+     * @return array
+     */
+    protected function parseRule($rule)
+    {
+        if (! is_string($rule)) {
+            return ValidationRuleParser::parse($rule);
+        }
+
+        return $this->parsedRules[$rule] ??= ValidationRuleParser::parse($rule);
+    }
+
+    /**
      * Get a rule and its parameters for a given attribute.
      *
      * @param  string  $attribute
@@ -1221,7 +1243,7 @@ class Validator implements ValidatorContract
         $rules = (array) $rules;
 
         foreach ($this->rules[$attribute] as $rule) {
-            [$rule, $parameters] = ValidationRuleParser::parse($rule);
+            [$rule, $parameters] = $this->parseRule($rule);
 
             if (in_array($rule, $rules)) {
                 return [$rule, $parameters];
