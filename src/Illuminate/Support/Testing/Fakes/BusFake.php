@@ -148,11 +148,13 @@ class BusFake implements Fake, QueueingDispatcher
      * Assert if a job was pushed a number of times.
      *
      * @param  string|\Closure  $command
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertDispatchedTimes($command, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $callback = null;
 
         if ($command instanceof Closure) {
@@ -235,11 +237,13 @@ class BusFake implements Fake, QueueingDispatcher
      * Assert if a job was pushed synchronously a number of times.
      *
      * @param  string|\Closure  $command
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertDispatchedSyncTimes($command, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $callback = null;
 
         if ($command instanceof Closure) {
@@ -304,11 +308,13 @@ class BusFake implements Fake, QueueingDispatcher
      * Assert if a job was pushed after the response was sent a number of times.
      *
      * @param  string|\Closure  $command
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertDispatchedAfterResponseTimes($command, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $callback = null;
 
         if ($command instanceof Closure) {

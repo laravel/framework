@@ -162,11 +162,13 @@ class EventFake implements Dispatcher, Fake
      * Assert if an event was dispatched a number of times.
      *
      * @param  string  $event
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertDispatchedTimes($event, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $count = $this->dispatched($event)->count();
 
         PHPUnit::assertSame(
