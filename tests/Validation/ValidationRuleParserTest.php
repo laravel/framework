@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationRuleParser;
 use PHPUnit\Framework\TestCase;
 
@@ -542,5 +546,97 @@ class ValidationRuleParserTest extends TestCase
                 'between:1,2',
             ],
         ], $results->rules);
+    }
+
+    public function testExplodeCompilesSubclassedNestedRulesThroughTheirOwnCompileMethod()
+    {
+        $rule = new class(fn () => ['name' => 'required']) extends NestedRules
+        {
+            public $compiled = [];
+
+            public function compile($attribute, $value, $data = null, $context = null)
+            {
+                $this->compiled[] = $attribute;
+
+                return parent::compile($attribute, $value, $data, $context);
+            }
+        };
+
+        $results = (new ValidationRuleParser([
+            'items' => [['name' => 'foo'], ['name' => 'bar']],
+        ]))->explode(['items.*' => $rule]);
+
+        $this->assertSame(['items.0', 'items.1'], $rule->compiled);
+
+        $this->assertEquals([
+            'items.0.name' => ['required'],
+            'items.1.name' => ['required'],
+        ], $results->rules);
+    }
+
+    public function testExplodeCompilesOtherCompilableRulesWithTheGatheredData()
+    {
+        $rule = new class implements CompilableRules
+        {
+            public $arguments = [];
+
+            public function compile($attribute, $value, $data = null, $context = null)
+            {
+                $this->arguments[] = func_get_args();
+
+                return Rule::compile($attribute, ['name' => 'required'], $data);
+            }
+        };
+
+        $data = ['items' => [['name' => 'foo'], ['name' => 'bar']]];
+
+        $results = (new ValidationRuleParser($data))->explode(['items.*' => $rule]);
+
+        $gathered = ValidationData::initializeAndGatherData('items.*', $data);
+
+        $this->assertSame([
+            ['items.0', ['name' => 'foo'], $gathered, $data['items']],
+            ['items.1', ['name' => 'bar'], $gathered, $data['items']],
+        ], $rule->arguments);
+
+        $this->assertEquals([
+            'items.0.name' => ['required'],
+            'items.1.name' => ['required'],
+        ], $results->rules);
+    }
+
+    public function testCompileWithUndottedDataMatchesCompile()
+    {
+        $data = ['items.0.tags.0' => 'foo', 'items.0.tags.1' => 'bar'];
+
+        $rules = ['tags.*' => 'string', 'name' => Rule::when(true, 'required')];
+
+        $this->assertEquals(
+            Rule::compile('items.0', $rules, $data),
+            Rule::compileWithUndottedData('items.0', $rules, $data, Arr::undot($data))
+        );
+
+        $nested = Rule::forEach(fn () => $rules);
+
+        $this->assertEquals(
+            $nested->compile('items.0', ['tags' => ['foo', 'bar']], $data),
+            $nested->compileWithUndottedData('items.0', ['tags' => ['foo', 'bar']], $data, null, Arr::undot($data))
+        );
+    }
+
+    public function testCompileWithUndottedDataExplodesWildcardsAgainstTheUndottedData()
+    {
+        $compiled = Rule::compileWithUndottedData(
+            'items.0', ['tags.*' => 'string'], [], ['items' => [['tags' => ['foo', 'bar']]]]
+        );
+
+        $this->assertEquals([
+            'items.0.tags.0' => ['string'],
+            'items.0.tags.1' => ['string'],
+        ], $compiled->rules);
+
+        $this->assertEquals([
+            'items.0.tags.*' => ['items.0.tags.0', 'items.0.tags.1'],
+        ], $compiled->implicitAttributes);
     }
 }

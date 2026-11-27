@@ -38,4 +38,21 @@ class NestedRules implements CompilableRules
 
         return Rule::compile($attribute, $rules, $data);
     }
+
+    /**
+     * Compile the callback into an array of rules using data that has already been undotted.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $data
+     * @param  mixed  $context
+     * @param  array  $undottedData
+     * @return \stdClass
+     */
+    public function compileWithUndottedData($attribute, $value, $data, $context, array $undottedData)
+    {
+        $rules = call_user_func($this->callback, $value, $attribute, $data, $context);
+
+        return Rule::compileWithUndottedData($attribute, $rules, $data, $undottedData);
+    }
 }

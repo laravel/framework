@@ -937,9 +937,23 @@ class Rule
      */
     public static function compile($attribute, $rules, $data = null)
     {
-        $parser = new ValidationRuleParser(
-            Arr::undot(Arr::wrap($data))
+        return static::compileWithUndottedData(
+            $attribute, $rules, $data, Arr::undot(Arr::wrap($data))
         );
+    }
+
+    /**
+     * Compile a set of rules for an attribute using data that has already been undotted.
+     *
+     * @param  string  $attribute
+     * @param  array  $rules
+     * @param  array|null  $data
+     * @param  array  $undottedData
+     * @return object|\stdClass
+     */
+    public static function compileWithUndottedData($attribute, $rules, $data, array $undottedData)
+    {
+        $parser = new ValidationRuleParser($undottedData);
 
         if (is_array($rules) && ! array_is_list($rules)) {
             $nested = [];

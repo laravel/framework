@@ -165,13 +165,21 @@ class ValidationRuleParser
 
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
+        $undottedData = null;
+
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $rule) {
                     if ($rule instanceof CompilableRules) {
                         $context = Arr::get($this->data, Str::beforeLast($key, '.'));
 
-                        $compiled = $rule->compile($key, $value, $data, $context);
+                        // Nested rules are exploded against the undotted data, which is the same for
+                        // every matching key, so it is built once here instead of once for each key.
+                        $compiled = $rule::class === NestedRules::class
+                            ? $rule->compileWithUndottedData(
+                                $key, $value, $data, $context, $undottedData ??= Arr::undot($data)
+                            )
+                            : $rule->compile($key, $value, $data, $context);
 
                         $this->implicitAttributes = array_merge_recursive(
                             $compiled->implicitAttributes,
