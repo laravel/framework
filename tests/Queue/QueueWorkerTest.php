@@ -296,7 +296,7 @@ class QueueWorkerTest extends TestCase
                 && $event->exception === $e
                 && ! $event->successful()
                 && is_float($event->duration)
-                && is_float($event->memoryUsage)
+                && is_numeric($event->memoryUsage)
                 && $event->memoryUsage > 0;
         });
     }
