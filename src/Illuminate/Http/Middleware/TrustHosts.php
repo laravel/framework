@@ -46,7 +46,9 @@ class TrustHosts
     public function hosts()
     {
         if (is_null(static::$alwaysTrust)) {
-            return [$this->allSubdomainsOfApplicationUrl()];
+            return [static::$subdomains === false
+                ? $this->applicationUrlWithoutSubdomains()
+                : $this->allSubdomainsOfApplicationUrl()];
         }
 
         $hosts = match (true) {
@@ -81,11 +83,11 @@ class TrustHosts
     /**
      * Specify the hosts that should always be trusted.
      *
-     * @param  array<int, string>|(callable(): array<int, string>)  $hosts
+     * @param  array<int, string>|(callable(): array<int, string>)|null  $hosts
      * @param  bool  $subdomains
      * @return void
      */
-    public static function at(array|callable $hosts, bool $subdomains = true)
+    public static function at(array|callable|null $hosts, bool $subdomains = true)
     {
         static::$alwaysTrust = $hosts;
         static::$subdomains = $subdomains;
@@ -111,6 +113,18 @@ class TrustHosts
     {
         if ($host = parse_url($this->app['config']->get('app.url'), PHP_URL_HOST)) {
             return '^(.+\.)?'.preg_quote($host).'$';
+        }
+    }
+
+    /**
+     * Get a regular expression matching only the application URL, excluding its subdomains.
+     *
+     * @return string|null
+     */
+    protected function applicationUrlWithoutSubdomains()
+    {
+        if ($host = parse_url($this->app['config']->get('app.url'), PHP_URL_HOST)) {
+            return '^'.preg_quote($host).'$';
         }
     }
 

@@ -741,9 +741,7 @@ class Middleware
     {
         $this->trustHosts = true;
 
-        if (! is_null($at)) {
-            TrustHosts::at($at, $subdomains);
-        }
+        TrustHosts::at($at, $subdomains);
 
         return $this;
     }
