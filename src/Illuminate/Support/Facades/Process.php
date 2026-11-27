@@ -52,16 +52,6 @@ use Illuminate\Process\Factory;
 class Process extends Facade
 {
     /**
-     * Get the alternative to mocking the methods the facade forwards.
-     *
-     * @return string
-     */
-    protected static function testingAlternative()
-    {
-        return 'Use `Process::fake()` and assert with `Process::assertRan()`.';
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

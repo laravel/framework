@@ -64,16 +64,6 @@ class Password extends Facade
     const RESET_THROTTLED = PasswordBroker::RESET_THROTTLED;
 
     /**
-     * Get the alternative to mocking the methods the facade forwards.
-     *
-     * @return string
-     */
-    protected static function testingAlternative()
-    {
-        return 'Use the real broker with `RefreshDatabase`, and `Notification::fake()` to assert the reset notification.';
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

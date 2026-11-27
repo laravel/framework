@@ -184,16 +184,6 @@ class Queue extends Facade
     }
 
     /**
-     * Get the alternative to mocking the methods the facade forwards.
-     *
-     * @return string
-     */
-    protected static function testingAlternative()
-    {
-        return 'Use `Queue::fake()` or `Bus::fake()` and assert with `Queue::assertPushed()`.';
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

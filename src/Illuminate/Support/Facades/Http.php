@@ -110,16 +110,6 @@ use Illuminate\Http\Client\Factory;
 class Http extends Facade
 {
     /**
-     * Get the alternative to mocking the methods the facade forwards.
-     *
-     * @return string
-     */
-    protected static function testingAlternative()
-    {
-        return 'Use `Http::fake()` and assert with `Http::assertSent()`.';
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

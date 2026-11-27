@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Traits\Macroable;
 use JMac\Testing\Double;
@@ -309,6 +310,32 @@ class SupportFacadeTest extends TestCase
     {
         Facade::useDouble();
 
+        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
+
+        $exception = $this->catchRuntimeException(fn () => Auth::shouldReceive('forwarded'));
+
+        $this->assertSame(
+            "`Auth::forwarded()` is forwarded through `FacadeStubForwardingTarget::__call()`, so it can't be mocked with Double. Authenticate a real user with `actingAs()` and assert with `assertAuthenticated()` or `assertGuest()`. Or call `Facade::useMockery()` to mock it with Mockery.",
+            $exception->getMessage()
+        );
+        $this->assertInstanceOf(UnknownMethodException::class, $exception->getPrevious());
+    }
+
+    public function testForwardedMethodExplainsTheInheritedTestingAlternativeWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
+
+        $exception = $this->catchRuntimeException(fn () => FacadeStubExtendingAuth::shouldReceive('forwarded'));
+
+        $this->assertStringContainsString('Authenticate a real user with `actingAs()`', $exception->getMessage());
+    }
+
+    public function testForwardedMethodExplainsTheOverriddenTestingAlternativeWhenUsingDouble()
+    {
+        Facade::useDouble();
+
         $this->setUpApplicationWith(new FacadeStubForwardingTarget);
 
         $exception = $this->catchRuntimeException(fn () => FacadeStubWithAlternative::shouldReceive('forwarded'));
@@ -317,7 +344,6 @@ class SupportFacadeTest extends TestCase
             "`FacadeStubWithAlternative::forwarded()` is forwarded through `FacadeStubForwardingTarget::__call()`, so it can't be mocked with Double. Use the real thing. Or call `Facade::useMockery()` to mock it with Mockery.",
             $exception->getMessage()
         );
-        $this->assertInstanceOf(UnknownMethodException::class, $exception->getPrevious());
     }
 
     public function testForwardedMethodWithoutTestingAlternativeWhenUsingDouble()
@@ -338,13 +364,13 @@ class SupportFacadeTest extends TestCase
     {
         Facade::useDouble();
 
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget);
+        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
 
-        FacadeStubWithAlternative::spy();
+        Auth::spy();
 
-        $exception = $this->catchRuntimeException(fn () => FacadeStubWithAlternative::shouldHaveReceived('forwarded'));
+        $exception = $this->catchRuntimeException(fn () => Auth::shouldHaveReceived('forwarded'));
 
-        $this->assertStringContainsString('Use the real thing.', $exception->getMessage());
+        $this->assertStringContainsString('Authenticate a real user with `actingAs()`', $exception->getMessage());
     }
 
     public function testCloseMatchKeepsTheSuggestionWhenUsingDouble()
@@ -387,10 +413,10 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldReceive('missing');
     }
 
-    protected function setUpApplicationWith(object $root): ApplicationStub
+    protected function setUpApplicationWith(object $root, string $accessor = 'foo'): ApplicationStub
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $root]);
+        $app->setAttributes([$accessor => $root]);
         FacadeStub::setFacadeApplication($app);
 
         return $app;
@@ -450,6 +476,11 @@ class FacadeStub extends Facade
     {
         return 'foo';
     }
+}
+
+class FacadeStubExtendingAuth extends Auth
+{
+    //
 }
 
 class FacadeStubWithAlternative extends Facade

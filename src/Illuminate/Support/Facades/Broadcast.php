@@ -42,16 +42,6 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
 class Broadcast extends Facade
 {
     /**
-     * Get the alternative to mocking the methods the facade forwards.
-     *
-     * @return string
-     */
-    protected static function testingAlternative()
-    {
-        return 'Use `Event::fake()` to assert broadcastable events were dispatched, or the `null` or `log` broadcaster.';
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

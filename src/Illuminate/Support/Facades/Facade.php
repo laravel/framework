@@ -251,6 +251,28 @@ abstract class Facade
      */
     protected static function testingAlternative()
     {
+        $alternatives = [
+            Auth::class => 'Authenticate a real user with `actingAs()` and assert with `assertAuthenticated()` or `assertGuest()`.',
+            Broadcast::class => 'Use `Event::fake()` to assert broadcastable events were dispatched, or the `null` or `log` broadcaster.',
+            Cache::class => 'Put real values in the cache with `Cache::put()` and assert with `Cache::has()`, using the array store during tests.',
+            Concurrency::class => 'Use the `sync` driver, which runs tasks in the same process.',
+            Date::class => 'Control time with `travelTo()` or `freezeTime()`.',
+            DB::class => 'Use a real database, such as in-memory SQLite with `RefreshDatabase`, and assert with `assertDatabaseHas()`.',
+            Http::class => 'Use `Http::fake()` and assert with `Http::assertSent()`.',
+            Mail::class => 'Use `Mail::fake()` and assert with `Mail::assertSent()`.',
+            Password::class => 'Use the real broker with `RefreshDatabase`, and `Notification::fake()` to assert the reset notification.',
+            Process::class => 'Use `Process::fake()` and assert with `Process::assertRan()`.',
+            Queue::class => 'Use `Queue::fake()` or `Bus::fake()` and assert with `Queue::assertPushed()`.',
+            Session::class => 'Seed the session with `withSession()` and assert with `assertSessionHas()` on the response, using the array driver during tests.',
+            Storage::class => 'Use `Storage::fake()` and assert with `Storage::assertExists()`.',
+        ];
+
+        foreach ($alternatives as $facade => $alternative) {
+            if (is_a(static::class, $facade, true)) {
+                return $alternative;
+            }
+        }
+
         return null;
     }
 
