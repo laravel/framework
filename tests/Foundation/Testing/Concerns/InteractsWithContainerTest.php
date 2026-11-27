@@ -5,11 +5,21 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Facade;
+use JMac\Testing\DoubleInterface;
+use JMac\Testing\Integrations\PHPUnit\PHPUnitUnexpectedCallException;
 use Orchestra\Testbench\TestCase;
 use stdClass;
 
 class InteractsWithContainerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Facade::useMockery();
+
+        parent::tearDown();
+    }
+
     public function testWithoutViteBindsEmptyHandlerAndReturnsInstance()
     {
         $instance = $this->withoutVite();
@@ -109,6 +119,79 @@ class InteractsWithContainerTest extends TestCase
 
         $this->forgetMock(InstanceStub::class);
         $this->assertSame('foo', $this->app->make(InstanceStub::class)->execute());
+    }
+
+    public function testMockBindsAStrictDoubleWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $double = $this->mock(DoubleStub::class);
+        $double->expects('execute')->returns('bar');
+
+        $this->assertInstanceOf(DoubleInterface::class, $double);
+        $this->assertSame($double, $this->app->make(DoubleStub::class));
+        $this->assertSame('bar', $this->app->make(DoubleStub::class)->execute());
+
+        $this->expectException(PHPUnitUnexpectedCallException::class);
+
+        $this->app->make(DoubleStub::class)->other();
+    }
+
+    public function testMockPassesTheDoubleToTheCallbackWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $double = $this->mock(DoubleStub::class, function ($mock) {
+            $mock->expects('execute')->returns('bar');
+        });
+
+        $this->assertSame('bar', $double->execute());
+    }
+
+    public function testPartialMockPassesThroughToTheRealMethodsWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $this->partialMock(DoubleStub::class)->allows('other')->returns('baz');
+
+        $this->assertSame('foo', $this->app->make(DoubleStub::class)->execute());
+        $this->assertSame('baz', $this->app->make(DoubleStub::class)->other());
+    }
+
+    public function testSpyRecordsCallsWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $spy = $this->spy(DoubleStub::class);
+
+        $this->assertNull($this->app->make(DoubleStub::class)->execute());
+
+        $spy->received('execute');
+    }
+
+    public function testMockResolvesTheClassOfANonClassAbstractWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $this->app->instance('my.service', new DoubleStub);
+
+        $this->mock('my.service')->expects('execute')->returns('bar');
+
+        $this->assertInstanceOf(DoubleStub::class, $this->app->make('my.service'));
+        $this->assertSame('bar', $this->app->make('my.service')->execute());
+    }
+}
+
+class DoubleStub
+{
+    public function execute()
+    {
+        return 'foo';
+    }
+
+    public function other()
+    {
+        return 'other';
     }
 }
 

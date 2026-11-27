@@ -6,9 +6,12 @@ use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\HtmlString;
+use JMac\Testing\Double;
 use Mockery;
+use RuntimeException;
 
 trait InteractsWithContainer
 {
@@ -74,7 +77,11 @@ trait InteractsWithContainer
      */
     protected function mock($abstract, ?Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
+        if (Facade::usesMockery()) {
+            return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
+        }
+
+        return $this->instanceDouble($abstract, $mock, fn ($double) => $double->strict());
     }
 
     /**
@@ -88,7 +95,11 @@ trait InteractsWithContainer
      */
     protected function partialMock($abstract, ?Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
+        if (Facade::usesMockery()) {
+            return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
+        }
+
+        return $this->instanceDouble($abstract, $mock, fn ($double) => $double->passthru());
     }
 
     /**
@@ -102,7 +113,45 @@ trait InteractsWithContainer
      */
     protected function spy($abstract, ?Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+        if (Facade::usesMockery()) {
+            return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+        }
+
+        return $this->instanceDouble($abstract, $mock);
+    }
+
+    /**
+     * Register a double of the given abstract in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $mode
+     * @return \JMac\Testing\DoubleInterface
+     *
+     * @throws \RuntimeException
+     */
+    protected function instanceDouble($abstract, ?Closure $callback = null, ?Closure $mode = null)
+    {
+        if (! class_exists(Double::class)) {
+            throw new RuntimeException('Mocking requires the [jasonmccreary/double] package. Install it using `composer require --dev jasonmccreary/double` or call `Facade::useMockery()`.');
+        }
+
+        $double = Double::for(
+            class_exists($abstract) || interface_exists($abstract) ? $abstract : $this->app->make($abstract),
+            override: true,
+        );
+
+        if ($mode) {
+            $mode($double);
+        }
+
+        $this->app->instance($abstract, $double->instance());
+
+        if ($callback) {
+            $callback($double);
+        }
+
+        return $double;
     }
 
     /**
