@@ -345,6 +345,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             foreach ($this as $key => $value) {
                 $group = enum_value($countBy($value, $key));
 
+                if ($group instanceof \Stringable) {
+                    $group = (string) $group;
+                }
+
                 if (empty($counts[$group])) {
                     $counts[$group] = 0;
                 }

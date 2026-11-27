@@ -953,6 +953,23 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['A' => 3, 'B' => 1], $c->countBy(static fn ($i) => TestStringBackedEnum::from($i))->all());
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testCountByWithStringableKey($collection)
+    {
+        $c = new $collection([
+            ['tag' => new Stringable('php')],
+            ['tag' => new HtmlString('php')],
+            ['tag' => new Stringable('js')],
+        ]);
+        $this->assertEquals(['php' => 2, 'js' => 1], $c->countBy('tag')->all());
+
+        $c = new $collection([new Stringable('a'), new Stringable('b'), new Stringable('a')]);
+        $this->assertEquals(['a' => 2, 'b' => 1], $c->countBy()->all());
+
+        $c = new $collection(['taylor@laravel.com', 'dayle@laravel.com', 'jess@example.com']);
+        $this->assertEquals(['laravel.com' => 2, 'example.com' => 1], $c->countBy(fn ($email) => Str::of($email)->after('@'))->all());
+    }
+
     public function testAdd()
     {
         $c = new Collection([]);
