@@ -857,13 +857,9 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            $isUniqueConstraintError = $this->isUniqueConstraintError($e);
-
-            $exceptionType = match (true) {
-                $isUniqueConstraintError => UniqueConstraintViolationException::class,
-                $this->isDataTypeError($e) => InvalidValueException::class,
-                default => QueryException::class,
-            };
+            $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
+                ? UniqueConstraintViolationException::class
+                : QueryException::class;
 
             $exception = new $exceptionType(
                 $this->getNameWithReadWriteType(),
@@ -892,14 +888,6 @@ class Connection implements ConnectionInterface
      * @return bool
      */
     protected function isUniqueConstraintError(Exception $exception)
-    {
-        return false;
-    }
-
-    /**
-     * Determine if the given database exception was caused by an invalid or out of range value.
-     */
-    protected function isDataTypeError(Exception $exception): bool
     {
         return false;
     }
