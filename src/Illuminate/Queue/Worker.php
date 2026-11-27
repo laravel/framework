@@ -658,7 +658,7 @@ class Worker
             }
 
             $this->events->dispatch(new JobAttempted(
-                $connectionName, $job, $exceptionOccurred ?? null, $duration ?? null
+                $connectionName, $job, $exceptionOccurred ?? null, $duration ?? null, $this->peakMemoryUsage()
             ));
         }
     }
@@ -1267,5 +1267,15 @@ class Worker
     protected function currentMemoryUsage()
     {
         return memory_get_usage(true) / 1024 / 1024;
+    }
+
+    /**
+     * Get the peak memory usage in MB.
+     *
+     * @return int|float
+     */
+    protected function peakMemoryUsage()
+    {
+        return memory_get_peak_usage(true) / 1024 / 1024;
     }
 }
