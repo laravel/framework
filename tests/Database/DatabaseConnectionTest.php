@@ -839,6 +839,18 @@ class DatabaseConnectionTest extends TestCase
         $this->assertFalse($connection->hasModifiedRecords());
     }
 
+    public function testUsingReadPdoUsesReadPdoWhenSticky()
+    {
+        $writePdo = new DatabaseConnectionTestMockPDO;
+        $readPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection = (new MySqlConnection($writePdo, config: ['sticky' => true]))->setReadPdo($readPdo);
+        $connection->recordsHaveBeenModified();
+
+        $this->assertSame($readPdo, $connection->usingReadPdo(fn ($connection) => $connection->getReadPdo()));
+        $this->assertSame($writePdo, $connection->getReadPdo());
+    }
+
     #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {
