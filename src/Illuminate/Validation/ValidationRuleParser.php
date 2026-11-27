@@ -173,10 +173,10 @@ class ValidationRuleParser
                     if ($rule instanceof CompilableRules) {
                         $context = Arr::get($this->data, Str::beforeLast($key, '.'));
 
-                        // Nested rules explode against the undotted data, which is the same for every
-                        // matching key, so it is built once here instead of once per key...
-                        $compiled = $rule instanceof NestedRules
-                            ? $rule->compile($key, $value, $data, $context, $undottedData ??= Arr::undot($data))
+                        // Nested rules are exploded against the undotted data, which is the same for
+                        // every matching key, so it is built once here instead of once for each key.
+                        $compiled = $rule::class === NestedRules::class
+                            ? $rule->compileWithUndottedData($key, $value, $data, $context, $undottedData ??= Arr::undot($data))
                             : $rule->compile($key, $value, $data, $context);
 
                         $this->implicitAttributes = array_merge_recursive(
