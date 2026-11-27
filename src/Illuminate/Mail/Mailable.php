@@ -47,6 +47,13 @@ class Mailable implements MailableContract, Renderable
     public $locale;
 
     /**
+     * Indicates if the mailable should be queued after the database transaction commits.
+     *
+     * @var bool|null
+     */
+    public $afterCommit;
+
+    /**
      * The person the message is from.
      *
      * @var array

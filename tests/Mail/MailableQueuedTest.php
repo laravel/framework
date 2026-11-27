@@ -10,6 +10,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
+use Illuminate\Mail\PendingMail;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
@@ -42,6 +43,44 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testQueuedMailableReceivesAfterCommitFromPendingMail(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = $this->getMockBuilder(Mailer::class)
+            ->setConstructorArgs($this->getMocks())
+            ->onlyMethods(['createMessage', 'to'])
+            ->getMock();
+        $mailer->setQueue($queueFake);
+        $mailable = new MailableQueueableStub;
+        $queueFake->assertNothingPushed();
+        (new PendingMail($mailer))->to('foo@example.tld')->afterCommit()->queue($mailable);
+        $queueFake->assertPushedOn(null, SendQueuedMailable::class);
+
+        $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
+        $this->assertTrue($pushedJob->afterCommit);
+        $this->assertTrue($mailable->afterCommit);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testQueuedMailableWithoutAfterCommitKeepsQueueConfiguration(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = $this->getMockBuilder(Mailer::class)
+            ->setConstructorArgs($this->getMocks())
+            ->onlyMethods(['createMessage', 'to'])
+            ->getMock();
+        $mailer->setQueue($queueFake);
+        $mailable = new MailableQueueableStub;
+        $queueFake->assertNothingPushed();
+        (new PendingMail($mailer))->to('foo@example.tld')->queue($mailable);
+        $queueFake->assertPushedOn(null, SendQueuedMailable::class);
+
+        $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
+        $this->assertNull($pushedJob->afterCommit);
+        $this->assertNull($mailable->afterCommit);
     }
 
     #[AllowMockObjectsWithoutExpectations]

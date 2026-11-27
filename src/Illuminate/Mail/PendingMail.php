@@ -26,6 +26,13 @@ class PendingMail
     protected $locale;
 
     /**
+     * Indicates if the mailable should be queued after the database transaction commits.
+     *
+     * @var bool|null
+     */
+    protected $afterCommit;
+
+    /**
      * The "to" recipients of the message.
      *
      * @var array
@@ -65,6 +72,19 @@ class PendingMail
     public function locale($locale)
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the message should be queued after the database transaction commits.
+     *
+     * @param  bool  $afterCommit
+     * @return $this
+     */
+    public function afterCommit($afterCommit = true)
+    {
+        $this->afterCommit = $afterCommit;
 
         return $this;
     }
@@ -170,6 +190,10 @@ class PendingMail
             ->bcc($this->bcc), function (MailableContract $mailable) {
                 if ($this->locale) {
                     $mailable->locale($this->locale);
+                }
+
+                if (! is_null($this->afterCommit) && $mailable instanceof Mailable) {
+                    $mailable->afterCommit = $this->afterCommit;
                 }
             });
     }
