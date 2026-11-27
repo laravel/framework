@@ -11,6 +11,7 @@ use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestStatus\TestStatus;
+use ReflectionProperty;
 
 class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 {
@@ -30,7 +31,7 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 
         DoubleLifecycleFacade::expects('handle');
 
-        $test->setStatus(TestStatus::success());
+        $test->markStatus(TestStatus::success());
 
         $this->expectException(AssertionFailedError::class);
 
@@ -48,7 +49,7 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 
         $this->assertSame('handled', DoubleLifecycleFacade::handle());
 
-        $test->setStatus(TestStatus::success());
+        $test->markStatus(TestStatus::success());
         $test->runTearDown();
     }
 
@@ -61,7 +62,7 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 
         DoubleLifecycleFacade::expects('handle');
 
-        $test->setStatus(TestStatus::failure('failed'));
+        $test->markStatus(TestStatus::failure('failed'));
         $test->runTearDown();
 
         $this->assertSame(0, Double::verifyAll());
@@ -77,7 +78,7 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 
             Double::for(DoubleLifecycleService::class)->expects('handle');
 
-            $test->setStatus(TestStatus::success());
+            $test->markStatus(TestStatus::success());
             $test->runTearDown();
         } finally {
             $this->expectException(AssertionFailedError::class);
@@ -98,7 +99,7 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
 
         $this->assertInstanceOf(DatabaseManager::class, $test->app()->make('db'));
 
-        $test->setStatus(TestStatus::success());
+        $test->markStatus(TestStatus::success());
         $test->runTearDown();
     }
 }
@@ -115,6 +116,11 @@ class LifecycleTestCase extends FoundationTestCase
     public function runTearDown(): void
     {
         $this->tearDown();
+    }
+
+    public function markStatus(TestStatus $status): void
+    {
+        (new ReflectionProperty(TestCase::class, 'status'))->setValue($this, $status);
     }
 
     public function app()
