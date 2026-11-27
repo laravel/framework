@@ -29,7 +29,7 @@ class Response extends SymfonyResponse
      */
     public function __construct($content = '', $status = 200, array $headers = [])
     {
-        if (method_exists($this, 'setHeaders')) {
+        if (method_exists($this, 'setHeaders') || property_exists(SymfonyResponse::class, 'writingHeaders')) {
             parent::__construct('', $status, new ResponseHeaderBag($headers));
         } else {
             $this->headers = new ResponseHeaderBag($headers);

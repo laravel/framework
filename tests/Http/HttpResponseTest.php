@@ -26,6 +26,32 @@ class HttpResponseTest extends TestCase
 {
     use VerifiesDoubles;
 
+    public function testConstructorInitializesHeadersWithoutDeprecation()
+    {
+        $deprecations = [];
+        set_error_handler(function ($severity, $message) use (&$deprecations) {
+            if ($severity === E_USER_DEPRECATED && str_contains($message, 'Directly setting property "headers"')) {
+                $deprecations[] = $message;
+
+                return true;
+            }
+
+            return false;
+        });
+
+        try {
+            $response = new Response(['foo' => 'bar'], 201, ['X-Test' => 'value']);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('value', $response->headers->get('X-Test'));
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+    }
+
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);
