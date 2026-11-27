@@ -61,6 +61,10 @@ do
     TMP_DIR="/tmp/laravel-split-$VERSION"
     REMOTE_URL="git@github.com:illuminate/$REMOTE.git"
 
+    # The component repository must contain the framework release before it is tagged.
+    COMPONENT=$(git ls-tree --name-only "$VERSION:src/Illuminate" | grep -ix "${REMOTE//-/}")
+    EXPECTED_TREE=$(git rev-parse "$VERSION:src/Illuminate/$COMPONENT")
+
     rm -rf $TMP_DIR;
     mkdir $TMP_DIR;
 
@@ -69,6 +73,13 @@ do
 
         git clone $REMOTE_URL .
         git checkout "$RELEASE_BRANCH";
+
+        if [[ $(git rev-parse "HEAD^{tree}") != $EXPECTED_TREE ]]
+        then
+            echo "The $REMOTE component is not in sync with $VERSION. Wait for the split workflow to finish and release again."
+
+            exit 1
+        fi
 
         git tag $VERSION
         git push origin --tags
