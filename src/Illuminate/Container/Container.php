@@ -177,7 +177,10 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The before resolving callback types that apply to each resolved abstract.
      *
-     * @var array<string, list<string>>
+     * For an abstract that is not a declared class, the entry also holds the autoloaders
+     * it was worked out with, since a later autoloader or declaration may change the answer.
+     *
+     * @var array<string, array{0: list<string>, 1: array|null}>
      */
     protected $beforeResolvingTypesByAbstract = [];
 
@@ -1553,8 +1556,10 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the before resolving callback types that apply to the given abstract.
      *
-     * The result is remembered because "is_subclass_of" triggers the autoloader on
-     * every call for an abstract that is not a class, such as the "config" alias.
+     * The answer is remembered because "is_subclass_of" runs the autoloaders on every
+     * call for an abstract that is not a class, such as the "config" alias. For such an
+     * abstract it is kept only while nothing could have changed it: no class of that
+     * name has been declared and the registered autoloaders are the same.
      *
      * @param  string  $abstract
      * @return list<string>
@@ -1565,10 +1570,35 @@ class Container implements ArrayAccess, ContainerContract
             return [];
         }
 
-        return $this->beforeResolvingTypesByAbstract[$abstract] ??= array_values(array_filter(
+        if (isset($this->beforeResolvingTypesByAbstract[$abstract])) {
+            [$types, $autoloaders] = $this->beforeResolvingTypesByAbstract[$abstract];
+
+            if ($autoloaders === null || ($autoloaders === spl_autoload_functions() && ! $this->isDeclaredType($abstract))) {
+                return $types;
+            }
+        }
+
+        $types = array_values(array_filter(
             array_keys($this->beforeResolvingCallbacks),
             fn ($type) => $type === $abstract || is_subclass_of($abstract, $type),
         ));
+
+        $this->beforeResolvingTypesByAbstract[$abstract] = [
+            $types, $this->isDeclaredType($abstract) ? null : spl_autoload_functions(),
+        ];
+
+        return $types;
+    }
+
+    /**
+     * Determine if the given name is a declared class or interface, without autoloading it.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isDeclaredType($name)
+    {
+        return class_exists($name, false) || interface_exists($name, false);
     }
 
     /**

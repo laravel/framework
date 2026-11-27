@@ -542,6 +542,54 @@ class ResolvingCallbackTest extends TestCase
         $this->assertEquals(1, $callCounter);
     }
 
+    public function testBeforeResolvingCallbacksSeeAnAutoloaderRegisteredAfterResolving()
+    {
+        $container = new Container;
+        $container->bind('ResolvingLateAutoloadedStub', fn () => new ResolvingImplementationStub);
+
+        $callCounter = 0;
+        $container->beforeResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make('ResolvingLateAutoloadedStub');
+        $this->assertSame(0, $callCounter);
+
+        $autoloader = function ($class) {
+            if ($class === 'ResolvingLateAutoloadedStub') {
+                eval('class ResolvingLateAutoloadedStub implements '.ResolvingContractStub::class.' {}');
+            }
+        };
+        spl_autoload_register($autoloader);
+
+        try {
+            $container->make('ResolvingLateAutoloadedStub');
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertSame(1, $callCounter);
+    }
+
+    public function testBeforeResolvingCallbacksSeeAClassDeclaredAfterResolving()
+    {
+        $container = new Container;
+        $container->bind('ResolvingLateDeclaredStub', fn () => new ResolvingImplementationStub);
+
+        $callCounter = 0;
+        $container->beforeResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make('ResolvingLateDeclaredStub');
+        $this->assertSame(0, $callCounter);
+
+        eval('class ResolvingLateDeclaredStub implements '.ResolvingContractStub::class.' {}');
+
+        $container->make('ResolvingLateDeclaredStub');
+        $this->assertSame(1, $callCounter);
+    }
+
     public function testGlobalBeforeResolvingCallbacksAreCalled()
     {
         // Given a call counter initialized to zero.
