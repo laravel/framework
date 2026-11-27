@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
-use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
@@ -308,11 +307,11 @@ class ApplicationBuilder
             $commands = [$this->app->path('Console/Commands')];
         }
 
-        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel, $app) use ($commands) {
             [$commands, $paths] = (new Collection($commands))->partition(fn ($command) => class_exists($command));
             [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
 
-            $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {
+            $app->booted(static function () use ($kernel, $commands, $paths, $routes) {
                 $kernel->addCommands($commands->all());
                 $kernel->addCommandPaths($paths->all());
                 $kernel->addCommandRoutePaths($routes->all());
@@ -330,8 +329,8 @@ class ApplicationBuilder
      */
     protected function withCommandRouting(array $paths)
     {
-        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel, $app) use ($paths) {
+            $app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
 
         return $this;
@@ -345,13 +344,7 @@ class ApplicationBuilder
      */
     public function withSchedule(callable $callback)
     {
-        Artisan::starting(function () use ($callback) {
-            $this->app->afterResolving(Schedule::class, fn ($schedule) => $callback($schedule));
-
-            if ($this->app->resolved(Schedule::class)) {
-                $callback($this->app->make(Schedule::class));
-            }
-        });
+        $this->app->afterResolving(Schedule::class, fn ($schedule) => $callback($schedule));
 
         return $this;
     }
