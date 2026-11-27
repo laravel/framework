@@ -44,6 +44,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
+use JMac\Testing\Double;
 use Laravel\Prompts\Prompt;
 use Mockery;
 use Mockery\LegacyMockInterface;
@@ -89,6 +90,13 @@ trait InteractsWithTestCaseLifecycle
     protected $setUpHasRun = false;
 
     /**
+     * Indicates if the expectations of doubles are verified when the test ends.
+     *
+     * @var bool
+     */
+    protected $verifiesDoubles = false;
+
+    /**
      * Setup the test environment.
      *
      * @internal
@@ -97,6 +105,12 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTheTestEnvironment(): void
     {
+        if (! Facade::usesMockery() && class_exists(Double::class)) {
+            Double::enableAutoVerify();
+
+            $this->verifiesDoubles = true;
+        }
+
         Facade::clearResolvedInstances();
 
         if (! $this->app) {
@@ -177,6 +191,12 @@ trait InteractsWithTestCaseLifecycle
         }
 
         $this->flushState();
+
+        if ($this->verifiesDoubles) {
+            $this->verifiesDoubles = false;
+
+            Double::verifyAll(testFailed: ! $this->status()->isSuccess());
+        }
 
         if ($this->callbackException) {
             throw $this->callbackException;
