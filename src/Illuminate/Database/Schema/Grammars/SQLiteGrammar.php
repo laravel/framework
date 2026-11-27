@@ -574,34 +574,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a check constraint command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    public function compileCheck(Blueprint $blueprint, Fluent $command)
-    {
-        throw new RuntimeException('SQLite does not support adding check constraints to existing tables.');
-    }
-
-    /**
-     * Compile a drop check constraint command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
-    {
-        throw new RuntimeException('SQLite does not support dropping check constraints.');
-    }
-
-    /**
      * Compile a drop index command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
