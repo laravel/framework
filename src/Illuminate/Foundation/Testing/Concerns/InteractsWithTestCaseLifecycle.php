@@ -46,7 +46,6 @@ use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
 use Laravel\Prompts\Prompt;
 use Mockery;
-use Mockery\Exception\InvalidCountException;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
 use ReflectionClass;
@@ -155,13 +154,7 @@ trait InteractsWithTestCaseLifecycle
                 $this->addToAssertionCount($container->mockery_getExpectationCount());
             }
 
-            try {
-                Mockery::close();
-            } catch (InvalidCountException $e) {
-                if (! Str::contains($e->getMethodName(), ['doWrite', 'askQuestion'])) {
-                    throw $e;
-                }
-            }
+            Mockery::close();
         }
 
         if (class_exists(Carbon::class)) {

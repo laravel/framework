@@ -7,23 +7,21 @@ use Illuminate\Console\PromptValidationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Testing\Console\FakeBufferedOutput;
+use Illuminate\Testing\Console\FakeOutputStyle;
 use Laravel\Prompts\Note as PromptsNote;
 use Laravel\Prompts\Prompt as BasePrompt;
 use Laravel\Prompts\Table as PromptsTable;
-use Mockery;
-use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
 {
@@ -77,6 +75,13 @@ class PendingCommand
      * @var bool
      */
     protected $hasExecuted = false;
+
+    /**
+     * The console output the command is run with.
+     *
+     * @var \Illuminate\Testing\Console\FakeOutputStyle|null
+     */
+    protected $consoleOutput;
 
     /**
      * Create a new pending console command run.
@@ -439,23 +444,17 @@ class PendingCommand
      * Execute the command.
      *
      * @return int
-     *
-     * @throws \Mockery\Exception\NoMatchingExpectationException
      */
     public function run()
     {
         $this->hasExecuted = true;
 
-        $mock = $this->mockConsoleOutput();
+        $this->consoleOutput = $this->mockConsoleOutput();
+
+        $this->flushExpectations();
 
         try {
-            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $mock);
-        } catch (NoMatchingExpectationException $e) {
-            if ($e->getMethodName() === 'askQuestion') {
-                $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
-            }
-
-            throw $e;
+            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $this->consoleOutput);
         } catch (PromptValidationException) {
             $exitCode = Command::FAILURE;
         }
@@ -473,7 +472,6 @@ class PendingCommand
         }
 
         $this->verifyExpectations();
-        $this->flushExpectations();
 
         $this->app->offsetUnset(OutputStyle::class);
 
@@ -508,142 +506,50 @@ class PendingCommand
      */
     protected function verifyExpectations()
     {
-        if (count($this->test->expectedQuestions)) {
-            $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
+        if ($failure = $this->consoleOutput->failure()) {
+            $this->test->fail($failure);
         }
 
-        if (count($this->test->expectedChoices) > 0) {
-            foreach ($this->test->expectedChoices as $question => $answers) {
-                $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
+        foreach ($this->consoleOutput->choices() as $question => $answers) {
+            $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
-                $this->test->{$assertion}(
-                    $answers['expected'],
-                    $answers['actual'],
-                    'Question "'.$question.'" has different options.'
-                );
-            }
+            $this->test->{$assertion}(
+                $answers['expected'],
+                $answers['actual'],
+                'Question "'.$question.'" has different options.'
+            );
         }
 
-        if (count($this->test->expectedOutput)) {
-            $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
-        }
-
-        if (count($this->test->expectedOutputSubstrings)) {
-            $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
-        }
-
-        if (($output = array_search(true, $this->test->unexpectedOutput)) !== false) {
-            $this->test->fail('Output "'.$output.'" was printed.');
-        }
-
-        if (($output = array_search(true, $this->test->unexpectedOutputSubstrings)) !== false) {
-            $this->test->fail('Output "'.$output.'" was printed.');
+        if ($failure = $this->consoleOutput->getOutput()->failure()) {
+            $this->test->fail($failure);
         }
     }
 
     /**
-     * Mock the application's console output.
+     * Fake the application's console output.
      *
-     * @return \Mockery\MockInterface
+     * @return \Illuminate\Testing\Console\FakeOutputStyle
      */
     protected function mockConsoleOutput()
     {
-        $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
-            new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
-        ]);
+        $output = new FakeOutputStyle(
+            new ArrayInput($this->parameters),
+            new FakeBufferedOutput(
+                $this->test->expectedOutput,
+                $this->test->expectedOutputSubstrings,
+                array_keys($this->test->unexpectedOutput),
+                array_keys($this->test->unexpectedOutputSubstrings),
+                $this->test->expectsOutput,
+            ),
+            $this->test->expectedQuestions,
+            $this->test->expectedChoices,
+        );
 
-        foreach ($this->test->expectedQuestions as $i => $question) {
-            $mock->shouldReceive('askQuestion')
-                ->once()
-                ->ordered()
-                ->with(Mockery::on(function ($argument) use ($question) {
-                    if (isset($this->test->expectedChoices[$question[0]])) {
-                        $this->test->expectedChoices[$question[0]]['actual'] = $argument instanceof ChoiceQuestion && ! array_is_list($this->test->expectedChoices[$question[0]]['expected'])
-                            ? $argument->getChoices()
-                            : $argument->getAutocompleterValues();
-                    }
-
-                    return $argument->getQuestion() == $question[0];
-                }))
-                ->andReturnUsing(function () use ($question, $i) {
-                    unset($this->test->expectedQuestions[$i]);
-
-                    return $question[1];
-                });
-        }
-
-        $this->app->bind(OutputStyle::class, function () use ($mock) {
-            return $mock;
+        $this->app->bind(OutputStyle::class, function () use ($output) {
+            return $output;
         });
 
-        return $mock;
-    }
-
-    /**
-     * Create a mock for the buffered output.
-     *
-     * @return \Mockery\MockInterface
-     */
-    private function createABufferedOutputMock()
-    {
-        $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
-            ->shouldAllowMockingProtectedMethods()
-            ->shouldIgnoreMissing();
-
-        if ($this->test->expectsOutput === false) {
-            $mock->shouldReceive('doWrite')->never();
-
-            return $mock;
-        }
-
-        if ($this->test->expectsOutput === true
-            && count($this->test->expectedOutput) === 0
-            && count($this->test->expectedOutputSubstrings) === 0) {
-            $mock->shouldReceive('doWrite')->atLeast()->once();
-        }
-
-        foreach ($this->test->expectedOutput as $i => $output) {
-            $mock->shouldReceive('doWrite')
-                ->once()
-                ->ordered()
-                ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutput[$i]);
-                });
-        }
-
-        foreach ($this->test->expectedOutputSubstrings as $i => $text) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutputSubstrings[$i]);
-                });
-        }
-
-        foreach ($this->test->unexpectedOutput as $output => $displayed) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->ordered()
-                ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($output) {
-                    $this->test->unexpectedOutput[$output] = true;
-                });
-        }
-
-        foreach ($this->test->unexpectedOutputSubstrings as $text => $displayed) {
-            $mock->shouldReceive('doWrite')
-                ->atLeast()
-                ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
-                ->andReturnUsing(function () use ($text) {
-                    $this->test->unexpectedOutputSubstrings[$text] = true;
-                });
-        }
-
-        return $mock;
+        return $output;
     }
 
     /**
@@ -660,6 +566,7 @@ class PendingCommand
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];
+        $this->test->expectsOutput = null;
     }
 
     /**
