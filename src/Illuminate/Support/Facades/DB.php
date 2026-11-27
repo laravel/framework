@@ -151,6 +151,16 @@ class DB extends Facade
     }
 
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Use a real database, such as in-memory SQLite with `RefreshDatabase`, and assert with `assertDatabaseHas()`.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

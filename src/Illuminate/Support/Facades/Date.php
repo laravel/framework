@@ -111,6 +111,16 @@ class Date extends Facade
     const DEFAULT_FACADE = DateFactory::class;
 
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Control time with `travelTo()` or `freezeTime()`.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

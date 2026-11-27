@@ -79,6 +79,16 @@ namespace Illuminate\Support\Facades;
 class Session extends Facade
 {
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Seed the session with `withSession()` and assert with `assertSessionHas()` on the response, using the array driver during tests.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

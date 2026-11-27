@@ -25,6 +25,16 @@ use Illuminate\Concurrency\ConcurrencyManager;
 class Concurrency extends Facade
 {
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Use the `sync` driver, which runs tasks in the same process.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

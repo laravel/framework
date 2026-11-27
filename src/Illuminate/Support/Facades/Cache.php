@@ -77,6 +77,16 @@ use Mockery;
 class Cache extends Facade
 {
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Put real values in the cache with `Cache::put()` and assert with `Cache::has()`, using the array store during tests.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

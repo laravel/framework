@@ -71,6 +71,16 @@ use RuntimeException;
 class Auth extends Facade
 {
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Authenticate a real user with `actingAs()` and assert with `assertAuthenticated()` or `assertGuest()`.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

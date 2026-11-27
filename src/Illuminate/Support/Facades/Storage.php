@@ -177,6 +177,16 @@ class Storage extends Facade
     }
 
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Use `Storage::fake()` and assert with `Storage::assertExists()`.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

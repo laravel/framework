@@ -11,11 +11,15 @@ use Illuminate\Support\Js;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\Fake;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Uri;
 use JMac\Testing\Double;
 use JMac\Testing\DoubleInterface;
+use JMac\Testing\Exceptions\UnknownMethodException;
 use Mockery;
 use Mockery\LegacyMockInterface;
+use ReflectionClass;
+use ReflectionMethod;
 use RuntimeException;
 
 abstract class Facade
@@ -154,9 +158,13 @@ abstract class Facade
     {
         $mock = static::getOrCreateMock();
 
-        return $mock instanceof LegacyMockInterface
-            ? $mock->shouldReceive(...func_get_args())
-            : $mock->allows(...func_get_args());
+        if ($mock instanceof LegacyMockInterface) {
+            return $mock->shouldReceive(...func_get_args());
+        }
+
+        $args = func_get_args();
+
+        return static::explainForwardedMethods(fn () => $mock->allows(...$args));
     }
 
     /**
@@ -166,7 +174,9 @@ abstract class Facade
      */
     public static function expects()
     {
-        return static::getOrCreateMock()->expects(...func_get_args());
+        $args = func_get_args();
+
+        return static::explainForwardedMethods(fn () => static::getOrCreateMock()->expects(...$args));
     }
 
     /**
@@ -182,7 +192,7 @@ abstract class Facade
             : static::getOrCreateMock();
 
         return $mock instanceof DoubleInterface
-            ? $mock->expects($method)->never()
+            ? static::explainForwardedMethods(fn () => $mock->expects($method)->never())
             : $mock->shouldNotReceive(...func_get_args());
     }
 
@@ -205,7 +215,7 @@ abstract class Facade
             return $mock->shouldHaveReceived(...func_get_args());
         }
 
-        $assertion = $mock->received($method);
+        $assertion = static::explainForwardedMethods(fn () => $mock->received($method));
 
         return is_null($args) ? $assertion : $assertion->with(...$args);
     }
@@ -229,9 +239,59 @@ abstract class Facade
             return $mock->shouldNotHaveReceived(...func_get_args());
         }
 
-        $assertion = $mock->received($method);
+        $assertion = static::explainForwardedMethods(fn () => $mock->received($method));
 
         return (is_null($args) ? $assertion : $assertion->with(...$args))->never();
+    }
+
+    /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string|null
+     */
+    protected static function testingAlternative()
+    {
+        return null;
+    }
+
+    /**
+     * Run the given callback, explaining any method the facade root only forwards.
+     *
+     * @template TReturn
+     *
+     * @param  \Closure(): TReturn  $callback
+     * @return TReturn
+     *
+     * @throws \RuntimeException
+     */
+    protected static function explainForwardedMethods(Closure $callback)
+    {
+        try {
+            return $callback();
+        } catch (UnknownMethodException $e) {
+            if (! is_null($e->suggestion) || ! method_exists($e->target, '__call')) {
+                throw $e;
+            }
+
+            $facade = class_basename(static::class);
+
+            $handlesMacrosOnly = (new ReflectionMethod($e->target, '__call'))->getFileName()
+                === (new ReflectionClass(Macroable::class))->getFileName();
+
+            if ($handlesMacrosOnly && ! $e->target::hasMacro($e->method)) {
+                throw $e;
+            }
+
+            $message = $handlesMacrosOnly
+                ? sprintf("`%s::%s()` is a macro, so it can't be mocked with Double.", $facade, $e->method)
+                : sprintf("`%s::%s()` is forwarded through `%s::__call()`, so it can't be mocked with Double.", $facade, $e->method, class_basename($e->target));
+
+            throw new RuntimeException(implode(' ', array_filter([
+                $message,
+                static::testingAlternative(),
+                'Or call `Facade::useMockery()` to mock it with Mockery.',
+            ])), previous: $e);
+        }
     }
 
     /**

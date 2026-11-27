@@ -13,6 +13,7 @@ use JMac\Testing\Matching\Argument;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheSpyMemoTest extends TestCase
 {
@@ -115,5 +116,15 @@ class CacheSpyMemoTest extends TestCase
         $this->assertSame('bar', $memoizedCache->remember('key', 60, fn () => 'bar'));
 
         $memoizedCache->received('remember')->times(1)->with('key', 60, Argument::type(Closure::class));
+    }
+
+    public function test_mocking_a_forwarded_method_suggests_the_testing_alternative_when_using_double()
+    {
+        Facade::useDouble();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("`Cache::get()` is forwarded through `CacheManager::__call()`, so it can't be mocked with Double. Put real values in the cache with `Cache::put()`");
+
+        Cache::shouldReceive('get');
     }
 }

@@ -84,6 +84,16 @@ class Mail extends Facade
     }
 
     /**
+     * Get the alternative to mocking the methods the facade forwards.
+     *
+     * @return string
+     */
+    protected static function testingAlternative()
+    {
+        return 'Use `Mail::fake()` and assert with `Mail::assertSent()`.';
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
