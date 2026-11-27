@@ -97,7 +97,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * Assert if a notification was sent on-demand a number of times.
      *
      * @param  string  $notification
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertSentOnDemandTimes($notification, $times = 1)
@@ -121,11 +121,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  mixed  $notifiable
      * @param  string  $notification
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertSentToTimes($notifiable, $notification, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $count = $this->sent($notifiable, $notification)->count();
 
         PHPUnit::assertSame(
@@ -228,11 +230,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * Assert the total amount of times a notification was sent.
      *
      * @param  string  $notification
-     * @param  int  $expectedCount
+     * @param  int|array|\Countable  $expectedCount
      * @return void
      */
     public function assertSentTimes($notification, $expectedCount)
     {
+        $expectedCount = is_countable($expectedCount) ? count($expectedCount) : $expectedCount;
+
         $actualCount = (new Collection($this->notifications))
             ->flatten(1)
             ->reduce(fn ($count, $sent) => $count + count($sent[$notification] ?? []), 0);
@@ -250,11 +254,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Assert the total count of notification that were sent.
      *
-     * @param  int  $expectedCount
+     * @param  int|array|\Countable  $expectedCount
      * @return void
      */
     public function assertCount($expectedCount)
     {
+        $expectedCount = is_countable($expectedCount) ? count($expectedCount) : $expectedCount;
+
         $actualCount = (new Collection($this->notifications))->flatten(3)->count();
 
         PHPUnit::assertSame(

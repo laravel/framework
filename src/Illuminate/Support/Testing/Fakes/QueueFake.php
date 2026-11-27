@@ -162,11 +162,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Assert if a job was pushed a number of times.
      *
      * @param  string  $job
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertPushedTimes($job, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $count = $this->pushed($job)->count();
 
         PHPUnit::assertSame(
@@ -353,11 +355,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Assert the total count of jobs that were pushed.
      *
-     * @param  int  $expectedCount
+     * @param  int|array|\Countable  $expectedCount
      * @return void
      */
     public function assertCount($expectedCount)
     {
+        $expectedCount = is_countable($expectedCount) ? count($expectedCount) : $expectedCount;
+
         $actualCount = (new Collection($this->jobs))->flatten(1)->count();
 
         PHPUnit::assertSame(

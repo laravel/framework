@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
@@ -355,6 +356,25 @@ class SupportTestingBusFakeTest extends TestCase
         }
 
         $this->fake->assertDispatchedSyncTimes(BusJobStub::class, 2);
+    }
+
+    public function testTimesAssertionsAcceptCountables()
+    {
+        $this->fake->dispatch(new BusJobStub);
+        $this->fake->dispatchSync(new BusJobStub);
+        $this->fake->dispatchAfterResponse(new BusJobStub);
+
+        $this->fake->assertDispatchedTimes(BusJobStub::class, ['foo', 'bar', 'baz']);
+        $this->fake->assertDispatchedTimes(BusJobStub::class, new Collection(['foo', 'bar', 'baz']));
+        $this->fake->assertDispatchedSyncTimes(BusJobStub::class, ['foo']);
+        $this->fake->assertDispatchedAfterResponseTimes(BusJobStub::class, new Collection(['foo']));
+
+        try {
+            $this->fake->assertDispatchedTimes(BusJobStub::class, ['foo']);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\BusJobStub] job was pushed 3 times instead of 1 time.', $e->getMessage());
+        }
     }
 
     public function testAssertDispatchedSyncTimesWithCallbackFunction()

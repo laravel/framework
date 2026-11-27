@@ -9,6 +9,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailManager;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -261,6 +262,24 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
+    }
+
+    public function testTimesAssertionsAcceptCountables()
+    {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertSentTimes(MailableStub::class, ['foo', 'bar']);
+        $this->fake->assertSentTimes(MailableStub::class, new Collection(['foo', 'bar']));
+        $this->fake->assertQueuedTimes(MailableStub::class, ['foo']);
+
+        try {
+            $this->fake->assertSentTimes(MailableStub::class, ['foo']);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 time.', $e->getMessage());
+        }
     }
 
     public function testAssertSentOnce()

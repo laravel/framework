@@ -11,6 +11,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\NullQueue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -212,6 +213,23 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->push($this->job);
 
         $this->fake->assertCount(3);
+    }
+
+    public function testTimesAssertionsAcceptCountables()
+    {
+        $this->fake->push($this->job);
+        $this->fake->push($this->job);
+
+        $this->fake->assertPushedTimes(JobStub::class, ['foo', 'bar']);
+        $this->fake->assertPushedTimes(JobStub::class, new Collection(['foo', 'bar']));
+        $this->fake->assertCount(['foo', 'bar']);
+
+        try {
+            $this->fake->assertPushedTimes(JobStub::class, ['foo']);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 time.', $e->getMessage());
+        }
     }
 
     public function testAssertNothingPushed()

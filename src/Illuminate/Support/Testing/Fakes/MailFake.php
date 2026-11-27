@@ -100,11 +100,13 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was sent a number of times.
      *
      * @param  string  $mailable
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertSentTimes($mailable, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $count = $this->sent($mailable)->count();
 
         PHPUnit::assertSame(
@@ -234,11 +236,13 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was queued a number of times.
      *
      * @param  string  $mailable
-     * @param  int  $times
+     * @param  int|array|\Countable  $times
      * @return void
      */
     public function assertQueuedTimes($mailable, $times = 1)
     {
+        $times = is_countable($times) ? count($times) : $times;
+
         $count = $this->queued($mailable)->count();
 
         PHPUnit::assertSame(

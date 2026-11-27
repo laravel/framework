@@ -211,6 +211,26 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertSentOnDemandTimes(NotificationStub::class, 3);
     }
 
+    public function testTimesAssertionsAcceptCountables()
+    {
+        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->assertSentTimes(NotificationStub::class, ['foo', 'bar', 'baz']);
+        $this->fake->assertSentTimes(NotificationStub::class, new Collection(['foo', 'bar', 'baz']));
+        $this->fake->assertSentToTimes($this->user, NotificationStub::class, ['foo', 'bar']);
+        $this->fake->assertSentOnDemandTimes(NotificationStub::class, new Collection(['foo']));
+        $this->fake->assertCount(['foo', 'bar', 'baz']);
+
+        try {
+            $this->fake->assertSentToTimes($this->user, NotificationStub::class, ['foo']);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Expected ['.NotificationStub::class.'] to be sent 1 times, but was sent 2 times.', $e->getMessage());
+        }
+    }
+
     public function testAssertSentToOnce()
     {
         $this->fake->send($this->user, new NotificationStub);

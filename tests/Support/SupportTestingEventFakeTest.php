@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Events\Dispatcher as EventDispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -92,6 +93,22 @@ class SupportTestingEventFakeTest extends TestCase
         }
 
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
+    }
+
+    public function testAssertDispatchedTimesAcceptsCountables()
+    {
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->dispatch(EventStub::class);
+
+        $this->fake->assertDispatchedTimes(EventStub::class, ['foo', 'bar']);
+        $this->fake->assertDispatchedTimes(EventStub::class, new Collection(['foo', 'bar']));
+
+        try {
+            $this->fake->assertDispatchedTimes(EventStub::class, ['foo']);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 time.', $e->getMessage());
+        }
     }
 
     public function testAssertDispatchedWithArrayOfProperties()
