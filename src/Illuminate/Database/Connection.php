@@ -1380,6 +1380,29 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute the given callback using the read PDO connection for reads, even if the connection is sticky.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
+     */
+    public function usingReadPdo(Closure $callback): mixed
+    {
+        [$readOnWriteConnection, $recordsModified] = [$this->readOnWriteConnection, $this->recordsModified];
+
+        $this->readOnWriteConnection = false;
+        $this->recordsModified = false;
+
+        try {
+            return $callback($this);
+        } finally {
+            $this->readOnWriteConnection = $readOnWriteConnection;
+            $this->recordsModified = $recordsModified || $this->recordsModified;
+        }
+    }
+
+    /**
      * Get the current PDO connection.
      *
      * @return \PDO
