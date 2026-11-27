@@ -1389,7 +1389,8 @@ class Connection implements ConnectionInterface
      */
     public function usingReadPdo(Closure $callback): mixed
     {
-        [$readOnWriteConnection, $recordsModified] = [$this->readOnWriteConnection, $this->recordsModified];
+        $readOnWriteConnection = $this->readOnWriteConnection;
+        $recordsModified = $this->recordsModified;
 
         $this->readOnWriteConnection = false;
         $this->recordsModified = false;
