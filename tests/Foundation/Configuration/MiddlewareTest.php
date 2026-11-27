@@ -33,6 +33,7 @@ class MiddlewareTest extends TestCase
         PreventRequestForgery::flushState();
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
+        TrustHosts::flushState();
         TrustProxies::flushState();
 
         foreach ([Authenticate::class, AuthenticateSession::class, AuthenticationException::class, RedirectIfAuthenticated::class] as $class) {
@@ -211,6 +212,11 @@ class MiddlewareTest extends TestCase
             {
                 return '^(.+\.)?laravel\.test$';
             }
+
+            protected function applicationUrlWithoutSubdomains()
+            {
+                return '^laravel\.test$';
+            }
         };
 
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
@@ -241,6 +247,12 @@ class MiddlewareTest extends TestCase
 
         $configuration->trustHosts(at: static fn () => [], subdomains: false);
         $this->assertSame([], $middleware->hosts());
+
+        $configuration->trustHosts(subdomains: false);
+        $this->assertEquals(['^laravel\.test$'], $middleware->hosts());
+
+        $configuration->trustHosts();
+        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
     }
 
     public function testEncryptCookies()
