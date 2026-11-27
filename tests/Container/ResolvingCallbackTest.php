@@ -500,6 +500,48 @@ class ResolvingCallbackTest extends TestCase
         $this->assertEquals(2, $callCounter);
     }
 
+    public function testBeforeResolvingCallbacksDoNotAutoloadTheSameAbstractRepeatedly()
+    {
+        $container = new Container;
+        $container->instance('ResolvingCallbackTestBinding', new ResolvingImplementationStub);
+        $container->beforeResolving(ResolvingContractStub::class, fn () => null);
+
+        $autoloadAttempts = 0;
+        $autoloader = function ($class) use (&$autoloadAttempts) {
+            if ($class === 'ResolvingCallbackTestBinding') {
+                $autoloadAttempts++;
+            }
+        };
+        spl_autoload_register($autoloader);
+
+        try {
+            $container->make('ResolvingCallbackTestBinding');
+            $container->make('ResolvingCallbackTestBinding');
+            $container->make('ResolvingCallbackTestBinding');
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertSame(1, $autoloadAttempts);
+    }
+
+    public function testBeforeResolvingCallbacksRegisteredAfterResolvingAreCalled()
+    {
+        $container = new Container;
+        $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
+        $container->beforeResolving(ResolvingImplementationStubTwo::class, fn () => null);
+
+        $container->make(ResolvingImplementationStub::class);
+
+        $callCounter = 0;
+        $container->beforeResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make(ResolvingImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+    }
+
     public function testGlobalBeforeResolvingCallbacksAreCalled()
     {
         // Given a call counter initialized to zero.

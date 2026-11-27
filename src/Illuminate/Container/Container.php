@@ -175,6 +175,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $beforeResolvingCallbacks = [];
 
     /**
+     * The before resolving callback types that apply to each resolved abstract.
+     *
+     * @var array<string, list<string>>
+     */
+    protected $beforeResolvingTypesByAbstract = [];
+
+    /**
      * All of the resolving callbacks by class type.
      *
      * @var array[]
@@ -1474,6 +1481,8 @@ class Container implements ArrayAccess, ContainerContract
             $this->globalBeforeResolvingCallbacks[] = $abstract;
         } else {
             $this->beforeResolvingCallbacks[$abstract][] = $callback;
+
+            $this->beforeResolvingTypesByAbstract = [];
         }
     }
 
@@ -1536,11 +1545,30 @@ class Container implements ArrayAccess, ContainerContract
     {
         $this->fireBeforeCallbackArray($abstract, $parameters, $this->globalBeforeResolvingCallbacks);
 
-        foreach ($this->beforeResolvingCallbacks as $type => $callbacks) {
-            if ($type === $abstract || is_subclass_of($abstract, $type)) {
-                $this->fireBeforeCallbackArray($abstract, $parameters, $callbacks);
-            }
+        foreach ($this->getBeforeResolvingTypes($abstract) as $type) {
+            $this->fireBeforeCallbackArray($abstract, $parameters, $this->beforeResolvingCallbacks[$type]);
         }
+    }
+
+    /**
+     * Get the before resolving callback types that apply to the given abstract.
+     *
+     * The result is remembered because "is_subclass_of" triggers the autoloader on
+     * every call for an abstract that is not a class, such as the "config" alias.
+     *
+     * @param  string  $abstract
+     * @return list<string>
+     */
+    protected function getBeforeResolvingTypes($abstract)
+    {
+        if ($this->beforeResolvingCallbacks === []) {
+            return [];
+        }
+
+        return $this->beforeResolvingTypesByAbstract[$abstract] ??= array_values(array_filter(
+            array_keys($this->beforeResolvingCallbacks),
+            fn ($type) => $type === $abstract || is_subclass_of($abstract, $type),
+        ));
     }
 
     /**
