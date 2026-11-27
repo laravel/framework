@@ -70,8 +70,35 @@ jobs:
               exit 1
             fi
           done
+
+          # The loop above ignores runs that already finished, so a failed split still lets the
+          # release through with stale component branches. Require a green split for this commit.
+          RUN_ID=""
+
+          for ATTEMPT in $(seq 1 20); do
+            RUN_ID=$(gh run list --workflow split.yml --limit 50 --json databaseId,headSha --jq ".[] | select(.headSha == \"$SHA\") | .databaseId" | head -1)
+
+            if [ -n "$RUN_ID" ]; then
+              break
+            fi
+
+            sleep 15
+          done
+
+          if [ -z "$RUN_ID" ]; then
+            echo "No split run found for $SHA, aborting release."
+            exit 1
+          fi
+
+          gh run watch "$RUN_ID" > /dev/null
+
+          if ! gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == $ENV.JOB) | .conclusion' | grep -qx success; then
+            echo "$JOB did not succeed in run $RUN_ID, aborting release."
+            exit 1
+          fi
         env:
           JOB: Split ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Application.php version
