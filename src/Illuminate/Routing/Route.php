@@ -1203,14 +1203,13 @@ class Route
 
         return $attributes->merge(
             $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF)
-        )->map(function (ReflectionAttribute $attribute) use ($method) {
+        )->flatMap(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(
                 $method, ['only' => $instance->only, 'except' => $instance->except],
-            ) ? null : $instance->middleware;
+            ) ? [] : Arr::wrap($instance->middleware);
         })
-            ->filter()
             ->values()
             ->all();
     }

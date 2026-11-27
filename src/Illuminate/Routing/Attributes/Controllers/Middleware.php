@@ -9,11 +9,12 @@ use Closure;
 class Middleware
 {
     /**
+     * @param  array<\Closure|string>|\Closure|string  $middleware
      * @param  array<string>|null  $only
      * @param  array<string>|null  $except
      */
     public function __construct(
-        public Closure|string $middleware,
+        public array|Closure|string $middleware,
         public ?array $only = null,
         public ?array $except = null,
     ) {

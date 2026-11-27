@@ -23,6 +23,40 @@ class MiddlewareAttributeTest extends TestCase
             'except-index',
         ], $route->controllerMiddleware());
     }
+
+    public function test_attribute_middleware_accepts_an_array(): void
+    {
+        $route = Route::get('/', [MiddlewareAttributeArrayController::class, 'index']);
+        $this->assertEquals([
+            'auth',
+            'verified',
+            'only-index',
+            'also-index',
+            'can:update,post',
+        ], $route->controllerMiddleware());
+
+        $route = Route::get('/', [MiddlewareAttributeArrayController::class, 'show']);
+        $this->assertEquals([
+            'auth',
+            'verified',
+        ], $route->controllerMiddleware());
+    }
+}
+
+#[Middleware(['auth', 'verified'])]
+#[Middleware(['only-index'], only: ['index'])]
+class MiddlewareAttributeArrayController
+{
+    #[Middleware(['also-index', 'can:update,post'])]
+    public function index(): void
+    {
+        // ...
+    }
+
+    public function show(): void
+    {
+        // ...
+    }
 }
 
 #[Middleware('all')]
