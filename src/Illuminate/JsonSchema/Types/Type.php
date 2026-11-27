@@ -42,6 +42,11 @@ abstract class Type extends JsonSchema
     protected ?bool $nullable = null;
 
     /**
+     * The name the type is registered under in the root "$defs".
+     */
+    protected ?string $definition = null;
+
+    /**
      * Indicate that the type is required.
      */
     public function required(bool $required = true): static
@@ -77,6 +82,16 @@ abstract class Type extends JsonSchema
     public function description(string $value): static
     {
         $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Register the type under the given name in the root "$defs" so it can be referenced with "ref()".
+     */
+    public function define(string $name): static
+    {
+        $this->definition = $name;
 
         return $this;
     }

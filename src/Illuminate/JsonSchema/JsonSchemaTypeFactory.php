@@ -72,6 +72,14 @@ class JsonSchemaTypeFactory extends JsonSchema implements JsonSchemaContract
     }
 
     /**
+     * Create a new reference to a schema registered with "define()".
+     */
+    public function ref(string $name): Types\RefType
+    {
+        return new Types\RefType($name);
+    }
+
+    /**
      * Create a new anyOf schema instance.
      *
      * @param  (Closure(JsonSchemaTypeFactory): array<int, Types\Type>)|array<int, Types\Type>  $schemas

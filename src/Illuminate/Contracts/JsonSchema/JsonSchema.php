@@ -4,6 +4,9 @@ namespace Illuminate\Contracts\JsonSchema;
 
 use Closure;
 
+/**
+ * @method \Illuminate\JsonSchema\Types\RefType ref(string $name)
+ */
 interface JsonSchema
 {
     /**

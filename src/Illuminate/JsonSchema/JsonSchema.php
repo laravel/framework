@@ -14,6 +14,7 @@ use Illuminate\JsonSchema\Types\Type;
  * @method static Types\BooleanType boolean()
  * @method static Types\ArrayType array()
  * @method static Types\UnionType union(array<int, string> $types)
+ * @method static Types\RefType ref(string $name)
  */
 class JsonSchema
 {
