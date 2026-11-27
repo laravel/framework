@@ -135,6 +135,9 @@ class PreventRequestForgery
     /**
      * Determine if the request has a valid origin based on the Sec-Fetch-Site header.
      *
+     * Browsers only send Sec-Fetch-Site to secure origins, so a request without
+     * it falls back to comparing the Origin header with the request's host.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      *
@@ -152,11 +155,40 @@ class PreventRequestForgery
             return true;
         }
 
+        if ($secFetchSite === null && $this->originMatchesHost($request)) {
+            return true;
+        }
+
         if (static::$originOnly) {
             throw new OriginMismatchException('Origin mismatch.');
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the request's Origin header matches the host it was sent to.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function originMatchesHost($request)
+    {
+        $origin = $request->header('Origin');
+
+        if (! is_string($origin) || $origin === '' || $origin === 'null') {
+            return false;
+        }
+
+        $host = parse_url($origin, PHP_URL_HOST);
+
+        if (! is_string($host)) {
+            return false;
+        }
+
+        $port = parse_url($origin, PHP_URL_PORT);
+
+        return strtolower($port ? $host.':'.$port : $host) === strtolower($request->getHttpHost());
     }
 
     /**

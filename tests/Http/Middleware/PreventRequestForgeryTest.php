@@ -85,6 +85,78 @@ class PreventRequestForgeryTest extends TestCase
         $middleware->handle($request, fn () => new Response('OK'));
     }
 
+    public function test_missing_header_with_matching_origin_passes()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'http://example.com']);
+
+        $response = $middleware->handle($request, fn () => new Response('OK'));
+
+        $this->assertSame('OK', $response->getContent());
+    }
+
+    public function test_missing_header_with_matching_origin_and_port_passes()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'http://example.com:8000'], url: 'http://example.com:8000/test');
+
+        $response = $middleware->handle($request, fn () => new Response('OK'));
+
+        $this->assertSame('OK', $response->getContent());
+    }
+
+    public function test_missing_header_with_other_origin_fails()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'http://evil.com']);
+
+        $this->expectException(TokenMismatchException::class);
+
+        $middleware->handle($request, fn () => new Response('OK'));
+    }
+
+    public function test_missing_header_with_other_port_fails()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'http://example.com:8080']);
+
+        $this->expectException(TokenMismatchException::class);
+
+        $middleware->handle($request, fn () => new Response('OK'));
+    }
+
+    public function test_missing_header_with_null_origin_fails()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'null']);
+
+        $this->expectException(TokenMismatchException::class);
+
+        $middleware->handle($request, fn () => new Response('OK'));
+    }
+
+    public function test_cross_site_header_ignores_matching_origin()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'cross-site', 'HTTP_ORIGIN' => 'http://example.com']);
+
+        $this->expectException(TokenMismatchException::class);
+
+        $middleware->handle($request, fn () => new Response('OK'));
+    }
+
+    public function test_origin_only_mode_passes_matching_origin_without_header()
+    {
+        PreventRequestForgery::useOriginOnly();
+
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(['HTTP_ORIGIN' => 'http://example.com']);
+
+        $response = $middleware->handle($request, fn () => new Response('OK'));
+
+        $this->assertSame('OK', $response->getContent());
+    }
+
     public function test_origin_only_mode_rejects_cross_site()
     {
         PreventRequestForgery::useOriginOnly();
@@ -142,10 +214,10 @@ class PreventRequestForgeryTest extends TestCase
         $this->assertEquals('OK', $response->getContent());
     }
 
-    protected function createRequest(array $server = [], ?string $token = null, string $method = 'POST')
+    protected function createRequest(array $server = [], ?string $token = null, string $method = 'POST', string $url = 'http://example.com/test')
     {
         $request = Request::create(
-            'http://example.com/test',
+            $url,
             $method,
             $token ? ['_token' => $token] : [],
             [],
