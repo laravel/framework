@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class CloudBootstrapperTest extends TestCase
 {
-    public function test_it_configures_the_cloud_json_logging_formatter()
+    public function test_it_configures_the_monolog_json_logging_formatter()
     {
         CloudBootstrapper::configureCloudLogging($this->app);
 
