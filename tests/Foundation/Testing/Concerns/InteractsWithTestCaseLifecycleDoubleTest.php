@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Testing\TestCase as FoundationTestCase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use JMac\Testing\Double;
 use Orchestra\Testbench\Concerns\CreatesApplication;
@@ -85,6 +87,20 @@ class InteractsWithTestCaseLifecycleDoubleTest extends TestCase
         }
     }
 
+    public function testTearDownSkipsDatabaseDoubleWhenUsingDouble()
+    {
+        Facade::useDouble();
+
+        $test = new LifecycleTestCase('testPlaceholder');
+        $test->runSetUp();
+
+        DB::shouldReceive('connection')->never();
+
+        $this->assertInstanceOf(DatabaseManager::class, $test->app()->make('db'));
+
+        $test->setStatus(TestStatus::success());
+        $test->runTearDown();
+    }
 }
 
 class LifecycleTestCase extends FoundationTestCase
@@ -99,6 +115,11 @@ class LifecycleTestCase extends FoundationTestCase
     public function runTearDown(): void
     {
         $this->tearDown();
+    }
+
+    public function app()
+    {
+        return $this->app;
     }
 
     public function testPlaceholder()
