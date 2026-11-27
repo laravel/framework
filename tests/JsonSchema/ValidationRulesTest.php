@@ -297,6 +297,22 @@ class ValidationRulesTest extends TestCase
         $this->assertFalse($this->passes($schema, ['size' => ['w' => '01', 'h' => '2.0']]));
     }
 
+    public function test_a_mixed_enum_compares_scalar_values_strictly()
+    {
+        $schema = ['type' => 'object', 'properties' => [
+            'filter' => ['enum' => [['all'], true, 0, 1]],
+        ], 'required' => ['filter']];
+
+        $this->assertTrue($this->passes($schema, ['filter' => ['all']]));
+        $this->assertTrue($this->passes($schema, ['filter' => true]));
+        $this->assertTrue($this->passes($schema, ['filter' => 0]));
+        $this->assertTrue($this->passes($schema, ['filter' => 1]));
+        $this->assertFalse($this->passes($schema, ['filter' => 'anything']));
+        $this->assertFalse($this->passes($schema, ['filter' => '01']));
+        $this->assertFalse($this->passes($schema, ['filter' => '1']));
+        $this->assertFalse($this->passes($schema, ['filter' => false]));
+    }
+
     public function test_exclusive_numeric_bounds()
     {
         $schema = $this->schema(fn ($s) => ['price' => $s->number()->required()]);
