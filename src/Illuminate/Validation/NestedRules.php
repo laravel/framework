@@ -30,12 +30,13 @@ class NestedRules implements CompilableRules
      * @param  mixed  $value
      * @param  mixed  $data
      * @param  mixed  $context
+     * @param  array|null  $undottedData
      * @return \stdClass
      */
-    public function compile($attribute, $value, $data = null, $context = null)
+    public function compile($attribute, $value, $data = null, $context = null, $undottedData = null)
     {
         $rules = call_user_func($this->callback, $value, $attribute, $data, $context);
 
-        return Rule::compile($attribute, $rules, $data);
+        return Rule::compile($attribute, $rules, $data, $undottedData);
     }
 }

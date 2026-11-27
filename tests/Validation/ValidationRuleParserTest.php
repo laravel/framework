@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\ParameterizedRule;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationRuleParser;
 use PHPUnit\Framework\TestCase;
 
@@ -542,5 +546,118 @@ class ValidationRuleParserTest extends TestCase
                 'between:1,2',
             ],
         ], $results->rules);
+    }
+
+    public function testExplodeGivesNestedRulesTheUndottedDataForEveryMatchingKey()
+    {
+        $data = [
+            'items' => [
+                ['discounts' => [['id' => 1], ['id' => 2]]],
+                ['discounts' => [['id' => 3]]],
+                ['discounts' => []],
+            ],
+        ];
+
+        $rule = new class(fn () => ['discounts.*.id' => 'distinct']) extends NestedRules
+        {
+            public $undottedData = [];
+
+            public function compile($attribute, $value, $data = null, $context = null, $undottedData = null)
+            {
+                $this->undottedData[$attribute] = $undottedData;
+
+                return parent::compile($attribute, $value, $data, $context, $undottedData);
+            }
+        };
+
+        $results = (new ValidationRuleParser($data))->explode(['items.*' => $rule]);
+
+        $undotted = Arr::undot(ValidationData::initializeAndGatherData('items.*', $data));
+
+        $this->assertSame([
+            'items.0' => $undotted,
+            'items.1' => $undotted,
+            'items.2' => $undotted,
+        ], $rule->undottedData);
+
+        $this->assertEquals([
+            'items.0.discounts.0.id' => ['distinct'],
+            'items.0.discounts.1.id' => ['distinct'],
+            'items.1.discounts.0.id' => ['distinct'],
+        ], $results->rules);
+    }
+
+    public function testExplodeGivesNestedRulesCallbacksTheDottedData()
+    {
+        $data = ['items' => [['name' => 'foo'], ['name' => 'bar']]];
+
+        $received = [];
+
+        $rules = [
+            'items.*' => Rule::forEach(function ($value, $attribute, $data, $context) use (&$received) {
+                $received[$attribute] = [$value, $data, $context];
+
+                return ['name' => 'required'];
+            }),
+        ];
+
+        (new ValidationRuleParser($data))->explode($rules);
+
+        $dotted = ValidationData::initializeAndGatherData('items.*', $data);
+
+        $this->assertSame([
+            'items.0' => [['name' => 'foo'], $dotted, $data['items']],
+            'items.1' => [['name' => 'bar'], $dotted, $data['items']],
+        ], $received);
+    }
+
+    public function testExplodeCompilesOtherCompilableRulesWithoutUndottedData()
+    {
+        $rule = new class implements CompilableRules
+        {
+            public $arguments = [];
+
+            public function compile($attribute, $value, $data = null, $context = null)
+            {
+                $this->arguments[] = func_get_args();
+
+                return Rule::compile($attribute, ['name' => 'required'], $data);
+            }
+        };
+
+        $data = ['items' => [['name' => 'foo'], ['name' => 'bar']]];
+
+        $results = (new ValidationRuleParser($data))->explode(['items.*' => $rule]);
+
+        $dotted = ValidationData::initializeAndGatherData('items.*', $data);
+
+        $this->assertSame([
+            ['items.0', ['name' => 'foo'], $dotted, $data['items']],
+            ['items.1', ['name' => 'bar'], $dotted, $data['items']],
+        ], $rule->arguments);
+
+        $this->assertEquals([
+            'items.0.name' => ['required'],
+            'items.1.name' => ['required'],
+        ], $results->rules);
+    }
+
+    public function testCompileExplodesAgainstTheUndottedDataItIsGiven()
+    {
+        $dotted = ['items.0.tags.0' => 'foo', 'items.0.tags.1' => 'bar'];
+
+        $this->assertEquals([
+            'items.0.tags.0' => ['string'],
+            'items.0.tags.1' => ['string'],
+        ], Rule::compile('items.0', ['tags.*' => 'string'], $dotted)->rules);
+
+        $this->assertEquals(
+            Rule::compile('items.0', ['tags.*' => 'string'], $dotted),
+            Rule::compile('items.0', ['tags.*' => 'string'], $dotted, Arr::undot($dotted))
+        );
+
+        $this->assertEquals([
+            'items.0.tags.0' => ['string'],
+        ], Rule::compile('items.0', ['tags.*' => 'string'], $dotted, ['items' => [['tags' => ['foo']]]])->rules);
     }
 }

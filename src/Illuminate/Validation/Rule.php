@@ -933,12 +933,13 @@ class Rule
      * @param  string  $attribute
      * @param  array  $rules
      * @param  array|null  $data
+     * @param  array|null  $undottedData
      * @return object|\stdClass
      */
-    public static function compile($attribute, $rules, $data = null)
+    public static function compile($attribute, $rules, $data = null, $undottedData = null)
     {
         $parser = new ValidationRuleParser(
-            Arr::undot(Arr::wrap($data))
+            $undottedData ?? Arr::undot(Arr::wrap($data))
         );
 
         if (is_array($rules) && ! array_is_list($rules)) {
