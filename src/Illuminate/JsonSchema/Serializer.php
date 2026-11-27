@@ -2,6 +2,7 @@
 
 namespace Illuminate\JsonSchema;
 
+use InvalidArgumentException;
 use RuntimeException;
 
 class Serializer
@@ -11,25 +12,71 @@ class Serializer
      *
      * @var array<int, string>
      */
-    protected static array $ignore = ['required', 'nullable'];
+    protected static array $ignore = ['required', 'nullable', 'definition'];
 
     /**
      * Serialize the given property to an array.
      *
+     * Types registered with "define()" are hoisted into the root "$defs" and replaced by a "$ref" pointer.
+     *
      * @return array<string, mixed>
      *
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public static function serialize(Types\Type $type): array
+    {
+        $definitions = ['schemas' => [], 'types' => []];
+
+        $schema = static::serializeType($type, $definitions, inline: true);
+
+        if ($definitions['schemas'] !== []) {
+            $schema['$defs'] = $definitions['schemas'];
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Serialize the given type, collecting any named definitions it contains.
+     *
+     * @param  array{schemas: array<string, array<string, mixed>>, types: array<string, \Illuminate\JsonSchema\Types\Type>}  $definitions
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    protected static function serializeType(Types\Type $type, array &$definitions, bool $inline = false): array
     {
         /** @var array<string, mixed> $attributes */
         $attributes = (fn () => get_object_vars($type))->call($type);
 
+        if (is_string($name = $attributes['definition'] ?? null)) {
+            static::define($name, $type, $definitions);
+
+            if (! $inline) {
+                return ['$ref' => static::pointer($name)];
+            }
+        }
+
+        if ($type instanceof Types\RefType) {
+            $reference = ['$ref' => static::pointer($attributes['ref'])];
+
+            unset($attributes['ref']);
+
+            $attributes = static::filter($attributes);
+
+            return static::isNullable($type)
+                ? [...$attributes, 'anyOf' => [$reference, ['type' => 'null']]]
+                : [...$reference, ...$attributes];
+        }
+
         if ($type instanceof Types\AnyOfType) {
-            $attributes['anyOf'] = array_map(
-                static fn (Types\Type $schema) => static::serialize($schema),
-                $attributes['schemas'],
-            );
+            $attributes['anyOf'] = [];
+
+            foreach ($attributes['schemas'] as $schema) {
+                $attributes['anyOf'][] = static::serializeType($schema, $definitions);
+            }
 
             unset($attributes['schemas']);
 
@@ -37,13 +84,7 @@ class Serializer
                 $attributes['anyOf'][] = ['type' => 'null'];
             }
 
-            return array_filter($attributes, static function (mixed $value, string $key) {
-                if (in_array($key, static::$ignore, true)) {
-                    return false;
-                }
-
-                return $value !== null;
-            }, ARRAY_FILTER_USE_BOTH);
+            return static::filter($attributes);
         }
 
         $attributes['type'] = match (get_class($type)) {
@@ -67,13 +108,7 @@ class Serializer
                 : [$attributes['type'], 'null'];
         }
 
-        $attributes = array_filter($attributes, static function (mixed $value, string $key) {
-            if (in_array($key, static::$ignore, true)) {
-                return false;
-            }
-
-            return $value !== null;
-        }, ARRAY_FILTER_USE_BOTH);
+        $attributes = static::filter($attributes);
 
         if ($type instanceof Types\ObjectType) {
             if (count($attributes['properties']) === 0) {
@@ -91,20 +126,68 @@ class Serializer
                     $attributes['required'] = $required;
                 }
 
-                $attributes['properties'] = array_map(
-                    static fn (Types\Type $property) => static::serialize($property),
-                    $attributes['properties'],
-                );
+                foreach ($attributes['properties'] as $key => $property) {
+                    $attributes['properties'][$key] = static::serializeType($property, $definitions);
+                }
             }
         }
 
         if ($type instanceof Types\ArrayType) {
             if (isset($attributes['items']) && $attributes['items'] instanceof Types\Type) {
-                $attributes['items'] = static::serialize($attributes['items']);
+                $attributes['items'] = static::serializeType($attributes['items'], $definitions);
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * Register the given type as a named definition.
+     *
+     * @param  array{schemas: array<string, array<string, mixed>>, types: array<string, \Illuminate\JsonSchema\Types\Type>}  $definitions
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected static function define(string $name, Types\Type $type, array &$definitions): void
+    {
+        if (isset($definitions['types'][$name])) {
+            if ($definitions['types'][$name] !== $type) {
+                throw new InvalidArgumentException("The schema definition [{$name}] has already been defined.");
+            }
+
+            return;
+        }
+
+        // Reserve the name before serializing so the definition keeps its position...
+        $definitions['types'][$name] = $type;
+        $definitions['schemas'][$name] = [];
+
+        $definitions['schemas'][$name] = static::serializeType($type, $definitions, inline: true);
+    }
+
+    /**
+     * Get the JSON pointer to the given definition.
+     */
+    protected static function pointer(string $name): string
+    {
+        return '#/$defs/'.str_replace(['~', '/'], ['~0', '~1'], $name);
+    }
+
+    /**
+     * Remove ignored and empty attributes.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    protected static function filter(array $attributes): array
+    {
+        return array_filter($attributes, static function (mixed $value, string $key) {
+            if (in_array($key, static::$ignore, true)) {
+                return false;
+            }
+
+            return $value !== null;
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**
