@@ -91,13 +91,6 @@ trait InteractsWithTestCaseLifecycle
     protected $setUpHasRun = false;
 
     /**
-     * Indicates if the expectations of doubles are verified when the test ends.
-     *
-     * @var bool
-     */
-    protected $verifiesDoubles = false;
-
-    /**
      * Setup the test environment.
      *
      * @internal
@@ -106,10 +99,8 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTheTestEnvironment(): void
     {
-        if (! Facade::usesMockery() && class_exists(Double::class)) {
+        if (class_exists(Double::class) && Facade::usesDouble()) {
             Double::enableAutoVerify();
-
-            $this->verifiesDoubles = true;
         }
 
         Facade::clearResolvedInstances();
@@ -193,9 +184,7 @@ trait InteractsWithTestCaseLifecycle
 
         $this->flushState();
 
-        if ($this->verifiesDoubles) {
-            $this->verifiesDoubles = false;
-
+        if (class_exists(Double::class) && Facade::usesDouble()) {
             Double::verifyAll(testFailed: ! $this->status()->isSuccess());
         }
 

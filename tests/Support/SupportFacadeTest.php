@@ -3,12 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Traits\Macroable;
-use JMac\Testing\Double;
 use JMac\Testing\DoubleInterface;
-use JMac\Testing\Exceptions\UnknownMethodException;
 use JMac\Testing\Integrations\PHPUnit\PHPUnitUnexpectedCallException;
 use Mockery;
 use Mockery\MockInterface;
@@ -30,15 +26,6 @@ class SupportFacadeTest extends TestCase
         Facade::useMockery();
 
         parent::tearDown();
-    }
-
-    protected function setUpApplication(): ApplicationStub
-    {
-        $app = new ApplicationStub;
-        $app->setAttributes(['foo' => new FacadeStubTarget]);
-        FacadeStub::setFacadeApplication($app);
-
-        return $app;
     }
 
     public function testFacadeCallsUnderlyingApplication()
@@ -107,29 +94,20 @@ class SupportFacadeTest extends TestCase
 
     public function testUsesMockeryByDefault()
     {
-        $this->assertTrue(Facade::usesMockery());
+        $this->assertFalse(Facade::usesDouble());
 
         Facade::useDouble();
-        $this->assertFalse(Facade::usesMockery());
+        $this->assertTrue(Facade::usesDouble());
 
         Facade::useMockery();
-        $this->assertTrue(Facade::usesMockery());
-    }
-
-    public function testSwappedDoubleIsConfiguredByTheFacade()
-    {
-        $app = $this->setUpApplication();
-
-        FacadeStub::swap($double = Double::for(FacadeStubTarget::class));
-        FacadeStub::shouldReceive('foo')->returns('baz');
-
-        $this->assertSame($double, $app['foo']);
-        $this->assertSame('baz', FacadeStub::foo());
+        $this->assertFalse(Facade::usesDouble());
     }
 
     public function testShouldHaveReceivedForwardsToMockerySpy()
     {
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         $spy = FacadeStub::spy();
 
@@ -143,7 +121,9 @@ class SupportFacadeTest extends TestCase
 
     public function testShouldNotReceiveForwardsToMockeryMock()
     {
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::shouldReceive('foo');
 
@@ -152,10 +132,12 @@ class SupportFacadeTest extends TestCase
         FacadeStub::foo();
     }
 
-    public function testShouldReceiveSwapsInADoubleWhenUsingDouble()
+    public function testShouldReceiveReturnsADouble()
     {
         Facade::useDouble();
-        $app = $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::shouldReceive('foo')->with('bar')->returns('baz');
 
@@ -164,10 +146,12 @@ class SupportFacadeTest extends TestCase
         $this->assertSame('baz', FacadeStub::foo('bar'));
     }
 
-    public function testShouldReceiveCreatesAStrictDoubleWhenUsingDouble()
+    public function testShouldReceiveCreatesAStrictDouble()
     {
         Facade::useDouble();
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::shouldReceive('foo');
 
@@ -176,10 +160,12 @@ class SupportFacadeTest extends TestCase
         FacadeStub::foo2();
     }
 
-    public function testSpyReturnsADoubleWhenUsingDouble()
+    public function testSpyReturnsADouble()
     {
         Facade::useDouble();
-        $app = $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf(DoubleInterface::class, $spy = FacadeStub::spy());
         $this->assertSame($spy, $app['foo']);
@@ -190,10 +176,12 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldHaveReceived('foo');
     }
 
-    public function testShouldReceiveCanBeCalledTwiceWhenUsingDouble()
+    public function testShouldReceiveCanBeCalledTwiceWithDouble()
     {
         Facade::useDouble();
-        $app = $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::expects('foo')->with('bar')->returns('baz');
         FacadeStub::expects('foo2')->with('bar2')->returns('baz2');
@@ -202,20 +190,22 @@ class SupportFacadeTest extends TestCase
         $this->assertSame('baz2', $app['foo']->foo2('bar2'));
     }
 
-    public function testCannotBeMockedWithoutUnderlyingInstanceWhenUsingDouble()
+    public function testDoubleRequiresUnderlyingInstance()
     {
         Facade::useDouble();
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not have a resolvable root');
+        $this->expectExceptionMessage('A facade root has not been set.');
 
         FacadeStub::expects('foo');
     }
 
-    public function testShouldNotReceiveWhenUsingDouble()
+    public function testShouldNotReceiveWithDouble()
     {
         Facade::useDouble();
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::shouldReceive('foo');
         FacadeStub::shouldNotReceive('foo2');
@@ -227,10 +217,12 @@ class SupportFacadeTest extends TestCase
         FacadeStub::foo2();
     }
 
-    public function testShouldHaveReceivedWithArgumentsWhenUsingDouble()
+    public function testShouldHaveReceivedWithDouble()
     {
         Facade::useDouble();
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::spy();
 
@@ -242,21 +234,12 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldNotHaveReceived('foo2');
     }
 
-    public function testShouldHaveReceivedRequiresAMockWhenUsingDouble()
+    public function testPartialMockPassesThroughWithDouble()
     {
         Facade::useDouble();
-        $this->setUpApplication();
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('must be spied or mocked');
-
-        FacadeStub::shouldHaveReceived('foo');
-    }
-
-    public function testPartialMockPassesThroughToTheRealInstanceWhenUsingDouble()
-    {
-        Facade::useDouble();
-        $this->setUpApplication();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
 
         FacadeStub::partialMock()->allows('foo2')->returns('baz');
 
@@ -264,22 +247,7 @@ class SupportFacadeTest extends TestCase
         $this->assertSame('baz', FacadeStub::foo2());
     }
 
-    public function testDoubleIsReusedAfterClearingResolvedInstancesWhenUsingDouble()
-    {
-        Facade::useDouble();
-        $this->setUpApplication();
-
-        FacadeStub::shouldReceive('foo')->returns('baz');
-
-        Facade::clearResolvedInstances();
-
-        FacadeStub::shouldReceive('foo2')->returns('baz2');
-
-        $this->assertSame('baz', FacadeStub::foo());
-        $this->assertSame('baz2', FacadeStub::foo2());
-    }
-
-    public function testRootWithReservedMethodNamesCanBeMockedWhenUsingDouble()
+    public function testRootWithReservedMethodNamesCanBeDoubled()
     {
         Facade::useDouble();
         $app = new ApplicationStub;
@@ -292,145 +260,6 @@ class SupportFacadeTest extends TestCase
         $this->assertTrue(FacadeStub::allows('ability'));
 
         FacadeStub::shouldHaveReceived('allows')->with('ability');
-    }
-
-    public function testSwappedMockeryMockIsConfiguredByTheFacadeWhenUsingDouble()
-    {
-        Facade::useDouble();
-        $app = $this->setUpApplication();
-
-        FacadeStub::swap($mock = Mockery::mock(FacadeStubTarget::class));
-        FacadeStub::shouldReceive('foo')->andReturn('baz');
-
-        $this->assertSame($mock, $app['foo']);
-        $this->assertSame('baz', FacadeStub::foo());
-    }
-
-    public function testForwardedMethodExplainsTheTestingAlternativeWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
-
-        $exception = $this->catchRuntimeException(fn () => Auth::shouldReceive('forwarded'));
-
-        $this->assertSame(
-            "`Auth::forwarded()` is forwarded through `FacadeStubForwardingTarget::__call()`, so it can't be mocked with Double. Authenticate a real user with `actingAs()` and assert with `assertAuthenticated()` or `assertGuest()`. Or call `Facade::useMockery()` to mock it with Mockery.",
-            $exception->getMessage()
-        );
-        $this->assertInstanceOf(UnknownMethodException::class, $exception->getPrevious());
-    }
-
-    public function testForwardedMethodExplainsTheInheritedTestingAlternativeWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
-
-        $exception = $this->catchRuntimeException(fn () => FacadeStubExtendingAuth::shouldReceive('forwarded'));
-
-        $this->assertStringContainsString('Authenticate a real user with `actingAs()`', $exception->getMessage());
-    }
-
-    public function testForwardedMethodExplainsTheOverriddenTestingAlternativeWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget);
-
-        $exception = $this->catchRuntimeException(fn () => FacadeStubWithAlternative::shouldReceive('forwarded'));
-
-        $this->assertSame(
-            "`FacadeStubWithAlternative::forwarded()` is forwarded through `FacadeStubForwardingTarget::__call()`, so it can't be mocked with Double. Use the real thing. Or call `Facade::useMockery()` to mock it with Mockery.",
-            $exception->getMessage()
-        );
-    }
-
-    public function testForwardedMethodWithoutTestingAlternativeWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget);
-
-        $exception = $this->catchRuntimeException(fn () => FacadeStub::expects('forwarded'));
-
-        $this->assertSame(
-            "`FacadeStub::forwarded()` is forwarded through `FacadeStubForwardingTarget::__call()`, so it can't be mocked with Double. Or call `Facade::useMockery()` to mock it with Mockery.",
-            $exception->getMessage()
-        );
-    }
-
-    public function testReceivedForwardedMethodExplainsTheTestingAlternativeWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget, 'auth');
-
-        Auth::spy();
-
-        $exception = $this->catchRuntimeException(fn () => Auth::shouldHaveReceived('forwarded'));
-
-        $this->assertStringContainsString('Authenticate a real user with `actingAs()`', $exception->getMessage());
-    }
-
-    public function testCloseMatchKeepsTheSuggestionWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubForwardingTarget);
-
-        $this->expectException(UnknownMethodException::class);
-        $this->expectExceptionMessage('store');
-
-        FacadeStub::shouldReceive('stor');
-    }
-
-    public function testMacroIsExplainedWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubMacroableTarget);
-
-        FacadeStubMacroableTarget::macro('shout', fn () => 'HEY');
-
-        try {
-            $exception = $this->catchRuntimeException(fn () => FacadeStub::shouldReceive('shout'));
-
-            $this->assertStringStartsWith("`FacadeStub::shout()` is a macro, so it can't be mocked with Double.", $exception->getMessage());
-        } finally {
-            FacadeStubMacroableTarget::flushMacros();
-        }
-    }
-
-    public function testUndeclaredMethodOnMacroOnlyRootIsUnchangedWhenUsingDouble()
-    {
-        Facade::useDouble();
-
-        $this->setUpApplicationWith(new FacadeStubMacroableTarget);
-
-        $this->expectException(UnknownMethodException::class);
-
-        FacadeStub::shouldReceive('missing');
-    }
-
-    protected function setUpApplicationWith(object $root, string $accessor = 'foo'): ApplicationStub
-    {
-        $app = new ApplicationStub;
-        $app->setAttributes([$accessor => $root]);
-        FacadeStub::setFacadeApplication($app);
-
-        return $app;
-    }
-
-    protected function catchRuntimeException(callable $callback): RuntimeException
-    {
-        try {
-            $callback();
-        } catch (RuntimeException $exception) {
-            return $exception;
-        }
-
-        $this->fail('Expected a RuntimeException to be thrown.');
     }
 
     public function testFacadeResolvesAgainAfterClearingSpecific()
@@ -476,42 +305,6 @@ class FacadeStub extends Facade
     {
         return 'foo';
     }
-}
-
-class FacadeStubExtendingAuth extends Auth
-{
-    //
-}
-
-class FacadeStubWithAlternative extends Facade
-{
-    protected static function testingAlternative()
-    {
-        return 'Use the real thing.';
-    }
-
-    protected static function getFacadeAccessor()
-    {
-        return 'foo';
-    }
-}
-
-class FacadeStubForwardingTarget
-{
-    public function store()
-    {
-        return 'store';
-    }
-
-    public function __call($method, $parameters)
-    {
-        return $method;
-    }
-}
-
-class FacadeStubMacroableTarget
-{
-    use Macroable;
 }
 
 class FacadeStubTarget

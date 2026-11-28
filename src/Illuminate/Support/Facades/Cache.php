@@ -87,31 +87,29 @@ class Cache extends Facade
     }
 
     /**
-     * Convert the facade into a spy that passes calls through to the real cache.
+     * Convert the facade into a Mockery spy.
      *
      * @return \Mockery\MockInterface
      */
     public static function spy()
     {
+        if (static::$usesDouble) {
+            return static::getDouble() ?? static::createFreshDouble()->passthru();
+        }
+
         if (! static::isMock()) {
-            if (static::$usesMockery) {
-                static::ensureMockingLibraryIsInstalled();
+            $class = static::getMockableClass();
+            $instance = static::getFacadeRoot();
 
-                $class = static::getMockableClass();
-                $instance = static::getFacadeRoot();
-
-                if ($class && $instance) {
-                    return tap(Mockery::spy($instance)->makePartial(), function ($spy) {
-                        static::swap($spy);
-                    });
-                }
-
-                return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            if ($class && $instance) {
+                return tap(Mockery::spy($instance)->makePartial(), function ($spy) {
                     static::swap($spy);
                 });
             }
 
-            return static::createFreshMockInstance()->passthru();
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+                static::swap($spy);
+            });
         }
     }
 }
