@@ -164,6 +164,7 @@ class InteractsWithContainerTest extends TestCase
 
         $spy = $this->spy(InstanceStub::class);
 
+        $this->assertInstanceOf(DoubleInterface::class, $spy);
         $this->assertNull($this->app->make(InstanceStub::class)->execute());
 
         $spy->received('execute');

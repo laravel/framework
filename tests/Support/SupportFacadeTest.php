@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use Illuminate\Support\Facades\Facade;
+use JMac\Testing\Double;
 use JMac\Testing\DoubleInterface;
 use JMac\Testing\Exceptions\StaticMethodException;
 use JMac\Testing\Integrations\PHPUnit\PHPUnitUnexpectedCallException;
@@ -247,6 +248,21 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldHaveReceived('foo')->with('bar')->times(1);
         FacadeStub::shouldNotHaveReceived('foo', ['baz']);
         FacadeStub::shouldNotHaveReceived('foo2');
+
+        $this->expectException(AssertionFailedError::class);
+
+        FacadeStub::shouldHaveReceived('foo', ['baz']);
+    }
+
+    public function testShouldHaveReceivedWithSwappedDouble()
+    {
+        Facade::useDouble();
+
+        FacadeStub::swap(Double::for(FacadeStubTarget::class));
+
+        FacadeStub::foo('bar');
+
+        FacadeStub::shouldHaveReceived('foo')->with('bar');
     }
 
     public function testPartialMockPassesThroughWithDouble()
