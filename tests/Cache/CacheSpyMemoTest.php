@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
 use JMac\Testing\DoubleInterface;
+use JMac\Testing\Exceptions\UnknownMethodException;
 use JMac\Testing\Matching\Argument;
 use Mockery;
 use Mockery\LegacyMockInterface;
@@ -115,5 +116,14 @@ class CacheSpyMemoTest extends TestCase
         $this->assertSame('bar', $memoizedCache->remember('key', 60, fn () => 'bar'));
 
         $memoizedCache->received('remember')->times(1)->with('key', 60, Argument::type(Closure::class));
+    }
+
+    public function test_cache_should_receive_forwarded_method_throws_when_using_double()
+    {
+        Facade::useDouble();
+
+        $this->expectException(UnknownMethodException::class);
+
+        Cache::shouldReceive('get');
     }
 }

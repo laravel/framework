@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use Illuminate\Support\Facades\Facade;
 use JMac\Testing\DoubleInterface;
+use JMac\Testing\Exceptions\StaticMethodException;
 use JMac\Testing\Integrations\PHPUnit\PHPUnitUnexpectedCallException;
 use Mockery;
 use Mockery\MockInterface;
@@ -160,6 +161,20 @@ class SupportFacadeTest extends TestCase
         FacadeStub::foo2();
     }
 
+    public function testExpectsCreatesAStrictDouble()
+    {
+        Facade::useDouble();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
+
+        FacadeStub::expects('foo');
+
+        $this->expectException(PHPUnitUnexpectedCallException::class);
+
+        FacadeStub::foo2();
+    }
+
     public function testSpyReturnsADouble()
     {
         Facade::useDouble();
@@ -262,6 +277,18 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldHaveReceived('allows')->with('ability');
     }
 
+    public function testStaticMethodCannotBeDoubled()
+    {
+        Facade::useDouble();
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new FacadeStubTarget]);
+        FacadeStub::setFacadeApplication($app);
+
+        $this->expectException(StaticMethodException::class);
+
+        FacadeStub::shouldReceive('staticFoo');
+    }
+
     public function testFacadeResolvesAgainAfterClearingSpecific()
     {
         $app = new ApplicationStub;
@@ -315,6 +342,11 @@ class FacadeStubTarget
     }
 
     public function foo2($arg = null)
+    {
+        return 'real';
+    }
+
+    public static function staticFoo()
     {
         return 'real';
     }
