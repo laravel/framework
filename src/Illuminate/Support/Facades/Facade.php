@@ -414,9 +414,7 @@ abstract class Facade
      */
     public static function clearResolvedInstance($name = null)
     {
-        $name ??= static::getFacadeAccessor();
-
-        unset(static::$resolvedInstance[$name], static::$doubles[$name]);
+        unset(static::$resolvedInstance[$name ?? static::getFacadeAccessor()]);
     }
 
     /**
