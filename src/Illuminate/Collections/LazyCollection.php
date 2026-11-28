@@ -956,6 +956,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $keys = is_array($keys) ? $keys : func_get_args();
         }
 
+        if ($keys === []) {
+            return static::empty();
+        }
+
         return new static(function () use ($keys) {
             if (is_null($keys)) {
                 yield from $this;

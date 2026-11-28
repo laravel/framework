@@ -857,6 +857,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testOnlyWithNoKeysDoesNotEnumerate()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $this->assertSame([], $collection->only([])->all());
+        });
+    }
+
     public function testPadIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
