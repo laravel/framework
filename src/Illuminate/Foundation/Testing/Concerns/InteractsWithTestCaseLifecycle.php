@@ -99,7 +99,7 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTheTestEnvironment(): void
     {
-        if (class_exists(Double::class) && Facade::usesDouble()) {
+        if (Facade::usesDouble()) {
             Double::enableAutoVerify();
         }
 
@@ -184,7 +184,7 @@ trait InteractsWithTestCaseLifecycle
 
         $this->flushState();
 
-        if (class_exists(Double::class) && Facade::usesDouble()) {
+        if (Facade::usesDouble()) {
             Double::verifyAll(testFailed: ! $this->status()->isSuccess());
         }
 
