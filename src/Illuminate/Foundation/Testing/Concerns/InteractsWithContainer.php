@@ -6,8 +6,10 @@ use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\HtmlString;
+use JMac\Testing\Double;
 use Mockery;
 
 trait InteractsWithContainer
@@ -74,6 +76,10 @@ trait InteractsWithContainer
      */
     protected function mock($abstract, ?Closure $mock = null)
     {
+        if (Facade::usesDouble()) {
+            return $this->createDouble($abstract, $mock)->strict();
+        }
+
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
 
@@ -88,6 +94,10 @@ trait InteractsWithContainer
      */
     protected function partialMock($abstract, ?Closure $mock = null)
     {
+        if (Facade::usesDouble()) {
+            return $this->createDouble($abstract, $mock)->passthru();
+        }
+
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
     }
 
@@ -102,7 +112,31 @@ trait InteractsWithContainer
      */
     protected function spy($abstract, ?Closure $mock = null)
     {
+        if (Facade::usesDouble()) {
+            return $this->createDouble($abstract, $mock);
+        }
+
         return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+    }
+
+    /**
+     * Register a double of the given abstract in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|null  $callback
+     * @return \JMac\Testing\DoubleInterface
+     */
+    protected function createDouble($abstract, ?Closure $callback = null)
+    {
+        $double = Double::for($abstract, override: true);
+
+        $this->app->instance($abstract, $double->instance());
+
+        if ($callback) {
+            $callback($double);
+        }
+
+        return $double;
     }
 
     /**

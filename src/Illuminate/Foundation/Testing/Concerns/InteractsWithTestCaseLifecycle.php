@@ -44,6 +44,8 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
+use JMac\Testing\Double;
+use JMac\Testing\DoubleInterface;
 use Laravel\Prompts\Prompt;
 use Mockery;
 use Mockery\LegacyMockInterface;
@@ -97,6 +99,10 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTheTestEnvironment(): void
     {
+        if (Facade::usesDouble()) {
+            Double::enableAutoVerify();
+        }
+
         Facade::clearResolvedInstances();
 
         if (! $this->app) {
@@ -178,6 +184,10 @@ trait InteractsWithTestCaseLifecycle
 
         $this->flushState();
 
+        if (Facade::usesDouble()) {
+            Double::verifyAll(testFailed: ! $this->status()->isSuccess());
+        }
+
         if ($this->callbackException) {
             throw $this->callbackException;
         }
@@ -232,7 +242,7 @@ trait InteractsWithTestCaseLifecycle
 
         $database = $this->app->make('db');
 
-        if (! $database instanceof DatabaseManager || $database instanceof LegacyMockInterface) {
+        if (! $database instanceof DatabaseManager || $database instanceof LegacyMockInterface || $database instanceof DoubleInterface) {
             return;
         }
 

@@ -12,6 +12,8 @@ use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\Fake;
 use Illuminate\Support\Uri;
+use JMac\Testing\Double;
+use JMac\Testing\DoubleInterface;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use RuntimeException;
@@ -31,6 +33,20 @@ abstract class Facade
      * @var array
      */
     protected static $resolvedInstance;
+
+    /**
+     * The doubles created for the facades.
+     *
+     * @var array<string, \JMac\Testing\DoubleInterface>
+     */
+    protected static $doubles = [];
+
+    /**
+     * Indicates if Double should be used instead of Mockery to mock facades and container bindings.
+     *
+     * @var bool
+     */
+    protected static $usesDouble = false;
 
     /**
      * Indicates if the resolved instance should be cached.
@@ -59,12 +75,46 @@ abstract class Facade
     }
 
     /**
+     * Use Mockery instead of Double to mock facades and container bindings.
+     *
+     * @return void
+     */
+    public static function useMockery()
+    {
+        static::$usesDouble = false;
+    }
+
+    /**
+     * Use Double instead of Mockery to mock facades and container bindings.
+     *
+     * @return void
+     */
+    public static function useDouble()
+    {
+        static::$usesDouble = true;
+    }
+
+    /**
+     * Determine if Double is used instead of Mockery to mock facades and container bindings.
+     *
+     * @return bool
+     */
+    public static function usesDouble()
+    {
+        return static::$usesDouble;
+    }
+
+    /**
      * Convert the facade into a Mockery spy.
      *
      * @return \Mockery\MockInterface
      */
     public static function spy()
     {
+        if (static::$usesDouble) {
+            return static::getDouble() ?? static::createFreshDouble();
+        }
+
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
@@ -81,6 +131,12 @@ abstract class Facade
      */
     public static function partialMock()
     {
+        if (static::$usesDouble) {
+            $double = static::getDouble() ?? static::createFreshDouble();
+
+            return $double->passthru();
+        }
+
         $name = static::getFacadeAccessor();
 
         $mock = static::isMock()
@@ -97,6 +153,12 @@ abstract class Facade
      */
     public static function shouldReceive()
     {
+        if (static::$usesDouble) {
+            $double = static::getDouble() ?? static::createFreshDouble()->strict();
+
+            return $double->allows(...func_get_args());
+        }
+
         $name = static::getFacadeAccessor();
 
         $mock = static::isMock()
@@ -113,6 +175,12 @@ abstract class Facade
      */
     public static function expects()
     {
+        if (static::$usesDouble) {
+            $double = static::getDouble() ?? static::createFreshDouble()->strict();
+
+            return $double->expects(...func_get_args());
+        }
+
         $name = static::getFacadeAccessor();
 
         $mock = static::isMock()
@@ -120,6 +188,58 @@ abstract class Facade
             : static::createFreshMockInstance();
 
         return $mock->expects(...func_get_args());
+    }
+
+    /**
+     * Initiate a mock expectation that the given method is never called on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function shouldNotReceive()
+    {
+        if (static::$usesDouble) {
+            $double = static::getDouble() ?? static::createFreshDouble()->strict();
+
+            return $double->expects(...func_get_args())->never();
+        }
+
+        return static::getFacadeRoot()->shouldNotReceive(...func_get_args());
+    }
+
+    /**
+     * Assert that the mocked facade received the given method.
+     *
+     * @param  string|null  $method
+     * @param  array|null  $args
+     * @return \Mockery\HigherOrderMessage|\Mockery\VerificationDirector
+     */
+    public static function shouldHaveReceived($method = null, $args = null)
+    {
+        if (static::$usesDouble) {
+            $assertion = static::getDouble()->received($method);
+
+            return is_null($args) ? $assertion : $assertion->with(...$args);
+        }
+
+        return static::getFacadeRoot()->shouldHaveReceived($method, $args);
+    }
+
+    /**
+     * Assert that the mocked facade did not receive the given method.
+     *
+     * @param  string|null  $method
+     * @param  array|null  $args
+     * @return \Mockery\HigherOrderMessage|null
+     */
+    public static function shouldNotHaveReceived($method = null, $args = null)
+    {
+        if (static::$usesDouble) {
+            $assertion = static::getDouble()->received($method);
+
+            return (is_null($args) ? $assertion : $assertion->with(...$args))->never();
+        }
+
+        return static::getFacadeRoot()->shouldNotHaveReceived($method, $args);
     }
 
     /**
@@ -149,6 +269,28 @@ abstract class Facade
     }
 
     /**
+     * Create a fresh double of the facade root.
+     *
+     * @return \JMac\Testing\DoubleInterface
+     *
+     * @throws \RuntimeException
+     */
+    protected static function createFreshDouble()
+    {
+        $root = static::getFacadeRoot();
+
+        if (! $root) {
+            throw new RuntimeException('A facade root has not been set.');
+        }
+
+        return tap(Double::for($root, override: true), function ($double) {
+            static::swap($double->instance());
+
+            static::$doubles[static::getFacadeAccessor()] = $double;
+        });
+    }
+
+    /**
      * Determines whether a mock is set as the instance of the facade.
      *
      * @return bool
@@ -159,6 +301,26 @@ abstract class Facade
 
         return isset(static::$resolvedInstance[$name]) &&
                static::$resolvedInstance[$name] instanceof LegacyMockInterface;
+    }
+
+    /**
+     * Get the double set as the instance of the facade, if any.
+     *
+     * @return \JMac\Testing\DoubleInterface|null
+     */
+    protected static function getDouble()
+    {
+        $name = static::getFacadeAccessor();
+
+        $instance = static::$resolvedInstance[$name] ?? null;
+
+        if ($instance instanceof DoubleInterface) {
+            return $instance;
+        }
+
+        if (isset(static::$doubles[$name]) && static::$doubles[$name]->instance() === $instance) {
+            return static::$doubles[$name];
+        }
     }
 
     /**
@@ -263,6 +425,7 @@ abstract class Facade
     public static function clearResolvedInstances()
     {
         static::$resolvedInstance = [];
+        static::$doubles = [];
     }
 
     /**

@@ -5,11 +5,21 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Facade;
+use JMac\Testing\DoubleInterface;
+use JMac\Testing\Integrations\PHPUnit\PHPUnitUnexpectedCallException;
 use Orchestra\Testbench\TestCase;
 use stdClass;
 
 class InteractsWithContainerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Facade::useMockery();
+
+        parent::tearDown();
+    }
+
     public function testWithoutViteBindsEmptyHandlerAndReturnsInstance()
     {
         $instance = $this->withoutVite();
@@ -110,6 +120,55 @@ class InteractsWithContainerTest extends TestCase
         $this->forgetMock(InstanceStub::class);
         $this->assertSame('foo', $this->app->make(InstanceStub::class)->execute());
     }
+
+    public function testMockWithDouble()
+    {
+        Facade::useDouble();
+
+        $double = $this->mock(InstanceStub::class);
+        $double->expects('execute')->returns('bar');
+
+        $this->assertInstanceOf(DoubleInterface::class, $double);
+        $this->assertSame($double, $this->app->make(InstanceStub::class));
+        $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());
+
+        $this->expectException(PHPUnitUnexpectedCallException::class);
+
+        $this->app->make(InstanceStub::class)->other();
+    }
+
+    public function testMockCallbackWithDouble()
+    {
+        Facade::useDouble();
+
+        $double = $this->mock(InstanceStub::class, function ($mock) {
+            $mock->expects('execute')->returns('bar');
+        });
+
+        $this->assertSame('bar', $double->execute());
+    }
+
+    public function testPartialMockWithDouble()
+    {
+        Facade::useDouble();
+
+        $this->partialMock(InstanceStub::class)->allows('other')->returns('baz');
+
+        $this->assertSame('foo', $this->app->make(InstanceStub::class)->execute());
+        $this->assertSame('baz', $this->app->make(InstanceStub::class)->other());
+    }
+
+    public function testSpyWithDouble()
+    {
+        Facade::useDouble();
+
+        $spy = $this->spy(InstanceStub::class);
+
+        $this->assertInstanceOf(DoubleInterface::class, $spy);
+        $this->assertNull($this->app->make(InstanceStub::class)->execute());
+
+        $spy->received('execute');
+    }
 }
 
 class InstanceStub
@@ -117,5 +176,10 @@ class InstanceStub
     public function execute()
     {
         return 'foo';
+    }
+
+    public function other()
+    {
+        return 'other';
     }
 }

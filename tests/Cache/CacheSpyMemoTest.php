@@ -8,6 +8,9 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
+use JMac\Testing\DoubleInterface;
+use JMac\Testing\Exceptions\UnknownMethodException;
+use JMac\Testing\Matching\Argument;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
@@ -36,6 +39,7 @@ class CacheSpyMemoTest extends TestCase
 
     protected function tearDown(): void
     {
+        Facade::useMockery();
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }
@@ -82,5 +86,44 @@ class CacheSpyMemoTest extends TestCase
         $memoizedCache->remember('key', 60, fn () => 'bar');
 
         $memoizedCache->shouldHaveReceived('remember')->once();
+    }
+
+    public function test_cache_spy_passes_through_to_the_real_cache_when_using_double()
+    {
+        Facade::useDouble();
+
+        $cache = Cache::spy();
+
+        $this->assertInstanceOf(DoubleInterface::class, $cache);
+
+        Cache::memo()->remember('key', 60, fn () => 'bar');
+
+        $this->assertSame('bar', Cache::memo()->get('key'));
+
+        $cache->received('memo')->times(2);
+    }
+
+    public function test_cache_spy_memo_returns_double_when_using_double()
+    {
+        Facade::useDouble();
+
+        Cache::spy();
+
+        $memoizedCache = Cache::memo();
+
+        $this->assertInstanceOf(DoubleInterface::class, $memoizedCache);
+
+        $this->assertSame('bar', $memoizedCache->remember('key', 60, fn () => 'bar'));
+
+        $memoizedCache->received('remember')->times(1)->with('key', 60, Argument::type(Closure::class));
+    }
+
+    public function test_cache_should_receive_forwarded_method_throws_when_using_double()
+    {
+        Facade::useDouble();
+
+        $this->expectException(UnknownMethodException::class);
+
+        Cache::shouldReceive('get');
     }
 }

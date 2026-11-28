@@ -93,6 +93,10 @@ class Cache extends Facade
      */
     public static function spy()
     {
+        if (static::$usesDouble) {
+            return static::getDouble() ?? static::createFreshDouble()->passthru();
+        }
+
         if (! static::isMock()) {
             $class = static::getMockableClass();
             $instance = static::getFacadeRoot();
