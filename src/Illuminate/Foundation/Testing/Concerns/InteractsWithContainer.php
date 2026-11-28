@@ -128,10 +128,7 @@ trait InteractsWithContainer
      */
     protected function createDouble($abstract, ?Closure $callback = null)
     {
-        $double = Double::for(
-            class_exists($abstract) || interface_exists($abstract) ? $abstract : $this->app->make($abstract),
-            override: true,
-        );
+        $double = Double::for($abstract, override: true);
 
         $this->app->instance($abstract, $double->instance());
 

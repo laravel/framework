@@ -168,18 +168,6 @@ class InteractsWithContainerTest extends TestCase
 
         $spy->received('execute');
     }
-
-    public function testMockAliasWithDouble()
-    {
-        Facade::useDouble();
-
-        $this->app->instance('my.service', new InstanceStub);
-
-        $this->mock('my.service')->expects('execute')->returns('bar');
-
-        $this->assertInstanceOf(InstanceStub::class, $this->app->make('my.service'));
-        $this->assertSame('bar', $this->app->make('my.service')->execute());
-    }
 }
 
 class InstanceStub
